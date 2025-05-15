@@ -19,4 +19,7 @@ dependencies = [
     "oauthlib>=3.2.2",
     "urllib3>=2.4.0",
     "flask-login>=0.6.3",
+    "django-storages>=1.14.6",
+    "boto3>=1.38.17",
+    "pillow>=11.2.1",
 ]

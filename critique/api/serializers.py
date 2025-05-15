@@ -4,11 +4,58 @@ from critique.models import ArtWork, Review, Profile
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for the user Profile model."""
+    username = serializers.CharField(source='user.username', read_only=True)
+    email = serializers.EmailField(source='user.email', read_only=True)
+    profile_picture_display_url = serializers.SerializerMethodField()
     
     class Meta:
         model = Profile
-        fields = ['id', 'bio', 'location', 'profile_picture', 'website', 'birth_date']
-        read_only_fields = ['id']
+        fields = ['id', 'username', 'email', 'bio', 'location', 'profile_picture', 
+                 'profile_picture_url', 'profile_picture_display_url', 'website', 'birth_date']
+        read_only_fields = ['id', 'username', 'email', 'profile_picture_display_url']
+        
+    def get_profile_picture_display_url(self, obj):
+        """Return the URL to display the profile picture, prioritizing S3 storage."""
+        if obj.profile_picture and hasattr(obj.profile_picture, 'url'):
+            return obj.profile_picture.url
+        return obj.profile_picture_url
+        
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating user profile information."""
+    first_name = serializers.CharField(source='user.first_name', required=False)
+    last_name = serializers.CharField(source='user.last_name', required=False)
+    profile_picture_display_url = serializers.SerializerMethodField(read_only=True)
+    
+    class Meta:
+        model = Profile
+        fields = ['bio', 'location', 'profile_picture', 'profile_picture_url', 
+                 'profile_picture_display_url', 'website', 'birth_date', 
+                 'first_name', 'last_name']
+                 
+    def get_profile_picture_display_url(self, obj):
+        """Return the URL to display the profile picture, prioritizing S3 storage."""
+        if obj.profile_picture and hasattr(obj.profile_picture, 'url'):
+            return obj.profile_picture.url
+        return obj.profile_picture_url
+        
+    def update(self, instance, validated_data):
+        """Update the User and Profile models."""
+        user_data = validated_data.pop('user', {})
+        
+        # Update User fields
+        user = instance.user
+        if 'first_name' in user_data:
+            user.first_name = user_data['first_name']
+        if 'last_name' in user_data:
+            user.last_name = user_data['last_name']
+        user.save()
+        
+        # Update Profile fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        
+        return instance
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for the User model with profile information."""
@@ -45,14 +92,23 @@ class ArtWorkSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
+    image_display_url = serializers.SerializerMethodField()
     
     class Meta:
         model = ArtWork
         fields = [
-            'id', 'title', 'description', 'image', 'created_at', 'updated_at',
-            'author', 'medium', 'dimensions', 'tags', 'likes_count', 'reviews_count', 'is_liked'
+            'id', 'title', 'description', 'image', 'image_url', 'image_display_url',
+            'created_at', 'updated_at', 'author', 'medium', 'dimensions', 'tags', 
+            'likes_count', 'reviews_count', 'is_liked'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'author', 'likes_count', 'reviews_count', 'is_liked']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'author', 
+                           'likes_count', 'reviews_count', 'is_liked', 'image_display_url']
+                           
+    def get_image_display_url(self, obj):
+        """Return the URL to display the image, prioritizing S3 storage."""
+        if obj.image and hasattr(obj.image, 'url'):
+            return obj.image.url
+        return obj.image_url
     
     def get_likes_count(self, obj):
         """Return the number of likes for this artwork."""
@@ -81,10 +137,18 @@ class ArtWorkListSerializer(serializers.ModelSerializer):
     likes_count = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
     tags_list = serializers.SerializerMethodField()
+    image_display_url = serializers.SerializerMethodField()
     
     class Meta:
         model = ArtWork
-        fields = ['id', 'title', 'image', 'author_name', 'created_at', 'medium', 'likes_count', 'reviews_count', 'tags_list']
+        fields = ['id', 'title', 'image_display_url', 'author_name', 'created_at', 
+                 'medium', 'likes_count', 'reviews_count', 'tags_list']
+                 
+    def get_image_display_url(self, obj):
+        """Return the URL to display the image, prioritizing S3 storage."""
+        if obj.image and hasattr(obj.image, 'url'):
+            return obj.image.url
+        return obj.image_url
         
     def get_likes_count(self, obj):
         """Return the number of likes for this artwork."""

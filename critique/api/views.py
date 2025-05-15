@@ -4,14 +4,21 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from critique.models import ArtWork, Review, Profile
 from .serializers import (
-    UserSerializer, ProfileSerializer, ArtWorkSerializer, 
+    UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
     ArtWorkListSerializer, ReviewSerializer
 )
 from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
 from django.db import connection
 
 class ProfileViewSet(viewsets.ModelViewSet):
-    """API endpoint for managing user profiles."""
+    """API endpoint for managing user profiles.
+    
+    This ViewSet provides endpoints for:
+    - GET /api/profiles/ - List all profiles (staff only)
+    - GET /api/profiles/{id}/ - Get profile by ID (staff or owner)
+    - GET /api/profiles/me/ - Get current user's profile
+    - PUT/PATCH /api/profiles/me/ - Update current user's profile
+    """
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -22,12 +29,41 @@ class ProfileViewSet(viewsets.ModelViewSet):
             return Profile.objects.all()
         return Profile.objects.filter(user=self.request.user)
     
+    def get_serializer_class(self):
+        """Return different serializers based on action."""
+        if self.action in ['update', 'partial_update', 'update_me']:
+            return ProfileUpdateSerializer
+        return ProfileSerializer
+    
     @action(detail=False, methods=['get'])
     def me(self, request):
         """Get the current user's profile."""
-        profile = self.get_queryset().get(user=request.user)
+        profile = Profile.objects.get(user=request.user)
         serializer = self.get_serializer(profile)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['put', 'patch'])
+    def update_me(self, request):
+        """Update the current user's profile."""
+        profile = Profile.objects.get(user=request.user)
+        
+        # Use partial=True for PATCH requests
+        partial = request.method == 'PATCH'
+        serializer = self.get_serializer(profile, data=request.data, partial=partial)
+        
+        if serializer.is_valid():
+            serializer.save()
+            # Get updated profile with standard serializer for response
+            response_serializer = ProfileSerializer(profile)
+            return Response(response_serializer.data)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def check_object_permissions(self, request, obj):
+        """Ensure users can only access their own profiles unless staff."""
+        if not request.user.is_staff and obj.user != request.user:
+            self.permission_denied(request, message="You can only access your own profile.")
+        return super().check_object_permissions(request, obj)
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     """API endpoint for viewing users."""

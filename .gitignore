@@ -4,6 +4,10 @@
 *.json
 secrets.py
 *.secret.*
+aws_credentials.txt
+.aws/
+aws-credentials.ini
+*aws*credentials*
 
 # Python
 __pycache__/

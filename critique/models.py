@@ -12,7 +12,8 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(null=True, blank=True)
-    profile_picture = models.URLField(max_length=1000, blank=True)
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile_picture_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field
     website = models.URLField(max_length=200, blank=True)
     
     def __str__(self):
@@ -35,7 +36,8 @@ class ArtWork(models.Model):
     """
     title = models.CharField(max_length=200)
     description = models.TextField()
-    image = models.URLField(max_length=1000, blank=True)  # URL to the image
+    image = models.ImageField(upload_to='artworks/', blank=True, null=True)  # Image file
+    image_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field for backwards compatibility
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
     author = models.ForeignKey(
