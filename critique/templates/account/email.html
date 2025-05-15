@@ -1,0 +1,101 @@
+{% extends "critique/base.html" %}
+
+{% block title %}Email Addresses - Art Critique{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="text-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-envelope text-primary mb-3" viewBox="0 0 16 16">
+                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z"/>
+                </svg>
+                <h1 class="display-6 fw-bold">Email Addresses</h1>
+                <p class="text-muted">Manage your account email addresses</p>
+            </div>
+            
+            <div class="card border-0 shadow rounded-4">
+                <div class="card-body p-4">
+                    {% if user.emailaddress_set.all %}
+                    <p class="mb-4">The following email addresses are associated with your account:</p>
+                    <form action="{% url 'account_email' %}" method="post">
+                        {% csrf_token %}
+                        
+                        <div class="list-group mb-4">
+                            {% for emailaddress in user.emailaddress_set.all %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center border-0 mb-2 rounded-3 bg-light">
+                                <div class="form-check">
+                                    <input id="email_radio_{{ forloop.counter }}" type="radio" name="email" 
+                                           class="form-check-input"
+                                           {% if emailaddress.primary or user.emailaddress_set.count == 1 %}checked="checked"{% endif %} 
+                                           value="{{ emailaddress.email }}"/>
+                                    <label for="email_radio_{{ forloop.counter }}" class="form-check-label {% if emailaddress.primary %}fw-bold{% endif %}">
+                                        {{ emailaddress.email }}
+                                    </label>
+                                </div>
+                                <div>
+                                    {% if emailaddress.verified %}
+                                    <span class="badge bg-success rounded-pill">Verified</span>
+                                    {% else %}
+                                    <span class="badge bg-warning text-dark rounded-pill">Unverified</span>
+                                    {% endif %}
+                                    {% if emailaddress.primary %}<span class="badge bg-primary rounded-pill ms-1">Primary</span>{% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <button class="btn btn-outline-primary" type="submit" name="action_primary">Make Primary</button>
+                            <button class="btn btn-outline-secondary" type="submit" name="action_send">Re-send Verification</button>
+                            <button class="btn btn-outline-danger" type="submit" name="action_remove">Remove</button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <h4 class="alert-heading">Warning!</h4>
+                        <p>You currently do not have any email address set up. You should add an email address so you can receive notifications and reset your password.</p>
+                    </div>
+                    {% endif %}
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">Add Email Address</h5>
+                    <form method="post" action="{% url 'account_email' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-floating mb-3">
+                            <input name="email" type="email" class="form-control" id="id_email" placeholder="Email address" required>
+                            <label for="id_email">Email address</label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button name="action_add" type="submit" class="btn btn-primary">Add Email</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="{% url 'critique:profile' %}" class="btn btn-outline-secondary">Back to Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_body %}
+<script type="text/javascript">
+(function() {
+  var message = "Do you really want to remove the selected email address?";
+  var actions = document.getElementsByName('action_remove');
+  if (actions.length) {
+    actions[0].addEventListener("click", function(e) {
+      if (!confirm(message)) {
+        e.preventDefault();
+      }
+    });
+  }
+})();
+</script>
+{% endblock %}
+{% endblock %}

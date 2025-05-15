@@ -3,24 +3,36 @@
 {% block title %}Log Out - Art Critique{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h2 class="mb-0">Log Out</h2>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="text-center mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-box-arrow-right text-danger mb-3" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                </svg>
+                <h1 class="display-6 fw-bold">Sign Out</h1>
+                <p class="text-muted">Are you sure you want to sign out?</p>
             </div>
-            <div class="card-body">
-                <p class="lead">Are you sure you want to log out?</p>
-                <form method="post" action="{% url 'account_logout' %}">
-                    {% csrf_token %}
-                    {% if redirect_field_value %}
-                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
-                    {% endif %}
-                    <div class="d-flex justify-content-between mt-4">
-                        <a href="{% url 'critique:index' %}" class="btn btn-secondary">Cancel</a>
-                        <button type="submit" class="btn btn-danger">Log Out</button>
-                    </div>
-                </form>
+            
+            <div class="card border-0 shadow rounded-4">
+                <div class="card-body p-4 text-center">
+                    <form method="post" action="{% url 'account_logout' %}">
+                        {% csrf_token %}
+                        {% if redirect_field_value %}
+                        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+                        {% endif %}
+                        <p class="mb-4">You will be logged out from your current session.</p>
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-center">
+                            <a href="{% url 'critique:index' %}" class="btn btn-outline-secondary px-4">Cancel</a>
+                            <button type="submit" class="btn btn-danger px-4">Sign Out</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <p class="mb-0">Having issues? <a href="{% url 'critique:index' %}" class="text-primary text-decoration-none">Contact Support</a></p>
             </div>
         </div>
     </div>
