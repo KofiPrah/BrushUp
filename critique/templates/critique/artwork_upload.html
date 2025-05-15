@@ -103,6 +103,41 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         
+        // First check if the user is authenticated
+        fetch('/api/auth/session/', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Authentication required');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.id) {
+                errorAlert.classList.remove('d-none');
+                errorMessage.textContent = 'You need to be logged in to upload artwork. Redirecting to login page...';
+                setTimeout(() => {
+                    window.location.href = '/accounts/login/?next=/critique/artwork_upload/';
+                }, 2000);
+                return;
+            }
+            
+            // User is authenticated, proceed with the upload
+            proceedWithUpload();
+        })
+        .catch(error => {
+            console.error('Authentication check failed:', error);
+            errorAlert.classList.remove('d-none');
+            errorMessage.textContent = 'You need to be logged in to upload artwork. Redirecting to login page...';
+            setTimeout(() => {
+                window.location.href = '/accounts/login/?next=/critique/artwork_upload/';
+            }, 2000);
+        });
+    });
+    
+    function proceedWithUpload() {
         const formData = new FormData(form);
         submitBtn.disabled = true;
         submitBtn.innerHTML = 'Uploading...';
@@ -116,15 +151,26 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Sending request to: /api/artworks/');
         console.log('CSRF Token:', csrftoken);
         
-        fetch('/api/artworks/', {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': csrftoken,
-                // Don't set Content-Type header here as the browser will set it 
-                // automatically with the correct boundary string for multipart/form-data
-            },
-            body: formData,
-            credentials: 'same-origin' // Include cookies
+        // First get a fresh CSRF token to ensure the session is valid
+        fetch('/api/auth/csrf/', {
+            method: 'GET',
+            credentials: 'same-origin'
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Use the fresh CSRF token for the artwork upload
+            const freshCsrfToken = data.csrfToken || csrftoken;
+            
+            return fetch('/api/artworks/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': freshCsrfToken,
+                    // Don't set Content-Type header here as the browser will set it 
+                    // automatically with the correct boundary string for multipart/form-data
+                },
+                body: formData,
+                credentials: 'same-origin' // Include cookies
+            });
         })
         .then(response => {
             console.log('Response status:', response.status);
@@ -200,17 +246,19 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if we need to redirect to login
             if (errorText.includes('login') || 
                 errorText.includes('authentication') || 
-                errorText.includes('<!DOCTYPE')) {
-                console.log('Authentication issue detected, may need to log in');
+                errorText.includes('<!DOCTYPE') ||
+                errorText.includes('Not authenticated')) {
+                console.log('Authentication issue detected, need to log in');
                 errorMessage.textContent = 'You need to be logged in to upload artwork. Redirecting to login page...';
                 
-                // Optional: redirect to login after a delay
-                // setTimeout(() => {
-                //     window.location.href = '/accounts/login/?next=/artworks/upload/';
-                // }, 2000);
+                // Redirect to login after a brief delay
+                setTimeout(() => {
+                    window.location.href = '/accounts/login/?next=/critique/artwork_upload/';
+                }, 2000);
             }
         });
-    });
+    } // End of proceedWithUpload function
+    
 });
 </script>
 {% endblock %}
