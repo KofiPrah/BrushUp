@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 errorAlert.classList.remove('d-none');
                 errorMessage.textContent = 'You need to be logged in to upload artwork. Redirecting to login page...';
                 setTimeout(() => {
-                    window.location.href = '/accounts/login/?next=/critique/artwork_upload/';
+                    window.location.href = '/accounts/login/?next=/artworks/upload/';
                 }, 2000);
                 return;
             }
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
             errorAlert.classList.remove('d-none');
             errorMessage.textContent = 'You need to be logged in to upload artwork. Redirecting to login page...';
             setTimeout(() => {
-                window.location.href = '/accounts/login/?next=/critique/artwork_upload/';
+                window.location.href = '/accounts/login/?next=/artworks/upload/';
             }, 2000);
         });
     });
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Redirect to login after a brief delay
                 setTimeout(() => {
-                    window.location.href = '/accounts/login/?next=/critique/artwork_upload/';
+                    window.location.href = '/accounts/login/?next=/artworks/upload/';
                 }, 2000);
             }
         });
