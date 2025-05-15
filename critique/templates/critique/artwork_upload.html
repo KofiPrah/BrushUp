@@ -1,0 +1,174 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}Upload Artwork - Art Critique{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card bg-dark text-light">
+            <div class="card-header">
+                <h1 class="h3 mb-0">Upload New Artwork</h1>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="medium" class="form-label">Medium</label>
+                        <input type="text" class="form-control" id="medium" name="medium" placeholder="Oil on canvas, Digital painting, etc.">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="dimensions" class="form-label">Dimensions</label>
+                        <input type="text" class="form-control" id="dimensions" name="dimensions" placeholder="24x36 inches, 1920x1080 pixels, etc.">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Tags</label>
+                        <input type="text" class="form-control" id="tags" name="tags" placeholder="landscape, portrait, abstract (comma separated)">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Artwork Image</label>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                        <div class="form-text text-light">Upload an image of your artwork (JPG, PNG, etc.)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div id="preview-container" class="d-none mt-3">
+                            <label class="form-label">Preview</label>
+                            <img id="image-preview" src="#" alt="Image preview" class="img-fluid rounded">
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-success d-none" id="upload-success">
+                        <strong>Success!</strong> Your artwork has been uploaded.
+                        <div id="result-link"></div>
+                    </div>
+                    
+                    <div class="alert alert-danger d-none" id="upload-error">
+                        <strong>Error!</strong> <span id="error-message"></span>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">Upload Artwork</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Image preview functionality
+    const imageInput = document.getElementById('image');
+    const imagePreview = document.getElementById('image-preview');
+    const previewContainer = document.getElementById('preview-container');
+    
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.addEventListener('load', function() {
+                imagePreview.setAttribute('src', this.result);
+                previewContainer.classList.remove('d-none');
+            });
+            
+            reader.readAsDataURL(file);
+        } else {
+            previewContainer.classList.add('d-none');
+        }
+    });
+    
+    // Form submission using Fetch API
+    const form = document.getElementById('upload-form');
+    const submitBtn = document.getElementById('submit-btn');
+    const successAlert = document.getElementById('upload-success');
+    const errorAlert = document.getElementById('upload-error');
+    const errorMessage = document.getElementById('error-message');
+    const resultLink = document.getElementById('result-link');
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Uploading...';
+        successAlert.classList.add('d-none');
+        errorAlert.classList.add('d-none');
+        
+        // Get CSRF token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+        fetch('/api/artworks/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            body: formData,
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(JSON.stringify(data));
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Success handling
+            successAlert.classList.remove('d-none');
+            resultLink.innerHTML = `<a href="/artworks/${data.id}/" class="alert-link">View your artwork</a>`;
+            
+            // Reset form and button
+            form.reset();
+            previewContainer.classList.add('d-none');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Upload Artwork';
+            
+            // Display the uploaded image from S3
+            const resultImage = document.createElement('img');
+            resultImage.src = data.image_display_url;
+            resultImage.alt = data.title;
+            resultImage.className = 'img-fluid rounded mt-3';
+            resultLink.appendChild(resultImage);
+            
+            // Log full response to console for debugging
+            console.log('Upload successful:', data);
+        })
+        .catch(error => {
+            // Error handling
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Upload Artwork';
+            errorAlert.classList.remove('d-none');
+            
+            let errorText = 'An error occurred during upload.';
+            try {
+                const errorData = JSON.parse(error.message);
+                errorText = Object.keys(errorData)
+                    .map(key => `${key}: ${errorData[key]}`)
+                    .join(', ');
+            } catch (e) {
+                errorText = error.message;
+            }
+            
+            errorMessage.textContent = errorText;
+            console.error('Upload error:', error);
+        });
+    });
+});
+</script>
+{% endblock %}

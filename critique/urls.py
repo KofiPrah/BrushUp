@@ -8,6 +8,7 @@ urlpatterns = [
     path('api/', views.api_root, name='api-root'),
     path('artworks/', views.ArtWorkListView.as_view(), name='artwork_list'),
     path('artworks/<int:pk>/', views.ArtWorkDetailView.as_view(), name='artwork_detail'),
+    path('artworks/upload/', views.artwork_upload_view, name='artwork_upload'),
     
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),

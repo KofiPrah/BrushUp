@@ -22,6 +22,11 @@
                         <a class="nav-link" href="{% url 'critique:artwork_list' %}">Artworks</a>
                     </li>
                     {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'critique:artwork_upload' %}">Upload Art</a>
+                    </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ user.username }}

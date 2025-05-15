@@ -1,10 +1,11 @@
-from django.shortcuts import render, get_object_or_404
-from django.views.generic import ListView, DetailView, UpdateView
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.generic import ListView, DetailView, UpdateView, CreateView
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
+from django.contrib import messages
 from .models import ArtWork, Review, Profile
 
 # Create your views here.
@@ -93,3 +94,11 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     def get_object(self, queryset=None):
         """Get the current user's profile."""
         return self.request.user.profile
+
+@login_required
+def artwork_upload_view(request):
+    """
+    View for displaying the artwork upload form. 
+    The actual upload will be handled by the API.
+    """
+    return render(request, 'critique/artwork_upload.html')
