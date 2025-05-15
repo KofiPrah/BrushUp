@@ -1,0 +1,266 @@
+{% extends "critique/base.html" %}
+
+{% block title %}My Artworks - Art Critique{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">My Artworks</h2>
+            <a href="{% url 'critique:artwork_upload' %}" class="btn btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload me-2" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                </svg>
+                Upload New Artwork
+            </a>
+        </div>
+        
+        <div class="card-body">
+            <!-- Filter and Sort Options -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search your artworks...">
+                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-md-end mt-3 mt-md-0">
+                        <select id="sortDropdown" class="form-select" style="max-width: 200px;">
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                            <option value="most_likes">Most Likes</option>
+                            <option value="title_asc">Title (A-Z)</option>
+                            <option value="title_desc">Title (Z-A)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            {% if artworks %}
+                <div class="row row-cols-1 row-cols-md-3 g-4" id="artworksContainer">
+                    {% for artwork in artworks %}
+                        <div class="col artwork-item">
+                            <div class="card h-100">
+                                <a href="{% url 'critique:artwork_detail' artwork.id %}">
+                                    {% if artwork.image %}
+                                        <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 220px; object-fit: cover;">
+                                    {% elif artwork.image_url %}
+                                        <img src="{{ artwork.image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 220px; object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 220px;">
+                                            <span>No Image</span>
+                                        </div>
+                                    {% endif %}
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ artwork.title }}</h5>
+                                    <p class="card-text text-muted">{{ artwork.created_at|date:"M d, Y" }}</p>
+                                    <p class="card-text">{{ artwork.description|truncatechars:100 }}</p>
+                                    
+                                    {% if artwork.medium %}
+                                        <div class="mb-2">
+                                            <span class="badge bg-secondary">{{ artwork.medium }}</span>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if artwork.tags %}
+                                        <div class="mb-2">
+                                            {% for tag in artwork.tags.split|slice:":3" %}
+                                                <span class="badge bg-primary me-1">{{ tag }}</span>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer bg-transparent">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                            </svg>
+                                            {{ artwork.total_likes }} likes
+                                        </small>
+                                        <div>
+                                            <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                                            <a href="#" class="btn btn-sm btn-outline-secondary edit-artwork" data-artwork-id="{{ artwork.id }}">Edit</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="First">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <li class="page-item active">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" aria-label="Last">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+                
+            {% else %}
+                <div class="alert alert-info text-center py-5">
+                    <h4 class="mb-3">You haven't uploaded any artworks yet</h4>
+                    <p>Share your creative work with the community to receive valuable feedback and appreciation!</p>
+                    <a href="{% url 'critique:artwork_upload' %}" class="btn btn-lg btn-primary mt-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload me-2" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                        </svg>
+                        Upload Your First Artwork
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const sortDropdown = document.getElementById('sortDropdown');
+    const artworksContainer = document.getElementById('artworksContainer');
+    
+    if (searchInput && searchButton) {
+        // Simple client-side search
+        const searchArtworks = () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            const artworkItems = document.querySelectorAll('.artwork-item');
+            
+            artworkItems.forEach(item => {
+                const title = item.querySelector('.card-title').textContent.toLowerCase();
+                const description = item.querySelector('.card-text:not(.text-muted)').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        };
+        
+        searchButton.addEventListener('click', searchArtworks);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                searchArtworks();
+            }
+        });
+    }
+    
+    if (sortDropdown && artworksContainer) {
+        // Client-side sorting
+        sortDropdown.addEventListener('change', function() {
+            const sortValue = this.value;
+            const artworkItems = Array.from(document.querySelectorAll('.artwork-item'));
+            
+            artworkItems.sort((a, b) => {
+                const titleA = a.querySelector('.card-title').textContent;
+                const titleB = b.querySelector('.card-title').textContent;
+                const dateA = new Date(a.querySelector('.text-muted').textContent);
+                const dateB = new Date(b.querySelector('.text-muted').textContent);
+                const likesA = parseInt(a.querySelector('small.text-muted').textContent.match(/\d+/)[0]);
+                const likesB = parseInt(b.querySelector('small.text-muted').textContent.match(/\d+/)[0]);
+                
+                switch(sortValue) {
+                    case 'newest':
+                        return dateB - dateA;
+                    case 'oldest':
+                        return dateA - dateB;
+                    case 'most_likes':
+                        return likesB - likesA;
+                    case 'title_asc':
+                        return titleA.localeCompare(titleB);
+                    case 'title_desc':
+                        return titleB.localeCompare(titleA);
+                    default:
+                        return 0;
+                }
+            });
+            
+            // Re-append sorted items
+            artworkItems.forEach(item => {
+                artworksContainer.appendChild(item);
+            });
+        });
+    }
+    
+    // Edit artwork button (placeholder for future implementation)
+    const editButtons = document.querySelectorAll('.edit-artwork');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const artworkId = this.getAttribute('data-artwork-id');
+            console.log(`Edit artwork ${artworkId} - This would open an edit form in the future`);
+            // For now just redirect to the detail page
+            window.location.href = `/artworks/${artworkId}/`;
+        });
+    });
+});
+</script>
+{% endblock %}

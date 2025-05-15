@@ -32,8 +32,8 @@
                                 {{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="#">My Profile</a></li>
-                                <li><a class="dropdown-item" href="#">My Artworks</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:profile' %}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:my_artworks' %}">My Artworks</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'account_logout' %}">Log Out</a></li>
                             </ul>

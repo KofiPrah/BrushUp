@@ -8,20 +8,29 @@
         <!-- Profile Information -->
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-dark text-white">
-                    <h2 class="mb-0">Profile</h2>
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">My Profile</h2>
+                    <a href="{% url 'critique:profile_edit' %}" class="btn btn-sm btn-outline-light">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+                        </svg>
+                        Edit
+                    </a>
                 </div>
                 
                 <div class="card-body">
                     <div class="text-center mb-4">
                         {% if profile.profile_picture %}
-                            <img src="{{ profile.profile_picture }}" alt="{{ user.username }}" class="rounded-circle img-fluid mb-3" style="max-width: 150px;">
+                            <img src="{{ profile.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle img-fluid mb-3" style="max-width: 150px; height: 150px; object-fit: cover;">
                         {% else %}
-                            <div class="bg-secondary rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 150px; height: 150px;">
+                            <div class="bg-dark rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 150px; height: 150px;">
                                 <span class="display-4 text-white">{{ user.username|first|upper }}</span>
                             </div>
                         {% endif %}
                         <h3>{{ user.username }}</h3>
+                        {% if user.first_name or user.last_name %}
+                            <h5 class="text-muted">{{ user.first_name }} {{ user.last_name }}</h5>
+                        {% endif %}
                         <p class="text-muted">{{ user.email }}</p>
                     </div>
                     
@@ -44,30 +53,74 @@
                     </div>
                     {% endif %}
                     
-                    <div class="d-grid gap-2 mt-4">
-                        <a href="{% url 'critique:profile_edit' %}" class="btn btn-primary">Edit Profile</a>
+                    {% if profile.birth_date %}
+                    <div class="mb-3">
+                        <h5>Birth Date</h5>
+                        <p>{{ profile.birth_date|date:"F d, Y" }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <h5>Member Since</h5>
+                        <p>{{ user.date_joined|date:"F Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Stats Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="mb-0">Activity Stats</h2>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h3>{{ artworks.count }}</h3>
+                            <p class="text-muted">Artworks</p>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ reviews_count|default:"0" }}</h3>
+                            <p class="text-muted">Reviews</p>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ likes_count|default:"0" }}</h3>
+                            <p class="text-muted">Likes</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- User's Artworks -->
+        <!-- Recent Artworks Preview -->
         <div class="col-lg-8">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                    <h2 class="mb-0">My Artworks</h2>
-                    <a href="#" class="btn btn-sm btn-outline-light">Upload New</a>
+                    <h2 class="mb-0">Recent Artworks</h2>
+                    <div>
+                        <a href="{% url 'critique:artwork_upload' %}" class="btn btn-sm btn-primary me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                            </svg>
+                            Upload New
+                        </a>
+                        <a href="{% url 'critique:my_artworks' %}" class="btn btn-sm btn-outline-light">
+                            View All
+                        </a>
+                    </div>
                 </div>
                 
                 <div class="card-body">
                     {% if artworks %}
                         <div class="row row-cols-1 row-cols-md-2 g-4">
-                            {% for artwork in artworks %}
+                            {% for artwork in artworks|slice:":4" %}
                                 <div class="col">
                                     <div class="card h-100">
                                         <a href="{% url 'critique:artwork_detail' artwork.id %}">
                                             {% if artwork.image %}
-                                                <img src="{{ artwork.image }}" class="card-img-top" alt="{{ artwork.title }}">
+                                                <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover;">
+                                            {% elif artwork.image_url %}
+                                                <img src="{{ artwork.image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover;">
                                             {% else %}
                                                 <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 200px;">
                                                     <span>No Image</span>
@@ -77,21 +130,39 @@
                                         <div class="card-body">
                                             <h5 class="card-title">{{ artwork.title }}</h5>
                                             <p class="card-text text-muted">{{ artwork.created_at|date:"M d, Y" }}</p>
-                                            <p class="card-text">{{ artwork.description|truncatechars:100 }}</p>
+                                            <p class="card-text">{{ artwork.description|truncatechars:80 }}</p>
                                         </div>
-                                        <div class="card-footer bg-transparent">
-                                            <small class="text-muted">{{ artwork.total_likes }} likes</small>
+                                        <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                                </svg>
+                                                {{ artwork.total_likes }} likes
+                                            </small>
+                                            <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-secondary">View</a>
                                         </div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
+                        
+                        {% if artworks.count > 4 %}
+                            <div class="text-center mt-4">
+                                <a href="{% url 'critique:my_artworks' %}" class="btn btn-primary">View All My Artworks</a>
+                            </div>
+                        {% endif %}
                     {% else %}
                         <div class="alert alert-info">
                             <p class="mb-0">You haven't uploaded any artworks yet.</p>
                         </div>
                         <div class="text-center mt-4">
-                            <a href="#" class="btn btn-primary">Upload Your First Artwork</a>
+                            <a href="{% url 'critique:artwork_upload' %}" class="btn btn-primary">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload me-2" viewBox="0 0 16 16">
+                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                </svg>
+                                Upload Your First Artwork
+                            </a>
                         </div>
                     {% endif %}
                 </div>

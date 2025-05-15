@@ -6,7 +6,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import ArtWork, Review, Profile
+from django.db.models import Count, Q, Sum
+from .models import ArtWork, Review, Profile, Comment
 
 # Create your views here.
 def index(request):
@@ -74,10 +75,16 @@ def profile_view(request):
     profile = request.user.profile
     artworks = ArtWork.objects.filter(author=request.user).order_by('-created_at')
     
+    # Get activity statistics
+    reviews_count = Review.objects.filter(reviewer=request.user).count()
+    likes_count = ArtWork.objects.filter(likes=request.user).count()
+    
     context = {
         'profile': profile,
         'user': request.user,
         'artworks': artworks,
+        'reviews_count': reviews_count,
+        'likes_count': likes_count,
     }
     
     return render(request, 'critique/profile.html', context=context)
@@ -102,3 +109,63 @@ def artwork_upload_view(request):
     The actual upload will be handled by the API.
     """
     return render(request, 'critique/artwork_upload.html')
+
+class MyArtworksListView(LoginRequiredMixin, ListView):
+    """
+    View for displaying all artworks of the logged-in user with pagination and sorting.
+    """
+    model = ArtWork
+    template_name = 'critique/my_artworks.html'
+    context_object_name = 'artworks'
+    paginate_by = 12  # Show 12 artworks per page
+    
+    def get_queryset(self):
+        """Return only the user's artworks."""
+        # Get the sort parameter, default to '-created_at' (newest first)
+        sort_param = self.request.GET.get('sort', '-created_at')
+        
+        # Map frontend sort options to model fields
+        sort_mapping = {
+            'newest': '-created_at',
+            'oldest': 'created_at',
+            'most_likes': '-likes',  # This might need to be aggregated if using annotate
+            'title_asc': 'title',
+            'title_desc': '-title',
+        }
+        
+        # If the sort parameter is in our mapping, use it, otherwise use the parameter directly
+        sort_field = sort_mapping.get(sort_param, sort_param)
+        
+        # Get the search query parameter
+        search_query = self.request.GET.get('search', '')
+        
+        # Start with all artworks for the current user
+        queryset = ArtWork.objects.filter(author=self.request.user)
+        
+        # Apply search filter if provided
+        if search_query:
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) | 
+                Q(description__icontains=search_query) |
+                Q(tags__icontains=search_query)
+            )
+        
+        # Apply sorting
+        if sort_field == '-likes':
+            # For likes, we need to use annotation since it's a ManyToMany field
+            queryset = queryset.annotate(like_count=Count('likes')).order_by('-like_count')
+        else:
+            queryset = queryset.order_by(sort_field)
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Add current sort parameter to context
+        context['current_sort'] = self.request.GET.get('sort', 'newest')
+        
+        # Add current search query to context
+        context['search_query'] = self.request.GET.get('search', '')
+        
+        return context
