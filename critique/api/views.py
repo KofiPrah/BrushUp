@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status, filters
+from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -90,6 +90,11 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     Allows list, retrieve, create, update, and delete operations on artworks.
     Only authenticated users can create artworks, and only the artwork's author 
     (or admins) can update or delete it.
+    
+    For image uploads:
+    - POST to /api/artworks/ with multipart/form-data
+    - Include 'image' field with the image file
+    - Other fields (title, description, etc.) can be included in the same request
     """
     queryset = ArtWork.objects.all().order_by('-created_at')
     serializer_class = ArtWorkSerializer
@@ -97,6 +102,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'tags', 'author__username']
     ordering_fields = ['created_at', 'updated_at', 'title']
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     
     def get_serializer_class(self):
         """Return different serializers for list and detail views."""

@@ -203,6 +203,12 @@ if USE_S3:
         'CacheControl': 'max-age=86400',  # 1 day cache
     }
     
+    # Disable signed URLs for public bucket access
+    AWS_QUERYSTRING_AUTH = False
+    
+    # For security, verify your bucket has proper CORS settings
+    AWS_DEFAULT_ACL = 'public-read'
+    
     # S3 Public Media Settings
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
