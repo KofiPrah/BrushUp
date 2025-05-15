@@ -1,0 +1,28 @@
+# Example .replit configuration file for Art Critique
+# Copy this file to .replit before deploying
+
+[deployment]
+deploymentTarget = "autoscale"
+run = [
+  "sh", "-c",
+  "gunicorn -b 0.0.0.0:${PORT:-8080} artcritique.wsgi:application"
+]
+
+[env]
+REPLIT_HEALTHCHECK_PATH = "/api/health/"
+
+# Development workflow configuration
+[nix]
+channel = "stable-22_11"
+
+[unitTest]
+language = "python3"
+
+# Local development workflow
+[dev]
+onBoot = ["gunicorn -b 0.0.0.0:5000 main:app"]
+
+# Local development (HTTP over TLS)
+[[ports]]
+localPort = 5000
+externalPort = 443

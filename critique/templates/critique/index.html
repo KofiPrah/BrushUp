@@ -1,0 +1,65 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}Home - Art Critique{% endblock %}
+
+{% block content %}
+    <div class="jumbotron bg-dark text-white p-5 rounded">
+        <h1 class="display-4">Welcome to Art Critique</h1>
+        <p class="lead">A platform for artists to share their work and receive constructive feedback.</p>
+        <hr class="my-4">
+        <p>Explore artwork from talented artists around the world and provide your insights.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'critique:artwork_list' %}" role="button">Browse Artworks</a>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card mb-4 bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Share Your Art</h5>
+                    <p class="card-text">Upload your artwork and receive valuable feedback from the community.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Review Artwork</h5>
+                    <p class="card-text">Provide constructive criticism to help artists improve their craft.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-4 bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Connect with Artists</h5>
+                    <p class="card-text">Build a network with like-minded creatives from around the world.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h4>Platform Statistics</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>{{ app_name }} v{{ app_version }}</h5>
+                            <p>Current artworks in the platform: <span class="badge bg-primary">{{ artwork_count }}</span></p>
+                            <p>Total reviews submitted: <span class="badge bg-success">{{ review_count }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>API Information</h5>
+                            <p>The Art Critique platform provides a RESTful API for integration.</p>
+                            <a href="{% url 'critique:api-root' %}" class="btn btn-info btn-sm">API Documentation</a>
+                            <a href="/api/health/" class="btn btn-secondary btn-sm">API Health Check</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "critique/base.html" %}
+
+{% block title %}Authentication Test - Art Critique{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="mb-0">Authentication Test Page</h2>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                        <div class="alert alert-success">
+                            <h4 class="alert-heading">Authentication Successful!</h4>
+                            <p>You are currently logged in as <strong>{{ user.username }}</strong>.</p>
+                            <hr>
+                            <p class="mb-0">Your user ID is {{ user.id }} and your email is {{ user.email }}.</p>
+                        </div>
+                        
+                        <h4 class="mt-4">User Information</h4>
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Username
+                                <span class="badge bg-primary rounded-pill">{{ user.username }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Email
+                                <span class="badge bg-primary rounded-pill">{{ user.email }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Last Login
+                                <span class="badge bg-primary rounded-pill">{{ user.last_login|date:"F j, Y, g:i a" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Date Joined
+                                <span class="badge bg-primary rounded-pill">{{ user.date_joined|date:"F j, Y" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Staff Status
+                                <span class="badge {% if user.is_staff %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">
+                                    {% if user.is_staff %}Yes{% else %}No{% endif %}
+                                </span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                Superuser Status
+                                <span class="badge {% if user.is_superuser %}bg-success{% else %}bg-secondary{% endif %} rounded-pill">
+                                    {% if user.is_superuser %}Yes{% else %}No{% endif %}
+                                </span>
+                            </li>
+                        </ul>
+                        
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'account_logout' %}" class="btn btn-danger">Log Out</a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <h4 class="alert-heading">Not Authenticated</h4>
+                            <p>You are currently not logged in. Please log in or sign up to access this content.</p>
+                        </div>
+                        
+                        <div class="d-flex gap-3 mt-4">
+                            <a href="{% url 'account_login' %}" class="btn btn-primary flex-grow-1">Log In</a>
+                            <a href="{% url 'account_signup' %}" class="btn btn-success flex-grow-1">Sign Up</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="small text-muted">
+                        Site Info: {{ site_name }} ({{ site_domain }})
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

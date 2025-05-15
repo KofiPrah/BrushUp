@@ -1,0 +1,134 @@
+**The “invalid SSL response” almost always means the Replit load-balancer could not complete an ordinary HTTP request to your container.**
+On Autoscale that happens when **no process is really listening on `$PORT`** *or* the process crashes before the first byte is written.
+
+Below is a focused checklist that solves 99 % of the remaining ERR\_SSL\_PROTOCOL\_ERROR cases on Replit.
+
+---
+
+## ① Confirm what the platform is doing
+
+| Replit side                                                        | What must be true in your program                                    |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Autoscale sets **`PORT=<random-high-number>`** (8080, 3030, etc.). | Your only listener **binds to `0.0.0.0:$PORT`**.                     |
+| LB calls `GET /` (HTTP/1.1) after \~30 s.                          | App must finish start-up and reply **200/30x/404** (any valid HTTP). |
+| TLS is already terminated.                                         | Your listener must be **plain HTTP**.                                |
+
+`ERR_SSL_PROTOCOL_ERROR` = LB started TLS with the browser, unwrapped to HTTP, spoke to container, got *garbage / no bytes / immediate close*.
+
+---
+
+## ② Verify the service is alive from inside the pod
+
+1. **Open the shell** in the Replit workspace.
+
+2. Run your command *exactly* as Autoscale does:
+
+   ```bash
+   export PORT=8080      # pick any free port
+   gunicorn -b 0.0.0.0:$PORT main:app
+   ```
+
+   *Does Gunicorn print “Booting worker” and stay running?*
+
+3. In a **second** shell tab:
+
+   ```bash
+   curl -v http://127.0.0.1:8080/
+   ```
+
+   * **If you get valid HTTP headers** → Gunicorn is fine – jump to step ③.
+   * **If it dies / connection refused** → Gunicorn path or import is wrong.
+
+   Common fixes:
+
+   | Symptom                     | Fix                                                                                                                          |
+   | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+   | `ModuleNotFoundError: main` | For Django use `gunicorn artcritique.wsgi:application`.<br>For FastAPI `gunicorn -k uvicorn.workers.UvicornWorker main:app`. |
+   | `Address already in use`    | Something else is on that port; pick another or kill stray process.                                                          |
+   | Instant exit with no error  | Missing dependency; check `requirements.txt`, reinstall.                                                                     |
+
+---
+
+## ③ Bind to `$PORT` in `.replit`
+
+```toml
+[deployment]
+deploymentTarget = "autoscale"
+run = [
+  "sh", "-c",
+  "gunicorn -b 0.0.0.0:${PORT:-8080} artcritique.wsgi:application"
+]
+```
+
+*Notes*
+
+* `artcritique.wsgi:application` → replace with your real module path.
+* **Do not** pass `--certfile` / `--keyfile` on Replit.
+* Drop `[[ports]]`; Autoscale ignores it.
+
+---
+
+## ④ Redeploy and tail logs
+
+After pressing **Deploy → Autoscale**, click **Logs** immediately:
+
+* **Success path**
+
+  ```
+  Booting worker with pid 123
+  Listening at: http://0.0.0.0:39157
+  ```
+
+  After \~10-20 s the log stops scrolling; visit your URL – it should load.
+
+* **Crash loop**
+
+  ```
+  [critical] ModuleNotFoundError ...
+  Replit is restarting your app
+  ```
+
+  Fix the exception, commit, redeploy.
+
+* **Health-check timeout**
+
+  If Gunicorn starts but Replit still shows “couldn’t reach”, check that **`/`** or **`/healthz`** (whichever your framework exposes) returns a normal HTTP response.
+  In Django you can add:
+
+  ```python
+  # project/urls.py
+  from django.http import JsonResponse
+  urlpatterns += [
+      path("healthz/", lambda r: JsonResponse({"ok": True})),
+  ]
+  ```
+
+  Then set a startup command in `.replit` environment:
+
+  ```toml
+  [env]
+  REPLIT_HEALTHCHECK_PATH = "/healthz/"
+  ```
+
+---
+
+## ⑤ Cross-check with a dummy server (optional)
+
+Still stuck? Replace your run command with a trivial Python server:
+
+```toml
+run = ["python", "-m", "http.server", "${PORT}"]
+```
+
+Redeploy.
+If the dummy server loads, the infrastructure is fine and you can focus on Gunicorn/Django.
+If even the dummy server fails, open a Replit support ticket – the workspace itself is broken.
+
+---
+
+### TL;DR
+
+1. **Local curl inside the pod first.**
+2. **Bind exactly to `0.0.0.0:$PORT`, plain HTTP.**
+3. **Make sure the import path is correct (`main:app` vs `project.wsgi:application`).**
+   Fix those three and the ERR\_SSL\_PROTOCOL\_ERROR disappears every time.

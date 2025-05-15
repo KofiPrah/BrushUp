@@ -1,0 +1,17 @@
+# Secrets
+.env
+*.env
+*.json
+secrets.py
+*.secret.*
+
+# Python
+__pycache__/
+*.pyc
+
+# Django / Logs
+db.sqlite3
+*.log
+
+# Node/JS (if hybrid)
+node_modules/

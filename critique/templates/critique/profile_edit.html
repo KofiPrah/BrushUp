@@ -1,0 +1,70 @@
+{% extends "critique/base.html" %}
+
+{% block title %}Edit Profile - Art Critique{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h2 class="mb-0">Edit Profile</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li>{{ field.label }}: {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="id_profile_picture" class="form-label">Profile Picture URL</label>
+                        <input type="url" name="profile_picture" class="form-control" id="id_profile_picture" value="{{ form.profile_picture.value|default:'' }}">
+                        <div class="form-text">Enter a URL to your profile picture (optional).</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_bio" class="form-label">Bio</label>
+                        <textarea name="bio" class="form-control" id="id_bio" rows="4">{{ form.bio.value|default:'' }}</textarea>
+                        <div class="form-text">Tell other users about yourself and your art.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_location" class="form-label">Location</label>
+                        <input type="text" name="location" class="form-control" id="id_location" value="{{ form.location.value|default:'' }}">
+                        <div class="form-text">Where are you based? (optional)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_website" class="form-label">Website</label>
+                        <input type="url" name="website" class="form-control" id="id_website" value="{{ form.website.value|default:'' }}">
+                        <div class="form-text">Your personal website or portfolio (optional).</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_birth_date" class="form-label">Birth Date</label>
+                        <input type="date" name="birth_date" class="form-control" id="id_birth_date" value="{{ form.birth_date.value|date:'Y-m-d'|default:'' }}">
+                        <div class="form-text">Your birth date (optional).</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'critique:profile' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
