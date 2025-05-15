@@ -112,20 +112,42 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get CSRF token
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         
+        // Log request details to console for debugging
+        console.log('Sending request to: /api/artworks/');
+        console.log('CSRF Token:', csrftoken);
+        
         fetch('/api/artworks/', {
             method: 'POST',
             headers: {
                 'X-CSRFToken': csrftoken,
+                // Don't set Content-Type header here as the browser will set it 
+                // automatically with the correct boundary string for multipart/form-data
             },
             body: formData,
-            credentials: 'same-origin'
+            credentials: 'same-origin' // Include cookies
         })
         .then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            
+            // First check if the response is ok (status in the range 200-299)
             if (!response.ok) {
-                return response.json().then(data => {
-                    throw new Error(JSON.stringify(data));
+                // Try to get the response content for better error reporting
+                return response.text().then(text => {
+                    console.log('Error response body:', text);
+                    
+                    // Try to parse as JSON if possible
+                    try {
+                        const data = JSON.parse(text);
+                        throw new Error(JSON.stringify(data));
+                    } catch (e) {
+                        // If not JSON, return the text with status
+                        throw new Error(`HTTP error ${response.status}: ${text.substring(0, 100)}...`);
+                    }
                 });
             }
+            
+            // If response is ok, try to parse as JSON
             return response.json();
         })
         .then(data => {
@@ -157,16 +179,36 @@ document.addEventListener('DOMContentLoaded', function() {
             
             let errorText = 'An error occurred during upload.';
             try {
-                const errorData = JSON.parse(error.message);
-                errorText = Object.keys(errorData)
-                    .map(key => `${key}: ${errorData[key]}`)
-                    .join(', ');
+                // First try to parse as JSON if it's a JSON string error
+                if (error.message.startsWith('{') || error.message.startsWith('[')) {
+                    const errorData = JSON.parse(error.message);
+                    errorText = Object.keys(errorData)
+                        .map(key => `${key}: ${errorData[key]}`)
+                        .join(', ');
+                } else {
+                    // Otherwise use the error message directly
+                    errorText = error.message;
+                }
             } catch (e) {
-                errorText = error.message;
+                console.error('Error parsing error message:', e);
+                errorText = error.message || 'Unknown error';
             }
             
             errorMessage.textContent = errorText;
             console.error('Upload error:', error);
+            
+            // Check if we need to redirect to login
+            if (errorText.includes('login') || 
+                errorText.includes('authentication') || 
+                errorText.includes('<!DOCTYPE')) {
+                console.log('Authentication issue detected, may need to log in');
+                errorMessage.textContent = 'You need to be logged in to upload artwork. Redirecting to login page...';
+                
+                // Optional: redirect to login after a delay
+                // setTimeout(() => {
+                //     window.location.href = '/accounts/login/?next=/artworks/upload/';
+                // }, 2000);
+            }
         });
     });
 });
