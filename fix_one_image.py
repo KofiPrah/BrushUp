@@ -77,14 +77,17 @@ def fix_specific_image(s3_key):
         return None
 
 def main():
-    # Let's fix the most recent test image
-    # Use the test file we uploaded earlier
-    s3_key = "test/direct_upload_1747426651.jpg" 
+    # Let's fix artwork images
     
-    # If you want to fix a specific artwork file, uncomment and modify this line:
-    # s3_key = "media/artworks/test_new_config.jpg"
+    # First, maintain our fix for the test image
+    fix_specific_image("test/direct_upload_1747426651.jpg")
     
-    fix_specific_image(s3_key)
+    # Now fix a specific artwork file
+    fix_specific_image("media/artworks/test_new_config.jpg")
+    
+    # Let's also try fixing any image that might have been uploaded through the web interface
+    # This covers the common pattern used by the application
+    fix_specific_image("media/artworks/A170D2D5-DCEE-4E01-AE2F-B015E363AD4A.png")
 
 if __name__ == "__main__":
     main()
