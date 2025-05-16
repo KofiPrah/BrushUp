@@ -92,3 +92,49 @@ class Comment(models.Model):
     
     def __str__(self):
         return f"Comment by {self.author.username} on {self.artwork.title}"
+
+class Critique(models.Model):
+    """
+    Model representing a structured critique on an artwork, 
+    with focus on constructive feedback and analysis.
+    """
+    artwork = models.ForeignKey(ArtWork, on_delete=models.CASCADE, related_name='critiques')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='critiques')
+    text = models.TextField(help_text="Critique content - analysis of the artwork")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Optional rating fields to provide numeric evaluation
+    composition_score = models.PositiveSmallIntegerField(
+        choices=[(i, i) for i in range(1, 11)], 
+        null=True, 
+        blank=True,
+        help_text="Rating for composition (1-10)"
+    )
+    technique_score = models.PositiveSmallIntegerField(
+        choices=[(i, i) for i in range(1, 11)], 
+        null=True,
+        blank=True,
+        help_text="Rating for technique execution (1-10)"
+    )
+    originality_score = models.PositiveSmallIntegerField(
+        choices=[(i, i) for i in range(1, 11)], 
+        null=True,
+        blank=True,
+        help_text="Rating for originality/creativity (1-10)"
+    )
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Critique'
+        verbose_name_plural = 'Critiques'
+    
+    def __str__(self):
+        return f"Critique by {self.author.username} on {self.artwork.title}"
+    
+    def get_average_score(self):
+        """Calculate the average score across all rating dimensions that have values."""
+        scores = [s for s in [self.composition_score, self.technique_score, self.originality_score] if s is not None]
+        if not scores:
+            return None
+        return sum(scores) / len(scores)

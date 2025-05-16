@@ -2,10 +2,10 @@ from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from critique.models import ArtWork, Review, Profile
+from critique.models import ArtWork, Review, Profile, Critique
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
-    ArtWorkListSerializer, ReviewSerializer
+    ArtWorkListSerializer, ReviewSerializer, CritiqueSerializer, CritiqueListSerializer
 )
 from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
 from django.db import connection
@@ -298,6 +298,76 @@ class ReviewViewSet(viewsets.ModelViewSet):
         """Set the reviewer to the current user when creating a review."""
         serializer.save(reviewer=self.request.user)
 
+
+class CritiqueViewSet(viewsets.ModelViewSet):
+    """API endpoint for viewing and editing critiques.
+    
+    Allows list, retrieve, create, update, and delete operations on critiques.
+    Only authenticated users can create critiques, and only the critique's author 
+    (or admins) can update or delete it.
+    """
+    queryset = Critique.objects.all().order_by('-created_at')
+    serializer_class = CritiqueSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['text']
+    ordering_fields = ['created_at', 'updated_at']
+    
+    def get_queryset(self):
+        """Optionally filter critiques by artwork ID or author ID."""
+        queryset = Critique.objects.all().order_by('-created_at')
+        
+        # Filter by artwork
+        artwork_id = self.request.query_params.get('artwork', None)
+        if artwork_id is not None:
+            queryset = queryset.filter(artwork_id=artwork_id)
+            
+        # Filter by author/user
+        author_id = self.request.query_params.get('author', None)
+        if author_id is not None:
+            queryset = queryset.filter(author_id=author_id)
+            
+        return queryset
+    
+    def get_serializer_class(self):
+        """Return different serializers based on action."""
+        if self.action == 'list':
+            return CritiqueListSerializer
+        return CritiqueSerializer
+    
+    def get_serializer_context(self):
+        """Add the request to the serializer context."""
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
+        
+    def perform_create(self, serializer):
+        """Set the author to the current user when creating a critique."""
+        serializer.save(author=self.request.user)
+    
+    @action(detail=False, methods=['get'], url_path='artwork/(?P<artwork_id>[^/.]+)')
+    def artwork_critiques(self, request, artwork_id=None):
+        """Get all critiques for a specific artwork."""
+        critiques = self.get_queryset().filter(artwork_id=artwork_id)
+        page = self.paginate_queryset(critiques)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+            
+        serializer = self.get_serializer(critiques, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'], url_path='user/(?P<user_id>[^/.]+)')
+    def user_critiques(self, request, user_id=None):
+        """Get all critiques by a specific user."""
+        critiques = self.get_queryset().filter(author_id=user_id)
+        page = self.paginate_queryset(critiques)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+            
+        serializer = self.get_serializer(critiques, many=True)
+        return Response(serializer.data)
 
 @api_view(['GET'])
 def health_check(request):

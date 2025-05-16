@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from critique.models import ArtWork, Review, Profile
+from critique.models import ArtWork, Review, Profile, Critique
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for the user Profile model."""
@@ -178,3 +178,54 @@ class ReviewSerializer(serializers.ModelSerializer):
         user = self.context['request'].user
         review = Review.objects.create(reviewer=user, **validated_data)
         return review
+
+class CritiqueSerializer(serializers.ModelSerializer):
+    """Serializer for the Critique model with author information."""
+    author = UserSerializer(read_only=True)
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    author_profile_url = serializers.SerializerMethodField()
+    artwork_title = serializers.CharField(source='artwork.title', read_only=True)
+    average_score = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Critique
+        fields = [
+            'id', 'artwork', 'artwork_title', 'author', 'author_name', 
+            'author_profile_url', 'text', 'composition_score', 'technique_score', 
+            'originality_score', 'average_score', 'created_at', 'updated_at'
+        ]
+        read_only_fields = [
+            'id', 'author', 'author_name', 'author_profile_url', 
+            'artwork_title', 'average_score', 'created_at', 'updated_at'
+        ]
+    
+    def get_author_profile_url(self, obj):
+        """Return a URL to the author's profile."""
+        return f"/profile/{obj.author.id}/"
+    
+    def get_average_score(self, obj):
+        """Return the average score for this critique."""
+        return obj.get_average_score()
+    
+    def create(self, validated_data):
+        """Create a new critique with the current user as author."""
+        user = self.context['request'].user
+        critique = Critique.objects.create(author=user, **validated_data)
+        return critique
+        
+class CritiqueListSerializer(serializers.ModelSerializer):
+    """Simplified serializer for listing critiques."""
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    artwork_title = serializers.CharField(source='artwork.title', read_only=True)
+    average_score = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Critique
+        fields = [
+            'id', 'artwork', 'artwork_title', 'author_name', 
+            'text', 'average_score', 'created_at'
+        ]
+    
+    def get_average_score(self, obj):
+        """Return the average score for this critique."""
+        return obj.get_average_score()
