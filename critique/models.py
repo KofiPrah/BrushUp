@@ -9,6 +9,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 class Profile(models.Model):
     """
     Extended user profile model with additional information about the user.
+    Includes karma points earned through positive contributions.
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(max_length=500, blank=True)
@@ -17,6 +18,7 @@ class Profile(models.Model):
     profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
     profile_picture_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field
     website = models.URLField(max_length=200, blank=True)
+    karma = models.IntegerField(default=0, help_text="Points earned through positive contributions")
     
     def __str__(self):
         return f"{self.user.username}'s profile"

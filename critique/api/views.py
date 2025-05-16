@@ -713,6 +713,34 @@ class NotificationViewSet(viewsets.ModelViewSet):
         ).update(is_read=True)
         
         return Response({"status": "success", "message": "All notifications marked as read"})
+        
+    @action(detail=False, methods=['post'])
+    def mark_multiple_read(self, request):
+        """Mark multiple notifications as read in a single request.
+        
+        Expects a JSON payload with a list of notification IDs:
+        { "notification_ids": [1, 2, 3] }
+        
+        Only works for notifications that belong to the current user.
+        """
+        notification_ids = request.data.get('notification_ids', [])
+        
+        if not notification_ids:
+            return Response(
+                {"error": "No notification IDs provided"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Update only notifications that belong to the current user
+        update_count = Notification.objects.filter(
+            id__in=notification_ids,
+            recipient=request.user
+        ).update(is_read=True)
+        
+        return Response({
+            "status": "success", 
+            "message": f"{update_count} notifications marked as read"
+        })
     
     @action(detail=True, methods=['post'])
     def mark_read(self, request, pk=None):

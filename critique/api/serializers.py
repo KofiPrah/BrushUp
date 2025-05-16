@@ -8,18 +8,26 @@ class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
     profile_picture_display_url = serializers.SerializerMethodField()
+    unread_notifications_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Profile
         fields = ['id', 'username', 'email', 'bio', 'location', 'profile_picture', 
-                 'profile_picture_url', 'profile_picture_display_url', 'website', 'birth_date']
-        read_only_fields = ['id', 'username', 'email', 'profile_picture_display_url']
+                 'profile_picture_url', 'profile_picture_display_url', 'website', 'birth_date',
+                 'karma', 'unread_notifications_count']
+        read_only_fields = ['id', 'username', 'email', 'profile_picture_display_url', 
+                           'karma', 'unread_notifications_count']
         
     def get_profile_picture_display_url(self, obj):
         """Return the URL to display the profile picture, prioritizing S3 storage."""
         if obj.profile_picture and hasattr(obj.profile_picture, 'url'):
             return obj.profile_picture.url
         return obj.profile_picture_url
+        
+    def get_unread_notifications_count(self, obj):
+        """Return the count of unread notifications for the user."""
+        from critique.models import Notification
+        return Notification.objects.filter(recipient=obj.user, is_read=False).count()
         
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     """Serializer for updating user profile information."""
@@ -71,11 +79,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """Enhanced serializer for the User model with extra authentication information."""
     profile = ProfileSerializer(read_only=True)
     auth_info = serializers.SerializerMethodField()
+    karma = serializers.SerializerMethodField()
+    unread_notifications_count = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile', 'auth_info']
-        read_only_fields = ['id']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile', 
+                 'auth_info', 'karma', 'unread_notifications_count']
+        read_only_fields = ['id', 'karma', 'unread_notifications_count']
         
     def get_auth_info(self, obj):
         """Return authentication-related information."""
@@ -86,6 +97,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'date_joined': obj.date_joined,
             'last_login': obj.last_login,
         }
+        
+    def get_karma(self, obj):
+        """Return the user's karma score."""
+        if hasattr(obj, 'profile'):
+            return obj.profile.karma
+        return 0
+        
+    def get_unread_notifications_count(self, obj):
+        """Return the count of unread notifications for the user."""
+        from critique.models import Notification
+        return Notification.objects.filter(recipient=obj, is_read=False).count()
 
 class ArtWorkSerializer(serializers.ModelSerializer):
     """Serializer for the ArtWork model with author information."""

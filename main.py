@@ -21,7 +21,7 @@ def health():
 # Check if we're in deployment mode (via environment variable)
 # This allows us to switch between local development (with SSL) and deployment (without SSL)
 ssl_enabled = os.environ.get('SSL_ENABLED', 'false').lower() == 'true'
-# Force disable SSL for testing
+# Force disable SSL for compatibility with Replit's load balancer
 ssl_enabled = False
 
 if not ssl_enabled:
