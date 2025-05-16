@@ -194,6 +194,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # AWS S3 Configuration
 USE_S3 = os.environ.get('USE_S3', 'False') == 'True'
+print(f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')})")
 
 if USE_S3:
     # AWS Settings
