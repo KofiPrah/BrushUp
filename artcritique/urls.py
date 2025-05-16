@@ -27,7 +27,7 @@ urlpatterns = [
     path('', include('critique.urls')),
 ]
 
-# Serve static and media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve static and media files in all environments since we're using local storage
+# This ensures media files are accessible in production as well
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
