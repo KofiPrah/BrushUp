@@ -16,7 +16,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -63,7 +62,6 @@ else:
     SECURE_CONTENT_TYPE_NOSNIFF = False
     SECURE_BROWSER_XSS_FILTER = False
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -74,7 +72,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
+
     # Third-party apps
     'rest_framework',
     'corsheaders',
@@ -83,7 +81,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'storages',  # AWS S3 storage
-    
+
     # Local apps
     'critique',  # Our critique app
 ]
@@ -110,12 +108,14 @@ ROOT_URLCONF = 'artcritique.urls'
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'BACKEND':
+        'django.template.backends.django.DjangoTemplates',
         'DIRS': [
             os.path.join(BASE_DIR, 'templates'),
             os.path.join(BASE_DIR, 'critique', 'templates'),
         ],
-        'APP_DIRS': True,
+        'APP_DIRS':
+        True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -129,7 +129,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'artcritique.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -145,25 +144,27 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+        'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -175,7 +176,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -194,38 +194,43 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # AWS S3 Configuration
 USE_S3 = os.environ.get('USE_S3', 'False') == 'True'
-print(f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')})")
+print(
+    f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')})"
+)
 
 if USE_S3:
     # AWS Settings
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', "us-east-2")
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     AWS_S3_OBJECT_PARAMETERS = {
+        "ACL": "public-read",
         'CacheControl': 'max-age=86400',  # 1 day cache
     }
-    
+
     # Important: Setting ACL to None since bucket doesn't support ACLs
     # This relies on bucket policy for public access instead
-    AWS_DEFAULT_ACL = None  
-    
+    AWS_DEFAULT_ACL = None
+
     # Disable signed URLs for public bucket access
     AWS_QUERYSTRING_AUTH = False
-    
+
     # S3 Public Media Settings
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-    
+
     # Force the storage to use S3
-    print(f"Using S3 storage: {DEFAULT_FILE_STORAGE} (ACLs disabled, using bucket policy)")
-    
+    print(
+        f"Using S3 storage: {DEFAULT_FILE_STORAGE} (ACLs disabled, using bucket policy)"
+    )
+
     # S3 Private Media Settings (optional)
     PRIVATE_MEDIA_LOCATION = 'private'
     PRIVATE_FILE_STORAGE = 'artcritique.storage_backends.PrivateMediaStorage'
-    
+
     # S3 Static Settings (optional)
     # To store static files on S3 too, uncomment the following:
     # STATIC_LOCATION = 'static'
@@ -246,8 +251,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'DEFAULT_PAGINATION_CLASS':
+    'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE':
+    10
 }
 
 # CORS settings
@@ -283,8 +290,10 @@ AUTHENTICATION_BACKENDS = [
 
 # Allauth configuration options
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_LOGIN_METHODS = {'username', 'email'}  # Allow login with either username or email
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']  # * means required
+ACCOUNT_LOGIN_METHODS = {'username',
+                         'email'}  # Allow login with either username or email
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*',
+                         'password2*']  # * means required
 ACCOUNT_EMAIL_VERIFICATION = 'optional'  # Can be 'mandatory', 'optional', or 'none'
 ACCOUNT_EMAIL_SUBJECT_PREFIX = '[Art Critique] '
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https' if SSL_ENABLED else 'http'
