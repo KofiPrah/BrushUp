@@ -1,10 +1,11 @@
 #!/bin/bash
-# Start the Django server in HTTP mode using manage.py
+# Start the server in HTTP mode without SSL certificates
+# This is needed for compatibility with Replit's load balancer which
+# handles the SSL termination.
+
+# Set environment variables
 export SSL_ENABLED=false
-export PORT=8080
+export SECURE_SSL_REDIRECT=false
 
-echo "Starting Django server in HTTP mode on port $PORT"
-echo "This can be used for testing the OAuth functionality"
-echo "Press Ctrl+C to stop the server"
-
-python manage.py runserver 0.0.0.0:$PORT
+echo "Starting server in HTTP mode..."
+gunicorn --bind 0.0.0.0:5000 --workers 1 --reload --reuse-port main:app

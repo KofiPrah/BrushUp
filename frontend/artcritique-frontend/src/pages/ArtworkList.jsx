@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
+import PlaceholderImage from '../components/PlaceholderImage';
 import { artworkAPI } from '../services/api';
 
 const ArtworkList = () => {
@@ -159,13 +160,24 @@ const ArtworkList = () => {
             {artworks.map(artwork => (
               <div className="col-md-4 mb-4" key={artwork.id}>
                 <div className="card h-100">
-                  <img 
-                    src={getValidImageUrl(artwork.image_display_url)} 
-                    className="card-img-top" 
-                    alt={artwork.title} 
-                    style={{ height: '200px', objectFit: 'cover' }}
-                    onError={handleImageError}
-                  />
+                  {artwork.image_display_url ? (
+                    <div className="card-img-container" style={{ height: '200px', position: 'relative' }}>
+                      <img 
+                        src={getValidImageUrl(artwork.image_display_url)} 
+                        className="card-img-top" 
+                        alt={artwork.title} 
+                        style={{ height: '200px', objectFit: 'cover', width: '100%' }}
+                        onError={handleImageError}
+                      />
+                    </div>
+                  ) : (
+                    <PlaceholderImage 
+                      alt={`${artwork.title} (image unavailable)`}
+                      className="card-img-top"
+                      style={{ height: '200px' }}
+                      aspectRatio="16:9"
+                    />
+                  )}
                   <div className="card-body">
                     <h5 className="card-title">{artwork.title}</h5>
                     <h6 className="card-subtitle mb-2 text-muted">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
+import PlaceholderImage from '../components/PlaceholderImage';
 
 const ArtworkDetail = () => {
   const { id } = useParams();
@@ -175,12 +176,20 @@ const ArtworkDetail = () => {
       {/* Artwork Details */}
       <div className="row">
         <div className="col-md-8">
-          <img 
-            src={getValidImageUrl(artwork.image_display_url)}
-            className="img-fluid rounded shadow" 
-            alt={artwork.title}
-            onError={handleImageError}
-          />
+          {artwork.image_display_url ? (
+            <img 
+              src={getValidImageUrl(artwork.image_display_url)}
+              className="img-fluid rounded shadow" 
+              alt={artwork.title}
+              onError={handleImageError}
+            />
+          ) : (
+            <PlaceholderImage 
+              alt={`${artwork.title} (image unavailable)`}
+              className="img-fluid rounded shadow"
+              style={{ height: '400px' }}
+            />
+          )}
         </div>
         <div className="col-md-4">
           <h1 className="mb-2">{artwork.title}</h1>
