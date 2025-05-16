@@ -1,0 +1,34 @@
+{% extends "socialaccount/base_entrance.html" %}
+{% load i18n %}
+
+{% block head_title %}Authentication Error - Art Critique{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-exclamation-circle text-danger mb-3" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+    </svg>
+    <h1 class="display-6 fw-bold">Authentication Error</h1>
+    <p class="text-muted">{% trans "An error occurred while attempting to log in via your social network account." %}</p>
+</div>
+
+<div class="card border-0 shadow rounded-4">
+    <div class="card-body p-4 p-md-5">
+        <div class="alert alert-danger">
+            {{ auth_error }}
+        </div>
+        <div class="mt-4">
+            <p>{% trans "Please try these solutions:" %}</p>
+            <ul class="text-start">
+                <li>{% trans "Check if you've granted all the required permissions" %}</li>
+                <li>{% trans "Try logging in with a different account" %}</li>
+                <li>{% trans "Use your email and password to log in instead" %}</li>
+            </ul>
+        </div>
+        <div class="d-grid gap-2 mt-4">
+            <a href="{% url 'account_login' %}" class="btn btn-outline-primary">{% trans "Return to Login" %}</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
