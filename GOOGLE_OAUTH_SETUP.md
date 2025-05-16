@@ -1,76 +1,82 @@
-# Google OAuth Setup for Art Critique
+# Google OAuth Setup Guide for Art Critique
 
-This document explains how to configure Google OAuth for the Art Critique application.
+This guide will help you set up Google OAuth authentication for the Art Critique application.
 
-## Overview
+## Prerequisites
 
-Google OAuth allows users to sign in to the application using their Google accounts, providing a seamless login experience without requiring a separate account creation process.
+1. A Google account
+2. Access to the [Google Cloud Console](https://console.cloud.google.com/)
 
-## Current Configuration
-
-The application is set up to use Google OAuth with the following configuration:
-
-- Client ID and Secret are stored in environment variables:
-  - `GOOGLE_OAUTH_CLIENT_ID`
-  - `GOOGLE_OAUTH_CLIENT_SECRET`
-
-- Requested scopes:
-  - `profile` - To get basic profile information
-  - `email` - To get the user's email address
-
-- Auto signup enabled - New users will be automatically created based on their Google profile
-
-## Required Redirect URIs
-
-For Google OAuth to work correctly, you must add these redirect URIs to your Google Cloud Console project:
-
-1. For local/development environment:
-   - `https://workspace.kprah4.repl.co/accounts/google/login/callback/`
-
-2. For production (if applicable):
-   - `https://your-production-domain.com/accounts/google/login/callback/`
-
-## Verifying Google OAuth Setup
-
-1. Navigate to the login page at `/accounts/login/`
-2. Click on the "Login with Google" button
-3. You should be redirected to Google's login page
-4. After successful authentication, you should be redirected back to the application
-
-## Common Issues
-
-1. **"Missing required parameter: client_id" or "Error 400: invalid_request"**:
-   - Check that the `GOOGLE_OAUTH_CLIENT_ID` and `GOOGLE_OAUTH_CLIENT_SECRET` environment variables are set correctly
-   - Ensure that the OAuth Client ID is properly configured in Google Cloud Console
-   - Verify that the redirect URIs are correctly set in Google Cloud Console
-
-2. **"Error: redirect_uri_mismatch"**:
-   - This means the redirect URI used by the application doesn't match any URIs configured in Google Cloud Console
-   - Add the correct redirect URI to the authorized redirect URIs list in your Google OAuth client settings
-
-3. **"Error: invalid_client"**:
-   - This typically means the client ID or secret is incorrect
-   - Check that you've copied the correct values from Google Cloud Console
-
-## Google Cloud Console Setup Instructions
+## Step 1: Create a Google Cloud Project
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Navigate to "APIs & Services" > "Credentials"
-4. Click "Create Credentials" > "OAuth client ID"
-5. Select "Web application" as the application type
-6. Add the necessary redirect URIs (as mentioned above)
-7. Copy the generated Client ID and Client Secret
-8. Set these values as environment variables in your Replit environment
+2. Click on the project dropdown at the top of the page
+3. Click "New Project"
+4. Enter a name for your project (e.g., "Art Critique")
+5. Click "Create"
 
-## Testing the Configuration
+## Step 2: Configure OAuth Consent Screen
 
-To verify that the Google OAuth integration is working correctly:
+1. From your Google Cloud project dashboard, go to "APIs & Services" > "OAuth consent screen"
+2. Select "External" user type (unless you have a Google Workspace organization)
+3. Click "Create"
+4. Fill in the required fields:
+   - App name: "Art Critique"
+   - User support email: Your email address
+   - Developer contact information: Your email address
+5. Click "Save and Continue"
+6. On the Scopes screen, click "Add or Remove Scopes"
+7. Select the following scopes:
+   - `./auth/userinfo.email`
+   - `./auth/userinfo.profile`
+   - `openid`
+8. Click "Save and Continue"
+9. Add any test users if needed
+10. Click "Save and Continue"
+11. Review your settings and click "Back to Dashboard"
 
-1. Make sure you're logged out of the application
-2. Go to the login page
-3. Click "Login with Google"
-4. Complete the Google authentication flow
-5. You should be redirected back to the application and logged in
+## Step 3: Create OAuth Client ID
 
-Once logged in, you can test additional functionality like uploading artwork images, which requires authentication.
+1. From your Google Cloud project dashboard, go to "APIs & Services" > "Credentials"
+2. Click "Create Credentials" > "OAuth client ID"
+3. Select "Web application" as the application type
+4. Enter a name for your client (e.g., "Art Critique Web Client")
+5. Add authorized JavaScript origins:
+   - For development: `https://your-replit-dev-domain.repl.co` (replace with your Replit domain)
+   - For production: Your production domain
+6. Add authorized redirect URIs:
+   - For development: `https://your-replit-dev-domain.repl.co/accounts/google/login/callback/` (replace with your Replit domain)
+   - For production: Your production redirect URI
+7. Click "Create"
+8. You'll see your Client ID and Client Secret - copy these values
+
+## Step 4: Set Environment Variables
+
+Add the following environment variables to your Replit project:
+
+```
+GOOGLE_OAUTH_CLIENT_ID=your_client_id_here
+GOOGLE_OAUTH_CLIENT_SECRET=your_client_secret_here
+```
+
+## Step 5: Verify Setup
+
+1. Restart your application
+2. Try logging in with Google
+3. You should be redirected to Google's login page and then back to your application
+
+## Troubleshooting
+
+If you encounter issues with Google OAuth:
+
+- Verify your redirect URIs are correctly set in the Google Cloud Console
+- Ensure your environment variables are correctly set
+- Check that your domain is correctly configured in the OAuth consent screen
+- Confirm that your application is making requests to the correct OAuth endpoints
+
+## Security Notes
+
+- Never commit your Client Secret to your code repository
+- Regularly review and audit OAuth access
+- Consider implementing additional security measures like CSRF protection
+- Follow Google's OAuth best practices

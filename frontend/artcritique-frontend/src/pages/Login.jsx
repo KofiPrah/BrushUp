@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
-const Login = ({ onLogin }) => {
+const Login = () => {
+  const { login, isAuthenticated } = useAuth();
+  const location = useLocation();
+  const redirectPath = location.state?.from || '/';
   const [formData, setFormData] = useState({
     username: '',
     password: ''
@@ -32,40 +36,79 @@ const Login = ({ onLogin }) => {
     });
   };
   
+  // Redirect if already authenticated and check URL for OAuth return
+  useEffect(() => {
+    // If user is already logged in, redirect them
+    if (isAuthenticated) {
+      navigate(redirectPath);
+      return;
+    }
+    
+    // Check if we're returning from OAuth process
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthProcess = urlParams.get('process');
+    
+    if (oauthProcess) {
+      // Coming back from OAuth provider, show loading state
+      setLoading(true);
+      
+      // Check if authentication was successful by calling user API
+      const checkAuthStatus = async () => {
+        try {
+          await authAPI.fetchCurrentUser();
+          // If we get a successful response, user is authenticated
+          // AuthContext will update the state automatically
+        } catch (err) {
+          // Failed OAuth login
+          setError('OAuth authentication failed. Please try again.');
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+      checkAuthStatus();
+    }
+  }, [isAuthenticated, navigate, redirectPath]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     
     try {
-      // Call Django login API
-      const response = await authAPI.login(formData);
+      // Call login method from AuthContext
+      const result = await login(formData);
       
-      // Get user data after successful login
-      const userResponse = await authAPI.fetchCurrentUser();
-      const userData = userResponse.data;
-      
-      if (onLogin) {
-        onLogin(userData);
+      if (result.success) {
+        // Redirect to the previous page or home
+        navigate(redirectPath);
+      } else {
+        setError(result.error.message || 'Invalid username or password');
       }
-      
-      navigate('/');
     } catch (err) {
       console.error('Login error:', err);
-      if (err.response && err.response.data) {
-        if (err.response.data.non_field_errors) {
-          setError(err.response.data.non_field_errors[0]);
-        } else if (err.response.data.detail) {
-          setError(err.response.data.detail);
-        } else {
-          setError('Invalid username or password. Please try again.');
-        }
-      } else {
-        setError('Login failed. Please try again later.');
-      }
+      setError('Login failed. Please try again later.');
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Function to handle Google OAuth login
+  const handleGoogleLogin = () => {
+    // Store the current location to redirect back after login
+    const currentPath = window.location.pathname;
+    if (currentPath !== '/login') {
+      sessionStorage.setItem('redirect_after_login', currentPath);
+    }
+    
+    // Get the base URL (domain) of the application
+    const appBaseUrl = window.location.origin;
+    
+    // Construct the Google OAuth URL
+    // Django-allauth will handle the OAuth flow and redirect back to our app
+    // Add process=login parameter to help identify the return from OAuth
+    // The next parameter tells Django where to redirect after successful authentication
+    window.location.href = `/accounts/google/login/?process=login&next=${appBaseUrl}/login?process=oauth_return`;
   };
   
   return (
@@ -142,7 +185,11 @@ const Login = ({ onLogin }) => {
                   Don't have an account? <Link to="/register">Register</Link>
                 </p>
                 <div className="mt-3">
-                  <button className="btn btn-outline-danger">
+                  <button 
+                    type="button"
+                    className="btn btn-outline-danger"
+                    onClick={handleGoogleLogin}
+                  >
                     <i className="bi bi-google me-2"></i>Login with Google
                   </button>
                 </div>

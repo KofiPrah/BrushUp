@@ -6,6 +6,7 @@ import './App.css';
 import Home from './pages/Home';
 import ArtworkList from './pages/ArtworkList';
 import ArtworkDetail from './pages/ArtworkDetail';
+import ArtworkUpload from './pages/ArtworkUpload';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
@@ -97,10 +98,7 @@ const AppRoutes = () => {
             path="/upload" 
             element={
               <ProtectedRoute>
-                <div className="container mt-5">
-                  <h2>Upload Artwork</h2>
-                  <p>Share your artwork with the community</p>
-                </div>
+                <ArtworkUpload />
               </ProtectedRoute>
             } 
           />

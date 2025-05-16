@@ -1,35 +1,45 @@
-# Google Login Instructions
+# Google Login Setup for Art Critique
 
-## Access the Login Page
+To enable Google login for the Art Critique application, you need to set up a Google OAuth client.
 
-Your Google OAuth credentials have been successfully configured in the Art Critique application. To test Google login functionality, you'll need to:
+## Step-by-Step Instructions
 
-1. Access the login page at: 
-   - **When using HTTPS**: https://workspace.kprah4.repl.co/accounts/login/
-   - **When using HTTP**: http://workspace.kprah4.repl.co/accounts/login/
+1. **Create a Google Cloud project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select an existing one
 
-2. On the login page, you'll see a red "Sign in with Google" button.
+2. **Configure the OAuth consent screen**
+   - Navigate to "APIs & Services" > "OAuth consent screen"
+   - Select "External" user type
+   - Fill in the required information (app name, support email, etc.)
+   - Add scopes for email and profile information
 
-3. Click this button to initiate the Google OAuth flow.
+3. **Create OAuth credentials**
+   - Navigate to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth client ID"
+   - Select "Web application" as the application type
+   - Add your application's domain to "Authorized JavaScript origins"
+   - Add your application's callback URL to "Authorized redirect URIs":
+     ```
+     https://your-domain.repl.co/accounts/google/login/callback/
+     ```
+
+4. **Set environment variables in your Replit project**
+   - Go to your Replit project
+   - Click on the "Secrets" tool (padlock icon)
+   - Add the following secrets:
+     - `GOOGLE_OAUTH_CLIENT_ID` = Your Google client ID
+     - `GOOGLE_OAUTH_CLIENT_SECRET` = Your Google client secret
+
+5. **Restart your application**
+   - The Google login button will now work!
 
 ## Troubleshooting
 
-If you're having issues with the application not loading or SSL errors, try:
+If you encounter issues:
+- Verify that your redirect URI is correctly set in Google Cloud Console
+- Check that your domain is properly configured
+- Make sure you've added the correct environment variables
+- Restart your application after making changes
 
-1. Accessing the HTTP version of the site directly (http://workspace.kprah4.repl.co/accounts/login/)
-
-2. If you're getting a "redirect_uri_mismatch" error from Google, ensure your Google Cloud Console project has the following redirect URIs configured:
-   - https://workspace.kprah4.repl.co/accounts/google/login/callback/
-   - http://workspace.kprah4.repl.co/accounts/google/login/callback/
-
-3. If you're getting other Google OAuth errors, check that the client ID and client secret are correctly configured.
-
-## Verify Configuration
-
-The following environment variables are now properly configured:
-- GOOGLE_OAUTH_CLIENT_ID
-- GOOGLE_OAUTH_CLIENT_SECRET
-
-These credentials will be used by Django Allauth to authenticate users with Google.
-
-After successfully logging in with Google, you'll be able to use the image upload functionality and other features that require authentication.
+For detailed setup information, see the full [Google OAuth Setup Guide](GOOGLE_OAUTH_SETUP.md).

@@ -27,6 +27,15 @@ export const AuthProvider = ({ children }) => {
         const response = await authAPI.fetchCurrentUser();
         setUser(response.data);
         setError(null);
+        
+        // Check if this was a redirect from OAuth process
+        const redirectPath = sessionStorage.getItem('redirect_after_login');
+        if (redirectPath) {
+          // Clear the stored path
+          sessionStorage.removeItem('redirect_after_login');
+          // Redirect to the stored path if needed
+          // This will be handled by components using the auth context
+        }
       } catch (err) {
         // Only set error if it's not a 401 (unauthorized), since that's expected when not logged in
         if (err.response && err.response.status !== 401) {
