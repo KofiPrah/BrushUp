@@ -18,8 +18,11 @@ import requests
 from urllib.parse import urlparse
 
 # Configuration
-BASE_URL = "https://61dced89-3318-4924-8e29-81233afc8678-00-qa67r5b70zxi.worf.replit.dev"  # Replit domain URL
-USERNAME = "admin"  # Change to an actual username
+# Get Replit domain from environment to ensure it's always correct
+import os
+REPLIT_DOMAIN = os.environ.get('REPLIT_DEV_DOMAIN', '') 
+BASE_URL = f"https://{REPLIT_DOMAIN}"
+USERNAME = "admin"  # Change to an actual username in your system
 PASSWORD = "password123"  # Change to an actual password
 TEST_IMAGE = "test_image.jpg"  # Path to test image
 
