@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
 import { artworkAPI } from '../services/api';
 
 const ArtworkList = () => {
@@ -159,10 +160,11 @@ const ArtworkList = () => {
               <div className="col-md-4 mb-4" key={artwork.id}>
                 <div className="card h-100">
                   <img 
-                    src={artwork.image_display_url} 
+                    src={getValidImageUrl(artwork.image_display_url)} 
                     className="card-img-top" 
                     alt={artwork.title} 
                     style={{ height: '200px', objectFit: 'cover' }}
+                    onError={handleImageError}
                   />
                   <div className="card-body">
                     <h5 className="card-title">{artwork.title}</h5>

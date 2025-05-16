@@ -5,26 +5,49 @@ This server runs without SSL certificates to work with Replit's load balancer.
 
 import os
 import sys
-from gunicorn.app.wsgiapp import WSGIApplication
+from gunicorn.app.base import BaseApplication
 
-# Configure environment variables
-os.environ["SSL_ENABLED"] = "false"
+
+class GunicornApp(BaseApplication):
+    """Gunicorn application for running the Art Critique server."""
+    
+    def __init__(self, app, options=None):
+        self.options = options or {}
+        self.application = app
+        super().__init__()
+
+    def load_config(self):
+        """Load the Gunicorn configuration."""
+        for key, value in self.options.items():
+            if key in self.cfg.settings and value is not None:
+                self.cfg.set(key.lower(), value)
+
+    def load(self):
+        """Return the WSGI application."""
+        return self.application
+
 
 def main():
     """Run Gunicorn server with HTTP configuration"""
-    # Set up the arguments for Gunicorn
-    sys.argv = [
-        "gunicorn",
-        "--bind", "0.0.0.0:5000",
-        "--reuse-port",
-        "--reload",
-        "main:app"
-    ]
     
-    # Run Gunicorn
-    print("Starting HTTP server on port 5000 (no SSL)")
-    print("SSL will be handled by Replit's load balancer")
-    WSGIApplication().run()
+    # Import main app while setting SSL_ENABLED to False
+    os.environ['SSL_ENABLED'] = 'false'
+    from main import app
+    
+    print("Running in HTTP mode (SSL handled by Replit's load balancer)")
+    
+    # Configure the Gunicorn options
+    options = {
+        'bind': '0.0.0.0:5000',
+        'workers': 1,
+        'reload': True,
+        'reuse_port': True,
+        'accesslog': '-',  # Log to stdout
+        'errorlog': '-',   # Log errors to stdout
+    }
+    
+    GunicornApp(app, options).run()
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()

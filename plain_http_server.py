@@ -8,23 +8,21 @@ import subprocess
 
 def main():
     """Start plain HTTP server"""
-    # Define the command
-    cmd = [
+    # Set environment variable to disable SSL
+    os.environ['SSL_ENABLED'] = 'false'
+    
+    print("Starting plain HTTP server (no SSL certificates)")
+    
+    # Use subprocess to run gunicorn without SSL certificates
+    subprocess.run([
         "gunicorn",
-        "--bind", "0.0.0.0:5000", 
-        # No SSL certificates
+        "--bind", "0.0.0.0:5000",
         "--reload",
+        "--reuse-port",
+        "--access-logfile", "-",
+        "--error-logfile", "-",
         "main:app"
-    ]
-    
-    print("Starting server with plain HTTP (SSL handled by Replit's load balancer)")
-    
-    # Run the command
-    try:
-        subprocess.run(cmd)
-    except KeyboardInterrupt:
-        print("Server stopped")
-        sys.exit(0)
+    ])
 
 if __name__ == "__main__":
     main()

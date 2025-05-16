@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
 
 const ArtworkDetail = () => {
   const { id } = useParams();
@@ -69,7 +70,7 @@ const ArtworkDetail = () => {
               karma: 210
             }
           },
-          text: 'I love the atmosphere you've created here. The gradient in the sky is executed beautifully. One suggestion would be to vary your brushwork more in the mountain textures to create more visual interest.',
+          text: "I love the atmosphere you have created here. The gradient in the sky is executed beautifully. One suggestion would be to vary your brushwork more in the mountain textures to create more visual interest.",
           composition_score: 5,
           technique_score: 4,
           originality_score: 5,
@@ -175,9 +176,10 @@ const ArtworkDetail = () => {
       <div className="row">
         <div className="col-md-8">
           <img 
-            src={artwork.image_display_url} 
+            src={getValidImageUrl(artwork.image_display_url)}
             className="img-fluid rounded shadow" 
-            alt={artwork.title} 
+            alt={artwork.title}
+            onError={handleImageError}
           />
         </div>
         <div className="col-md-4">

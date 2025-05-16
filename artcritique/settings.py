@@ -29,7 +29,8 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Configure SSL based on environment variable
-SSL_ENABLED = os.environ.get('SSL_ENABLED', 'false').lower() == 'true'
+# Forced to False for Replit to work with the load balancer
+SSL_ENABLED = False  # Force SSL off for Replit
 
 # Flexible SSL settings that work in both development and production
 if SSL_ENABLED:

@@ -1,5 +1,6 @@
 #!/bin/bash
-# Start Gunicorn with plain HTTP (no SSL)
+# Run HTTP server without SSL for Art Critique
 
-export SSL_ENABLED=false
-exec gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+echo "Starting HTTP server for Art Critique (no SSL)"
+cd "$(dirname "$0")"
+python setup_http_server.py

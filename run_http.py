@@ -4,31 +4,28 @@ This is needed for compatibility with Replit's load balancer.
 """
 
 import os
-import subprocess
 import sys
+import subprocess
 
 def main():
-    # Set environment variable to disable SSL
-    os.environ["SSL_ENABLED"] = "false"
+    """Run Gunicorn server without SSL"""
+    print("Starting HTTP-only server...")
     
-    # Define the command to run Gunicorn without SSL
+    # Force HTTP mode
+    os.environ['SSL_ENABLED'] = 'false'
+    
+    # Run Gunicorn without SSL
     cmd = [
         "gunicorn",
         "--bind", "0.0.0.0:5000",
-        "--reuse-port",
         "--reload",
+        "--access-logfile", "-",
+        "--error-logfile", "-",
         "main:app"
     ]
     
-    print("Starting HTTP server (no SSL) for compatibility with Replit's load balancer")
-    
-    try:
-        # Execute the command
-        process = subprocess.run(cmd)
-        sys.exit(process.returncode)
-    except KeyboardInterrupt:
-        print("\nServer stopped by user")
-        sys.exit(0)
+    print(f"Running command: {' '.join(cmd)}")
+    subprocess.run(cmd)
 
 if __name__ == "__main__":
     main()
