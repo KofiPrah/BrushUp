@@ -1,0 +1,109 @@
+/* App-wide styles */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* Bootstrap overrides and extensions */
+.btn-outline-danger:hover {
+  color: white;
+}
+
+.card {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Artwork display */
+.artwork-image {
+  object-fit: cover;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* Critique section */
+.score-display {
+  margin-bottom: 10px;
+}
+
+.reaction-button {
+  transition: all 0.2s ease;
+}
+
+.reaction-button:hover {
+  transform: scale(1.05);
+}
+
+/* Profile display */
+.profile-picture {
+  object-fit: cover;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.karma-badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+/* Notifications */
+.notification-item {
+  transition: background-color 0.2s ease;
+}
+
+.notification-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.notification-item.unread {
+  border-left: 3px solid var(--bs-primary);
+}
+
+/* Footer styling */
+footer {
+  margin-top: auto;
+}
+
+/* Animation for page transitions */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}
