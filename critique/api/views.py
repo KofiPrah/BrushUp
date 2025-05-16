@@ -2,11 +2,11 @@ from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from critique.models import ArtWork, Review, Profile, Critique, Reaction
+from critique.models import ArtWork, Review, Profile, Critique, Reaction, Notification
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
     ArtWorkListSerializer, ReviewSerializer, CritiqueSerializer, CritiqueListSerializer,
-    ReactionSerializer
+    ReactionSerializer, NotificationSerializer
 )
 from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
 from django.db import connection
@@ -674,3 +674,78 @@ def health_check(request):
     }
     
     return Response(data, status=status.HTTP_200_OK)
+
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    """API endpoint for managing user notifications.
+    
+    This ViewSet provides endpoints for:
+    - GET /api/notifications/ - List all notifications for the current user
+    - GET /api/notifications/{id}/ - Get a specific notification
+    - PATCH /api/notifications/{id}/ - Mark a notification as read
+    - DELETE /api/notifications/{id}/ - Delete a notification
+    - GET /api/notifications/unread/ - Get count of unread notifications
+    - POST /api/notifications/mark-all-read/ - Mark all notifications as read
+    """
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """Return only notifications for the current user."""
+        return Notification.objects.filter(recipient=self.request.user).order_by('-created_at')
+    
+    @action(detail=False, methods=['get'])
+    def unread(self, request):
+        """Return count of unread notifications for the current user."""
+        count = Notification.objects.filter(
+            recipient=request.user,
+            is_read=False
+        ).count()
+        
+        return Response({"unread_count": count})
+    
+    @action(detail=False, methods=['post'])
+    def mark_all_read(self, request):
+        """Mark all notifications for the current user as read."""
+        Notification.objects.filter(
+            recipient=request.user,
+            is_read=False
+        ).update(is_read=True)
+        
+        return Response({"status": "success", "message": "All notifications marked as read"})
+    
+    @action(detail=True, methods=['post'])
+    def mark_read(self, request, pk=None):
+        """Mark a specific notification as read."""
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        
+        return Response({
+            "status": "success", 
+            "message": "Notification marked as read"
+        })
+        
+    def perform_create(self, serializer):
+        """Ensure notifications are always associated with the current user as recipient."""
+        serializer.save(recipient=self.request.user)
+    
+    def update(self, request, *args, **kwargs):
+        """Limit updates to only the is_read field for security."""
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        
+        # Only allow updating is_read field
+        if 'is_read' in request.data:
+            data = {'is_read': request.data['is_read']}
+        else:
+            return Response(
+                {"error": "Only 'is_read' field can be updated"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        serializer = self.get_serializer(instance, data=data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        
+        return Response(serializer.data)

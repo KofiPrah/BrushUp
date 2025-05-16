@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 # Create your models here.
 class Profile(models.Model):
@@ -177,3 +179,37 @@ class Reaction(models.Model):
     
     def __str__(self):
         return f"{self.user.username}'s {self.reaction_type} reaction to critique by {self.critique.author.username}"
+
+
+class Notification(models.Model):
+    """Model to store user notifications."""
+    recipient = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='notifications'
+    )
+    message = models.TextField()
+    # Optional link to relevant content
+    target_content_type = models.ForeignKey(
+        ContentType, 
+        on_delete=models.CASCADE,
+        null=True, 
+        blank=True
+    )
+    target_object_id = models.PositiveIntegerField(null=True, blank=True)
+    target = GenericForeignKey('target_content_type', 'target_object_id')
+    # Optional direct URL for simple notifications
+    url = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['recipient', 'is_read', 'created_at'])
+        ]
+        verbose_name = 'Notification'
+        verbose_name_plural = 'Notifications'
+    
+    def __str__(self):
+        return f"Notification for {self.recipient.username}: {self.message[:50]}"

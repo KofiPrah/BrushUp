@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from critique.models import ArtWork, Review, Profile, Critique
+from django.contrib.contenttypes.models import ContentType
+from critique.models import ArtWork, Review, Profile, Critique, Notification, Reaction
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for the user Profile model."""
@@ -357,3 +358,50 @@ class ReactionSerializer(serializers.ModelSerializer):
         """Create a new reaction with the current user."""
         user = self.context['request'].user
         return Reaction.objects.create(user=user, **validated_data)
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    """Serializer for Notification objects."""
+    recipient_username = serializers.ReadOnlyField(source='recipient.username')
+    target_type = serializers.SerializerMethodField()
+    target_id = serializers.SerializerMethodField()
+    target_display = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'recipient', 'recipient_username', 'message', 
+            'target_type', 'target_id', 'target_display', 'url',
+            'created_at', 'is_read'
+        ]
+        read_only_fields = ['id', 'recipient', 'recipient_username', 'created_at']
+    
+    def get_target_type(self, obj):
+        """Get the target content type name if available."""
+        if obj.target_content_type:
+            return obj.target_content_type.model
+        return None
+    
+    def get_target_id(self, obj):
+        """Get the target object ID if available."""
+        return obj.target_object_id
+    
+    def get_target_display(self, obj):
+        """Get a human-readable representation of the target."""
+        if not obj.target:
+            return None
+            
+        # Handle different types of target objects
+        if isinstance(obj.target, ArtWork):
+            return f"Artwork: {obj.target.title}"
+        elif isinstance(obj.target, Critique):
+            return f"Critique on: {obj.target.artwork.title}"
+        elif isinstance(obj.target, Review):
+            return f"Review on: {obj.target.artwork.title}"
+        elif isinstance(obj.target, Reaction):
+            return f"Reaction on critique for: {obj.target.critique.artwork.title}"
+        elif isinstance(obj.target, User):
+            return f"User: {obj.target.username}"
+        
+        # Default fallback
+        return str(obj.target)
