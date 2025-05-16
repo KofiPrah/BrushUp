@@ -18,7 +18,7 @@ import requests
 from urllib.parse import urlparse
 
 # Configuration
-BASE_URL = "https://localhost:5000"  # Change to your actual domain
+BASE_URL = "https://61dced89-3318-4924-8e29-81233afc8678-00-qa67r5b70zxi.worf.replit.dev"  # Replit domain URL
 USERNAME = "admin"  # Change to an actual username
 PASSWORD = "password123"  # Change to an actual password
 TEST_IMAGE = "test_image.jpg"  # Path to test image
