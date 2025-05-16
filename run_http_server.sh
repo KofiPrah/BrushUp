@@ -1,6 +1,11 @@
 #!/bin/bash
-# Run HTTP server without SSL for Art Critique
+# Run the Django application in HTTP mode with Gunicorn
+# This script uses a custom Gunicorn configuration for HTTP
 
-echo "Starting HTTP server for Art Critique (no SSL)"
-cd "$(dirname "$0")"
-python setup_http_server.py
+# Set environment variables
+export SSL_ENABLED=false
+export HTTP_ONLY=true
+
+# Run Gunicorn with HTTP configuration
+echo "Starting Django in HTTP mode (SSL handled by Replit's load balancer)..."
+exec gunicorn --config gunicorn_http.conf.py main:app

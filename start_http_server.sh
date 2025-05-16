@@ -1,11 +1,11 @@
 #!/bin/bash
-# Start the server in HTTP mode without SSL certificates
-# This is needed for compatibility with Replit's load balancer which
-# handles the SSL termination.
+# Start the Art Critique application in HTTP mode
+# This script is designed for Replit's load balancer
 
 # Set environment variables
 export SSL_ENABLED=false
-export SECURE_SSL_REDIRECT=false
+export HTTP_ONLY=true
 
-echo "Starting server in HTTP mode..."
-gunicorn --bind 0.0.0.0:5000 --workers 1 --reload --reuse-port main:app
+# Run Gunicorn with our HTTP main module
+echo "Starting Art Critique in HTTP-only mode..."
+exec gunicorn --bind 0.0.0.0:5000 --reuse-port --reload http_main:app

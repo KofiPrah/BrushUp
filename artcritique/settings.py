@@ -195,10 +195,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # AWS S3 Configuration
-# Temporarily forcing local storage until S3 access issues are resolved
-USE_S3 = False  # os.environ.get('USE_S3', 'False') == 'True'
+# S3 storage is enabled when USE_S3 environment variable is set to 'True'
+USE_S3 = os.environ.get('USE_S3', 'False') == 'True'
 print(
-    f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')}) - FORCED to False for local storage"
+    f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')})"
 )
 
 if USE_S3:
@@ -222,11 +222,11 @@ if USE_S3:
     # S3 Public Media Settings
     PUBLIC_MEDIA_LOCATION = 'media'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'artcritique.storage_backends.PublicMediaStorage'
 
     # Force the storage to use S3
     print(
-        f"Using S3 storage: {DEFAULT_FILE_STORAGE} (ACLs disabled, using bucket policy)"
+        f"Using S3 storage: {DEFAULT_FILE_STORAGE} with bucket policy (no ACLs)"
     )
 
     # S3 Private Media Settings (optional)
