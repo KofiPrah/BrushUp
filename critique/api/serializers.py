@@ -166,8 +166,9 @@ class ArtWorkSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create a new artwork with the current user as author."""
-        user = self.context['request'].user
-        artwork = ArtWork.objects.create(author=user, **validated_data)
+        # Author is now being set in the view via perform_create method
+        # so we don't need to set it here to avoid the duplicate argument error
+        artwork = ArtWork.objects.create(**validated_data)
         return artwork
 
 class ArtWorkListSerializer(serializers.ModelSerializer):
