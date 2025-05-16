@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -13,45 +12,13 @@ import Register from './pages/Register';
 // Components
 import Navbar from './components/Navbar';
 
-function App() {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+// Authentication Context
+import { AuthProvider, useAuth } from './context/AuthContext';
 
-  // In a real app, we would check if the user is already logged in
-  useEffect(() => {
-    // Simulating a session check
-    const checkSession = async () => {
-      try {
-        // This would be an API call to check the session
-        // Example: const response = await authAPI.checkSession();
-        
-        // For the demo, we'll check localStorage for a user session
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          setUser(JSON.parse(storedUser));
-        }
-      } catch (error) {
-        console.error('Session check failed', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkSession();
-  }, []);
-
-  const handleLogin = (userData) => {
-    setUser(userData);
-    // Store in localStorage for demo purposes (in a real app, this would be handled by cookies)
-    localStorage.setItem('user', JSON.stringify(userData));
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    // In a real app, this would also call an API endpoint to logout
-  };
-
+// Protected Route wrapper component
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, loading } = useAuth();
+  
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
@@ -61,52 +28,109 @@ function App() {
       </div>
     );
   }
+  
+  if (!isAuthenticated) {
+    // Store the current location to redirect back after login
+    sessionStorage.setItem('redirect_after_login', window.location.pathname);
+    return <Navigate to="/login" />;
+  }
+  
+  return children;
+};
 
+// Main App Routes component that uses the auth context
+const AppRoutes = () => {
+  const { user, loading, isAuthenticated, logout } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+  
   return (
-    <Router>
-      <div className="app-container">
-        <Navbar user={user} onLogout={handleLogout} />
-        
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/artworks" element={<ArtworkList />} />
-            <Route path="/artworks/:id" element={<ArtworkDetail />} />
-            <Route 
-              path="/login" 
-              element={user ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} 
-            />
-            <Route 
-              path="/register" 
-              element={user ? <Navigate to="/" /> : <Register onLogin={handleLogin} />} 
-            />
-            
-            {/* Protected routes */}
-            <Route 
-              path="/profile" 
-              element={user ? <div>Profile Page (To be implemented)</div> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/my-artworks" 
-              element={user ? <div>My Artworks Page (To be implemented)</div> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/upload" 
-              element={user ? <div>Upload Artwork Page (To be implemented)</div> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/notifications" 
-              element={user ? <div>Notifications Page (To be implemented)</div> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/settings" 
-              element={user ? <div>Settings Page (To be implemented)</div> : <Navigate to="/login" />} 
-            />
-            
-            {/* Fallback for unknown routes */}
-            <Route path="*" element={<div className="container mt-5 text-center"><h2>Page Not Found</h2></div>} />
-          </Routes>
-        </main>
+    <div className="app-container">
+      <Navbar user={user} isAuthenticated={isAuthenticated} onLogout={logout} />
+      
+      <main>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/artworks" element={<ArtworkList />} />
+          <Route path="/artworks/:id" element={<ArtworkDetail />} />
+          <Route 
+            path="/login" 
+            element={isAuthenticated ? <Navigate to="/" /> : <Login />} 
+          />
+          <Route 
+            path="/register" 
+            element={isAuthenticated ? <Navigate to="/" /> : <Register />} 
+          />
+          
+          {/* Protected routes */}
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <div className="container mt-5">
+                  <h2>Profile Page</h2>
+                  <p>This page will display your profile information</p>
+                </div>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/my-artworks" 
+            element={
+              <ProtectedRoute>
+                <div className="container mt-5">
+                  <h2>My Artworks</h2>
+                  <p>Here you'll see all the artwork you've uploaded</p>
+                </div>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/upload" 
+            element={
+              <ProtectedRoute>
+                <div className="container mt-5">
+                  <h2>Upload Artwork</h2>
+                  <p>Share your artwork with the community</p>
+                </div>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/notifications" 
+            element={
+              <ProtectedRoute>
+                <div className="container mt-5">
+                  <h2>Notifications</h2>
+                  <p>Check your latest notifications</p>
+                </div>
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/settings" 
+            element={
+              <ProtectedRoute>
+                <div className="container mt-5">
+                  <h2>Account Settings</h2>
+                  <p>Manage your account preferences</p>
+                </div>
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Fallback for unknown routes */}
+          <Route path="*" element={<div className="container mt-5 text-center"><h2>Page Not Found</h2></div>} />
+        </Routes>
+      </main>
         
         <footer className="bg-dark text-light mt-5 py-4">
           <div className="container">
@@ -140,6 +164,16 @@ function App() {
           </div>
         </footer>
       </div>
+    </Router>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </Router>
   );
 }

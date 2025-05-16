@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const Navbar = ({ user, onLogout }) => {
+const Navbar = () => {
+  const { user, isAuthenticated, logout } = useAuth();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const navigate = useNavigate();
   
   const handleNavCollapse = () => setIsNavCollapsed(!isNavCollapsed);
   
-  const handleLogout = () => {
-    if (onLogout) {
-      onLogout();
+  const handleLogout = async () => {
+    try {
+      const result = await logout();
+      if (result.success) {
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   };
 
@@ -41,7 +48,7 @@ const Navbar = ({ user, onLogout }) => {
             <li className="nav-item">
               <Link className="nav-link" to="/artworks">Artworks</Link>
             </li>
-            {user && (
+            {isAuthenticated && (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" to="/upload">Upload Artwork</Link>
@@ -54,7 +61,7 @@ const Navbar = ({ user, onLogout }) => {
           </ul>
           
           <ul className="navbar-nav">
-            {user ? (
+            {isAuthenticated && user ? (
               <>
                 <li className="nav-item dropdown">
                   <a 
@@ -72,7 +79,7 @@ const Navbar = ({ user, onLogout }) => {
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                     <li><h6 className="dropdown-header">Notifications</h6></li>
-                    {user.unread_notifications === 0 ? (
+                    {!user.unread_notifications || user.unread_notifications === 0 ? (
                       <li><span className="dropdown-item text-muted">No new notifications</span></li>
                     ) : (
                       <li>
@@ -93,11 +100,13 @@ const Navbar = ({ user, onLogout }) => {
                     data-bs-toggle="dropdown" 
                     aria-expanded="false"
                   >
-                    {user.username}
-                    <span className="badge bg-info ms-1">
-                      <i className="bi bi-star-fill me-1"></i>
-                      {user.karma}
-                    </span>
+                    {user.username || 'User'}
+                    {user.karma !== undefined && (
+                      <span className="badge bg-info ms-1">
+                        <i className="bi bi-star-fill me-1"></i>
+                        {user.karma}
+                      </span>
+                    )}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                     <li><Link className="dropdown-item" to="/profile">My Profile</Link></li>

@@ -1,12 +1,25 @@
 import axios from 'axios';
 
+// Determine the base URL based on environment
+const getBaseURL = () => {
+  // In development, use the proxy configured in vite.config.js
+  if (import.meta.env.DEV) {
+    return '/api';
+  }
+  
+  // In production, use the absolute URL to the backend API
+  // This can be configured via environment variable if needed
+  return import.meta.env.VITE_API_URL || '/api';
+};
+
 // Create an axios instance with defaults configured for our API
 const API = axios.create({
-  baseURL: '/api',
+  baseURL: getBaseURL(),
   withCredentials: true, // Important for sending cookies with requests
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
+  timeout: 30000, // 30 second timeout
 });
 
 // Request interceptor to handle common request configurations
@@ -17,9 +30,81 @@ API.interceptors.request.use(
     if (csrfToken) {
       config.headers['X-CSRFToken'] = csrfToken;
     }
+    
+    // For JWT token-based auth (if implemented)
+    const authToken = localStorage.getItem('auth_token');
+    if (authToken && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${authToken}`;
+    }
+    
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for global error handling
+API.interceptors.response.use(
+  (response) => {
+    // Success case - just return the response
+    return response;
+  },
+  (error) => {
+    const originalRequest = error.config;
+    
+    // Handle authentication errors (redirect to login)
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+      // Clear any stored authentication data
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user');
+      
+      // Redirect to login page (if using client-side router)
+      if (window.location.pathname !== '/login') {
+        // Store the current location to redirect back after login
+        sessionStorage.setItem('redirect_after_login', window.location.pathname);
+        window.location.href = '/login';
+      }
+    }
+    
+    // Handle CSRF token errors by refreshing the token and retrying
+    if (error.response && error.response.status === 403 && 
+        error.response.data && 
+        error.response.data.detail && 
+        error.response.data.detail.includes('CSRF') && 
+        !originalRequest._retry) {
+      
+      originalRequest._retry = true;
+      
+      // Get a fresh CSRF token and retry the request
+      return API.get('/auth/csrf/')
+        .then(() => {
+          // Update the CSRF token in the original request
+          originalRequest.headers['X-CSRFToken'] = getCookie('csrftoken');
+          return API(originalRequest);
+        });
+    }
+    
+    // Handle rate limiting
+    if (error.response && error.response.status === 429) {
+      console.warn('Rate limit exceeded. Please try again later.');
+    }
+    
+    // Log errors that might need debugging
+    if (error.response) {
+      console.error('API Error Response:', {
+        status: error.response.status,
+        data: error.response.data,
+        headers: error.response.headers,
+        url: originalRequest.url
+      });
+    } else if (error.request) {
+      console.error('API Error Request:', error.request);
+    } else {
+      console.error('API Error:', error.message);
+    }
+    
     return Promise.reject(error);
   }
 );
