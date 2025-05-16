@@ -218,6 +218,9 @@ if USE_S3:
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{PUBLIC_MEDIA_LOCATION}/'
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     
+    # Force the storage to use S3
+    print(f"Using S3 storage: {DEFAULT_FILE_STORAGE}")
+    
     # S3 Private Media Settings (optional)
     PRIVATE_MEDIA_LOCATION = 'private'
     PRIVATE_FILE_STORAGE = 'artcritique.storage_backends.PrivateMediaStorage'
