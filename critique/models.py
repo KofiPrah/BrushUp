@@ -138,3 +138,42 @@ class Critique(models.Model):
         if not scores:
             return None
         return sum(scores) / len(scores)
+
+
+class Reaction(models.Model):
+    """
+    Model to represent a user's reaction to a critique.
+    Each user can only give one reaction of each type to a specific critique.
+    """
+    # Reaction type choices using TextChoices for better organization
+    class ReactionType(models.TextChoices):
+        HELPFUL = 'HELPFUL', 'Helpful'
+        INSPIRING = 'INSPIRING', 'Inspiring'
+        DETAILED = 'DETAILED', 'Detailed'
+    
+    # Relationships
+    critique = models.ForeignKey(Critique, on_delete=models.CASCADE, related_name='reactions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='critique_reactions')
+    
+    # Reaction data
+    reaction_type = models.CharField(
+        max_length=20, 
+        choices=ReactionType.choices,
+        help_text="The type of reaction given to the critique"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        # Ensure each user can only react once per type on a given critique
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'critique', 'reaction_type'],
+                name='unique_user_critique_reaction'
+            )
+        ]
+        ordering = ['-created_at']
+        verbose_name = 'Critique Reaction'
+        verbose_name_plural = 'Critique Reactions'
+    
+    def __str__(self):
+        return f"{self.user.username}'s {self.reaction_type} reaction to critique by {self.critique.author.username}"

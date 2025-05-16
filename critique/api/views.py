@@ -2,10 +2,11 @@ from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from critique.models import ArtWork, Review, Profile, Critique
+from critique.models import ArtWork, Review, Profile, Critique, Reaction
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
-    ArtWorkListSerializer, ReviewSerializer, CritiqueSerializer, CritiqueListSerializer
+    ArtWorkListSerializer, ReviewSerializer, CritiqueSerializer, CritiqueListSerializer,
+    ReactionSerializer
 )
 from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
 from django.db import connection
@@ -383,6 +384,159 @@ class CritiqueViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Set the author to the current user when creating a critique."""
         serializer.save(author=self.request.user)
+        
+    @action(detail=True, methods=['post'])
+    def toggle_reaction(self, request, pk=None):
+        """
+        Toggle a reaction on this critique.
+        
+        Example: POST /api/critiques/5/toggle_reaction/
+        Payload: {"type": "HELPFUL"}
+        
+        This will create the reaction if it doesn't exist or remove it if it does,
+        effectively toggling the reaction status.
+        """
+        critique = self.get_object()
+        
+        # Validate reaction type
+        reaction_type = request.data.get('type')
+        if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+            return Response(
+                {"error": f"Invalid reaction type. Allowed values: {[choice[0] for choice in Reaction.ReactionType.choices]}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Check if user already gave this reaction type to this critique
+        existing_reaction = Reaction.objects.filter(
+            user=request.user,
+            critique=critique,
+            reaction_type=reaction_type
+        ).first()
+        
+        # Toggle reaction: remove if exists, add if doesn't
+        created = False
+        if existing_reaction:
+            # Remove the reaction (toggle off)
+            existing_reaction.delete()
+        else:
+            # Create the reaction (toggle on)
+            Reaction.objects.create(
+                user=request.user,
+                critique=critique,
+                reaction_type=reaction_type
+            )
+            created = True
+        
+        # Get updated reaction counts
+        critique_serializer = CritiqueSerializer(critique, context={'request': request})
+        
+        response_data = {
+            'created': created,
+            'reaction_type': reaction_type,
+            'critique_id': critique.id,
+            'helpful_count': critique_serializer.get_helpful_count(critique),
+            'inspiring_count': critique_serializer.get_inspiring_count(critique),
+            'detailed_count': critique_serializer.get_detailed_count(critique),
+            'user_reactions': critique_serializer.get_user_reactions(critique)
+        }
+            
+        return Response(response_data, status=status.HTTP_200_OK)
+        
+    @action(detail=True, methods=['post'])
+    def react(self, request, pk=None):
+        """
+        Add a reaction to this critique.
+        
+        Example: POST /api/critiques/5/react/
+        Payload: {"reaction_type": "HELPFUL"}
+        
+        Note: This endpoint is deprecated. Use toggle_reaction instead.
+        """
+        critique = self.get_object()
+        
+        # Validate reaction type
+        reaction_type = request.data.get('reaction_type')
+        if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+            return Response(
+                {"error": f"Invalid reaction_type. Allowed values: {[choice[0] for choice in Reaction.ReactionType.choices]}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Check if user already gave this reaction type to this critique
+        existing = Reaction.objects.filter(
+            user=request.user,
+            critique=critique,
+            reaction_type=reaction_type
+        ).exists()
+        
+        if existing:
+            return Response(
+                {"error": f"You have already given a {reaction_type} reaction to this critique."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Create the reaction
+        reaction = Reaction.objects.create(
+            user=request.user,
+            critique=critique,
+            reaction_type=reaction_type
+        )
+        
+        # Get updated reaction counts
+        critique_serializer = CritiqueSerializer(critique, context={'request': request})
+        
+        response_data = {
+            'reaction': ReactionSerializer(reaction, context={'request': request}).data,
+            'helpful_count': critique_serializer.get_helpful_count(critique),
+            'inspiring_count': critique_serializer.get_inspiring_count(critique),
+            'detailed_count': critique_serializer.get_detailed_count(critique)
+        }
+        
+        return Response(response_data, status=status.HTTP_201_CREATED)
+        
+    @action(detail=True, methods=['delete'])
+    def unreact(self, request, pk=None):
+        """
+        Remove a reaction from this critique.
+        
+        Example: DELETE /api/critiques/5/unreact/?reaction_type=HELPFUL
+        
+        Note: This endpoint is deprecated. Use toggle_reaction instead.
+        """
+        critique = self.get_object()
+        
+        # Validate reaction type
+        reaction_type = request.query_params.get('reaction_type')
+        if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+            return Response(
+                {"error": f"Invalid reaction_type. Allowed values: {[choice[0] for choice in Reaction.ReactionType.choices]}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        # Find and delete the reaction
+        try:
+            reaction = Reaction.objects.get(
+                user=request.user,
+                critique=critique,
+                reaction_type=reaction_type
+            )
+            reaction.delete()
+            
+            # Get updated reaction counts
+            critique_serializer = CritiqueSerializer(critique, context={'request': request})
+            
+            response_data = {
+                'helpful_count': critique_serializer.get_helpful_count(critique),
+                'inspiring_count': critique_serializer.get_inspiring_count(critique),
+                'detailed_count': critique_serializer.get_detailed_count(critique)
+            }
+            
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Reaction.DoesNotExist:
+            return Response(
+                {"error": f"You haven't given a {reaction_type} reaction to this critique."},
+                status=status.HTTP_404_NOT_FOUND
+            )
     
     @action(detail=False, methods=['get'], url_path='artwork/(?P<artwork_id>[^/.]+)')
     def artwork_critiques(self, request, artwork_id=None):
@@ -407,6 +561,80 @@ class CritiqueViewSet(viewsets.ModelViewSet):
             
         serializer = self.get_serializer(critiques, many=True)
         return Response(serializer.data)
+
+class ReactionViewSet(viewsets.ModelViewSet):
+    """API endpoint for managing reactions to critiques.
+    
+    Allows authenticated users to react to critiques with different reaction types:
+    - HELPFUL - Indicates the critique was useful to the user
+    - INSPIRING - Indicates the critique provided inspiration
+    - DETAILED - Indicates the critique was thorough and comprehensive
+    
+    Each user can give one reaction of each type to a specific critique.
+    """
+    queryset = Reaction.objects.all()
+    serializer_class = ReactionSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    
+    def get_queryset(self):
+        """Filter reactions by user and/or critique."""
+        queryset = Reaction.objects.all()
+        
+        # Filter by user
+        user_id = self.request.query_params.get('user', None)
+        if user_id:
+            queryset = queryset.filter(user_id=user_id)
+            
+        # Filter by critique
+        critique_id = self.request.query_params.get('critique', None)
+        if critique_id:
+            queryset = queryset.filter(critique_id=critique_id)
+            
+        # Filter by reaction type
+        reaction_type = self.request.query_params.get('type', None)
+        if reaction_type:
+            queryset = queryset.filter(reaction_type=reaction_type)
+            
+        return queryset
+    
+    def perform_create(self, serializer):
+        """Set the current user when creating a reaction."""
+        serializer.save(user=self.request.user)
+        
+    @action(detail=False, methods=['get'])
+    def my_reactions(self, request):
+        """Get all reactions made by the current user."""
+        reactions = Reaction.objects.filter(user=request.user)
+        serializer = self.get_serializer(reactions, many=True)
+        return Response(serializer.data)
+        
+    @action(detail=False, methods=['get'])
+    def reaction_types(self, request):
+        """Get all available reaction types."""
+        return Response({
+            'reaction_types': [
+                {'value': choice[0], 'display': choice[1]} 
+                for choice in Reaction.ReactionType.choices
+            ]
+        })
+        
+    @action(detail=False, methods=['get'])
+    def stats(self, request):
+        """Get statistics about reactions across the platform."""
+        # Total reactions count
+        total_count = Reaction.objects.count()
+        
+        # Count by type
+        counts_by_type = {}
+        for reaction_type in [choice[0] for choice in Reaction.ReactionType.choices]:
+            count = Reaction.objects.filter(reaction_type=reaction_type).count()
+            counts_by_type[reaction_type] = count
+            
+        return Response({
+            'total_count': total_count,
+            'counts_by_type': counts_by_type
+        })
+
 
 @api_view(['GET'])
 def health_check(request):

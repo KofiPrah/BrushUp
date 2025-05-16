@@ -1,7 +1,6 @@
-#!/usr/bin/env python
 """
-Simple script to run the Django application over HTTP.
-This is useful for testing when SSL issues occur.
+Simple script to run the Django application over HTTP (no SSL).
+This is needed for compatibility with Replit's load balancer.
 """
 
 import os
@@ -12,20 +11,19 @@ def main():
     # Set environment variable to disable SSL
     os.environ["SSL_ENABLED"] = "false"
     
-    # Define the port to use
-    port = 8080
-    
-    print(f"Starting Django server in HTTP mode on port {port}")
-    print("This can be used for testing the image upload functionality")
-    print("Press Ctrl+C to stop the server")
-    
-    # Construct the command
+    # Define the command to run Gunicorn without SSL
     cmd = [
-        "python", "manage.py", "runserver", f"0.0.0.0:{port}"
+        "gunicorn",
+        "--bind", "0.0.0.0:5000",
+        "--reuse-port",
+        "--reload",
+        "main:app"
     ]
     
-    # Run the command
+    print("Starting HTTP server (no SSL) for compatibility with Replit's load balancer")
+    
     try:
+        # Execute the command
         process = subprocess.run(cmd)
         sys.exit(process.returncode)
     except KeyboardInterrupt:

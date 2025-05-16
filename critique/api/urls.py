@@ -2,7 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     UserViewSet, ProfileViewSet, ArtWorkViewSet, 
-    ReviewViewSet, CritiqueViewSet, health_check
+    ReviewViewSet, CritiqueViewSet, health_check,
+    ReactionViewSet
 )
 
 # Create a router and register our viewsets with it
@@ -12,6 +13,7 @@ router.register(r'profiles', ProfileViewSet)
 router.register(r'artworks', ArtWorkViewSet)
 router.register(r'reviews', ReviewViewSet)
 router.register(r'critiques', CritiqueViewSet)
+router.register(r'reactions', ReactionViewSet)
 
 # The API URLs are determined automatically by the router
 urlpatterns = [

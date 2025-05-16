@@ -202,17 +202,26 @@ class CritiqueSerializer(serializers.ModelSerializer):
     author_profile_url = serializers.SerializerMethodField()
     artwork_title = serializers.CharField(source='artwork.title', read_only=True)
     average_score = serializers.SerializerMethodField()
+    reactions_count = serializers.SerializerMethodField()
+    helpful_count = serializers.SerializerMethodField()
+    inspiring_count = serializers.SerializerMethodField()
+    detailed_count = serializers.SerializerMethodField()
+    user_reactions = serializers.SerializerMethodField()
     
     class Meta:
         model = Critique
         fields = [
             'id', 'artwork', 'artwork_title', 'author', 'author_name', 
             'author_profile_url', 'text', 'composition_score', 'technique_score', 
-            'originality_score', 'average_score', 'created_at', 'updated_at'
+            'originality_score', 'average_score', 'reactions_count',
+            'helpful_count', 'inspiring_count', 'detailed_count', 'user_reactions',
+            'created_at', 'updated_at'
         ]
         read_only_fields = [
             'id', 'author', 'author_name', 'author_profile_url', 
-            'artwork_title', 'average_score', 'created_at', 'updated_at'
+            'artwork_title', 'average_score', 'reactions_count',
+            'helpful_count', 'inspiring_count', 'detailed_count', 'user_reactions',
+            'created_at', 'updated_at'
         ]
     
     def get_author_profile_url(self, obj):
@@ -222,6 +231,26 @@ class CritiqueSerializer(serializers.ModelSerializer):
     def get_average_score(self, obj):
         """Return the average score for this critique."""
         return obj.get_average_score()
+        
+    def get_helpful_count(self, obj):
+        """Return the count of HELPFUL reactions for this critique."""
+        return obj.reaction_set.filter(reaction_type='HELPFUL').count()
+        
+    def get_inspiring_count(self, obj):
+        """Return the count of INSPIRING reactions for this critique."""
+        return obj.reaction_set.filter(reaction_type='INSPIRING').count()
+        
+    def get_detailed_count(self, obj):
+        """Return the count of DETAILED reactions for this critique."""
+        return obj.reaction_set.filter(reaction_type='DETAILED').count()
+        
+    def get_user_reactions(self, obj):
+        """Return a list of reaction types the current user has given to this critique."""
+        user = self.context.get('request').user
+        if not user or user.is_anonymous:
+            return []
+            
+        return list(obj.reaction_set.filter(user=user).values_list('reaction_type', flat=True))
     
     def create(self, validated_data):
         """Create a new critique with the current user as author."""
@@ -234,14 +263,97 @@ class CritiqueListSerializer(serializers.ModelSerializer):
     author_name = serializers.CharField(source='author.username', read_only=True)
     artwork_title = serializers.CharField(source='artwork.title', read_only=True)
     average_score = serializers.SerializerMethodField()
+    reactions_count = serializers.SerializerMethodField()
+    helpful_count = serializers.SerializerMethodField()
+    inspiring_count = serializers.SerializerMethodField()
+    detailed_count = serializers.SerializerMethodField()
+    user_reactions = serializers.SerializerMethodField()
     
     class Meta:
         model = Critique
         fields = [
             'id', 'artwork', 'artwork_title', 'author_name', 
-            'text', 'average_score', 'created_at'
+            'text', 'average_score', 'reactions_count', 
+            'helpful_count', 'inspiring_count', 'detailed_count',
+            'user_reactions', 'created_at'
         ]
     
     def get_average_score(self, obj):
         """Return the average score for this critique."""
         return obj.get_average_score()
+        
+    def get_reactions_count(self, obj):
+        """Return the count of reactions for this critique, grouped by type."""
+        reactions_count = {
+            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
+            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
+            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
+            'total': obj.reaction_set.count()
+        }
+        return reactions_count
+        
+    def get_helpful_count(self, obj):
+        """Return the count of HELPFUL reactions for this critique."""
+        return obj.reaction_set.filter(reaction_type='HELPFUL').count()
+        
+    def get_inspiring_count(self, obj):
+        """Return the count of INSPIRING reactions for this critique."""
+        return obj.reaction_set.filter(reaction_type='INSPIRING').count()
+        
+    def get_detailed_count(self, obj):
+        """Return the count of DETAILED reactions for this critique."""
+        return obj.reaction_set.filter(reaction_type='DETAILED').count()
+        
+    def get_user_reactions(self, obj):
+        """Return a list of reaction types the current user has given to this critique."""
+        user = self.context.get('request').user
+        if not user or user.is_anonymous:
+            return []
+            
+        return list(obj.reaction_set.filter(user=user).values_list('reaction_type', flat=True))
+        
+        
+class ReactionSerializer(serializers.ModelSerializer):
+    """Serializer for the Reaction model."""
+    user = UserSerializer(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    critique_id = serializers.PrimaryKeyRelatedField(
+        source='critique',
+        queryset=Critique.objects.all()
+    )
+    
+    class Meta:
+        model = Reaction
+        fields = [
+            'id', 'critique_id', 'user', 'username', 
+            'reaction_type', 'created_at'
+        ]
+        read_only_fields = ['id', 'user', 'username', 'created_at']
+    
+    def validate(self, data):
+        """
+        Check that the user hasn't already given this type of reaction to this critique.
+        This is in addition to the model constraint, to provide a better error message.
+        """
+        user = self.context['request'].user
+        critique = data['critique']
+        reaction_type = data['reaction_type']
+        
+        # Check if user already gave this reaction type to this critique
+        existing = Reaction.objects.filter(
+            user=user,
+            critique=critique,
+            reaction_type=reaction_type
+        ).exists()
+        
+        if existing:
+            raise serializers.ValidationError(
+                f"You have already given a {reaction_type} reaction to this critique."
+            )
+        
+        return data
+    
+    def create(self, validated_data):
+        """Create a new reaction with the current user."""
+        user = self.context['request'].user
+        return Reaction.objects.create(user=user, **validated_data)
