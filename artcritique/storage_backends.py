@@ -17,6 +17,15 @@ class PublicMediaStorage(S3Boto3Storage):
     location = settings.PUBLIC_MEDIA_LOCATION if hasattr(settings, 'PUBLIC_MEDIA_LOCATION') else 'media'
     default_acl = 'public-read'
     file_overwrite = False
+    
+    def _save(self, name, content):
+        """
+        Override _save to ensure public-read ACL is explicitly set on each upload.
+        """
+        params = self.get_object_parameters(name)
+        # Explicitly set ACL for this upload
+        params['ACL'] = 'public-read'
+        return super()._save(name, content)
 
 
 class PrivateMediaStorage(S3Boto3Storage):
