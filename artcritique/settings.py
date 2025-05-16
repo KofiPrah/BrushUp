@@ -207,8 +207,9 @@ if USE_S3:
         'CacheControl': 'max-age=86400',  # 1 day cache
     }
     
-    # Set default ACL to public-read to make files accessible
-    AWS_DEFAULT_ACL = 'public-read'
+    # Important: Setting ACL to None since bucket doesn't support ACLs
+    # This relies on bucket policy for public access instead
+    AWS_DEFAULT_ACL = None  
     
     # Disable signed URLs for public bucket access
     AWS_QUERYSTRING_AUTH = False
@@ -219,7 +220,7 @@ if USE_S3:
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
     
     # Force the storage to use S3
-    print(f"Using S3 storage: {DEFAULT_FILE_STORAGE}")
+    print(f"Using S3 storage: {DEFAULT_FILE_STORAGE} (ACLs disabled, using bucket policy)")
     
     # S3 Private Media Settings (optional)
     PRIVATE_MEDIA_LOCATION = 'private'
