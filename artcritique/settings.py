@@ -203,6 +203,7 @@ if USE_S3:
     AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
     AWS_S3_OBJECT_PARAMETERS = {
+        'ACL': 'public-read',
         'CacheControl': 'max-age=86400',  # 1 day cache
     }
     
@@ -210,7 +211,8 @@ if USE_S3:
     AWS_QUERYSTRING_AUTH = False
     
     # For security, verify your bucket has proper CORS settings
-    AWS_DEFAULT_ACL = 'public-read'
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False # Disable signed URLs for public bucket access
     
     # S3 Public Media Settings
     PUBLIC_MEDIA_LOCATION = 'media'
