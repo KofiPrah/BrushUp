@@ -91,18 +91,21 @@ class ArtWorkSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     likes_count = serializers.SerializerMethodField()
     reviews_count = serializers.SerializerMethodField()
+    critiques_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     image_display_url = serializers.SerializerMethodField()
+    critiques = serializers.SerializerMethodField()
     
     class Meta:
         model = ArtWork
         fields = [
             'id', 'title', 'description', 'image', 'image_url', 'image_display_url',
             'created_at', 'updated_at', 'author', 'medium', 'dimensions', 'tags', 
-            'likes_count', 'reviews_count', 'is_liked'
+            'likes_count', 'reviews_count', 'critiques_count', 'is_liked', 'critiques'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'author', 
-                           'likes_count', 'reviews_count', 'is_liked', 'image_display_url']
+                           'likes_count', 'reviews_count', 'critiques_count', 
+                           'is_liked', 'image_display_url', 'critiques']
                            
     def get_image_display_url(self, obj):
         """Return the URL to display the image, prioritizing S3 storage."""
@@ -117,6 +120,19 @@ class ArtWorkSerializer(serializers.ModelSerializer):
     def get_reviews_count(self, obj):
         """Return the number of reviews for this artwork."""
         return obj.reviews.count()
+        
+    def get_critiques_count(self, obj):
+        """Return the number of critiques for this artwork."""
+        return obj.critiques.count()
+    
+    def get_critiques(self, obj):
+        """Return the critiques for this artwork."""
+        # For detail view, include critiques with the artwork
+        if self.context.get('view') and self.context['view'].action == 'retrieve':
+            critiques = obj.critiques.all().order_by('-created_at')[:5]  # Limit to the 5 most recent critiques
+            from .serializers import CritiqueListSerializer
+            return CritiqueListSerializer(critiques, many=True, context=self.context).data
+        return None
     
     def get_is_liked(self, obj):
         """Return whether the current user has liked this artwork."""

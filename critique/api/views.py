@@ -120,6 +120,45 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         """Set the author to the current user when creating an artwork."""
         serializer.save(author=self.request.user)
         
+    @action(detail=True, methods=['get'])
+    def critiques(self, request, pk=None):
+        """Get all critiques for this artwork.
+        
+        Example: /api/artworks/5/critiques/
+        """
+        artwork = self.get_object()
+        critiques = artwork.critiques.all().order_by('-created_at')
+        
+        # Apply pagination
+        page = self.paginate_queryset(critiques)
+        if page is not None:
+            serializer = CritiqueSerializer(page, many=True, context={'request': request})
+            return self.get_paginated_response(serializer.data)
+            
+        serializer = CritiqueSerializer(critiques, many=True, context={'request': request})
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def add_critique(self, request, pk=None):
+        """Add a critique to this artwork.
+        
+        Example: POST /api/artworks/5/add_critique/
+        Payload: { "text": "Great composition!", "composition_score": 5, "technique_score": 4, "originality_score": 5 }
+        """
+        artwork = self.get_object()
+        
+        # Create a mutable copy of the request data and add the artwork ID
+        data = request.data.copy()
+        data['artwork'] = artwork.id
+        
+        # Create and validate the serializer
+        serializer = CritiqueSerializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(author=request.user, artwork=artwork)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
     @action(detail=True, methods=['post'])
     def like(self, request, pk=None):
         """Toggle like status for the current user on this artwork."""
