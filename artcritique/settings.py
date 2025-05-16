@@ -193,9 +193,10 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # AWS S3 Configuration
-USE_S3 = os.environ.get('USE_S3', 'False') == 'True'
+# Temporarily forcing local storage until S3 access issues are resolved
+USE_S3 = False  # os.environ.get('USE_S3', 'False') == 'True'
 print(
-    f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')})"
+    f"USE_S3 is {USE_S3} (value from env: {os.environ.get('USE_S3', 'False')}) - FORCED to False for local storage"
 )
 
 if USE_S3:
