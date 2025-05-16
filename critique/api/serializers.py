@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from critique.models import ArtWork, Review, Profile, Critique, Notification, Reaction
+from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
     """Serializer for the user Profile model."""
