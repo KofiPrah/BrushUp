@@ -1,14 +1,8 @@
 #!/bin/bash
-# Script to start the HTTP server without SSL for Replit compatibility
-
-# Kill any existing gunicorn processes
-pkill -9 gunicorn
-pkill -9 python
-
-# Set environment variables
+# Run Django in HTTP-only mode
 export SSL_ENABLED=false
 export HTTP_ONLY=true
+export DJANGO_SETTINGS_MODULE=artcritique.settings
 
-# Start the server without SSL
-echo "Starting Django app in HTTP-only mode..."
-gunicorn --bind 0.0.0.0:5000 --workers 1 --reload http_server_config:app
+echo "Starting Art Critique in HTTP mode..."
+gunicorn --bind 0.0.0.0:5000 artcritique.wsgi:application
