@@ -163,7 +163,7 @@
                                             <h6>Composition</h6>
                                             <div class="progress">
                                                 <div class="progress-bar bg-info" role="progressbar" 
-                                                     style="width: {{ critique.composition_score|default:0|mul:10 }}%" 
+                                                     style="width: {% widthratio critique.composition_score|default:0 1 10 %}%" 
                                                      aria-valuenow="{{ critique.composition_score|default:0 }}" 
                                                      aria-valuemin="0" aria-valuemax="10">
                                                     {{ critique.composition_score|default:"N/A" }}
@@ -174,7 +174,7 @@
                                             <h6>Technique</h6>
                                             <div class="progress">
                                                 <div class="progress-bar bg-success" role="progressbar" 
-                                                     style="width: {{ critique.technique_score|default:0|mul:10 }}%" 
+                                                     style="width: {% widthratio critique.technique_score|default:0 1 10 %}%" 
                                                      aria-valuenow="{{ critique.technique_score|default:0 }}" 
                                                      aria-valuemin="0" aria-valuemax="10">
                                                     {{ critique.technique_score|default:"N/A" }}
@@ -185,7 +185,7 @@
                                             <h6>Originality</h6>
                                             <div class="progress">
                                                 <div class="progress-bar bg-warning" role="progressbar" 
-                                                     style="width: {{ critique.originality_score|default:0|mul:10 }}%" 
+                                                     style="width: {% widthratio critique.originality_score|default:0 1 10 %}%" 
                                                      aria-valuenow="{{ critique.originality_score|default:0 }}" 
                                                      aria-valuemin="0" aria-valuemax="10">
                                                     {{ critique.originality_score|default:"N/A" }}

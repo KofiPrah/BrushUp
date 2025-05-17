@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'storages',  # AWS S3 storage
+    'mathfilters',  # Math filters for templates
 
     # Local apps
     'critique',  # Our critique app
