@@ -1,0 +1,133 @@
+{% extends "critique/base.html" %}
+
+{% block title %}Karma Leaderboard - Art Critique{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">Community Leaderboard</h2>
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'critique:my_karma' %}" class="btn btn-outline-light">
+                            <i class="bi bi-person"></i> My Karma
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated and user_rank %}
+                    <div class="alert alert-info mb-4">
+                        <div class="d-flex align-items-center">
+                            <div>
+                                <p class="mb-0"><strong>Your rank:</strong> #{{ user_rank }} with {{ user.profile.karma }} karma points</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>#</th>
+                                    <th>User</th>
+                                    <th>Karma</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for profile in top_profiles %}
+                                <tr{% if user.is_authenticated and profile.user == user %} class="table-active"{% endif %}>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if profile.profile_picture %}
+                                            <img src="{{ profile.profile_picture.url }}" alt="{{ profile.user.username }}" 
+                                                class="rounded-circle me-2" style="width: 32px; height: 32px; object-fit: cover;">
+                                            {% else %}
+                                            <div class="bg-dark rounded-circle d-inline-flex justify-content-center align-items-center me-2" 
+                                                style="width: 32px; height: 32px;">
+                                                <span class="text-white" style="font-size: 14px;">{{ profile.user.username|first|upper }}</span>
+                                            </div>
+                                            {% endif %}
+                                            {{ profile.user.username }}
+                                            
+                                            {% if forloop.counter == 1 %}
+                                            <span class="ms-2 text-warning">
+                                                <i class="bi bi-trophy-fill"></i>
+                                            </span>
+                                            {% elif forloop.counter == 2 %}
+                                            <span class="ms-2 text-secondary">
+                                                <i class="bi bi-trophy"></i>
+                                            </span>
+                                            {% elif forloop.counter == 3 %}
+                                            <span class="ms-2 text-danger">
+                                                <i class="bi bi-trophy"></i>
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td><strong>{{ profile.karma }}</strong></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No karma data available yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5>How to earn karma points:</h5>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Upload artwork
+                                        <span class="badge bg-primary rounded-pill">+5</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Receive comments on your artwork
+                                        <span class="badge bg-primary rounded-pill">+2</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Post comments
+                                        <span class="badge bg-primary rounded-pill">+1</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Daily site visit
+                                        <span class="badge bg-primary rounded-pill">+1</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="list-group">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Receive likes on your artwork
+                                        <span class="badge bg-primary rounded-pill">+3</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Give likes to artwork
+                                        <span class="badge bg-primary rounded-pill">+1</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Receive critique on your artwork
+                                        <span class="badge bg-primary rounded-pill">+5</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        Post critiques
+                                        <span class="badge bg-primary rounded-pill">+3</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

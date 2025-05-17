@@ -125,6 +125,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'critique.context_processors.site_info',  # Custom context processor for site info
+                'critique.context_processors.karma_notifications',  # Karma notifications
             ],
         },
     },

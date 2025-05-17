@@ -7,17 +7,23 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
-from .models import ArtWork, Review, Profile, Comment
+from .models import ArtWork, Review, Profile, Comment, KarmaEvent
 from .forms import CommentForm, ReplyForm
 
 # Create your views here.
 def index(request):
     """
     Home page view for the Art Critique application.
+    Awards daily visit karma points for logged-in users.
     """
     # Count objects for display
     artwork_count = ArtWork.objects.count()
     review_count = Review.objects.count()
+    
+    # Award daily visit karma if user is logged in
+    if request.user.is_authenticated:
+        from .karma import award_daily_visit_karma
+        award_daily_visit_karma(request.user)
     
     context = {
         'artwork_count': artwork_count,
@@ -293,3 +299,50 @@ def delete_comment(request, pk):
         messages.success(request, "Comment deleted successfully!")
     
     return redirect('critique:artwork_detail', pk=artwork_pk)
+
+
+@login_required
+def karma_view(request):
+    """
+    View to display user's karma points and karma history.
+    """
+    # Get karma events for the current user
+    karma_events = KarmaEvent.objects.filter(user=request.user).order_by('-created_at')[:50]
+    
+    # Calculate karma statistics
+    karma_by_category = KarmaEvent.objects.filter(user=request.user).values('action').annotate(
+        total=Sum('points'),
+        count=Count('id')
+    ).order_by('-total')
+    
+    # Get total karma
+    total_karma = request.user.profile.karma
+    
+    context = {
+        'karma_events': karma_events,
+        'karma_by_category': karma_by_category,
+        'total_karma': total_karma,
+    }
+    
+    return render(request, 'critique/karma_detail.html', context)
+
+
+def karma_leaderboard(request):
+    """
+    View to display top users by karma points.
+    """
+    # Get top users by karma points
+    top_profiles = Profile.objects.select_related('user').order_by('-karma')[:20]
+    
+    # Get user's rank if logged in
+    user_rank = None
+    if request.user.is_authenticated:
+        higher_karma_count = Profile.objects.filter(karma__gt=request.user.profile.karma).count()
+        user_rank = higher_karma_count + 1  # Add 1 because ranks start at 1, not 0
+    
+    context = {
+        'top_profiles': top_profiles,
+        'user_rank': user_rank,
+    }
+    
+    return render(request, 'critique/karma_leaderboard.html', context)

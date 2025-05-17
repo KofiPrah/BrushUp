@@ -15,7 +15,7 @@ flask_app = Flask(__name__)
 @flask_app.route('/')
 def index():
     """Redirect to the Django app"""
-    return redirect('/admin/')
+    return redirect('/critique/')
 
 @flask_app.route('/health')
 def health():

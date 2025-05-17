@@ -1,0 +1,120 @@
+{% extends "critique/base.html" %}
+
+{% block title %}My Karma - Art Critique{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="mb-0">My Karma Points</h2>
+                        <a href="{% url 'critique:karma_leaderboard' %}" class="btn btn-outline-light">
+                            <i class="bi bi-trophy"></i> Leaderboard
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-4">{{ total_karma }}</div>
+                        <p class="text-muted">Total karma points earned</p>
+                    </div>
+
+                    <h4 class="mb-3">Points Breakdown</h4>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Count</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in karma_by_category %}
+                                <tr>
+                                    <td>
+                                        {% if category.action == 'artwork_upload' %}
+                                            <i class="bi bi-image me-2"></i> Artwork uploads
+                                        {% elif category.action == 'comment_received' %}
+                                            <i class="bi bi-chat-left-text me-2"></i> Comments received
+                                        {% elif category.action == 'comment_posted' %}
+                                            <i class="bi bi-chat-dots me-2"></i> Comments posted
+                                        {% elif category.action == 'artwork_liked' %}
+                                            <i class="bi bi-heart me-2"></i> Likes received
+                                        {% elif category.action == 'like_given' %}
+                                            <i class="bi bi-hand-thumbs-up me-2"></i> Likes given
+                                        {% elif category.action == 'critique_received' %}
+                                            <i class="bi bi-chat-square-text me-2"></i> Critiques received
+                                        {% elif category.action == 'critique_posted' %}
+                                            <i class="bi bi-chat-square me-2"></i> Critiques posted
+                                        {% elif category.action == 'review_received' %}
+                                            <i class="bi bi-star me-2"></i> Reviews received
+                                        {% elif category.action == 'review_posted' %}
+                                            <i class="bi bi-pencil me-2"></i> Reviews posted
+                                        {% elif category.action == 'daily_visit' %}
+                                            <i class="bi bi-calendar-check me-2"></i> Daily visits
+                                        {% else %}
+                                            <i class="bi bi-award me-2"></i> {{ category.action|title }}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ category.count }}</td>
+                                    <td>{{ category.total }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center">No karma activity yet</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h4 class="mb-3 mt-4">Recent Activity</h4>
+                    <div class="list-group">
+                        {% for event in karma_events %}
+                        <div class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {% if event.action == 'artwork_upload' %}
+                                        <i class="bi bi-image me-2"></i> Artwork Upload
+                                    {% elif event.action == 'comment_received' %}
+                                        <i class="bi bi-chat-left-text me-2"></i> Comment Received
+                                    {% elif event.action == 'comment_posted' %}
+                                        <i class="bi bi-chat-dots me-2"></i> Comment Posted
+                                    {% elif event.action == 'artwork_liked' %}
+                                        <i class="bi bi-heart me-2"></i> Artwork Liked
+                                    {% elif event.action == 'like_given' %}
+                                        <i class="bi bi-hand-thumbs-up me-2"></i> Like Given
+                                    {% elif event.action == 'critique_received' %}
+                                        <i class="bi bi-chat-square-text me-2"></i> Critique Received
+                                    {% elif event.action == 'critique_posted' %}
+                                        <i class="bi bi-chat-square me-2"></i> Critique Posted
+                                    {% elif event.action == 'review_received' %}
+                                        <i class="bi bi-star me-2"></i> Review Received
+                                    {% elif event.action == 'review_posted' %}
+                                        <i class="bi bi-pencil me-2"></i> Review Posted
+                                    {% elif event.action == 'daily_visit' %}
+                                        <i class="bi bi-calendar-check me-2"></i> Daily Visit
+                                    {% else %}
+                                        <i class="bi bi-award me-2"></i> {{ event.action|title }}
+                                    {% endif %}
+                                </h5>
+                                <small class="text-muted">{{ event.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ event.reason }}</p>
+                            <small class="text-primary">+{{ event.points }} points</small>
+                        </div>
+                        {% empty %}
+                        <div class="list-group-item">
+                            <p class="text-center mb-0">No recent karma activity</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -39,6 +39,15 @@
                         <p>{{ profile.bio|default:"No bio provided yet." }}</p>
                     </div>
                     
+                    <div class="mb-3">
+                        <h5>Karma Points</h5>
+                        <div class="d-flex align-items-center">
+                            <span class="h3 mb-0 me-2">{{ profile.karma }}</span>
+                            <a href="{% url 'critique:my_karma' %}" class="btn btn-sm btn-primary">View Details</a>
+                        </div>
+                        <p class="text-muted small mt-1">Points earned through community contributions</p>
+                    </div>
+                    
                     {% if profile.location %}
                     <div class="mb-3">
                         <h5>Location</h5>

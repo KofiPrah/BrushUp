@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.conf import settings
+from django.utils import timezone
 
 # Import S3 storage backend for files if S3 is enabled
 if settings.USE_S3:
@@ -191,6 +192,31 @@ class Reaction(models.Model):
     
     def __str__(self):
         return f"{self.user.username}'s {self.reaction_type} reaction to critique by {self.critique.author.username}"
+
+
+class KarmaEvent(models.Model):
+    """
+    Model to track karma point awards and the reasons behind them.
+    Provides a historical record of how users earned karma points.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='karma_events')
+    points = models.IntegerField(default=0)
+    action = models.CharField(max_length=50)
+    reason = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    
+    # Optional content object reference (what the karma was earned for)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Karma Event'
+        verbose_name_plural = 'Karma Events'
+        
+    def __str__(self):
+        return f"Karma: {self.points} points to {self.user.username} for {self.action}"
 
 
 class Notification(models.Model):

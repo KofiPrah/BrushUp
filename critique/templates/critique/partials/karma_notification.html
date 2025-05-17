@@ -1,0 +1,48 @@
+{% load static %}
+
+{% if karma_notification %}
+<div id="karma-notification" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+    <div class="toast show bg-dark text-white" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-dark text-white border-bottom border-secondary">
+            <strong class="me-auto">Karma Points Earned!</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="bi bi-award text-warning" style="font-size: 2rem;"></i>
+                </div>
+                <div>
+                    <p class="mb-1">You earned <strong class="text-success">+{{ karma_notification.points }}</strong> karma points!</p>
+                    <p class="mb-0 small">{{ karma_notification.reason }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide the notification after 5 seconds
+    setTimeout(function() {
+        const notification = document.getElementById('karma-notification');
+        if (notification) {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.5s ease';
+            setTimeout(function() {
+                notification.remove();
+            }, 500);
+        }
+    }, 5000);
+    
+    // Handle close button
+    const closeBtn = document.querySelector('#karma-notification .btn-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            const notification = document.getElementById('karma-notification');
+            notification.remove();
+        });
+    }
+});
+</script>
+{% endif %}

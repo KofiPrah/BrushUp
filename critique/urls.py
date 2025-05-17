@@ -21,6 +21,8 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.ProfileUpdateView.as_view(), name='profile_edit'),
     path('my-artworks/', views.MyArtworksListView.as_view(), name='my_artworks'),
+    path('my-karma/', views.karma_view, name='my_karma'),
+    path('leaderboard/', views.karma_leaderboard, name='karma_leaderboard'),
     
     # Authentication test
     path('auth-test/', views.auth_test, name='auth_test'),
