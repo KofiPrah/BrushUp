@@ -106,6 +106,35 @@ def profile_view(request):
         'artworks': artworks,
         'reviews_count': reviews_count,
         'likes_count': likes_count,
+        'is_own_profile': True,  # Flag to indicate this is the user's own profile
+    }
+    
+    return render(request, 'critique/profile.html', context=context)
+
+def user_profile_view(request, username):
+    """
+    View for displaying any user's profile.
+    This view is accessible to all users, even those who aren't logged in.
+    """
+    # Get the user by username or return 404 if not found
+    profile_user = get_object_or_404(User, username=username)
+    profile = profile_user.profile
+    artworks = ArtWork.objects.filter(author=profile_user).order_by('-created_at')
+    
+    # Get activity statistics
+    reviews_count = Review.objects.filter(reviewer=profile_user).count()
+    likes_count = ArtWork.objects.filter(likes=profile_user).count()
+    
+    # Check if this is the user's own profile
+    is_own_profile = request.user.is_authenticated and request.user == profile_user
+    
+    context = {
+        'profile': profile,
+        'user': profile_user,
+        'artworks': artworks,
+        'reviews_count': reviews_count,
+        'likes_count': likes_count,
+        'is_own_profile': is_own_profile,
     }
     
     return render(request, 'critique/profile.html', context=context)

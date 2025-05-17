@@ -27,6 +27,7 @@ urlpatterns = [
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.ProfileUpdateView.as_view(), name='profile_edit'),
+    path('user/<str:username>/', views.user_profile_view, name='user_profile'),
     path('my-artworks/', views.MyArtworksListView.as_view(), name='my_artworks'),
     path('my-karma/', views.karma_view, name='my_karma'),
     path('leaderboard/', views.karma_leaderboard, name='karma_leaderboard'),
