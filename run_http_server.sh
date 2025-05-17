@@ -1,13 +1,10 @@
 #!/bin/bash
-# Run the Django application in HTTP mode
-# This script helps ensure the application works correctly with Replit's load balancer
+# Run Brush Up in HTTP mode
 
-echo "Starting Art Critique in HTTP-only mode..."
-
-# Set environment variables for HTTP mode
+# Make sure SSL is disabled in the environment
 export SSL_ENABLED=false
 export HTTP_ONLY=true
-export DJANGO_SETTINGS_MODULE=artcritique.settings
 
-# Run with gunicorn without SSL
-gunicorn --bind 0.0.0.0:5000 --workers 1 --timeout 120 --reload artcritique.wsgi:application
+# Start Django development server
+echo "Starting Brush Up (formerly Art Critique) in HTTP mode..."
+python manage.py runserver 0.0.0.0:5000
