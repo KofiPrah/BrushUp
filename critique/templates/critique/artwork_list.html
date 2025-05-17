@@ -6,15 +6,30 @@
     <h1 class="mb-4">Artwork Gallery</h1>
     
     {% if artworks %}
-        <div class="row">
+        <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for artwork in artworks %}
-                <div class="col-md-4">
-                    <div class="card mb-4 bg-dark text-white">
+                <div class="col">
+                    <div class="card h-100 bg-dark text-white">
+                        <a href="{% url 'critique:artwork_detail' artwork.pk %}">
+                            {% if artwork.image %}
+                                <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 220px; object-fit: cover;">
+                            {% elif artwork.image_url %}
+                                <img src="{{ artwork.image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 220px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 220px;">
+                                    <span>No Image</span>
+                                </div>
+                            {% endif %}
+                        </a>
                         <div class="card-body">
                             <h5 class="card-title">{{ artwork.title }}</h5>
                             <p class="card-text">{{ artwork.description|truncatewords:20 }}</p>
-                            <p class="card-text"><small class="text-muted">Created: {{ artwork.created_at|date:"F d, Y" }}</small></p>
-                            <a href="{% url 'critique:artwork_detail' artwork.pk %}" class="btn btn-primary">View Details</a>
+                        </div>
+                        <div class="card-footer">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">Created: {{ artwork.created_at|date:"M d, Y" }}</small>
+                                <a href="{% url 'critique:artwork_detail' artwork.pk %}" class="btn btn-primary btn-sm">View Details</a>
+                            </div>
                         </div>
                     </div>
                 </div>
