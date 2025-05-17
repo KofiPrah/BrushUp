@@ -15,7 +15,7 @@ import json
 # Create your views here.
 def index(request):
     """
-    Home page view for the Art Critique application.
+    Home page view for the Brush Up application.
     Awards daily visit karma points for logged-in users.
     """
     # Count objects for display
@@ -30,7 +30,7 @@ def index(request):
     context = {
         'artwork_count': artwork_count,
         'review_count': review_count,
-        'app_name': 'Art Critique Platform',
+        'app_name': 'Brush Up Platform',
         'app_version': '1.0.0',
     }
     
@@ -42,7 +42,7 @@ def api_root(request):
     """
     data = {
         'status': 'success',
-        'message': 'Welcome to the Art Critique API',
+        'message': 'Welcome to the Brush Up API',
         'version': '1.0.0',
         'endpoints': {
             'artworks': '/api/artworks/',

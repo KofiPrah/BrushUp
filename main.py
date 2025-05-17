@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
 """
-Main entry point for Art Critique application
-Configured for HTTP mode to work with Replit's load balancer
+Main entry point for Brush Up application
+Works with both HTTP and HTTPS modes
 """
 import os
 import sys
+from flask import Flask, redirect
 
-# Configure for HTTP mode (SSL handled by Replit load balancer)
-os.environ["SSL_ENABLED"] = "false"
-os.environ["HTTP_ONLY"] = "true"
+# Create a simple Flask app that will be used by gunicorn
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    """Redirect to the Django app"""
+    return redirect('/critique/')
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    return 'OK'
+
+# Set Django settings module
 os.environ["DJANGO_SETTINGS_MODULE"] = "artcritique.settings"
 
-# Import the Django WSGI application
-from artcritique.wsgi import application
-
-# Export for Gunicorn
-app = application
-
 if __name__ == "__main__":
-    print("Starting Art Critique application in HTTP mode...")
+    print("Starting Brush Up application...")
     from django.core.management import execute_from_command_line
     execute_from_command_line(sys.argv)
