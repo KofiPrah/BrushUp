@@ -411,32 +411,54 @@ def create_critique(request, artwork_id):
         technique_score = request.POST.get('technique_score')
         originality_score = request.POST.get('originality_score')
         
+        # Debug info for understanding form submission
+        print(f"DEBUG: Critique form submission for artwork {artwork_id}")
+        print(f"DEBUG: text: {text}")
+        print(f"DEBUG: composition_score: {composition_score}")
+        print(f"DEBUG: technique_score: {technique_score}")
+        print(f"DEBUG: originality_score: {originality_score}")
+        print(f"DEBUG: User authenticated: {request.user.is_authenticated}")
+        print(f"DEBUG: Username: {request.user.username}")
+        
         if not text:
             messages.error(request, "Critique text cannot be empty.")
+            print("DEBUG: Empty critique text, showing error message")
             return redirect('critique:artwork_detail', pk=artwork_id)
         
-        # Create critique object
-        critique = Critique(
-            artwork=artwork,
-            author=request.user,
-            text=text
-        )
-        
-        # Add optional scores if provided
-        if composition_score:
-            critique.composition_score = int(composition_score)
-        if technique_score:
-            critique.technique_score = int(technique_score)
-        if originality_score:
-            critique.originality_score = int(originality_score)
+        try:
+            # Create critique object
+            critique = Critique(
+                artwork=artwork,
+                author=request.user,
+                text=text
+            )
             
-        critique.save()
-        
-        # Award karma for creating a critique
-        award_critique_karma(critique)
-        
-        messages.success(request, "Your critique has been added!")
-        return redirect('critique:artwork_detail', pk=artwork_id)
+            # Add optional scores if provided
+            if composition_score:
+                critique.composition_score = int(composition_score)
+            if technique_score:
+                critique.technique_score = int(technique_score)
+            if originality_score:
+                critique.originality_score = int(originality_score)
+                
+            critique.save()
+            print(f"DEBUG: Critique saved with ID: {critique.id}")
+            
+            # Award karma for creating a critique
+            try:
+                award_critique_karma(critique)
+                print("DEBUG: Karma awarded successfully")
+            except Exception as e:
+                print(f"DEBUG: Error awarding karma: {str(e)}")
+                # Continue even if karma award fails
+            
+            messages.success(request, "Your critique has been added!")
+            print("DEBUG: Success message shown, redirecting")
+            return redirect('critique:artwork_detail', pk=artwork_id)
+        except Exception as e:
+            print(f"DEBUG: Error saving critique: {str(e)}")
+            messages.error(request, f"Error saving critique: {str(e)}")
+            return redirect('critique:artwork_detail', pk=artwork_id)
     
     # For GET requests, redirect to artwork detail page
     return redirect('critique:artwork_detail', pk=artwork_id)
