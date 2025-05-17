@@ -28,6 +28,10 @@ DEBUG = True
 # Allow all hosts
 ALLOWED_HOSTS = ['*']
 
+# Get Replit domain from environment
+REPLIT_DOMAIN = os.environ.get('REPLIT_DOMAIN', '*')
+CSRF_TRUSTED_ORIGINS = [f'https://{REPLIT_DOMAIN}', f'https://*.{REPLIT_DOMAIN}']
+
 # Configure SSL based on environment variable
 # Forced to False for Replit to work with the load balancer
 SSL_ENABLED = False  # Force SSL off for Replit
@@ -262,7 +266,9 @@ REST_FRAMEWORK = {
 }
 
 # CORS settings
-CORS_ALLOW_ALL_ORIGINS = True  # For development only, should be more restrictive in production
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+SESSION_COOKIE_SAMESITE = 'Lax'  # For development only, should be more restrictive in production
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_METHODS = [
     'DELETE',

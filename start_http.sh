@@ -1,8 +1,9 @@
 #!/bin/bash
+# Start Brush Up application in HTTP mode (no SSL certificates)
 
-# Force HTTP mode
+# Set environment variables
 export SSL_ENABLED=false
 export HTTP_ONLY=true
 
-# Start gunicorn in HTTP mode (no SSL certificates)
-exec gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+# Run Django with gunicorn in HTTP mode
+exec gunicorn --bind 0.0.0.0:5000 --workers 1 --timeout 120 --reload main:app
