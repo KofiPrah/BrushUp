@@ -160,22 +160,60 @@ class Critique(models.Model):
             return False
         return self.reactions.filter(user=user).exists()
         
-    def has_user_reaction_helpful(self, user):
+    def has_user_reaction_helpful(self, user=None):
         """Check if a user has given a HELPFUL reaction to this critique."""
-        if not user.is_authenticated:
+        # Get the user from the context if not provided explicitly
+        from django.contrib.auth.models import AnonymousUser
+        from threading import currentThread
+        
+        # Get thread local request
+        request = getattr(currentThread(), 'request', None)
+        if user is None and request is not None:
+            user = getattr(request, 'user', None)
+        
+        if not user or not hasattr(user, 'is_authenticated') or not user.is_authenticated:
             return False
+            
         return self.reactions.filter(user=user, reaction_type='HELPFUL').exists()
         
-    def has_user_reaction_inspiring(self, user):
+    def has_user_reaction_inspiring(self, user=None):
         """Check if a user has given an INSPIRING reaction to this critique."""
-        if not user.is_authenticated:
+        # Get the user from the context if not provided explicitly
+        from django.contrib.auth.models import AnonymousUser
+        
+        # Get current user if not provided
+        if user is None:
+            from django.contrib.auth import get_user
+            try:
+                from django.contrib.auth.middleware import get_user
+                from django.contrib.auth.models import AnonymousUser
+                user = AnonymousUser()
+            except:
+                pass
+        
+        if not user or not hasattr(user, 'is_authenticated') or not user.is_authenticated:
             return False
+            
         return self.reactions.filter(user=user, reaction_type='INSPIRING').exists()
         
-    def has_user_reaction_detailed(self, user):
+    def has_user_reaction_detailed(self, user=None):
         """Check if a user has given a DETAILED reaction to this critique."""
-        if not user.is_authenticated:
+        # Get the user from the context if not provided explicitly
+        from django.contrib.auth.models import AnonymousUser
+        
+        # Get current user if not provided
+        if user is None:
+            from django.contrib.auth import get_user
+            try:
+                from django.contrib.auth.middleware import get_user
+                from django.contrib.auth.models import AnonymousUser
+                user = AnonymousUser()
+            except:
+                pass
+        
+        if not user or not hasattr(user, 'is_authenticated') or not user.is_authenticated:
             return False
+            
         return self.reactions.filter(user=user, reaction_type='DETAILED').exists()
         
     def get_helpful_count(self):

@@ -2,29 +2,22 @@
 A Simple WSGI HTTP server for Django using Gunicorn without SSL.
 """
 import os
-import sys
-from gunicorn.app.wsgiapp import WSGIApplication
 
-# Make sure Django knows where to find settings
-os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
-os.environ['SSL_ENABLED'] = 'false'
-os.environ['HTTP_ONLY'] = 'true'
+# Set environment variables for HTTP mode
+os.environ["SSL_ENABLED"] = "false"
+os.environ["HTTP_ONLY"] = "true"
+os.environ["DJANGO_SETTINGS_MODULE"] = "artcritique.settings"
 
-# Ensure mathfilters is available
-try:
-    import mathfilters
-    print("mathfilters module is available")
-except ImportError:
-    print("Warning: mathfilters module not found")
+# Import Django WSGI application
+from artcritique.wsgi import application
 
-if __name__ == '__main__':
-    # Setup the command line arguments
-    sys.argv = [
-        'gunicorn',
-        '--bind=0.0.0.0:5000',
-        '--workers=1',
-        'artcritique.wsgi:application'
-    ]
-    
-    print("Starting Gunicorn without SSL...")
-    WSGIApplication().run()
+# For Gunicorn
+app = application
+
+# These are the server settings
+bind = "0.0.0.0:8000"
+workers = 1
+reload = True
+# No SSL
+certfile = None
+keyfile = None
