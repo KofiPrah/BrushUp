@@ -12,6 +12,11 @@ urlpatterns = [
     path('artworks/<int:pk>/delete/', views.ArtWorkDeleteView.as_view(), name='artwork_delete'),
     path('artworks/<int:pk>/delete-confirm/', views.delete_artwork, name='artwork_delete_confirm'),
     
+    # Comment URLs
+    path('artworks/<int:pk>/comment/', views.add_comment, name='add_comment'),
+    path('artworks/<int:artwork_pk>/comment/<int:comment_pk>/reply/', views.add_reply, name='add_reply'),
+    path('comments/<int:pk>/delete/', views.delete_comment, name='delete_comment'),
+    
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.ProfileUpdateView.as_view(), name='profile_edit'),

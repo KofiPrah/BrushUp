@@ -133,9 +133,9 @@
                     <h3>Comments</h3>
                 </div>
                 <div class="card-body">
-                    {% if artwork.comments.all %}
-                        {% for comment in artwork.comments.all %}
-                            <div class="card mb-3 bg-dark border border-secondary">
+                    {% if comments %}
+                        {% for comment in comments %}
+                            <div class="card mb-3 bg-dark border border-secondary" id="comment-{{ comment.id }}">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
                                         <h6 class="card-subtitle mb-2">{{ comment.author.username }}</h6>
@@ -147,21 +147,57 @@
                                     {% if comment.replies.all %}
                                         <div class="ms-4 mt-3">
                                             {% for reply in comment.replies.all %}
-                                                <div class="card mb-2 bg-dark border border-secondary">
+                                                <div class="card mb-2 bg-dark border border-secondary" id="comment-{{ reply.id }}">
                                                     <div class="card-body py-2">
                                                         <div class="d-flex justify-content-between">
                                                             <h6 class="card-subtitle mb-1">{{ reply.author.username }}</h6>
                                                             <small class="text-muted">{{ reply.created_at|date:"F d, Y" }}</small>
                                                         </div>
                                                         <p class="card-text">{{ reply.content }}</p>
+                                                        
+                                                        <!-- Delete button for reply -->
+                                                        {% if user.is_authenticated and user == reply.author %}
+                                                        <form method="post" action="{% url 'critique:delete_comment' reply.id %}" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                                        </form>
+                                                        {% endif %}
                                                     </div>
                                                 </div>
                                             {% endfor %}
                                         </div>
                                     {% endif %}
                                     
-                                    <!-- Reply button for each comment -->
-                                    <button class="btn btn-sm btn-outline-secondary mt-2">Reply</button>
+                                    <div class="mt-2 d-flex">
+                                        <!-- Reply button for each comment -->
+                                        <button class="btn btn-sm btn-outline-secondary me-2 reply-toggle" 
+                                                data-comment-id="{{ comment.id }}">Reply</button>
+                                                
+                                        <!-- Delete button for comment -->
+                                        {% if user.is_authenticated and user == comment.author %}
+                                        <form method="post" action="{% url 'critique:delete_comment' comment.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Reply form (hidden by default) -->
+                                    <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
+                                        {% if user.is_authenticated %}
+                                        <form method="post" action="{% url 'critique:add_reply' artwork.id comment.id %}">
+                                            {% csrf_token %}
+                                            {{ reply_form.content }}
+                                            <button type="submit" class="btn btn-sm btn-primary mt-2">Submit Reply</button>
+                                            <button type="button" class="btn btn-sm btn-secondary mt-2 reply-cancel" 
+                                                    data-comment-id="{{ comment.id }}">Cancel</button>
+                                        </form>
+                                        {% else %}
+                                        <div class="alert alert-info">
+                                            <p>Please <a href="{% url 'login' %}">log in</a> to reply.</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                             </div>
                         {% endfor %}
@@ -172,12 +208,58 @@
                     {% endif %}
                     
                     <!-- Comment form -->
+                    {% if user.is_authenticated %}
                     <div class="mt-4">
-                        <textarea class="form-control bg-dark text-white" rows="3" placeholder="Write a comment..."></textarea>
-                        <button class="btn btn-primary mt-2">Submit Comment</button>
+                        <form method="post" action="{% url 'critique:add_comment' artwork.id %}">
+                            {% csrf_token %}
+                            {{ comment_form.content }}
+                            <button type="submit" class="btn btn-primary mt-2">Submit Comment</button>
+                        </form>
                     </div>
+                    {% else %}
+                    <div class="alert alert-info mt-4">
+                        <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all reply toggle buttons
+    const replyToggleButtons = document.querySelectorAll('.reply-toggle');
+    const replyCancelButtons = document.querySelectorAll('.reply-cancel');
+    
+    // Add event listeners to toggle reply forms
+    replyToggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            
+            // Hide all other reply forms first
+            document.querySelectorAll('.reply-form').forEach(form => {
+                form.style.display = 'none';
+            });
+            
+            // Show this reply form
+            replyForm.style.display = 'block';
+        });
+    });
+    
+    // Add event listeners to cancel buttons
+    replyCancelButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            const replyForm = document.getElementById(`reply-form-${commentId}`);
+            
+            // Hide the reply form
+            replyForm.style.display = 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

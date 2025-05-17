@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
 from .models import ArtWork, Review, Profile, Comment
+from .forms import CommentForm, ReplyForm
 
 # Create your views here.
 def index(request):
@@ -61,11 +62,21 @@ class ArtWorkListView(ListView):
 
 class ArtWorkDetailView(DetailView):
     """
-    View for displaying details of a specific artwork including its reviews.
+    View for displaying details of a specific artwork including its reviews and comments.
     """
     model = ArtWork
     template_name = 'critique/artwork_detail.html'
     context_object_name = 'artwork'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add comment form to context
+        context['comment_form'] = CommentForm()
+        # Add reply form to context
+        context['reply_form'] = ReplyForm()
+        # Get only top-level comments (not replies)
+        context['comments'] = self.object.comments.filter(parent=None).order_by('-created_at')
+        return context
 
 @login_required
 def profile_view(request):
@@ -218,3 +229,67 @@ def delete_artwork(request, pk):
         return redirect('critique:my_artworks')
     
     return render(request, 'critique/artwork_confirm_delete.html', {'artwork': artwork})
+
+
+@login_required
+def add_comment(request, pk):
+    """
+    View for adding comments to an artwork.
+    """
+    artwork = get_object_or_404(ArtWork, pk=pk)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.artwork = artwork
+            comment.author = request.user
+            comment.save()
+            messages.success(request, "Comment added successfully!")
+        else:
+            messages.error(request, "There was an error with your comment.")
+    
+    return redirect('critique:artwork_detail', pk=artwork.pk)
+
+
+@login_required
+def add_reply(request, artwork_pk, comment_pk):
+    """
+    View for adding replies to existing comments.
+    """
+    artwork = get_object_or_404(ArtWork, pk=artwork_pk)
+    parent_comment = get_object_or_404(Comment, pk=comment_pk)
+    
+    if request.method == 'POST':
+        form = ReplyForm(request.POST)
+        if form.is_valid():
+            reply = form.save(commit=False)
+            reply.artwork = artwork
+            reply.author = request.user
+            reply.parent = parent_comment
+            reply.save()
+            messages.success(request, "Reply added successfully!")
+        else:
+            messages.error(request, "There was an error with your reply.")
+    
+    return redirect('critique:artwork_detail', pk=artwork_pk)
+
+
+@login_required
+def delete_comment(request, pk):
+    """
+    View for deleting comments. Only comment author can delete their comments.
+    """
+    comment = get_object_or_404(Comment, pk=pk)
+    artwork_pk = comment.artwork.pk
+    
+    # Check if the user is the comment author
+    if comment.author != request.user:
+        messages.error(request, "You don't have permission to delete this comment.")
+        return redirect('critique:artwork_detail', pk=artwork_pk)
+    
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, "Comment deleted successfully!")
+    
+    return redirect('critique:artwork_detail', pk=artwork_pk)
