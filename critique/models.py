@@ -153,6 +153,42 @@ class Critique(models.Model):
         if not scores:
             return None
         return sum(scores) / len(scores)
+        
+    def has_user_reaction(self, user):
+        """Check if a user has given any reaction to this critique."""
+        if not user.is_authenticated:
+            return False
+        return self.reactions.filter(user=user).exists()
+        
+    def has_user_reaction_helpful(self, user):
+        """Check if a user has given a HELPFUL reaction to this critique."""
+        if not user.is_authenticated:
+            return False
+        return self.reactions.filter(user=user, reaction_type='HELPFUL').exists()
+        
+    def has_user_reaction_inspiring(self, user):
+        """Check if a user has given an INSPIRING reaction to this critique."""
+        if not user.is_authenticated:
+            return False
+        return self.reactions.filter(user=user, reaction_type='INSPIRING').exists()
+        
+    def has_user_reaction_detailed(self, user):
+        """Check if a user has given a DETAILED reaction to this critique."""
+        if not user.is_authenticated:
+            return False
+        return self.reactions.filter(user=user, reaction_type='DETAILED').exists()
+        
+    def get_helpful_count(self):
+        """Get count of HELPFUL reactions."""
+        return self.reactions.filter(reaction_type='HELPFUL').count()
+        
+    def get_inspiring_count(self):
+        """Get count of INSPIRING reactions."""
+        return self.reactions.filter(reaction_type='INSPIRING').count()
+        
+    def get_detailed_count(self):
+        """Get count of DETAILED reactions."""
+        return self.reactions.filter(reaction_type='DETAILED').count()
 
 
 class Reaction(models.Model):

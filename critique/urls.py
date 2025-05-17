@@ -18,6 +18,11 @@ urlpatterns = [
     path('artworks/<int:artwork_pk>/comment/<int:comment_pk>/reply/', views.add_reply, name='add_reply'),
     path('comments/<int:pk>/delete/', views.delete_comment, name='delete_comment'),
     
+    # Critique URLs
+    path('artworks/<int:artwork_id>/critique/', views.create_critique, name='create_critique'),
+    path('critiques/<int:critique_id>/react/', views.toggle_reaction, name='toggle_reaction'),
+    path('critiques/<int:critique_id>/react/ajax/', views.toggle_reaction_ajax, name='toggle_reaction_ajax'),
+    
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.ProfileUpdateView.as_view(), name='profile_edit'),

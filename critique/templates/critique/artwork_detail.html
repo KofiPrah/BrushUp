@@ -138,6 +138,117 @@
         </div>
     </div>
     
+    <!-- Critiques Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Critiques</h2>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#critiquebModal">Write a Critique</button>
+                </div>
+                <div class="card-body">
+                    {% if artwork.critiques.all %}
+                        {% for critique in artwork.critiques.all %}
+                            <div class="card mb-4 bg-dark border border-secondary">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h5 class="card-title mb-0">{{ critique.author.username }}</h5>
+                                    <small class="text-muted">{{ critique.created_at|date:"F d, Y" }}</small>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text">{{ critique.text }}</p>
+                                    
+                                    {% if critique.composition_score or critique.technique_score or critique.originality_score %}
+                                    <div class="row mb-3 mt-4">
+                                        <div class="col-md-4">
+                                            <h6>Composition</h6>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" role="progressbar" 
+                                                     style="width: {{ critique.composition_score|default:0|mul:10 }}%" 
+                                                     aria-valuenow="{{ critique.composition_score|default:0 }}" 
+                                                     aria-valuemin="0" aria-valuemax="10">
+                                                    {{ critique.composition_score|default:"N/A" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Technique</h6>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: {{ critique.technique_score|default:0|mul:10 }}%" 
+                                                     aria-valuenow="{{ critique.technique_score|default:0 }}" 
+                                                     aria-valuemin="0" aria-valuemax="10">
+                                                    {{ critique.technique_score|default:"N/A" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <h6>Originality</h6>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-warning" role="progressbar" 
+                                                     style="width: {{ critique.originality_score|default:0|mul:10 }}%" 
+                                                     aria-valuenow="{{ critique.originality_score|default:0 }}" 
+                                                     aria-valuemin="0" aria-valuemax="10">
+                                                    {{ critique.originality_score|default:"N/A" }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-footer">
+                                    <div class="d-flex">
+                                        {% if user.is_authenticated %}
+                                            <button type="button" 
+                                                    data-reaction-critique-id="{{ critique.id }}" 
+                                                    data-reaction-type="HELPFUL" 
+                                                    class="btn btn-sm me-2 {% if critique.has_user_reaction_helpful user %}btn-success{% else %}btn-outline-success{% endif %}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
+                                                    <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
+                                                </svg>
+                                                <span>Helpful <span class="badge bg-light text-dark helpful-count">{{ critique.get_helpful_count }}</span></span>
+
+                                            </button>
+                                            
+                                            <button type="button" 
+                                                    data-reaction-critique-id="{{ critique.id }}" 
+                                                    data-reaction-type="INSPIRING" 
+                                                    class="btn btn-sm me-2 {% if critique.has_user_reaction_inspiring user %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightbulb" viewBox="0 0 16 16">
+                                                    <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"/>
+                                                </svg>
+                                                <span>Inspiring <span class="badge bg-light text-dark inspiring-count">{{ critique.get_inspiring_count }}</span></span>
+
+                                            </button>
+                                            
+                                            <button type="button" 
+                                                    data-reaction-critique-id="{{ critique.id }}" 
+                                                    data-reaction-type="DETAILED" 
+                                                    class="btn btn-sm {% if critique.has_user_reaction_detailed user %}btn-info{% else %}btn-outline-info{% endif %}">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
+                                                    <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                                                </svg>
+                                                <span>Detailed <span class="badge bg-light text-dark detailed-count">{{ critique.get_detailed_count }}</span></span>
+
+                                            </button>
+                                        {% else %}
+                                            <a href="{% url 'account_login' %}" class="me-2 btn btn-sm btn-outline-secondary">
+                                                Log in to react
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p>No critiques yet. Be the first to critique this artwork with detailed feedback!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Comments Section -->
     <div class="row mt-4">
         <div class="col-12">
@@ -385,5 +496,213 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+// Reaction AJAX handling
+document.addEventListener('DOMContentLoaded', function() {
+    // Get all reaction buttons with data attribute
+    const reactionButtons = document.querySelectorAll('[data-reaction-critique-id]');
+    
+    reactionButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const critiqueId = this.getAttribute('data-reaction-critique-id');
+            const reactionType = this.getAttribute('data-reaction-type');
+            
+            // Send AJAX request
+            fetch(`{% url 'critique:toggle_reaction_ajax' 0 %}`.replace('0', critiqueId), {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    'reaction_type': reactionType
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showToast('Error', data.error, 'danger');
+                    return;
+                }
+                
+                // Update button appearance based on toggle state
+                if (data.toggled) {
+                    this.classList.remove('btn-outline-success', 'btn-outline-primary', 'btn-outline-info');
+                    if (reactionType === 'HELPFUL') {
+                        this.classList.add('btn-success');
+                    } else if (reactionType === 'INSPIRING') {
+                        this.classList.add('btn-primary');
+                    } else if (reactionType === 'DETAILED') {
+                        this.classList.add('btn-info');
+                    }
+                } else {
+                    this.classList.remove('btn-success', 'btn-primary', 'btn-info');
+                    if (reactionType === 'HELPFUL') {
+                        this.classList.add('btn-outline-success');
+                    } else if (reactionType === 'INSPIRING') {
+                        this.classList.add('btn-outline-primary');
+                    } else if (reactionType === 'DETAILED') {
+                        this.classList.add('btn-outline-info');
+                    }
+                }
+                
+                // Update count badges
+                updateReactionCount(critiqueId, 'helpful', data.helpful_count);
+                updateReactionCount(critiqueId, 'inspiring', data.inspiring_count);
+                updateReactionCount(critiqueId, 'detailed', data.detailed_count);
+                
+                // Show success message
+                showToast('Success', data.message, 'success');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error', 'There was an error processing your reaction. Please try again.', 'danger');
+            });
+        });
+    });
+    
+    // Helper function to update reaction count badge
+    function updateReactionCount(critiqueId, type, count) {
+        // Find the button for this critique and reaction type
+        const button = document.querySelector(`[data-reaction-critique-id="${critiqueId}"][data-reaction-type="${type.toUpperCase()}"]`);
+        if (button) {
+            // Find the count badge inside this button
+            const countBadge = button.querySelector(`.${type}-count`);
+            if (countBadge) {
+                countBadge.textContent = count;
+            }
+        }
+    }
+    
+    // Helper function to show toast notifications
+    function showToast(title, message, type = 'info') {
+        const toastContainer = document.createElement('div');
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.bottom = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '1050';
+        
+        const toast = document.createElement('div');
+        toast.className = `toast bg-${type} text-white`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+            <div class="toast-header bg-${type} text-white">
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        document.body.appendChild(toastContainer);
+        
+        // Initialize and show the toast using Bootstrap
+        const bsToast = new bootstrap.Toast(toast, {
+            delay: 3000
+        });
+        bsToast.show();
+        
+        // Remove the toast element after it's hidden
+        toast.addEventListener('hidden.bs.toast', function () {
+            document.body.removeChild(toastContainer);
+        });
+    }
+    
+    // Helper function to get CSRF token from cookie
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
 </script>
+
+<!-- Critique Modal -->
+<div class="modal fade" id="critiquebModal" tabindex="-1" aria-labelledby="critiquebModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="critiquebModalLabel">Critique "{{ artwork.title }}"</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{% url 'critique:create_critique' artwork.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="critiqueText" class="form-label">Your Critique</label>
+                        <textarea class="form-control bg-dark text-white" id="critiqueText" name="text" rows="6" placeholder="Share your detailed analysis of the artwork's composition, technique, and creativity..."></textarea>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="compositionScore" class="form-label">Composition Score</label>
+                                <select class="form-select bg-dark text-white" id="compositionScore" name="composition_score">
+                                    <option value="">- Not Rated -</option>
+                                    {% for i in "12345678910"|make_list %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="techniqueScore" class="form-label">Technique Score</label>
+                                <select class="form-select bg-dark text-white" id="techniqueScore" name="technique_score">
+                                    <option value="">- Not Rated -</option>
+                                    {% for i in "12345678910"|make_list %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="originalityScore" class="form-label">Originality Score</label>
+                                <select class="form-select bg-dark text-white" id="originalityScore" name="originality_score">
+                                    <option value="">- Not Rated -</option>
+                                    {% for i in "12345678910"|make_list %}
+                                    <option value="{{ i }}">{{ i }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <small>
+                            <strong>Guidelines for constructive critique:</strong>
+                            <ul>
+                                <li>Be specific and detailed in your feedback</li>
+                                <li>Focus on the artwork, not the artist</li>
+                                <li>Balance positive observations with suggestions for improvement</li>
+                                <li>Share your perspective while respecting the artist's creative choices</li>
+                            </ul>
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Submit Critique</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

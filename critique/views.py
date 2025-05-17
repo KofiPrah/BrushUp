@@ -1,15 +1,16 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
-from .models import ArtWork, Review, Profile, Comment, KarmaEvent
+from .models import ArtWork, Review, Profile, Comment, KarmaEvent, Critique, Reaction
 from .forms import CommentForm, ReplyForm
-from .karma import award_like_karma
+from .karma import award_like_karma, award_critique_karma
+import json
 
 # Create your views here.
 def index(request):
@@ -392,3 +393,153 @@ def karma_leaderboard(request):
     }
     
     return render(request, 'critique/karma_leaderboard.html', context)
+
+
+@login_required
+def create_critique(request, artwork_id):
+    """
+    View for creating a new critique for an artwork.
+    """
+    artwork = get_object_or_404(ArtWork, pk=artwork_id)
+    
+    if request.method == 'POST':
+        # Check if form data exists
+        text = request.POST.get('text')
+        composition_score = request.POST.get('composition_score')
+        technique_score = request.POST.get('technique_score')
+        originality_score = request.POST.get('originality_score')
+        
+        if not text:
+            messages.error(request, "Critique text cannot be empty.")
+            return redirect('critique:artwork_detail', pk=artwork_id)
+        
+        # Create critique object
+        critique = Critique(
+            artwork=artwork,
+            author=request.user,
+            text=text
+        )
+        
+        # Add optional scores if provided
+        if composition_score:
+            critique.composition_score = int(composition_score)
+        if technique_score:
+            critique.technique_score = int(technique_score)
+        if originality_score:
+            critique.originality_score = int(originality_score)
+            
+        critique.save()
+        
+        # Award karma for creating a critique
+        award_critique_karma(critique)
+        
+        messages.success(request, "Your critique has been added!")
+        return redirect('critique:artwork_detail', pk=artwork_id)
+    
+    # For GET requests, redirect to artwork detail page
+    return redirect('critique:artwork_detail', pk=artwork_id)
+
+
+@login_required
+def toggle_reaction(request, critique_id):
+    """
+    View for toggling a reaction on a critique.
+    If the user has already given this reaction, remove it.
+    If the user hasn't given this reaction, add it.
+    """
+    critique = get_object_or_404(Critique, pk=critique_id)
+    artwork_id = critique.artwork.id
+    
+    if request.method == 'POST':
+        reaction_type = request.POST.get('reaction_type')
+        
+        # Validate reaction type
+        if reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+            messages.error(request, "Invalid reaction type.")
+            return redirect('critique:artwork_detail', pk=artwork_id)
+        
+        # Check if user already gave this reaction
+        existing_reaction = Reaction.objects.filter(
+            user=request.user,
+            critique=critique,
+            reaction_type=reaction_type
+        ).first()
+        
+        if existing_reaction:
+            # User already gave this reaction, so remove it
+            existing_reaction.delete()
+            messages.success(request, f"Removed {reaction_type.lower()} reaction.")
+        else:
+            # User hasn't given this reaction, so add it
+            reaction = Reaction(
+                user=request.user,
+                critique=critique,
+                reaction_type=reaction_type
+            )
+            reaction.save()
+            messages.success(request, f"Added {reaction_type.lower()} reaction.")
+    
+    # Redirect back to the artwork detail page
+    return redirect('critique:artwork_detail', pk=artwork_id)
+
+
+@login_required
+def toggle_reaction_ajax(request, critique_id):
+    """
+    View for toggling a reaction on a critique via AJAX.
+    Returns JSON response with updated reaction counts.
+    """
+    if not request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return HttpResponseBadRequest("This endpoint only accepts AJAX requests")
+    
+    critique = get_object_or_404(Critique, pk=critique_id)
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            reaction_type = data.get('reaction_type')
+            
+            # Validate reaction type
+            if reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+                return JsonResponse({'error': 'Invalid reaction type'}, status=400)
+            
+            # Check if user already gave this reaction
+            existing_reaction = Reaction.objects.filter(
+                user=request.user,
+                critique=critique,
+                reaction_type=reaction_type
+            ).first()
+            
+            if existing_reaction:
+                # User already gave this reaction, so remove it
+                existing_reaction.delete()
+                toggled = False
+            else:
+                # User hasn't given this reaction, so add it
+                reaction = Reaction(
+                    user=request.user,
+                    critique=critique,
+                    reaction_type=reaction_type
+                )
+                reaction.save()
+                toggled = True
+            
+            # Get updated reaction counts
+            helpful_count = critique.reactions.filter(reaction_type='HELPFUL').count()
+            inspiring_count = critique.reactions.filter(reaction_type='INSPIRING').count()
+            detailed_count = critique.reactions.filter(reaction_type='DETAILED').count()
+            
+            # Return updated counts and toggle status
+            return JsonResponse({
+                'toggled': toggled,
+                'reaction_type': reaction_type,
+                'helpful_count': helpful_count,
+                'inspiring_count': inspiring_count,
+                'detailed_count': detailed_count,
+                'message': f"{'Added' if toggled else 'Removed'} {reaction_type.lower()} reaction"
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+    
+    return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
