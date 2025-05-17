@@ -1,5 +1,5 @@
 """
-ASGI config for artcritique project.
+ASGI config for Brush Up project (formerly Art Critique).
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

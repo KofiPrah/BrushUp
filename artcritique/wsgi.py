@@ -1,5 +1,5 @@
 """
-WSGI config for artcritique project.
+WSGI config for Brush Up project (formerly Art Critique).
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

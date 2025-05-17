@@ -2,14 +2,26 @@ import axios from 'axios';
 
 // Determine the base URL based on environment
 const getBaseURL = () => {
-  // In development, use the proxy configured in vite.config.js
+  // In development environment
   if (import.meta.env.DEV) {
+    // When running on Replit, use the Replit domain
+    if (window.location.hostname.includes('replit')) {
+      const replitDomain = window.location.hostname;
+      return `https://${replitDomain}/api`;
+    }
+    // Local development - use the proxy configured in vite.config.js
     return '/api';
   }
   
   // In production, use the absolute URL to the backend API
-  // This can be configured via environment variable if needed
-  return import.meta.env.VITE_API_URL || '/api';
+  // First try environment variable, then current domain, finally fallback
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Use current domain (production environment)
+  const domain = window.location.hostname;
+  return `https://${domain}/api`;
 };
 
 // Create an axios instance with defaults configured for our API
