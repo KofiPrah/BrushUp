@@ -194,7 +194,7 @@
                                         </form>
                                         {% else %}
                                         <div class="alert alert-info">
-                                            <p>Please <a href="{% url 'login' %}">log in</a> to reply.</p>
+                                            <p>Please <a href="{% url 'account_login' %}">log in</a> to reply.</p>
                                         </div>
                                         {% endif %}
                                     </div>
@@ -218,7 +218,7 @@
                     </div>
                     {% else %}
                     <div class="alert alert-info mt-4">
-                        <p>Please <a href="{% url 'login' %}">log in</a> to leave a comment.</p>
+                        <p>Please <a href="{% url 'account_login' %}">log in</a> to leave a comment.</p>
                     </div>
                     {% endif %}
                 </div>
