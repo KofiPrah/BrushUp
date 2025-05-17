@@ -70,7 +70,7 @@ class ArtWorkListView(ListView):
 
 class ArtWorkDetailView(DetailView):
     """
-    View for displaying details of a specific artwork including its reviews and comments.
+    View for displaying details of a specific artwork including its reviews, comments, and critiques.
     """
     model = ArtWork
     template_name = 'critique/artwork_detail.html'
@@ -84,6 +84,8 @@ class ArtWorkDetailView(DetailView):
         context['reply_form'] = ReplyForm()
         # Get only top-level comments (not replies)
         context['comments'] = self.object.comments.filter(parent=None).order_by('-created_at')
+        # Add critiques to context
+        context['critiques'] = Critique.objects.filter(artwork=self.object).order_by('-created_at')
         return context
 
 @login_required

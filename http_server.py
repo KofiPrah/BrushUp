@@ -1,25 +1,29 @@
+#!/usr/bin/env python3
 """
-Simple HTTP server for Art Critique
-
-This script runs a pure HTTP server for the Art Critique app
-without using SSL certificates.
+HTTP server for Art Critique (without SSL)
+This script runs a Django application in HTTP mode to work 
+with Replit's load balancer which handles SSL termination.
 """
-
 import os
-from flask import Flask, redirect
+import sys
 
-# Create a minimal Flask app for HTTP mode
-app = Flask(__name__)
+# Set environment variables to enable HTTP mode
+os.environ["SSL_ENABLED"] = "false"
+os.environ["HTTP_ONLY"] = "true" 
+os.environ["DJANGO_SETTINGS_MODULE"] = "artcritique.settings"
 
-@app.route('/')
-def http_index():
-    """Redirect to the main application"""
-    return "HTTP Server is running. Visit the application at the standard URL."
+# Import the Django WSGI application
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
 
-if __name__ == '__main__':
-    # Force HTTP mode
-    os.environ['SSL_ENABLED'] = 'false'
-    os.environ['HTTP_ONLY'] = 'true'
+# Export for Gunicorn
+app = application
+
+if __name__ == "__main__":
+    # If running directly, start a simple server
+    from wsgiref.simple_server import make_server
     
-    print("Starting HTTP-only server...")
-    app.run(host='0.0.0.0', port=5000)
+    port = 8000
+    print(f"Starting HTTP server on port {port}...")
+    httpd = make_server('0.0.0.0', port, application)
+    httpd.serve_forever()

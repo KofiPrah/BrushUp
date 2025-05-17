@@ -147,8 +147,8 @@
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#critiquebModal">Write a Critique</button>
                 </div>
                 <div class="card-body">
-                    {% if artwork.critiques.all %}
-                        {% for critique in artwork.critiques.all %}
+                    {% if critiques %}
+                        {% for critique in critiques %}
                             <div class="card mb-4 bg-dark border border-secondary">
                                 <div class="card-header d-flex justify-content-between">
                                     <h5 class="card-title mb-0">{{ critique.author.username }}</h5>

@@ -1,39 +1,24 @@
+#!/usr/bin/env python3
 """
-Simple launcher script to run the Art Critique application in HTTP mode.
-This ensures compatibility with Replit's environment.
+Simple HTTP server for the Art Critique application
+Uses regular HTTP instead of HTTPS for Replit compatibility
 """
 import os
 import sys
-import subprocess
 
-# Set environment variables for HTTP mode
-os.environ["SSL_ENABLED"] = "false"
-os.environ["HTTP_ONLY"] = "true"
+# Configure environment for HTTP mode
+os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
+os.environ['SSL_ENABLED'] = 'false'
+os.environ['HTTP_ONLY'] = 'true'
 
-def main():
-    """Run the server in HTTP mode"""
-    print("Starting Art Critique in HTTP mode")
-    print("==================================")
-    
-    # Build the gunicorn command
-    cmd = [
-        "gunicorn",
-        "--bind", "0.0.0.0:5000",
-        "--reuse-port",
-        "--reload",
-        "main:app"
-    ]
-    
-    # Run the server
-    try:
-        subprocess.run(cmd)
-    except KeyboardInterrupt:
-        print("\nServer stopped")
-    except Exception as e:
-        print(f"Error starting server: {e}")
-        return 1
-    
-    return 0
+# Start the server on port 8080 (to avoid conflicts)
+port = 8080
+host = '0.0.0.0'
 
-if __name__ == "__main__":
-    sys.exit(main())
+print(f"Starting HTTP server on http://{host}:{port}")
+print("Running in HTTP mode (SSL handled by Replit's load balancer)")
+
+# Import and run Django application
+from django.core.management import execute_from_command_line
+sys.argv = [sys.argv[0], "runserver", f"{host}:{port}"]
+execute_from_command_line(sys.argv)
