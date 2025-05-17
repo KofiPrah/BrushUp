@@ -9,6 +9,8 @@ urlpatterns = [
     path('artworks/', views.ArtWorkListView.as_view(), name='artwork_list'),
     path('artworks/<int:pk>/', views.ArtWorkDetailView.as_view(), name='artwork_detail'),
     path('artworks/upload/', views.artwork_upload_view, name='artwork_upload'),
+    path('artworks/<int:pk>/delete/', views.ArtWorkDeleteView.as_view(), name='artwork_delete'),
+    path('artworks/<int:pk>/delete-confirm/', views.delete_artwork, name='artwork_delete_confirm'),
     
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),

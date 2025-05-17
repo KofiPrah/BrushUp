@@ -1,9 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.views.generic import ListView, DetailView, UpdateView, CreateView
-from django.http import JsonResponse
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
+from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
@@ -169,3 +169,52 @@ class MyArtworksListView(LoginRequiredMixin, ListView):
         context['search_query'] = self.request.GET.get('search', '')
         
         return context
+
+
+class ArtWorkDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """
+    View for deleting an artwork. This view ensures that only the owner of the artwork
+    can delete it by using the UserPassesTestMixin.
+    """
+    model = ArtWork
+    template_name = 'critique/artwork_confirm_delete.html'
+    success_url = reverse_lazy('critique:my_artworks')
+    context_object_name = 'artwork'
+    
+    def test_func(self):
+        """Test that ensures only the author can delete their artwork"""
+        artwork = self.get_object()
+        return self.request.user == artwork.author
+    
+    def delete(self, request, *args, **kwargs):
+        """Override delete to add a success message"""
+        artwork = self.get_object()
+        messages.success(self.request, f'Artwork "{artwork.title}" has been deleted.')
+        return super().delete(request, *args, **kwargs)
+
+
+@login_required
+def delete_artwork(request, pk):
+    """
+    Function-based view for deleting artwork (alternative to class-based view).
+    This provides a simpler interface for AJAX requests.
+    """
+    artwork = get_object_or_404(ArtWork, pk=pk)
+    
+    # Check if the user is the author
+    if request.user != artwork.author:
+        messages.error(request, "You don't have permission to delete this artwork.")
+        return redirect('critique:artwork_detail', pk=pk)
+    
+    if request.method == 'POST':
+        artwork_title = artwork.title
+        artwork.delete()
+        messages.success(request, f'Artwork "{artwork_title}" has been deleted.')
+        
+        # Check if the request is AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'status': 'success'})
+        
+        return redirect('critique:my_artworks')
+    
+    return render(request, 'critique/artwork_confirm_delete.html', {'artwork': artwork})
