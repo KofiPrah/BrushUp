@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.db.models import Count, Q, Sum
 from .models import ArtWork, Review, Profile, Comment, KarmaEvent
 from .forms import CommentForm, ReplyForm
+from .karma import award_like_karma
 
 # Create your views here.
 def index(request):
@@ -299,6 +300,51 @@ def delete_comment(request, pk):
         messages.success(request, "Comment deleted successfully!")
     
     return redirect('critique:artwork_detail', pk=artwork_pk)
+
+
+@login_required
+def like_artwork(request, pk):
+    """
+    View for liking/unliking an artwork.
+    If the user has already liked the artwork, unlike it.
+    If the user hasn't liked the artwork, like it.
+    
+    Supports both GET and POST requests, but POST is preferred for security.
+    """
+    artwork = get_object_or_404(ArtWork, pk=pk)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+    
+    # Only allow POST and GET methods
+    if request.method not in ['POST', 'GET']:
+        if is_ajax:
+            return JsonResponse({'error': 'Method not allowed'}, status=405)
+        messages.error(request, "Method not allowed.")
+        return redirect('critique:artwork_detail', pk=pk)
+    
+    # Check if user already likes this artwork
+    if request.user in artwork.likes.all():
+        # Remove the like
+        artwork.likes.remove(request.user)
+        liked = False
+        messages.success(request, "You unliked this artwork.")
+    else:
+        # Add the like
+        artwork.likes.add(request.user)
+        liked = True
+        # Award karma for liking
+        award_like_karma(artwork, request.user)
+        messages.success(request, "You liked this artwork!")
+    
+    # Handle AJAX requests
+    if is_ajax:
+        return JsonResponse({
+            'liked': liked,
+            'total_likes': artwork.total_likes(),
+            'message': "Artwork unliked." if not liked else "Artwork liked!"
+        })
+    
+    # For non-AJAX requests, redirect back to the artwork detail page
+    return redirect('critique:artwork_detail', pk=pk)
 
 
 @login_required

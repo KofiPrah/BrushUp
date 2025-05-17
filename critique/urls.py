@@ -11,6 +11,7 @@ urlpatterns = [
     path('artworks/upload/', views.artwork_upload_view, name='artwork_upload'),
     path('artworks/<int:pk>/delete/', views.ArtWorkDeleteView.as_view(), name='artwork_delete'),
     path('artworks/<int:pk>/delete-confirm/', views.delete_artwork, name='artwork_delete_confirm'),
+    path('artworks/<int:pk>/like/', views.like_artwork, name='like_artwork'),
     
     # Comment URLs
     path('artworks/<int:pk>/comment/', views.add_comment, name='add_comment'),
