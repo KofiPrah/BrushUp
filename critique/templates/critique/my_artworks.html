@@ -87,7 +87,7 @@
                                         </small>
                                         <div>
                                             <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-primary">View</a>
-                                            <a href="#" class="btn btn-sm btn-outline-secondary edit-artwork" data-artwork-id="{{ artwork.id }}">Edit</a>
+                                            <a href="{% url 'critique:artwork_edit' artwork.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
                                             <a href="{% url 'critique:artwork_delete' artwork.id %}" class="btn btn-sm btn-outline-danger">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                                     <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
@@ -256,17 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Edit artwork button (placeholder for future implementation)
-    const editButtons = document.querySelectorAll('.edit-artwork');
-    editButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            const artworkId = this.getAttribute('data-artwork-id');
-            console.log(`Edit artwork ${artworkId} - This would open an edit form in the future`);
-            // For now just redirect to the detail page
-            window.location.href = `/artworks/${artworkId}/`;
-        });
-    });
+    // Edit functionality is now handled by direct links to the edit page
 });
 </script>
 {% endblock %}

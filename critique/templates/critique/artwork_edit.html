@@ -1,0 +1,76 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}Edit {{ artwork.title }} - Art Critique{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card bg-dark text-white mb-4">
+                <div class="card-header">
+                    <h2 class="mb-0">Edit Artwork</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_title" class="form-label">Title</label>
+                            <input type="text" class="form-control bg-dark text-white" id="id_title" name="title" value="{{ artwork.title }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">Description</label>
+                            <textarea class="form-control bg-dark text-white" id="id_description" name="description" rows="4" required>{{ artwork.description }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_medium" class="form-label">Medium</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="id_medium" name="medium" value="{{ artwork.medium }}">
+                                    <div class="form-text text-muted">E.g., Oil painting, Digital art, Photography</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="id_dimensions" class="form-label">Dimensions</label>
+                                    <input type="text" class="form-control bg-dark text-white" id="id_dimensions" name="dimensions" value="{{ artwork.dimensions }}">
+                                    <div class="form-text text-muted">E.g., 24x36 inches, 1920x1080 pixels</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_tags" class="form-label">Tags</label>
+                            <input type="text" class="form-control bg-dark text-white" id="id_tags" name="tags" value="{{ artwork.tags }}">
+                            <div class="form-text text-muted">Comma-separated tags (e.g., landscape, portrait, abstract)</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_image" class="form-label">Artwork Image</label>
+                            {% if artwork.image %}
+                                <div class="mb-2">
+                                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="img-thumbnail mb-2" style="max-height: 200px;">
+                                    <p class="text-muted">Current image. Upload a new one to replace it.</p>
+                                </div>
+                            {% elif artwork.image_url %}
+                                <div class="mb-2">
+                                    <img src="{{ artwork.image_url }}" alt="{{ artwork.title }}" class="img-thumbnail mb-2" style="max-height: 200px;">
+                                    <p class="text-muted">Current image. Upload a new one to replace it.</p>
+                                </div>
+                            {% endif %}
+                            <input type="file" class="form-control bg-dark text-white" id="id_image" name="image" accept="image/*">
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Update Artwork</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

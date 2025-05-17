@@ -192,6 +192,36 @@ class MyArtworksListView(LoginRequiredMixin, ListView):
         return context
 
 
+class ArtWorkEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """
+    View for editing an artwork. This view ensures that only the owner of the artwork
+    can edit it by using the UserPassesTestMixin.
+    """
+    model = ArtWork
+    template_name = 'critique/artwork_edit.html'
+    context_object_name = 'artwork'
+    fields = ['title', 'description', 'medium', 'dimensions', 'tags', 'image']
+    
+    def test_func(self):
+        """Test that ensures only the author can edit their artwork"""
+        artwork = self.get_object()
+        return self.request.user == artwork.author
+    
+    def form_valid(self, form):
+        """Process the form submission."""
+        # Save the artwork
+        response = super().form_valid(form)
+        
+        # Show a success message
+        messages.success(self.request, f'Artwork "{self.object.title}" has been updated successfully.')
+        
+        return response
+    
+    def get_success_url(self):
+        """Return to the artwork detail page after successful update."""
+        return reverse('critique:artwork_detail', kwargs={'pk': self.object.pk})
+
+
 class ArtWorkDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """
     View for deleting an artwork. This view ensures that only the owner of the artwork
