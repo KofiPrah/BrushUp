@@ -19,8 +19,6 @@ class StaticStorage(S3Boto3Storage):
         # With bucket ownership enforced, we should not set ACL
         if 'ACL' in params:
             del params['ACL']
-        # Set bucket owner to have full control
-        params['ObjectOwnership'] = 'BucketOwnerEnforced'
         return params
 
 
@@ -42,8 +40,6 @@ class PublicMediaStorage(S3Boto3Storage):
         # With bucket ownership enforced, we should not set ACL
         if 'ACL' in params:
             del params['ACL']
-        # Set bucket owner to have full control
-        params['ObjectOwnership'] = 'BucketOwnerEnforced'
         return params
     
     def _save(self, name, content):
@@ -75,6 +71,4 @@ class PrivateMediaStorage(S3Boto3Storage):
         # Remove ACL parameter if it exists
         if 'ACL' in params:
             del params['ACL']
-        # Set bucket owner to have full control
-        params['ObjectOwnership'] = 'BucketOwnerEnforced'
         return params

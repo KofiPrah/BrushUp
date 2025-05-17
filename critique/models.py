@@ -4,6 +4,14 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.conf import settings
+
+# Import S3 storage backend for files if S3 is enabled
+if settings.USE_S3:
+    from artcritique.storage_backends import PublicMediaStorage
+    s3_storage = PublicMediaStorage()
+else:
+    s3_storage = None
 
 # Create your models here.
 class Profile(models.Model):
@@ -15,7 +23,8 @@ class Profile(models.Model):
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=100, blank=True)
     birth_date = models.DateField(null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profiles/', blank=True, null=True, 
+                                    storage=s3_storage if settings.USE_S3 else None)
     profile_picture_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field
     website = models.URLField(max_length=200, blank=True)
     karma = models.IntegerField(default=0, help_text="Points earned through positive contributions")
@@ -40,7 +49,8 @@ class ArtWork(models.Model):
     """
     title = models.CharField(max_length=200)
     description = models.TextField()
-    image = models.ImageField(upload_to='artworks/', blank=True, null=True)  # Image file
+    image = models.ImageField(upload_to='artworks/', blank=True, null=True,
+                           storage=s3_storage if settings.USE_S3 else None)  # Image file
     image_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field for backwards compatibility
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
