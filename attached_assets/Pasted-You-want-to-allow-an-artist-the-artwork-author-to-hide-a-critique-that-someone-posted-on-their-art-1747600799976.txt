@@ -1,0 +1,72 @@
+You want to allow an artist (the artwork author) to hide a critique that someone posted on their artwork.
+
+You're getting this error:
+
+mathematica
+Copy
+Edit
+POST to /artworks/29/ → 405 Method Not Allowed
+This means you're sending the request to the artwork detail endpoint, but hiding a critique is not an action that belongs on the artwork detail route. It's an action on a critique, not an artwork.
+
+✅ The Right Approach
+Instead of posting to:
+
+bash
+Copy
+Edit
+POST /artworks/29/
+You should be posting to something like:
+
+bash
+Copy
+Edit
+POST /api/critiques/<critique_id>/hide/
+This would be a custom action on the Critique model or viewset.
+
+🔧 Backend Fix (Django REST Framework)
+If you're using DRF and have a CritiqueViewSet, you can define a custom action like this:
+
+python
+Copy
+Edit
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status, permissions
+
+class CritiqueViewSet(viewsets.ModelViewSet):
+    queryset = Critique.objects.all()
+    serializer_class = CritiqueSerializer
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def hide(self, request, pk=None):
+        critique = self.get_object()
+
+        # Check if the request user is the author of the artwork being critiqued
+        if critique.artwork.author != request.user:
+            return Response({'detail': 'Not authorized.'}, status=status.HTTP_403_FORBIDDEN)
+
+        critique.is_hidden = True
+        critique.save()
+        return Response({'detail': 'Critique hidden.'}, status=status.HTTP_200_OK)
+And in your urls.py:
+
+python
+Copy
+Edit
+router.register(r'critiques', CritiqueViewSet)
+Then from the frontend, send a POST request to:
+
+bash
+Copy
+Edit
+POST /api/critiques/14/hide/
+Payload can be empty unless you want to log a reason or timestamp.
+
+🔁 Recap
+/artworks/29/ is not the right place to POST.
+
+Make /api/critiques/<id>/hide/ accept POST via a custom action.
+
+Validate that the current user owns the artwork.
+
+Update the is_hidden field and return success.
