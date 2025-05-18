@@ -233,6 +233,15 @@ class CritiqueSerializer(serializers.ModelSerializer):
     detailed_count = serializers.SerializerMethodField()
     user_reactions = serializers.SerializerMethodField()
     
+    def get_reactions_count(self, obj):
+        """Return the total count of all reactions for this critique."""
+        return {
+            'HELPFUL': obj.reactions.filter(reaction_type='HELPFUL').count(),
+            'INSPIRING': obj.reactions.filter(reaction_type='INSPIRING').count(),
+            'DETAILED': obj.reactions.filter(reaction_type='DETAILED').count(),
+            'TOTAL': obj.reactions.count()
+        }
+    
     class Meta:
         model = Critique
         fields = [
@@ -294,6 +303,15 @@ class CritiqueListSerializer(serializers.ModelSerializer):
     inspiring_count = serializers.SerializerMethodField()
     detailed_count = serializers.SerializerMethodField()
     user_reactions = serializers.SerializerMethodField()
+    
+    def get_reactions_count(self, obj):
+        """Return the total count of all reactions for this critique."""
+        return {
+            'HELPFUL': obj.reactions.filter(reaction_type='HELPFUL').count(),
+            'INSPIRING': obj.reactions.filter(reaction_type='INSPIRING').count(),
+            'DETAILED': obj.reactions.filter(reaction_type='DETAILED').count(),
+            'TOTAL': obj.reactions.count()
+        }
     
     class Meta:
         model = Critique

@@ -1,24 +1,11 @@
 #!/bin/bash
-# HTTP-only server for Brush Up application
-# This script:
-# 1. Stops any existing servers
-# 2. Fixes the CritiqueSerializer to add the missing get_reactions_count method
-# 3. Runs the application in HTTP mode (without SSL certificates)
+# Run Brush Up application without SSL certificates
+# Replit handles HTTPS for us, so we don't need certificates
 
-# Kill any existing server processes
-echo "Stopping any existing servers..."
+# Kill any existing Gunicorn processes
 pkill -f gunicorn || true
-pkill -f runserver || true
-sleep 1
 
-# Set environment variables for HTTP mode
-export SSL_ENABLED=false
-export HTTPS=off
-export HTTP_ONLY=true
-export wsgi_url_scheme=http
-
-# Fix the CritiqueSerializer issue
-echo "Applying serializer fixes..."
+# Apply serializer fixes
 python -c "
 import django
 import os
@@ -36,22 +23,17 @@ def get_reactions_count(self, obj):
         'TOTAL': obj.reactions.count()
     }
 
-# Add method to both serializers if needed
+# Add the method to both serializers
 if not hasattr(CritiqueSerializer, 'get_reactions_count'):
     setattr(CritiqueSerializer, 'get_reactions_count', get_reactions_count)
     print('✓ Added get_reactions_count to CritiqueSerializer')
-else:
-    print('✓ CritiqueSerializer already has get_reactions_count method')
 
 if not hasattr(CritiqueListSerializer, 'get_reactions_count'):
     setattr(CritiqueListSerializer, 'get_reactions_count', get_reactions_count)
     print('✓ Added get_reactions_count to CritiqueListSerializer')
-else:
-    print('✓ CritiqueListSerializer already has get_reactions_count method')
 
-print('✓ Serializer fixes applied successfully')
+print('✓ Successfully fixed serializer methods')
 "
 
-# Run the server in HTTP mode (no SSL certificates)
-echo "Starting Brush Up in HTTP mode..."
+# Start Gunicorn WITHOUT SSL certificates
 exec gunicorn --bind 0.0.0.0:5000 main:app

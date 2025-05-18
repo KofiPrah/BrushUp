@@ -1,0 +1,103 @@
+Problem: Conflicting startup commands are re-enabling SSL
+You have two conflicting instructions:
+
+❌ 1. In [deployment]:
+toml
+Copy
+Edit
+run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+✅ This is safe and HTTP-only.
+
+❌ 2. In [workflows.workflow.tasks] (under “Start application”):
+toml
+Copy
+Edit
+args = "gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --reuse-port --reload main:app"
+⛔ This runs Gunicorn with SSL, which fails because cert.pem and key.pem are likely missing or shouldn't be used in Replit.
+
+⚠️ Replit is probably running this task after your safe deployment — restarting the server with broken SSL config.
+
+✅ The Fix: Safely disable the SSL startup
+🔧 Step 1: Remove or rewrite the broken task
+Replace this block:
+
+toml
+Copy
+Edit
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --reuse-port --reload main:app"
+waitForPort = 5000
+With this safe HTTP-only command:
+
+toml
+Copy
+Edit
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 main:app"
+waitForPort = 5000
+✅ This ensures that both deployment and workflow run the same safe Gunicorn config.
+
+🔧 Step 2: Update your [env] section (optional but good)
+toml
+Copy
+Edit
+[env]
+SSL_ENABLED = "false"
+✅ This lets you safely check in main.py:
+
+python
+Copy
+Edit
+if os.getenv("SSL_ENABLED", "false") == "true":
+    # start SSL server (not recommended on Replit)
+else:
+    # start plain HTTP server
+✅ Final Cleaned-Up .replit Example
+toml
+Copy
+Edit
+modules = ["python-3.11", "postgresql-16", "nodejs-20"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["openssl", "postgresql", "awscli2", ...]
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["gunicorn", "--bind", "0.0.0.0:5000", "main:app"]
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 main:app"
+waitForPort = 5000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[env]
+SSL_ENABLED = "false"
+✅ Final Steps
+Save the updated .replit file
+
+Stop and restart your Replit app
+
+The SSL error should be gone for good ✅
