@@ -1,0 +1,90 @@
+These 403 Forbidden errors mean your Django app is blocking access to:
+
+bash
+Copy
+Edit
+POST /api/critiques/14/hide/
+POST /api/critiques/14/reply/
+This almost always comes from a permission issue, especially when using Django REST Framework ViewSets + @action.
+
+✅ Step-by-Step Fix
+🔍 Step 1: You’re likely using @action methods
+In CritiqueViewSet, you probably have:
+
+python
+Copy
+Edit
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+class CritiqueViewSet(viewsets.ModelViewSet):
+    
+    @action(detail=True, methods=['post'])
+    def hide(self, request, pk=None):
+        # logic here...
+
+    @action(detail=True, methods=['post'])
+    def reply(self, request, pk=None):
+        # logic here...
+⚠️ Problem:
+By default, DRF applies the viewset’s permission classes (e.g., IsAuthenticatedOrReadOnly) to all actions, but doesn't always assume ownership rules.
+
+If you're trying to:
+
+Let only the author hide their critique
+
+Or only allow authenticated users to reply
+
+... you need to write explicit permission logic.
+
+✅ Step 2: Fix permissions per action
+Here’s a safe pattern you can use:
+
+1. Restrict hide to the critique’s author
+python
+Copy
+Edit
+@action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+def hide(self, request, pk=None):
+    critique = self.get_object()
+    if critique.author != request.user:
+        return Response({"detail": "You cannot hide someone else's critique."}, status=403)
+    
+    critique.is_hidden = True
+    critique.save()
+    return Response({"status": "Critique hidden"})
+2. Allow reply only to logged-in users
+python
+Copy
+Edit
+@action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+def reply(self, request, pk=None):
+    parent_critique = self.get_object()
+    text = request.data.get("text")
+
+    if not text:
+        return Response({"detail": "Reply text is required."}, status=400)
+
+    Critique.objects.create(
+        artwork=parent_critique.artwork,
+        parent=parent_critique,
+        author=request.user,
+        text=text,
+    )
+
+    return Response({"status": "Reply posted"})
+✅ This should resolve the 403 errors if:
+
+You’re logged in
+
+You pass a valid CSRF token (for session auth)
+
+🛠 Bonus: Set global auth for APIView-based actions
+If you're using APIView or non-viewset routes, make sure permission_classes = [IsAuthenticated] is set.
+
+✅ Final Checklist
+Check	Should be true
+Are you logged in and session is valid?	✅
+Is CSRF token sent in the header?	✅
+Does the action method have @action(..., permission_classes=[...])	✅
+Does the logic verify the user (e.g., critique.author == request.user)?	✅

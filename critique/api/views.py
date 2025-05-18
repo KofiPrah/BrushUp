@@ -433,7 +433,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
             
         serializer.save(author=self.request.user)
         
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def hide(self, request, pk=None):
         """
         Hide a critique from public view.
@@ -460,7 +460,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(critique)
         return Response(serializer.data)
     
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def unhide(self, request, pk=None):
         """
         Unhide a previously hidden critique.
@@ -483,7 +483,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(critique)
         return Response(serializer.data)
     
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def flag(self, request, pk=None):
         """
         Flag a critique for moderation.
@@ -507,7 +507,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         
         return Response({"status": "Critique has been flagged for moderation"})
     
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def reply(self, request, pk=None):
         """
         Add a reply to a critique.
@@ -544,7 +544,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         serializer = CritiqueReplySerializer(reply)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def toggle_reaction(self, request, pk=None):
         """
         Toggle a reaction on this critique.
@@ -601,7 +601,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
             
         return Response(response_data, status=status.HTTP_200_OK)
         
-    @action(detail=True, methods=['post'])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def react(self, request, pk=None):
         """
         Add a reaction to this critique.
@@ -653,7 +653,7 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         
         return Response(response_data, status=status.HTTP_201_CREATED)
         
-    @action(detail=True, methods=['delete'])
+    @action(detail=True, methods=['delete'], permission_classes=[permissions.IsAuthenticated])
     def unreact(self, request, pk=None):
         """
         Remove a reaction from this critique.
