@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from critique.models import ArtWork, Review, Profile, Critique, Notification, Reaction
+from critique.models import ArtWork, Review, Profile, Critique, Notification, Reaction, CritiqueReply
 from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -220,6 +220,17 @@ class ReviewSerializer(serializers.ModelSerializer):
         review = Review.objects.create(reviewer=user, **validated_data)
         return review
 
+class CritiqueReplySerializer(serializers.ModelSerializer):
+    """Serializer for artist replies to critiques."""
+    author = UserSerializer(read_only=True)
+    author_name = serializers.CharField(source='author.username', read_only=True)
+    
+    class Meta:
+        model = CritiqueReply
+        fields = ['id', 'critique', 'author', 'author_name', 'text', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'author', 'author_name', 'created_at', 'updated_at']
+
+
 class CritiqueSerializer(serializers.ModelSerializer):
     """Serializer for the Critique model with author information."""
     author = UserSerializer(read_only=True)
@@ -232,6 +243,12 @@ class CritiqueSerializer(serializers.ModelSerializer):
     inspiring_count = serializers.SerializerMethodField()
     detailed_count = serializers.SerializerMethodField()
     user_reactions = serializers.SerializerMethodField()
+    replies = CritiqueReplySerializer(many=True, read_only=True)
+    is_hidden_from_public = serializers.BooleanField(source='is_hidden', read_only=True)
+    can_hide = serializers.SerializerMethodField()
+    can_reply = serializers.SerializerMethodField()
+    hidden_reason = serializers.CharField(read_only=True)
+    is_flagged = serializers.BooleanField(read_only=True)
     
     def get_reactions_count(self, obj):
         """Return the total count of all reactions for this critique."""
@@ -242,6 +259,20 @@ class CritiqueSerializer(serializers.ModelSerializer):
             'TOTAL': obj.reactions.count()
         }
     
+    def get_can_hide(self, obj):
+        """Return true if the current user can hide this critique (artwork owner)."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.artwork.author == request.user
+    
+    def get_can_reply(self, obj):
+        """Return true if the current user can reply to this critique (artwork owner)."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.artwork.author == request.user
+    
     class Meta:
         model = Critique
         fields = [
@@ -249,13 +280,15 @@ class CritiqueSerializer(serializers.ModelSerializer):
             'author_profile_url', 'text', 'composition_score', 'technique_score', 
             'originality_score', 'average_score', 'reactions_count',
             'helpful_count', 'inspiring_count', 'detailed_count', 'user_reactions',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'replies', 'is_hidden_from_public', 'hidden_reason',
+            'is_flagged', 'can_hide', 'can_reply'
         ]
         read_only_fields = [
             'id', 'author', 'author_name', 'author_profile_url', 
             'artwork_title', 'average_score', 'reactions_count',
             'helpful_count', 'inspiring_count', 'detailed_count', 'user_reactions',
-            'created_at', 'updated_at'
+            'created_at', 'updated_at', 'replies', 'is_hidden_from_public', 
+            'hidden_reason', 'is_flagged', 'can_hide', 'can_reply'
         ]
     
     def get_author_profile_url(self, obj):
@@ -303,6 +336,10 @@ class CritiqueListSerializer(serializers.ModelSerializer):
     inspiring_count = serializers.SerializerMethodField()
     detailed_count = serializers.SerializerMethodField()
     user_reactions = serializers.SerializerMethodField()
+    is_hidden_from_public = serializers.BooleanField(source='is_hidden', read_only=True)
+    can_hide = serializers.SerializerMethodField()
+    can_reply = serializers.SerializerMethodField()
+    has_replies = serializers.SerializerMethodField()
     
     def get_reactions_count(self, obj):
         """Return the total count of all reactions for this critique."""
@@ -313,13 +350,32 @@ class CritiqueListSerializer(serializers.ModelSerializer):
             'TOTAL': obj.reactions.count()
         }
     
+    def get_can_hide(self, obj):
+        """Return true if the current user can hide this critique (artwork owner)."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.artwork.author == request.user
+    
+    def get_can_reply(self, obj):
+        """Return true if the current user can reply to this critique (artwork owner)."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.artwork.author == request.user
+    
+    def get_has_replies(self, obj):
+        """Return true if this critique has any replies."""
+        return obj.replies.exists()
+    
     class Meta:
         model = Critique
         fields = [
             'id', 'artwork', 'artwork_title', 'author_name', 
             'text', 'average_score', 'reactions_count', 
             'helpful_count', 'inspiring_count', 'detailed_count',
-            'user_reactions', 'created_at'
+            'user_reactions', 'created_at', 'is_hidden_from_public',
+            'can_hide', 'can_reply', 'has_replies'
         ]
     
     def get_average_score(self, obj):

@@ -2,11 +2,12 @@ from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from critique.models import ArtWork, Review, Profile, Critique, Reaction, Notification
+from django.db import models
+from critique.models import ArtWork, Review, Profile, Critique, Reaction, Notification, CritiqueReply
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
     ArtWorkListSerializer, ReviewSerializer, CritiqueSerializer, CritiqueListSerializer,
-    ReactionSerializer, NotificationSerializer
+    ReactionSerializer, NotificationSerializer, CritiqueReplySerializer
 )
 from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
 from django.db import connection
@@ -354,7 +355,10 @@ class CritiqueViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'updated_at']
     
     def get_queryset(self):
-        """Optionally filter critiques by artwork ID or author ID."""
+        """
+        Filter critiques by artwork ID or author ID.
+        Only show hidden critiques to the artwork owner and critique author.
+        """
         queryset = Critique.objects.all().order_by('-created_at')
         
         # Filter by artwork
@@ -366,6 +370,39 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         author_id = self.request.query_params.get('author', None)
         if author_id is not None:
             queryset = queryset.filter(author_id=author_id)
+        
+        # Hide critiques that have been hidden by the artwork owner, unless
+        # the current user is the artwork owner or the critique author
+        user = self.request.user
+        if user.is_authenticated:
+            # If user is authenticated, show hidden critiques if user is
+            # the artwork owner or critique author
+            queryset = queryset.filter(
+                # Either critique is not hidden
+                # OR user is the artwork owner
+                # OR user is the critique author
+                models.Q(is_hidden=False) |
+                models.Q(artwork__author=user) |
+                models.Q(author=user)
+            )
+        else:
+            # For anonymous users, never show hidden critiques
+            queryset = queryset.filter(is_hidden=False)
+            
+        # Filter out critiques with rejected moderation status unless
+        # the user is the author or artwork owner
+        if user.is_authenticated:
+            queryset = queryset.filter(
+                # Either critique is not rejected
+                # OR user is the artwork owner
+                # OR user is the critique author
+                models.Q(moderation_status__in=['APPROVED', 'PENDING']) |
+                models.Q(artwork__author=user) |
+                models.Q(author=user)
+            )
+        else:
+            # For anonymous users, only show approved critiques
+            queryset = queryset.filter(moderation_status='APPROVED')
             
         return queryset
     
@@ -396,6 +433,117 @@ class CritiqueViewSet(viewsets.ModelViewSet):
             
         serializer.save(author=self.request.user)
         
+    @action(detail=True, methods=['post'])
+    def hide(self, request, pk=None):
+        """
+        Hide a critique from public view.
+        Only the artwork owner can hide critiques.
+        
+        Example: POST /api/critiques/5/hide/
+        Payload: { "reason": "Inappropriate content" } (optional)
+        """
+        critique = self.get_object()
+        
+        # Check if user is the artwork owner
+        if request.user != critique.artwork.author:
+            return Response(
+                {"error": "Only the artwork owner can hide critiques"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Get the reason from request data (optional)
+        reason = request.data.get('reason', None)
+        
+        # Hide the critique
+        critique.hide(request.user, reason)
+        
+        serializer = self.get_serializer(critique)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def unhide(self, request, pk=None):
+        """
+        Unhide a previously hidden critique.
+        Only the artwork owner who hid the critique can unhide it.
+        
+        Example: POST /api/critiques/5/unhide/
+        """
+        critique = self.get_object()
+        
+        # Check if user is the artwork owner
+        if request.user != critique.artwork.author:
+            return Response(
+                {"error": "Only the artwork owner can unhide critiques"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Unhide the critique
+        critique.unhide()
+        
+        serializer = self.get_serializer(critique)
+        return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'])
+    def flag(self, request, pk=None):
+        """
+        Flag a critique for moderation.
+        Any authenticated user can flag a critique.
+        
+        Example: POST /api/critiques/5/flag/
+        Payload: { "reason": "Offensive content" }
+        """
+        critique = self.get_object()
+        
+        # Check if reason is provided
+        reason = request.data.get('reason', None)
+        if not reason:
+            return Response(
+                {"error": "Reason for flagging is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Flag the critique
+        critique.flag(request.user, reason)
+        
+        return Response({"status": "Critique has been flagged for moderation"})
+    
+    @action(detail=True, methods=['post'])
+    def reply(self, request, pk=None):
+        """
+        Add a reply to a critique.
+        Only the artwork owner can reply to critiques.
+        
+        Example: POST /api/critiques/5/reply/
+        Payload: { "text": "Thank you for your feedback!" }
+        """
+        critique = self.get_object()
+        
+        # Check if user is the artwork owner
+        if request.user != critique.artwork.author:
+            return Response(
+                {"error": "Only the artwork owner can reply to critiques"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check if text is provided
+        text = request.data.get('text', None)
+        if not text:
+            return Response(
+                {"error": "Reply text is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Create the reply
+        from critique.models import CritiqueReply
+        reply = CritiqueReply.objects.create(
+            critique=critique,
+            author=request.user,
+            text=text
+        )
+        
+        serializer = CritiqueReplySerializer(reply)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     @action(detail=True, methods=['post'])
     def toggle_reaction(self, request, pk=None):
         """

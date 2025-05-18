@@ -119,6 +119,27 @@ class Critique(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
+    # Hide from public view - only visible to the artist and author
+    is_hidden = models.BooleanField(default=False, help_text="If true, critique is hidden from public view and only visible to the artist and author")
+    hidden_reason = models.TextField(blank=True, null=True, help_text="Optional reason for hiding the critique")
+    hidden_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='hidden_critiques')
+    hidden_at = models.DateTimeField(null=True, blank=True)
+    
+    # Moderation flags
+    is_flagged = models.BooleanField(default=False, help_text="If true, critique has been flagged for moderation")
+    flag_reason = models.TextField(blank=True, null=True, help_text="Reason for flagging the critique")
+    flagged_by = models.ManyToManyField(User, related_name='flagged_critiques', blank=True)
+    moderation_status = models.CharField(
+        max_length=20,
+        choices=[
+            ('PENDING', 'Pending Review'),
+            ('APPROVED', 'Approved'),
+            ('REJECTED', 'Rejected')
+        ],
+        default='APPROVED',
+        help_text="Moderation status of this critique"
+    )
+    
     # Optional rating fields to provide numeric evaluation
     composition_score = models.PositiveSmallIntegerField(
         choices=[(i, i) for i in range(1, 11)], 
@@ -227,6 +248,43 @@ class Critique(models.Model):
     def get_detailed_count(self):
         """Get count of DETAILED reactions."""
         return self.reactions.filter(reaction_type='DETAILED').count()
+        
+    def hide(self, user, reason=None):
+        """Hide a critique from public view."""
+        from django.utils import timezone
+        self.is_hidden = True
+        self.hidden_reason = reason
+        self.hidden_by = user
+        self.hidden_at = timezone.now()
+        self.save()
+        
+    def unhide(self):
+        """Unhide a critique."""
+        self.is_hidden = False
+        self.hidden_reason = None
+        self.hidden_by = None
+        self.hidden_at = None
+        self.save()
+        
+    def flag(self, user, reason):
+        """Flag a critique for moderation."""
+        self.is_flagged = True
+        self.flag_reason = reason
+        self.flagged_by.add(user)
+        self.moderation_status = 'PENDING'
+        self.save()
+        
+    def approve(self):
+        """Approve a flagged critique after moderation."""
+        self.is_flagged = False
+        self.moderation_status = 'APPROVED'
+        self.save()
+        
+    def reject(self):
+        """Reject a flagged critique after moderation."""
+        self.is_flagged = True
+        self.moderation_status = 'REJECTED'
+        self.save()
 
 
 class Reaction(models.Model):
@@ -291,6 +349,26 @@ class KarmaEvent(models.Model):
         
     def __str__(self):
         return f"Karma: {self.points} points to {self.user.username} for {self.action}"
+
+
+class CritiqueReply(models.Model):
+    """
+    Model for artist replies to critiques.
+    Allows the artwork owner to respond to critiques without deleting them.
+    """
+    critique = models.ForeignKey(Critique, on_delete=models.CASCADE, related_name='replies')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='critique_replies')
+    text = models.TextField(help_text="Reply to the critique")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Critique Reply'
+        verbose_name_plural = 'Critique Replies'
+    
+    def __str__(self):
+        return f"Reply by {self.author.username} to critique on {self.critique.artwork.title}"
 
 
 class Notification(models.Model):
