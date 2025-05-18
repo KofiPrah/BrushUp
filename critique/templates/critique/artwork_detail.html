@@ -580,6 +580,47 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Unhide critique
+    const unhideCritiqueModal = document.getElementById('unhideCritiqueModal');
+    if (unhideCritiqueModal) {
+        unhideCritiqueModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const critiqueId = button.getAttribute('data-critique-id');
+            document.getElementById('unhideCritiqueId').value = critiqueId;
+        });
+        
+        const unhideCritiqueForm = document.getElementById('unhideCritiqueForm');
+        unhideCritiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const critiqueId = document.getElementById('unhideCritiqueId').value;
+            
+            fetch(`/api/critiques/${critiqueId}/unhide/`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
+                modal.hide();
+                
+                // Show success message
+                alert('Critique has been successfully unhidden.');
+                
+                // Reload page to show updated UI
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error unhiding critique:', error);
+                alert('There was an error unhiding this critique. Please try again.');
+            });
+        });
+    }
+    
     // Flag critique
     const flagCritiqueModal = document.getElementById('flagCritiqueModal');
     if (flagCritiqueModal) {

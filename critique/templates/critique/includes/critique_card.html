@@ -89,12 +89,12 @@
                     <i class="bi bi-eye-slash"></i> Hide
                 </button>
                 {% else %}
-                <form method="POST" action="/api/critiques/{{ critique.id }}/unhide/" class="d-inline me-2">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-sm btn-outline-success">
-                        <i class="bi bi-eye"></i> Unhide
-                    </button>
-                </form>
+                <button type="button" class="btn btn-sm btn-outline-success me-2" 
+                        data-critique-id="{{ critique.id }}"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#unhideCritiqueModal">
+                    <i class="bi bi-eye"></i> Unhide
+                </button>
                 {% endif %}
                 
                 <button type="button" class="btn btn-sm btn-outline-primary" 
