@@ -1,0 +1,35 @@
+{% if user.is_authenticated and user == artwork.author %}
+    <div class="mt-2">
+        {% if not critique.is_hidden %}
+            <form method="POST" action="{% url 'critique:hide_critique' critique.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="button" class="btn btn-sm btn-outline-danger" 
+                        data-bs-toggle="modal" data-bs-target="#hideCritiqueModal"
+                        data-critique-id="{{ critique.id }}">
+                    <i class="bi bi-eye-slash"></i> Hide Critique
+                </button>
+            </form>
+        {% else %}
+            <form method="POST" action="{% url 'critique:unhide_critique' critique.id %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-eye"></i> Unhide Critique
+                </button>
+            </form>
+        {% endif %}
+        
+        <button type="button" class="btn btn-sm btn-outline-primary" 
+                data-bs-toggle="modal" data-bs-target="#replyCritiqueModal"
+                data-critique-id="{{ critique.id }}">
+            <i class="bi bi-reply"></i> Reply
+        </button>
+    </div>
+{% elif user.is_authenticated and user != critique.author %}
+    <div class="mt-2">
+        <button type="button" class="btn btn-sm btn-outline-warning"
+                data-bs-toggle="modal" data-bs-target="#flagCritiqueModal"
+                data-critique-id="{{ critique.id }}">
+            <i class="bi bi-flag"></i> Flag Inappropriate
+        </button>
+    </div>
+{% endif %}

@@ -1,0 +1,37 @@
+{% if user.is_authenticated %}
+    <div class="mt-3 pt-2 border-top d-flex justify-content-end">
+        {% if user == artwork.author %}
+            <!-- Artist moderation options -->
+            {% if not critique.is_hidden %}
+                <button type="button" class="btn btn-sm btn-outline-danger me-2"
+                        data-critique-id="{{ critique.id }}"
+                        data-bs-toggle="modal" 
+                        data-bs-target="#hideCritiqueModal">
+                    <i class="bi bi-eye-slash"></i> Hide
+                </button>
+            {% else %}
+                <form method="POST" action="/api/critiques/{{ critique.id }}/unhide/" class="d-inline me-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-eye"></i> Unhide
+                    </button>
+                </form>
+            {% endif %}
+            
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    data-critique-id="{{ critique.id }}"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#replyCritiqueModal">
+                <i class="bi bi-reply"></i> Reply
+            </button>
+        {% elif user != critique.author %}
+            <!-- Other users moderation options -->
+            <button type="button" class="btn btn-sm btn-outline-warning"
+                    data-critique-id="{{ critique.id }}"
+                    data-bs-toggle="modal" 
+                    data-bs-target="#flagCritiqueModal">
+                <i class="bi bi-flag"></i> Flag
+            </button>
+        {% endif %}
+    </div>
+{% endif %}

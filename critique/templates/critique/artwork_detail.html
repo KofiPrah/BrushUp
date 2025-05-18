@@ -162,55 +162,73 @@
                 <div class="card-body">
                     {% if critiques %}
                         {% for critique in critiques %}
-                            <div class="card mb-4 bg-dark border border-secondary">
+                            <div class="card mb-4 bg-dark border border-secondary {% if critique.is_hidden %}border-danger{% endif %}">
                                 <div class="card-header d-flex justify-content-between">
                                     <h5 class="card-title mb-0"><a href="{% url 'critique:user_profile' critique.author.username %}" class="text-info">{{ critique.author.username }}</a></h5>
-                                    <small class="text-muted">{{ critique.created_at|date:"F d, Y" }}</small>
+                                    <div>
+                                        {% if critique.is_hidden %}
+                                            <span class="badge bg-danger me-2">Hidden Critique</span>
+                                        {% endif %}
+                                        {% if critique.is_flagged %}
+                                            <span class="badge bg-warning me-2">Flagged</span>
+                                        {% endif %}
+                                        <small class="text-muted">{{ critique.created_at|date:"F d, Y" }}</small>
+                                    </div>
                                 </div>
                                 <div class="card-body">
-                                    <p class="card-text">{{ critique.text }}</p>
-                                    
-                                    {% if critique.composition_score or critique.technique_score or critique.originality_score %}
-                                    <div class="row mb-3 mt-4">
-                                        <div class="col-md-4">
-                                            <h6>Composition</h6>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-info" role="progressbar" 
-                                                     style="width: {% widthratio critique.composition_score|default:0 1 10 %}%" 
-                                                     aria-valuenow="{{ critique.composition_score|default:0 }}" 
-                                                     aria-valuemin="0" aria-valuemax="10">
-                                                    {{ critique.composition_score|default:"N/A" }}
+                                    {% if critique.is_hidden and not user == artwork.author and not user == critique.author %}
+                                        <div class="alert alert-danger">
+                                            <p><i class="bi bi-eye-slash"></i> This critique has been hidden by the artist.</p>
+                                            {% if critique.hidden_reason %}
+                                                <p class="mb-0"><strong>Reason:</strong> {{ critique.hidden_reason }}</p>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <p class="card-text">{{ critique.text }}</p>
+                                        
+                                        {% if critique.composition_score or critique.technique_score or critique.originality_score %}
+                                        <div class="row mb-3 mt-4">
+                                            <div class="col-md-4">
+                                                <h6>Composition</h6>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-info" role="progressbar" 
+                                                         style="width: {% widthratio critique.composition_score|default:0 1 10 %}%" 
+                                                         aria-valuenow="{{ critique.composition_score|default:0 }}" 
+                                                         aria-valuemin="0" aria-valuemax="10">
+                                                        {{ critique.composition_score|default:"N/A" }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h6>Technique</h6>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-success" role="progressbar" 
+                                                         style="width: {% widthratio critique.technique_score|default:0 1 10 %}%" 
+                                                         aria-valuenow="{{ critique.technique_score|default:0 }}" 
+                                                         aria-valuemin="0" aria-valuemax="10">
+                                                        {{ critique.technique_score|default:"N/A" }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h6>Originality</h6>
+                                                <div class="progress">
+                                                    <div class="progress-bar bg-warning" role="progressbar" 
+                                                         style="width: {% widthratio critique.originality_score|default:0 1 10 %}%" 
+                                                         aria-valuenow="{{ critique.originality_score|default:0 }}" 
+                                                         aria-valuemin="0" aria-valuemax="10">
+                                                        {{ critique.originality_score|default:"N/A" }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <h6>Technique</h6>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-success" role="progressbar" 
-                                                     style="width: {% widthratio critique.technique_score|default:0 1 10 %}%" 
-                                                     aria-valuenow="{{ critique.technique_score|default:0 }}" 
-                                                     aria-valuemin="0" aria-valuemax="10">
-                                                    {{ critique.technique_score|default:"N/A" }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <h6>Originality</h6>
-                                            <div class="progress">
-                                                <div class="progress-bar bg-warning" role="progressbar" 
-                                                     style="width: {% widthratio critique.originality_score|default:0 1 10 %}%" 
-                                                     aria-valuenow="{{ critique.originality_score|default:0 }}" 
-                                                     aria-valuemin="0" aria-valuemax="10">
-                                                    {{ critique.originality_score|default:"N/A" }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 <div class="card-footer">
-                                    <div class="d-flex">
-                                        {% if user.is_authenticated %}
+                                    <div class="d-flex justify-content-between">
+                                        <div class="d-flex">
+                                        {% if user.is_authenticated and user != artwork.author %}
                                             <button type="button" 
                                                     data-reaction-critique-id="{{ critique.id }}" 
                                                     data-reaction-type="HELPFUL" 
@@ -249,6 +267,45 @@
                                             </a>
                                         {% endif %}
                                     </div>
+                                    
+                                    <!-- Moderation Buttons -->
+                                    {% if user.is_authenticated %}
+                                        <div class="mt-3 pt-2 border-top d-flex justify-content-end">
+                                            {% if user == artwork.author %}
+                                                <!-- Artist moderation options -->
+                                                {% if not critique.is_hidden %}
+                                                    <button type="button" class="btn btn-sm btn-outline-danger me-2"
+                                                            data-critique-id="{{ critique.id }}"
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#hideCritiqueModal">
+                                                        <i class="bi bi-eye-slash"></i> Hide
+                                                    </button>
+                                                {% else %}
+                                                    <form method="POST" action="/api/critiques/{{ critique.id }}/unhide/" class="d-inline me-2">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-success">
+                                                            <i class="bi bi-eye"></i> Unhide
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                
+                                                <button type="button" class="btn btn-sm btn-outline-primary"
+                                                        data-critique-id="{{ critique.id }}"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#replyCritiqueModal">
+                                                    <i class="bi bi-reply"></i> Reply
+                                                </button>
+                                            {% elif user != critique.author %}
+                                                <!-- Other users moderation options -->
+                                                <button type="button" class="btn btn-sm btn-outline-warning"
+                                                        data-critique-id="{{ critique.id }}"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#flagCritiqueModal">
+                                                    <i class="bi bi-flag"></i> Flag
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}
@@ -362,11 +419,220 @@
             </div>
         </div>
     </div>
+<!-- Hide Critique Modal -->
+<div class="modal fade" id="hideCritiqueModal" tabindex="-1" aria-labelledby="hideCritiqueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hideCritiqueModalLabel">Hide Critique</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="hideCritiqueForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="hideCritiqueId" name="critique_id" value="">
+                <div class="modal-body">
+                    <p>This critique will be hidden from public view, but will remain visible to you as the artwork owner.</p>
+                    <div class="mb-3">
+                        <label for="hideReason" class="form-label">Reason (optional):</label>
+                        <textarea class="form-control bg-dark text-white" id="hideReason" name="reason" rows="3" placeholder="Why are you hiding this critique?"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Hide Critique</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Flag Critique Modal -->
+<div class="modal fade" id="flagCritiqueModal" tabindex="-1" aria-labelledby="flagCritiqueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="flagCritiqueModalLabel">Flag Inappropriate Content</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="flagCritiqueForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="flagCritiqueId" name="critique_id" value="">
+                <div class="modal-body">
+                    <p>Flag this critique if it contains inappropriate content, violates community guidelines, or is abusive.</p>
+                    <div class="mb-3">
+                        <label for="flagReason" class="form-label">Reason (required):</label>
+                        <textarea class="form-control bg-dark text-white" id="flagReason" name="reason" rows="3" placeholder="Why are you flagging this critique?" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-warning">Flag Critique</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reply to Critique Modal -->
+<div class="modal fade" id="replyCritiqueModal" tabindex="-1" aria-labelledby="replyCritiqueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="replyCritiqueModalLabel">Reply to Critique</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="replyCritiqueForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="replyCritiqueId" name="critique_id" value="">
+                <div class="modal-body">
+                    <p>Add your response to this critique</p>
+                    <div class="mb-3">
+                        <label for="replyText" class="form-label">Your Reply:</label>
+                        <textarea class="form-control bg-dark text-white" id="replyText" name="text" rows="4" placeholder="Thank you for your feedback..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Post Reply</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Moderation functionality
+    
+    // Hide critique
+    const hideCritiqueModal = document.getElementById('hideCritiqueModal');
+    if (hideCritiqueModal) {
+        hideCritiqueModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const critiqueId = button.getAttribute('data-critique-id');
+            document.getElementById('hideCritiqueId').value = critiqueId;
+        });
+        
+        const hideCritiqueForm = document.getElementById('hideCritiqueForm');
+        hideCritiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const critiqueId = document.getElementById('hideCritiqueId').value;
+            const reason = document.getElementById('hideReason').value;
+            
+            fetch(`/api/critiques/${critiqueId}/hide/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({reason: reason})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(hideCritiqueModal);
+                modal.hide();
+                
+                // Refresh the page to show updated state
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error hiding critique:', error);
+                alert('There was an error hiding this critique. Please try again.');
+            });
+        });
+    }
+    
+    // Flag critique
+    const flagCritiqueModal = document.getElementById('flagCritiqueModal');
+    if (flagCritiqueModal) {
+        flagCritiqueModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const critiqueId = button.getAttribute('data-critique-id');
+            document.getElementById('flagCritiqueId').value = critiqueId;
+        });
+        
+        const flagCritiqueForm = document.getElementById('flagCritiqueForm');
+        flagCritiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const critiqueId = document.getElementById('flagCritiqueId').value;
+            const reason = document.getElementById('flagReason').value;
+            
+            if (!reason) {
+                alert('Please provide a reason for flagging this critique.');
+                return;
+            }
+            
+            fetch(`/api/critiques/${critiqueId}/flag/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({reason: reason})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(flagCritiqueModal);
+                modal.hide();
+                
+                // Show success message
+                alert('Thank you for flagging this critique. It will be reviewed by moderators.');
+            })
+            .catch(error => {
+                console.error('Error flagging critique:', error);
+                alert('There was an error flagging this critique. Please try again.');
+            });
+        });
+    }
+    
+    // Reply to critique
+    const replyCritiqueModal = document.getElementById('replyCritiqueModal');
+    if (replyCritiqueModal) {
+        replyCritiqueModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const critiqueId = button.getAttribute('data-critique-id');
+            document.getElementById('replyCritiqueId').value = critiqueId;
+        });
+        
+        const replyCritiqueForm = document.getElementById('replyCritiqueForm');
+        replyCritiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const critiqueId = document.getElementById('replyCritiqueId').value;
+            const text = document.getElementById('replyText').value;
+            
+            if (!text) {
+                alert('Please provide your reply text.');
+                return;
+            }
+            
+            fetch(`/api/critiques/${critiqueId}/reply/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({text: text})
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(replyCritiqueModal);
+                modal.hide();
+                
+                // Refresh the page to show the reply
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error submitting reply:', error);
+                alert('There was an error submitting your reply. Please try again.');
+            });
+        });
+    }
+    
     // Get all reply toggle buttons
     const replyToggleButtons = document.querySelectorAll('.reply-toggle');
     const replyCancelButtons = document.querySelectorAll('.reply-cancel');
