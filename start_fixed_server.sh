@@ -1,4 +1,7 @@
 #!/bin/bash
+# Kill any existing server processes
+pkill -f gunicorn || true
+pkill -f "python manage.py runserver" || true
 
-# Start the server in HTTP mode without SSL certificates
-gunicorn --bind 0.0.0.0:5000 --reuse-port --reload http_fixed_server:app
+# Run the HTTP server
+python run_fixed_server.py

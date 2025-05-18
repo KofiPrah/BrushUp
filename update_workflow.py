@@ -1,75 +1,57 @@
 #!/usr/bin/env python3
 """
-Update the workflow to use HTTP-only mode without SSL
-for compatibility with Replit's environment
+Update the workflow configuration to run the Django server in HTTP mode.
+This script modifies the .replit file to update the run command.
 """
 import os
 import json
 
-# Define the updated workflow configuration
-workflow_content = {
-    "modules": ["python-3.11", "postgresql-16", "nodejs-20"],
-    "nix": {
-        "channel": "stable-24_05",
-        "packages": ["awscli2", "cargo", "freetype", "jre17_minimal", "lcms2", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pkg-config", "postgresql", "rustc", "tcl", "tk", "zlib"]
-    },
-    "deployment": {
-        "deploymentTarget": "autoscale",
-        "run": ["python", "http_server_nossl.py"]
-    },
-    "workflows": {
-        "runButton": "Project",
-        "workflow": [
-            {
-                "name": "Project",
-                "mode": "parallel",
-                "author": "agent",
-                "tasks": [
-                    {
-                        "task": "workflow.run",
-                        "args": "Start application"
-                    }
-                ]
-            },
-            {
-                "name": "Start application",
-                "author": "agent",
-                "tasks": [
-                    {
-                        "task": "shell.exec",
-                        "args": "python http_server_nossl.py",
-                        "waitForPort": 5000
-                    }
-                ]
-            }
-        ]
-    },
-    "ports": [
-        {
-            "localPort": 5000,
-            "externalPort": 80
-        },
-        {
-            "localPort": 8000,
-            "externalPort": 8000
-        },
-        {
-            "localPort": 8080,
-            "externalPort": 8080
-        }
-    ],
-    "env": {
-        "SSL_ENABLED": "false",
-        "HTTP_ONLY": "true"
-    }
-}
+# Create a simpler HTTP version of main.py
+with open("main.py.http", "w") as f:
+    f.write("""#!/usr/bin/env python3
+'''
+HTTP-only Django app for Brush Up in Replit environment
+'''
+import os
 
-print("Attempting to update .replit.new file...")
-with open('.replit.new', 'w') as f:
-    json.dump(workflow_content, f, indent=2)
-print("Successfully created .replit.new with HTTP-only configuration")
+# Configure Django for HTTP mode
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")
+os.environ["SSL_ENABLED"] = "false"
+os.environ["HTTP_ONLY"] = "true"
+os.environ["HTTPS"] = "off"
+os.environ["wsgi.url_scheme"] = "http"
 
-print("\nTo enable HTTP mode:")
-print("1. Replace the .replit file with .replit.new")
-print("2. Restart Replit")
-print("3. Alternatively, manually update the workflow to use 'python http_server_nossl.py'")
+# Import Django application
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+
+# Create app variable for gunicorn
+app = application
+""")
+
+# Make it executable
+os.chmod("main.py.http", 0o755)
+
+# Copy it to main.py
+with open("main.py.http", "r") as src:
+    with open("main.py", "w") as dst:
+        dst.write(src.read())
+
+print("Updated main.py for HTTP mode")
+
+# Create a gunicorn config for HTTP mode
+with open("gunicorn_http_config.py", "w") as f:
+    f.write("""
+bind = "0.0.0.0:5000"
+workers = 1
+reload = True
+""")
+
+print("Created gunicorn HTTP config")
+
+# Update the workflow command
+print("To start the server in HTTP mode, use the command:")
+print("gunicorn --config=gunicorn_http_config.py main:app")
+print("\nMake sure to update your workflow in Replit to use this command.")
+
+print("\nAll done! The server should now run in HTTP mode without SSL certificates.")
