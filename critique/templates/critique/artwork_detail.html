@@ -654,8 +654,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h5 class="modal-title" id="critiquebModalLabel">Critique "{{ artwork.title }}"</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="post" action="{% url 'critique:create_critique' artwork.id %}">
+            <form method="post" id="critiqueForm">
                 {% csrf_token %}
+                <!-- Form will be submitted via AJAX to the API endpoint -->
+                <input type="hidden" name="artwork" value="{{ artwork.id }}">
+                <div id="critiqueFormMessage" class="alert alert-danger d-none"></div>
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="critiqueText" class="form-label">Your Critique</label>
@@ -718,4 +721,92 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+<script>
+// Handle submission of critique form via AJAX to the API endpoint
+document.addEventListener('DOMContentLoaded', function() {
+    const critiqueForm = document.getElementById('critiqueForm');
+    
+    if (critiqueForm) {
+        critiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Hide any previous error messages
+            const messageElement = document.getElementById('critiqueFormMessage');
+            messageElement.classList.add('d-none');
+            
+            // Get the form data
+            const artworkId = document.querySelector('input[name="artwork"]').value;
+            const text = document.getElementById('critiqueText').value;
+            const compositionScore = document.getElementById('compositionScore').value;
+            const techniqueScore = document.getElementById('techniqueScore').value;
+            const originalityScore = document.getElementById('originalityScore').value;
+            
+            // Validate required fields
+            if (!text || text.trim() === '') {
+                messageElement.textContent = 'Please enter your critique text.';
+                messageElement.classList.remove('d-none');
+                return;
+            }
+            
+            // Create the payload
+            const data = {
+                artwork: artworkId,
+                text: text
+            };
+            
+            // Add optional scores if provided
+            if (compositionScore) data.composition_score = parseInt(compositionScore);
+            if (techniqueScore) data.technique_score = parseInt(techniqueScore);
+            if (originalityScore) data.originality_score = parseInt(originalityScore);
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Send the API request
+            fetch('/api/critiques/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken
+                },
+                body: JSON.stringify(data),
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    return response.json().then(errorData => {
+                        throw new Error(JSON.stringify(errorData));
+                    });
+                }
+            })
+            .then(data => {
+                // Success - close modal and refresh page to show the new critique
+                const modal = bootstrap.Modal.getInstance(document.getElementById('critiquebModal'));
+                modal.hide();
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                try {
+                    const errorData = JSON.parse(error.message);
+                    // Show specific error messages if available
+                    if (errorData.non_field_errors) {
+                        messageElement.textContent = errorData.non_field_errors.join(', ');
+                    } else if (errorData.detail) {
+                        messageElement.textContent = errorData.detail;
+                    } else {
+                        messageElement.textContent = 'There was an error submitting your critique. Please try again.';
+                    }
+                } catch (e) {
+                    messageElement.textContent = 'There was an error submitting your critique. Please try again.';
+                }
+                messageElement.classList.remove('d-none');
+            });
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -3,6 +3,7 @@
 HTTP-only server for Brush Up application in Replit
 
 This script runs Django without SSL certificates to work in Replit's environment
+(Modified to update the workflow command)
 """
 import os
 import sys

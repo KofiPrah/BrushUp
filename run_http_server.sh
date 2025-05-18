@@ -1,10 +1,11 @@
 #!/bin/bash
-# Run Brush Up in HTTP mode
+# Run Django server in HTTP mode (no SSL)
+# This script avoids using certificates which solves the SSL PEM lib errors
 
-# Make sure SSL is disabled in the environment
+# Set environment variables for HTTP mode
 export SSL_ENABLED=false
 export HTTP_ONLY=true
 
-# Start Django development server
-echo "Starting Brush Up (formerly Art Critique) in HTTP mode..."
-python manage.py runserver 0.0.0.0:5000
+# Start the server (HTTP only, no SSL)
+echo "Starting server in HTTP mode (without SSL certificates)"
+gunicorn --bind 0.0.0.0:5000 --worker-class=sync --workers=1 main:app

@@ -456,7 +456,10 @@ def karma_leaderboard(request):
     return render(request, 'critique/karma_leaderboard.html', context)
 
 
+from django.views.decorators.http import require_http_methods
+
 @login_required
+@require_http_methods(["GET", "POST"])
 def create_critique(request, artwork_id):
     """
     View for creating a new critique for an artwork.
@@ -526,7 +529,8 @@ def create_critique(request, artwork_id):
             messages.error(request, f"Error saving critique: {str(e)}")
             return redirect('critique:artwork_detail', pk=artwork_id)
     
-    # For GET requests, redirect to artwork detail page
+    # For GET requests, render a template or redirect to artwork detail page
+    # We need to allow both GET and POST methods to fix the 405 Method Not Allowed error
     return redirect('critique:artwork_detail', pk=artwork_id)
 
 

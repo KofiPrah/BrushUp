@@ -3,6 +3,7 @@
 Simple HTTP server for Brush Up application
 
 This script runs gunicorn in HTTP-only mode to work with Replit's environment
+(Updated to run without SSL certificates)
 """
 import os
 import sys
