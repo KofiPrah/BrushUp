@@ -595,6 +595,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const critiqueId = document.getElementById('unhideCritiqueId').value;
             console.log('Unhiding critique with ID:', critiqueId);
             
+            // Using fetch, but ensuring proper handling to stay on the page
             fetch(`/api/critiques/${critiqueId}/unhide/`, {
                 method: 'POST',
                 credentials: 'same-origin',
