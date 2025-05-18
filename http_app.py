@@ -1,5 +1,6 @@
 """
-HTTP-only WSGI app for Brush Up (no SSL certificates)
+HTTP-only app for Brush Up application
+This simple WSGI app works with gunicorn and doesn't require SSL certificates
 """
 import os
 import subprocess
@@ -7,26 +8,20 @@ import sys
 import time
 from threading import Thread
 
-# Configure environment to run in HTTP mode without SSL
+# Configure environment for Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
 os.environ['SSL_ENABLED'] = 'false'
 os.environ['HTTP_ONLY'] = 'true'
 os.environ['HTTPS'] = 'off'
 os.environ['wsgi.url_scheme'] = 'http'
 
-# Fix models and database if needed
+# Fix the CritiqueSerializer if needed
 try:
-    # Apply CritiqueSerializer fixes
-    from fix_critique_serializer import add_missing_method
-    add_missing_method()
-    print("✓ Added missing get_reactions_count method to CritiqueSerializer")
-    
-    # Verify database tables
-    from fix_karma_db import create_karma_tables
-    create_karma_tables()
-    print("✓ Verified KarmaEvent table exists")
-except Exception as e:
-    print(f"! Error during fixes: {str(e)}")
+    import fix_critique_serializer
+    fix_critique_serializer.add_missing_method()
+    print("✓ CritiqueSerializer fixes applied")
+except:
+    print("! Could not apply CritiqueSerializer fixes - already fixed?")
 
 # Variables for Django subprocess
 django_process = None
@@ -34,6 +29,12 @@ django_process = None
 def start_django():
     """Start Django server in the background"""
     global django_process
+    try:
+        from fix_karma_db import create_karma_tables
+        create_karma_tables()
+        print("✓ Verified KarmaEvent table existence")
+    except:
+        print("! Could not verify KarmaEvent table - likely exists already")
     
     # Close any existing process
     if django_process:
@@ -43,19 +44,20 @@ def start_django():
         except:
             pass
     
+    # Use Django development server directly (no SSL)
     cmd = [sys.executable, "manage.py", "runserver", "0.0.0.0:8000"]
     print(f"Starting Django with: {' '.join(cmd)}")
     django_process = subprocess.Popen(cmd)
     time.sleep(2)  # Give Django time to start
 
-# Simple Flask app to serve as a proxy
+# Start Django in a separate thread
+Thread(target=start_django).start()
+
+# Simple Flask app to proxy requests
 from flask import Flask, request, redirect, send_from_directory
 import requests
 
 app = Flask(__name__)
-
-# Start Django when Flask app is created
-Thread(target=start_django).start()
 
 @app.route('/')
 def index():
@@ -65,7 +67,6 @@ def index():
 @app.route('/health')
 def health():
     """Health check endpoint"""
-    # Check if Django is running
     try:
         response = requests.get("http://localhost:8000/", timeout=2)
         return "Django server is running", 200
@@ -101,12 +102,7 @@ def proxy(path):
     except Exception as e:
         return f"Error proxying to Django: {str(e)}", 500
 
-@app.route('/static/<path:path>')
-def static_files(path):
-    """Serve static files directly"""
-    return send_from_directory('static', path)
-
-# Provide wsgi app for gunicorn
+# Gunicorn needs the application object
 application = app
 
 if __name__ == '__main__':

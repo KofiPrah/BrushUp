@@ -1,8 +1,21 @@
 #!/bin/bash
-# Deployment script for Replit Autoscale
+# HTTP-only startup script for Brush Up application
+# This script runs the Django server directly without requiring SSL certificates
 
-# If PORT environment variable is not set, use default 5000
-export PORT="${PORT:-5000}"
+echo "-----------------------------------------------------"
+echo "Starting Brush Up application in HTTP mode..."
+echo "-----------------------------------------------------"
 
-echo "Starting server on port $PORT"
-gunicorn --bind "0.0.0.0:$PORT" --reuse-port main:app
+# First, fix the CritiqueSerializer to ensure it has the get_reactions_count method
+echo "Fixing CritiqueSerializer..."
+python fix_critique_serializer.py
+
+# Check if the KarmaEvent table exists
+echo "Verifying database tables..."
+python fix_karma_db.py
+
+# Start the Django server in HTTP mode
+echo "-----------------------------------------------------"
+echo "Starting HTTP server on port 5000"
+echo "-----------------------------------------------------"
+exec python server.py
