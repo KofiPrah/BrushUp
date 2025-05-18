@@ -1,21 +1,20 @@
-#!/usr/bin/env python3
-"""
-HTTP-only server for Brush Up application
-Serves Django application without SSL certificates
-"""
 import os
-import sys
 import django
 
-# Set environment variables for HTTP mode
-os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
+# Configure Django environment
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
 os.environ['SSL_ENABLED'] = 'false'
-os.environ['HTTP_ONLY'] = 'true' 
+os.environ['HTTP_ONLY'] = 'true'
 os.environ['HTTPS'] = 'off'
 os.environ['wsgi.url_scheme'] = 'http'
 
 # Initialize Django
 django.setup()
+
+# Import and configure WSGI application
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+app = application
 
 # Fix the CritiqueSerializer to use 'reactions' instead of 'reaction_set'
 try:
@@ -71,12 +70,8 @@ try:
 except Exception as e:
     print(f"Warning: Unable to fix serializer: {e}")
 
-# Import the Django WSGI application
-from django.core.wsgi import get_wsgi_application
-application = get_wsgi_application()
-app = application
-
 # Run the server if executed directly
 if __name__ == '__main__':
+    import sys
     from django.core.management import execute_from_command_line
     execute_from_command_line(sys.argv)
