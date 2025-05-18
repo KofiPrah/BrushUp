@@ -580,25 +580,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // AJAX function to handle unhide critique operation
-    function handleUnhideCritique(event, critiqueId) {
-        event.preventDefault();
+    // Set up the unhide critique modal functionality
+    const unhideCritiqueModal = document.getElementById('unhideCritiqueModal');
+    if (unhideCritiqueModal) {
+        unhideCritiqueModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const critiqueId = button.getAttribute('data-critique-id');
+            document.getElementById('unhideCritiqueId').value = critiqueId;
+        });
         
-        if (confirm('Are you sure you want to unhide this critique?')) {
-            console.log('Unhiding critique with ID:', critiqueId);
+        const unhideCritiqueForm = document.getElementById('unhideCritiqueForm');
+        unhideCritiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const critiqueId = document.getElementById('unhideCritiqueId').value;
             
-            // Get CSRF token
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            
-            // Create a fetch request to the API
+            // Send the request to unhide the critique
             fetch(`/api/critiques/${critiqueId}/unhide/`, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
                     'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
+                }
             })
             .then(response => {
                 if (!response.ok) {
@@ -609,84 +613,23 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 console.log('Unhide successful:', data);
                 
-                // Create and show toast notification for success
-                const toastContainer = document.createElement('div');
-                toastContainer.style.position = 'fixed';
-                toastContainer.style.bottom = '20px';
-                toastContainer.style.right = '20px';
-                toastContainer.style.zIndex = '1050';
+                // Show success toast notification
+                showToast('Success', 'Critique has been successfully unhidden.', 'success');
                 
-                const toast = document.createElement('div');
-                toast.className = 'toast bg-success text-white';
-                toast.setAttribute('role', 'alert');
-                toast.setAttribute('aria-live', 'assertive');
-                toast.setAttribute('aria-atomic', 'true');
-                toast.innerHTML = `
-                    <div class="toast-header bg-success text-white">
-                        <strong class="me-auto">Success</strong>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        Critique has been successfully unhidden.
-                    </div>
-                `;
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
+                modal.hide();
                 
-                toastContainer.appendChild(toast);
-                document.body.appendChild(toastContainer);
-                
-                // Initialize and show the toast using Bootstrap
-                const bsToast = new bootstrap.Toast(toast, {
-                    delay: 3000
-                });
-                bsToast.show();
-                
-                // Remove the toast element after it's hidden
-                toast.addEventListener('hidden.bs.toast', function () {
-                    document.body.removeChild(toastContainer);
-                    // Reload page to refresh the UI
-                    window.location.reload();
-                });
+                // Refresh the page to show updated state
+                window.location.reload();
             })
             .catch(error => {
                 console.error('Error unhiding critique:', error);
                 
-                // Create and show toast notification for error
-                const toastContainer = document.createElement('div');
-                toastContainer.style.position = 'fixed';
-                toastContainer.style.bottom = '20px';
-                toastContainer.style.right = '20px';
-                toastContainer.style.zIndex = '1050';
-                
-                const toast = document.createElement('div');
-                toast.className = 'toast bg-danger text-white';
-                toast.setAttribute('role', 'alert');
-                toast.setAttribute('aria-live', 'assertive');
-                toast.setAttribute('aria-atomic', 'true');
-                toast.innerHTML = `
-                    <div class="toast-header bg-danger text-white">
-                        <strong class="me-auto">Error</strong>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                    </div>
-                    <div class="toast-body">
-                        There was an error unhiding this critique. Please try again.
-                    </div>
-                `;
-                
-                toastContainer.appendChild(toast);
-                document.body.appendChild(toastContainer);
-                
-                // Initialize and show the toast using Bootstrap
-                const bsToast = new bootstrap.Toast(toast, {
-                    delay: 3000
-                });
-                bsToast.show();
-                
-                // Remove the toast element after it's hidden
-                toast.addEventListener('hidden.bs.toast', function () {
-                    document.body.removeChild(toastContainer);
-                });
+                // Show error toast
+                showToast('Error', 'There was an error unhiding this critique. Please try again.', 'danger');
             });
-        }
+        });
     }
     
     // Flag critique
