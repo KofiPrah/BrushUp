@@ -593,6 +593,7 @@ document.addEventListener('DOMContentLoaded', function() {
         unhideCritiqueForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const critiqueId = document.getElementById('unhideCritiqueId').value;
+            console.log('Unhiding critique with ID:', critiqueId);
             
             fetch(`/api/critiques/${critiqueId}/unhide/`, {
                 method: 'POST',
@@ -602,8 +603,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Unhide successful:', data);
                 // Close modal
                 const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
                 modal.hide();
