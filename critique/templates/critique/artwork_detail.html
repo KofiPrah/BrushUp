@@ -509,6 +509,30 @@
         </div>
     </div>
 </div>
+
+<!-- Unhide Critique Modal -->
+<div class="modal fade" id="unhideCritiqueModal" tabindex="-1" aria-labelledby="unhideCritiqueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unhideCritiqueModalLabel">Unhide Critique</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="unhideCritiqueForm" method="POST">
+                {% csrf_token %}
+                <input type="hidden" id="unhideCritiqueId" name="critique_id" value="">
+                <div class="modal-body">
+                    <p>This will make the critique visible to all users again.</p>
+                    <p>Are you sure you want to unhide this critique?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Unhide Critique</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -597,6 +621,47 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error flagging critique:', error);
                 alert('There was an error flagging this critique. Please try again.');
+            });
+        });
+    }
+    
+    // Unhide critique
+    const unhideCritiqueModal = document.getElementById('unhideCritiqueModal');
+    if (unhideCritiqueModal) {
+        unhideCritiqueModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const critiqueId = button.getAttribute('data-critique-id');
+            document.getElementById('unhideCritiqueId').value = critiqueId;
+        });
+        
+        const unhideCritiqueForm = document.getElementById('unhideCritiqueForm');
+        unhideCritiqueForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const critiqueId = document.getElementById('unhideCritiqueId').value;
+            
+            fetch(`/api/critiques/${critiqueId}/unhide/`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
+                modal.hide();
+                
+                // Show success message
+                alert('Critique has been successfully unhidden.');
+                
+                // Reload page to show updated UI
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('Error unhiding critique:', error);
+                alert('There was an error unhiding this critique. Please try again.');
             });
         });
     }
