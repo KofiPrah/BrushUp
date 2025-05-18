@@ -1,34 +1,23 @@
-#!/usr/bin/env python3
 """
-HTTP-only main entry point for Brush Up application
-This version runs in plain HTTP mode for compatibility with Replit
+HTTP-only server for Brush Up application to work with Replit
 """
 import os
 import sys
+import django
+from django.core.wsgi import get_wsgi_application
+from django.core.management import execute_from_command_line
 
-# Configure for HTTP-only mode
+# Set up Django environment
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")
+os.environ["HTTPS"] = "off"
+os.environ["wsgi.url_scheme"] = "http"
 os.environ["SSL_ENABLED"] = "false"
 os.environ["HTTP_ONLY"] = "true"
-os.environ["DJANGO_SETTINGS_MODULE"] = "artcritique.settings"
 
-# Import Flask for a simple wrapper app
-from flask import Flask, redirect
+# Initialize Django
+django.setup()
 
-# Create a simple Flask app as the WSGI entry point
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    """Redirect to the Django app"""
-    return redirect('/critique/')
-
-@app.route('/health')
-def health():
-    """Health check endpoint"""
-    return 'OK'
-
-# For direct execution (not via gunicorn)
-if __name__ == "__main__":
-    print("Starting Brush Up application in HTTP mode...")
-    from django.core.management import execute_from_command_line
+if __name__ == '__main__':
+    # Run the Django development server directly
+    sys.argv = [sys.argv[0], "runserver", "0.0.0.0:5000"]
     execute_from_command_line(sys.argv)
