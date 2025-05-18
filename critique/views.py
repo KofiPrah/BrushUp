@@ -461,6 +461,7 @@ def create_critique(request, artwork_id):
     """
     View for creating a new critique for an artwork.
     Users cannot critique their own artwork.
+    Handles both GET and POST requests properly.
     """
     artwork = get_object_or_404(ArtWork, pk=artwork_id)
     
