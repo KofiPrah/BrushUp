@@ -279,8 +279,9 @@ class CritiqueSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create a new critique with the current user as author."""
-        user = self.context['request'].user
-        critique = Critique.objects.create(author=user, **validated_data)
+        # Author is set in the view's perform_create method
+        # This prevents the "multiple values for keyword argument 'author'" error
+        critique = Critique.objects.create(**validated_data)
         return critique
         
 class CritiqueListSerializer(serializers.ModelSerializer):
