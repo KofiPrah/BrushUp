@@ -580,53 +580,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Unhide critique
-    const unhideCritiqueModal = document.getElementById('unhideCritiqueModal');
-    if (unhideCritiqueModal) {
-        unhideCritiqueModal.addEventListener('show.bs.modal', function (event) {
-            const button = event.relatedTarget;
-            const critiqueId = button.getAttribute('data-critique-id');
-            document.getElementById('unhideCritiqueId').value = critiqueId;
-        });
+    // Function to handle unhide form submission via AJAX
+    function handleUnhideSubmit(event, critiqueId) {
+        event.preventDefault();
         
-        const unhideCritiqueForm = document.getElementById('unhideCritiqueForm');
-        unhideCritiqueForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const critiqueId = document.getElementById('unhideCritiqueId').value;
+        if (confirm('Are you sure you want to unhide this critique?')) {
             console.log('Unhiding critique with ID:', critiqueId);
             
-            // Using fetch, but ensuring proper handling to stay on the page
-            fetch(`/api/critiques/${critiqueId}/unhide/`, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            // Get the form element that was submitted
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            // Set up the request with XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', form.action, true);
+            xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+            
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    console.log('Unhide successful:', xhr.responseText);
+                    alert('Critique has been successfully unhidden.');
+                    window.location.reload();
+                } else {
+                    console.error('Error unhiding critique:', xhr.status, xhr.statusText);
+                    alert('There was an error unhiding this critique. Please try again.');
                 }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Unhide successful:', data);
-                // Close modal
-                const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
-                modal.hide();
-                
-                // Show success message
-                alert('Critique has been successfully unhidden.');
-                
-                // Reload page to show updated UI
-                window.location.reload();
-            })
-            .catch(error => {
-                console.error('Error unhiding critique:', error);
-                alert('There was an error unhiding this critique. Please try again.');
-            });
-        });
+            };
+            
+            xhr.onerror = function() {
+                console.error('Network error occurred while unhiding critique');
+                alert('Network error occurred. Please check your connection and try again.');
+            };
+            
+            xhr.send(formData);
+        }
     }
     
     // Flag critique

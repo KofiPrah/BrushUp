@@ -1,0 +1,8 @@
+{% if user.is_authenticated and user == artwork.author and critique.is_hidden %}
+<form method="POST" action="{% url 'critique:unhide_critique' critique.id %}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm btn-outline-success">
+        <i class="bi bi-eye"></i> Unhide Critique
+    </button>
+</form>
+{% endif %}

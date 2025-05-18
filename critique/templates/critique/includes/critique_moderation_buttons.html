@@ -10,11 +10,13 @@
                 </button>
             </form>
         {% else %}
-            <button type="button" class="btn btn-sm btn-outline-success" 
-                    data-bs-toggle="modal" data-bs-target="#unhideCritiqueModal"
-                    data-critique-id="{{ critique.id }}">
-                <i class="bi bi-eye"></i> Unhide Critique
-            </button>
+            <form method="POST" action="/api/critiques/{{ critique.id }}/unhide/" class="d-inline"
+                  onsubmit="handleUnhideSubmit(event, {{ critique.id }})">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-eye"></i> Unhide Critique
+                </button>
+            </form>
         {% endif %}
         
         <button type="button" class="btn btn-sm btn-outline-primary" 

@@ -23,6 +23,7 @@ urlpatterns = [
     path('artworks/<int:artwork_id>/critique/', views.create_critique, name='create_critique'),
     path('critiques/<int:critique_id>/react/', views.toggle_reaction, name='toggle_reaction'),
     path('critiques/<int:critique_id>/react/ajax/', views.toggle_reaction_ajax, name='toggle_reaction_ajax'),
+    path('critiques/<int:critique_id>/unhide/', views.unhide_critique, name='unhide_critique'),
     
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),
