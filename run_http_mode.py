@@ -1,23 +1,39 @@
 #!/usr/bin/env python3
 """
-A simple HTTP server for Art Critique (without SSL)
+A simple HTTP server for Brush Up (without SSL)
 """
-from flask import Flask, redirect
+import os
+import sys
+import subprocess
 
-# Create a simple Flask app
-app = Flask(__name__)
+# Disable SSL certificates
+os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
+os.environ['SSL_ENABLED'] = 'false'
+os.environ['HTTP_ONLY'] = 'true'
+os.environ['HTTPS'] = 'off'
+os.environ['wsgi.url_scheme'] = 'http'
 
-@app.route('/')
-def index():
-    """Redirect to the Django app"""
-    return redirect('/critique/')
+# Make sure db tables exist
+try:
+    from fix_database import main as fix_db
+    fix_db()
+    print("✓ Database tables verified")
+except Exception as e:
+    print(f"! Warning: Database check failed: {str(e)}")
 
-@app.route('/health')
-def health():
-    """Health check endpoint"""
-    return {"status": "healthy"}
+# Run the server with gunicorn in HTTP mode (no SSL)
+print("Starting HTTP server without SSL certificates...")
+cmd = [
+    "gunicorn",
+    "--bind", "0.0.0.0:5000",
+    "--reload",
+    "--log-level", "debug",
+    "wsgi:application"
+]
 
-if __name__ == "__main__":
-    # Run with HTTP (not HTTPS)
-    print("Starting HTTP server on port 8000...")
-    app.run(host='0.0.0.0', port=8000)
+try:
+    # Run the command and make it replace this process
+    os.execvp(cmd[0], cmd)
+except Exception as e:
+    print(f"Error starting server: {str(e)}")
+    sys.exit(1)

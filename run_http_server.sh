@@ -1,13 +1,8 @@
 #!/bin/bash
-# Kill any existing server processes
+# HTTP server starter for Brush Up without SSL certificates
+
+# Kill any existing gunicorn processes
 pkill -f gunicorn || true
-pkill -f "python manage.py runserver" || true
 
-# Set environment variables for HTTP mode
-export SSL_ENABLED=false
-export HTTP_ONLY=true
-export HTTPS=off
-export wsgi_url_scheme=http
-
-# Run Django development server
-python manage.py runserver 0.0.0.0:5000
+# Start the server in HTTP mode
+exec gunicorn --bind 0.0.0.0:5000 --reload main:app

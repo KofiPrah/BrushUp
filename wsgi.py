@@ -10,9 +10,17 @@ django.setup()
 
 # Apply serializer fixes
 try:
-    from fix_critique_serializer import add_missing_method
-    add_missing_method()
-    print("✓ Successfully fixed CritiqueSerializer")
+    # Fix the reactions_set issue in CritiqueSerializer
+    from critique.api.serializers import CritiqueSerializer
+    # Check if any instance method uses reaction_set
+    serializer_path = 'critique/api/serializers.py'
+    with open(serializer_path, 'r') as file:
+        content = file.read()
+    if 'obj.reaction_set' in content:
+        content = content.replace('obj.reaction_set', 'obj.reactions')
+        with open(serializer_path, 'w') as file:
+            file.write(content)
+        print("✓ Fixed reaction_set references in CritiqueSerializer")
 except Exception as e:
     print(f"! Error fixing serializer: {str(e)}")
 

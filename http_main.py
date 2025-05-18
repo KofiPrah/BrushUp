@@ -1,52 +1,29 @@
 #!/usr/bin/env python3
 """
-HTTP-only entry point for Brush Up application
-Simplified HTTP server that works reliably in Replit environment
+HTTP-only server script for Brush Up application in Replit
 """
 import os
-import sys
-from flask import Flask, redirect, send_from_directory
+import subprocess
 
-# Create Flask app
-app = Flask(__name__)
+# Stop any existing server
+subprocess.run("pkill -f gunicorn || true", shell=True)
 
-# Set Django environment variables
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")
-os.environ["SSL_ENABLED"] = "false"
-os.environ["HTTP_ONLY"] = "true"
+# Set environment variables for HTTP mode
+os.environ['HTTPS'] = 'off'
+os.environ['wsgi.url_scheme'] = 'http'
+os.environ['HTTP_ONLY'] = 'true'
+os.environ['SSL_ENABLED'] = 'false'
 
-# Configure standard port
-PORT = 5000
+# Run the server without SSL certificates
+print("Starting HTTP server (no SSL)...")
+cmd = [
+    "gunicorn",
+    "--bind", "0.0.0.0:5000",
+    "--reload",
+    "--access-logfile", "-",
+    "--error-logfile", "-",
+    "http_workflow_server:app"
+]
 
-# Import Django for direct integration
-import django
-django.setup()
-
-# Import Django views directly
-from django.core.wsgi import get_wsgi_application
-from werkzeug.middleware.dispatcher import DispatcherMiddleware
-
-# Create a combined application
-application = DispatcherMiddleware(
-    app,  # Flask app for root
-    {
-        '': get_wsgi_application()  # Django app
-    }
-)
-
-@app.route('/static/<path:path>')
-def static_files(path):
-    """Serve static files"""
-    return send_from_directory('staticfiles', path)
-
-@app.route('/health')
-def health():
-    """Health check endpoint"""
-    return {"status": "healthy"}
-
-if __name__ == "__main__":
-    # Run the app
-    app.run(host="0.0.0.0", port=PORT)
-else:
-    # Export for gunicorn
-    app = application
+# Start the server process
+subprocess.run(cmd, env=os.environ)

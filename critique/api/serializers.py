@@ -259,215 +259,15 @@ class CritiqueSerializer(serializers.ModelSerializer):
         
     def get_helpful_count(self, obj):
         """Return the count of HELPFUL reactions for this critique."""
-        return obj.reaction_set.filter(reaction_type='HELPFUL').count()
+        return obj.reactions.filter(reaction_type='HELPFUL').count()
         
     def get_inspiring_count(self, obj):
         """Return the count of INSPIRING reactions for this critique."""
-        return obj.reaction_set.filter(reaction_type='INSPIRING').count()
+        return obj.reactions.filter(reaction_type='INSPIRING').count()
         
     def get_detailed_count(self, obj):
         """Return the count of DETAILED reactions for this critique."""
-        return obj.reaction_set.filter(reaction_type='DETAILED').count()
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
+        return obj.reactions.filter(reaction_type='DETAILED').count()
         
     def get_user_reactions(self, obj):
         """Return a list of reaction types the current user has given to this critique."""
@@ -475,7 +275,7 @@ class CritiqueSerializer(serializers.ModelSerializer):
         if not user or user.is_anonymous:
             return []
             
-        return list(obj.reaction_set.filter(user=user).values_list('reaction_type', flat=True))
+        return list(obj.reactions.filter(user=user).values_list('reaction_type', flat=True))
     
     def create(self, validated_data):
         """Create a new critique with the current user as author."""
@@ -508,227 +308,17 @@ class CritiqueListSerializer(serializers.ModelSerializer):
         """Return the average score for this critique."""
         return obj.get_average_score()
         
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
     def get_helpful_count(self, obj):
         """Return the count of HELPFUL reactions for this critique."""
-        return obj.reaction_set.filter(reaction_type='HELPFUL').count()
+        return obj.reactions.filter(reaction_type='HELPFUL').count()
         
     def get_inspiring_count(self, obj):
         """Return the count of INSPIRING reactions for this critique."""
-        return obj.reaction_set.filter(reaction_type='INSPIRING').count()
+        return obj.reactions.filter(reaction_type='INSPIRING').count()
         
     def get_detailed_count(self, obj):
         """Return the count of DETAILED reactions for this critique."""
-        return obj.reaction_set.filter(reaction_type='DETAILED').count()
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
-        
-    def get_reactions_count(self, obj):
-        """Return the count of reactions for this critique, grouped by type."""
-        reactions_count = {
-            'HELPFUL': obj.reaction_set.filter(reaction_type='HELPFUL').count(),
-            'INSPIRING': obj.reaction_set.filter(reaction_type='INSPIRING').count(),
-            'DETAILED': obj.reaction_set.filter(reaction_type='DETAILED').count(),
-            'total': obj.reaction_set.count()
-        }
-        return reactions_count
+        return obj.reactions.filter(reaction_type='DETAILED').count()
         
     def get_user_reactions(self, obj):
         """Return a list of reaction types the current user has given to this critique."""
@@ -736,7 +326,7 @@ class CritiqueListSerializer(serializers.ModelSerializer):
         if not user or user.is_anonymous:
             return []
             
-        return list(obj.reaction_set.filter(user=user).values_list('reaction_type', flat=True))
+        return list(obj.reactions.filter(user=user).values_list('reaction_type', flat=True))
         
         
 class ReactionSerializer(serializers.ModelSerializer):

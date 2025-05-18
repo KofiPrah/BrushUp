@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """
-HTTP-only server for Brush Up application
-Serves Django application without SSL certificates
+HTTP-only server for Brush Up application for use in workflow
 """
 import os
 import sys
 import django
+from django.core.wsgi import get_wsgi_application
 
-# Set environment variables for HTTP mode
-os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
-os.environ['SSL_ENABLED'] = 'false'
-os.environ['HTTP_ONLY'] = 'true' 
+# Set environment variables to force HTTP mode
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
 os.environ['HTTPS'] = 'off'
 os.environ['wsgi.url_scheme'] = 'http'
+os.environ['HTTP_ONLY'] = 'true'
+os.environ['SSL_ENABLED'] = 'false'
 
 # Initialize Django
 django.setup()
@@ -53,12 +53,8 @@ try:
 except Exception as e:
     print(f"Warning: Unable to fix serializer: {e}")
 
-# Import the Django WSGI application
-from django.core.wsgi import get_wsgi_application
+# Get the Django WSGI application
 application = get_wsgi_application()
-app = application
 
-# Run the server if executed directly
-if __name__ == '__main__':
-    from django.core.management import execute_from_command_line
-    execute_from_command_line(sys.argv)
+# Alias for gunicorn
+app = application
