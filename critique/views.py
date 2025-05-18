@@ -578,6 +578,22 @@ def toggle_reaction(request, critique_id):
 
 
 @login_required
+@login_required
+def unhide_critique(request, critique_id):
+    """Unhide a previously hidden critique."""
+    critique = get_object_or_404(Critique, pk=critique_id)
+    
+    # Check if user is the artwork owner
+    if request.user != critique.artwork.author:
+        return HttpResponseForbidden("Only the artwork owner can unhide critiques")
+    
+    # Unhide the critique
+    critique.hidden = False
+    critique.save()
+    
+    # Redirect back to the artwork page
+    return redirect('critique:artwork_detail', pk=critique.artwork.id)
+
 def toggle_reaction_ajax(request, critique_id):
     """
     View for toggling a reaction on a critique via AJAX.
