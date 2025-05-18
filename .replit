@@ -6,7 +6,7 @@ packages = ["awscli2", "cargo", "freetype", "jre17_minimal", "lcms2", "libiconv"
 
 [deployment]
 deploymentTarget = "autoscale"
-run = ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 main:app"]
+run = ["sh", "-c", "gunicorn --bind 0.0.0.0:5000 --workers 2 main:app"]
 
 [workflows]
 runButton = "HTTP Server"
