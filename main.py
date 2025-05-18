@@ -1,113 +1,26 @@
+#!/usr/bin/env python3
 """
-HTTP-only WSGI app for Brush Up (no SSL certificates)
+HTTP-only server for Brush Up application
+Serves Django application without SSL certificates
 """
 import os
-import subprocess
 import sys
-import time
-from threading import Thread
 
-# Configure environment to run in HTTP mode without SSL
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
+# Set environment variables for HTTP mode
+os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
 os.environ['SSL_ENABLED'] = 'false'
-os.environ['HTTP_ONLY'] = 'true'
+os.environ['HTTP_ONLY'] = 'true' 
 os.environ['HTTPS'] = 'off'
 os.environ['wsgi.url_scheme'] = 'http'
 
-# Fix models and database if needed
+# Apply serializer fixes
 try:
-    # Apply CritiqueSerializer fixes
     from fix_critique_serializer import add_missing_method
     add_missing_method()
-    print("✓ Added missing get_reactions_count method to CritiqueSerializer")
-    
-    # Verify database tables
-    from fix_karma_db import create_karma_tables
-    create_karma_tables()
-    print("✓ Verified KarmaEvent table exists")
+    print("✓ Successfully fixed CritiqueSerializer")
 except Exception as e:
-    print(f"! Error during fixes: {str(e)}")
+    print(f"! Error fixing serializer: {str(e)}")
 
-# Variables for Django subprocess
-django_process = None
-
-def start_django():
-    """Start Django server in the background"""
-    global django_process
-    
-    # Close any existing process
-    if django_process:
-        try:
-            django_process.terminate()
-            time.sleep(1)
-        except:
-            pass
-    
-    cmd = [sys.executable, "manage.py", "runserver", "0.0.0.0:8000"]
-    print(f"Starting Django with: {' '.join(cmd)}")
-    django_process = subprocess.Popen(cmd)
-    time.sleep(2)  # Give Django time to start
-
-# Simple Flask app to serve as a proxy
-from flask import Flask, request, redirect, send_from_directory
-import requests
-
-app = Flask(__name__)
-
-# Start Django when Flask app is created
-Thread(target=start_django).start()
-
-@app.route('/')
-def index():
-    """Redirect to Django app"""
-    return redirect("http://localhost:8000/")
-
-@app.route('/health')
-def health():
-    """Health check endpoint"""
-    # Check if Django is running
-    try:
-        response = requests.get("http://localhost:8000/", timeout=2)
-        return "Django server is running", 200
-    except:
-        return "Django server is not running", 503
-
-@app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE', 'PATCH'])
-def proxy(path):
-    """Proxy all requests to Django"""
-    django_url = f"http://localhost:8000/{path}"
-    
-    try:
-        # Forward the request to Django
-        resp = requests.request(
-            method=request.method,
-            url=django_url,
-            headers={key: value for key, value in request.headers if key != 'Host'},
-            data=request.get_data(),
-            cookies=request.cookies,
-            allow_redirects=False,
-            params=request.args,
-            timeout=5
-        )
-        
-        # Forward the response from Django
-        response = app.response_class(
-            response=resp.content,
-            status=resp.status_code,
-            headers=dict(resp.headers)
-        )
-        
-        return response
-    except Exception as e:
-        return f"Error proxying to Django: {str(e)}", 500
-
-@app.route('/static/<path:path>')
-def static_files(path):
-    """Serve static files directly"""
-    return send_from_directory('static', path)
-
-# Provide wsgi app for gunicorn
-application = app
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+# Get Django application
+from django.core.wsgi import get_wsgi_application
+app = get_wsgi_application()  # Named 'app' to match workflow expectations

@@ -1,39 +1,32 @@
-#!/usr/bin/env python3
 """
-Simple HTTP server for the Brush Up application
-Runs Django directly in HTTP mode without SSL certificates
+Simple HTTP server for the Brush Up application (no SSL)
+Designed to work with Replit's environment
 """
-import os
 import sys
+import os
 
-# Configure Django for HTTP mode
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
-os.environ['HTTPS'] = 'off'
-os.environ['wsgi.url_scheme'] = 'http'
+# Set environment variables for HTTP mode
 os.environ['SSL_ENABLED'] = 'false'
 os.environ['HTTP_ONLY'] = 'true'
+os.environ['wsgi.url_scheme'] = 'http'
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
 
-# Set up Django environment
+# Apply CritiqueSerializer fixes
+try:
+    from fix_critique_serializer import add_missing_method
+    add_missing_method()
+    print("✓ Fixed CritiqueSerializer's get_reactions_count method")
+except Exception as e:
+    print(f"! Error fixing CritiqueSerializer: {str(e)}")
+
+# Create the Brush Up application using Django
 try:
     import django
     django.setup()
-    
-    # Update settings dynamically
-    from django.conf import settings
-    settings.CSRF_COOKIE_SECURE = False
-    settings.SESSION_COOKIE_SECURE = False
-    settings.CORS_ALLOW_CREDENTIALS = True
-    
-    # Log configuration
-    print("Django configured for HTTP mode")
-except Exception as e:
-    print(f"Error setting up Django: {e}")
-    sys.exit(1)
-
-if __name__ == "__main__":
-    # Run Django without SSL
     from django.core.management import execute_from_command_line
     
-    # Use plain HTTP server that works with Replit
-    print("Starting Brush Up in HTTP mode...")
-    execute_from_command_line(["manage.py", "runserver", "0.0.0.0:5000"])
+    # Use the standard Django development server
+    args = [sys.argv[0], 'runserver', '0.0.0.0:5000']
+    execute_from_command_line(args)
+except Exception as e:
+    print(f"! Error starting server: {str(e)}")
