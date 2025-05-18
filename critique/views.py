@@ -460,8 +460,14 @@ def karma_leaderboard(request):
 def create_critique(request, artwork_id):
     """
     View for creating a new critique for an artwork.
+    Users cannot critique their own artwork.
     """
     artwork = get_object_or_404(ArtWork, pk=artwork_id)
+    
+    # Check if the user is trying to critique their own artwork
+    if request.user == artwork.author:
+        messages.error(request, "You cannot critique your own artwork.")
+        return redirect('critique:artwork_detail', pk=artwork_id)
     
     if request.method == 'POST':
         # Check if form data exists

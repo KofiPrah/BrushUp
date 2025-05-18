@@ -382,7 +382,18 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         return context
         
     def perform_create(self, serializer):
-        """Set the author to the current user when creating a critique."""
+        """
+        Set the author to the current user when creating a critique.
+        Prevent users from critiquing their own artwork.
+        """
+        artwork_id = serializer.validated_data.get('artwork').id
+        artwork = ArtWork.objects.get(id=artwork_id)
+        
+        # Check if user is trying to critique their own artwork
+        if self.request.user == artwork.author:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("You cannot critique your own artwork.")
+            
         serializer.save(author=self.request.user)
         
     @action(detail=True, methods=['post'])

@@ -1,36 +1,35 @@
 #!/usr/bin/env python3
 """
-HTTP-only Flask app for Brush Up in Replit environment
+Simple HTTP Server for Brush Up application
+This script runs a Flask server that proxies requests to Django without using SSL
 """
+from flask import Flask, request, Response, redirect
 import os
 import sys
 import subprocess
 import requests
-from flask import Flask, request, Response, redirect
+import time
 
-# Create Flask app
-app = Flask(__name__)
-
-# Set Django environment
+# Configure environment for Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
 os.environ['SSL_ENABLED'] = 'false'
 os.environ['HTTP_ONLY'] = 'true'
 
-# Django process
+app = Flask(__name__)
 django_process = None
 
 def start_django():
-    """Start Django server on a local port"""
+    """Start the Django server in the background"""
     global django_process
     if django_process is None or django_process.poll() is not None:
-        print("Starting Django server...")
+        print("Starting Django development server...")
+        # Use manage.py runserver without SSL
         django_process = subprocess.Popen(
             [sys.executable, "manage.py", "runserver", "127.0.0.1:8000"],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT
         )
-        # Give Django time to start
-        import time
+        # Wait for Django to start up
         time.sleep(2)
         print("Django server started")
 
@@ -42,44 +41,50 @@ def health():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def proxy(path):
-    """Proxy requests to Django"""
+    """Forward all requests to Django"""
+    # Make sure Django is running
     start_django()
     
-    # Target Django server
+    # Build the target URL
     target_url = f"http://127.0.0.1:8000/{path}"
     
-    # Forward request headers
-    headers = {key: value for key, value in request.headers.items() 
-               if key.lower() not in ('host',)}
+    # Copy headers, excluding Host
+    headers = {
+        key: value for key, value in request.headers.items()
+        if key.lower() not in ('host',)
+    }
     
     try:
         # Forward the request to Django
-        resp = requests.request(
+        response = requests.request(
             method=request.method,
             url=target_url,
             headers=headers,
             data=request.get_data(),
             cookies=request.cookies,
-            params=request.args,
+            params=dict(request.args),  # Convert to dict to avoid compatibility issues
             allow_redirects=False
         )
         
-        # Create Flask response
-        response = Response(resp.content, resp.status_code)
+        # Create a response to send back
+        flask_response = Response(
+            response.content,
+            status=response.status_code
+        )
         
-        # Forward response headers
-        for key, value in resp.headers.items():
+        # Forward headers from Django response
+        for key, value in response.headers.items():
             if key.lower() not in ('content-length', 'transfer-encoding', 'connection'):
-                response.headers[key] = value
+                flask_response.headers[key] = value
                 
-        return response
+        return flask_response
     except Exception as e:
-        return f"Error: {str(e)}", 500
+        return f"Error connecting to Django: {str(e)}", 500
 
 if __name__ == "__main__":
-    # Start Django in the background
+    # Start Django server
     start_django()
     
-    # Run Flask app
-    print("Starting Brush Up in HTTP mode...")
+    # Start Flask server
+    print("Starting Brush Up HTTP proxy server...")
     app.run(host='0.0.0.0', port=5000)
