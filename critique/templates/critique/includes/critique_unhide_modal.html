@@ -1,0 +1,22 @@
+<!-- Unhide Critique Modal -->
+<div class="modal fade" id="unhideCritiqueModal" tabindex="-1" aria-labelledby="unhideCritiqueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unhideCritiqueModalLabel">Unhide Critique</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to unhide this critique? It will become visible to everyone.</p>
+                <form id="unhideCritiqueForm">
+                    {% csrf_token %}
+                    <input type="hidden" id="unhideCritiqueId" name="critique_id" value="">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmUnhideBtn">Unhide</button>
+            </div>
+        </div>
+    </div>
+</div>

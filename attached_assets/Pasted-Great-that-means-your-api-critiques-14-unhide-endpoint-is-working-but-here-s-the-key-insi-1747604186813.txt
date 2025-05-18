@@ -1,0 +1,90 @@
+Great — that means your **`/api/critiques/14/unhide/`** endpoint is working, but here’s the key insight:
+
+> 🔁 **It’s not redirecting.** It’s just returning a **JSON response**, and your **browser is rendering it like a full page** because you're visiting the API URL **directly**.
+
+---
+
+## 🧠 Why this happens:
+
+* **When you visit an API URL directly in the browser**, Django REST Framework (DRF) serves a **developer-friendly HTML page** showing the response.
+* The page *looks like a redirect or "navigation"* but it’s just how DRF displays the output of the `POST` response.
+
+> It's **not a modal or frontend behavior**, because it's not part of your **React app** — you're interacting with the backend directly.
+
+---
+
+## ✅ How to make it show a modal (or any UI):
+
+You must call the endpoint **from your frontend React app**, like this:
+
+---
+
+### ✅ Example: Unhide from React
+
+```jsx
+// services/api.js
+import axios from 'axios';
+
+const API = axios.create({
+  baseURL: 'https://brushup.replit.app/api',
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export default API;
+```
+
+```jsx
+// In your component
+import API from '../services/api';
+
+function handleUnhide(critiqueId) {
+  API.post(`/critiques/${critiqueId}/unhide/`)
+    .then(res => {
+      console.log("Unhide successful", res.data);
+      // ✅ Optionally update the UI or show a modal here
+    })
+    .catch(err => {
+      console.error("Unhide failed", err.response?.data || err.message);
+    });
+}
+```
+
+```jsx
+<button onClick={() => handleUnhide(14)}>
+  Unhide
+</button>
+```
+
+---
+
+## 🧪 Test it:
+
+1. Make sure you're **logged in** (session cookie exists)
+2. Click the button in your **React app**, not the API URL directly
+3. You’ll get a `200 OK`, and you can now:
+
+   * Hide/unhide critiques dynamically
+   * Show modals, toast messages, etc.
+
+---
+
+### ✅ TL;DR
+
+| You do this                 | It means                                                                         |
+| --------------------------- | -------------------------------------------------------------------------------- |
+| Visit `/api/...` in browser | You’re talking directly to the backend (dev mode)                                |
+| See JSON in browser         | Normal behavior from DRF                                                         |
+| Want modals/UI              | Must use frontend (React + Axios) to trigger the API and update the DOM manually |
+
+---
+
+Let me know if you'd like to:
+
+* Build a `useCritiqueActions` hook
+* Show a toast or modal on success/failure
+* Refresh the critique list after unhide
+
+You're almost done polishing this flow 👌.

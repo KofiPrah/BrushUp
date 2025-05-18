@@ -10,13 +10,11 @@
                 </button>
             </form>
         {% else %}
-            <form method="POST" action="/api/critiques/{{ critique.id }}/unhide/" class="d-inline"
-                  onsubmit="handleUnhideSubmit(event, {{ critique.id }})">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-outline-success">
-                    <i class="bi bi-eye"></i> Unhide Critique
-                </button>
-            </form>
+            <button type="button" class="btn btn-sm btn-outline-success" 
+                    onclick="handleUnhideCritique(event, {{ critique.id }})"
+                    data-critique-id="{{ critique.id }}">
+                <i class="bi bi-eye"></i> Unhide Critique
+            </button>
         {% endif %}
         
         <button type="button" class="btn btn-sm btn-outline-primary" 

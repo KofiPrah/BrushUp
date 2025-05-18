@@ -1,40 +1,59 @@
-#!/usr/bin/env python
 """
-Simple HTTP server for Brush Up application
+HTTP Server for Brush Up application
+Run Django in HTTP mode without SSL configuration
+"""
 
-This script:
-1. Creates empty SSL certificate files (if they don't exist)
-2. Starts Django with gunicorn in HTTP-only mode
-"""
 import os
-import subprocess
 import sys
+import subprocess
+import time
+import signal
+
+def print_banner(message):
+    """Print a formatted banner message"""
+    line = "=" * len(message)
+    print(f"\n{line}\n{message}\n{line}")
+
+def signal_handler(sig, frame):
+    """Handle termination signals"""
+    print_banner("Shutting down HTTP server...")
+    if 'django_process' in globals():
+        django_process.terminate()
+    sys.exit(0)
 
 def main():
-    """Create empty certificates and run the server"""
-    # Create empty cert files to avoid gunicorn errors
-    if not os.path.exists('cert.pem'):
-        with open('cert.pem', 'w') as f:
-            f.write('')
+    """Run Django directly in HTTP mode"""
+    # Configure signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     
-    if not os.path.exists('key.pem'):
-        with open('key.pem', 'w') as f:
-            f.write('')
-            
-    # Print status message
-    print("Starting Brush Up in HTTP-only mode...")
+    # Set environment variables for HTTP mode
+    env = os.environ.copy()
+    env['SSL_ENABLED'] = 'false'
+    env['HTTP_ONLY'] = 'true'
+    env['HTTPS'] = 'off'
+    env['wsgi.url_scheme'] = 'http'
     
-    # Run HTTP-only server
+    # Start Django with gunicorn in HTTP mode (no SSL)
+    print_banner("Starting Brush Up in HTTP mode")
+    
     cmd = [
-        "python", "-m", "gunicorn",
-        "--bind", "0.0.0.0:5000",
-        "--reload",
-        "main:app"
+        sys.executable, '-m', 'gunicorn',
+        '--bind', '0.0.0.0:5000',
+        '--reload',
+        'main:app'
     ]
     
-    # Start the server
-    process = subprocess.run(cmd)
-    return process.returncode
+    global django_process
+    django_process = subprocess.Popen(cmd, env=env)
+    
+    try:
+        django_process.wait()
+    except KeyboardInterrupt:
+        print_banner("Keyboard interrupt received")
+        django_process.terminate()
+        django_process.wait()
+        print_banner("Server stopped")
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
