@@ -1,16 +1,20 @@
 #!/bin/bash
+# Start Brush Up in HTTP-only mode
+# This avoids SSL certificate errors in Replit
 
-# HTTP-only server for Brush Up application
+# Kill any existing server processes
+pkill -f 'gunicorn|runserver' || true
 
-echo "====================================="
-echo "Starting Brush Up in HTTP-only mode"
-echo "====================================="
+# Create empty certificate files
+echo "" > cert.pem
+echo "" > key.pem
 
-# Set environment variables to disable SSL and use HTTP
-export SSL_ENABLED=false
-export HTTP_ONLY=true
-export HTTPS=off
-export wsgi_url_scheme=http
+# Set environment variables for HTTP mode
+export DJANGO_SETTINGS_MODULE="artcritique.settings"
+export SSL_ENABLED="false"
+export HTTP_ONLY="true"
+export HTTPS="off"
 
-# Run the Django development server directly
-python manage.py runserver 0.0.0.0:8000
+# Start Django with gunicorn in HTTP mode
+echo "Starting Brush Up in HTTP-only mode..."
+exec gunicorn --bind 0.0.0.0:5000 artcritique.wsgi:application

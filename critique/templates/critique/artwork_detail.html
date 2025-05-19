@@ -954,8 +954,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get CSRF token 
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
-            // Send AJAX request
-            fetch(`{% url 'critique:toggle_reaction_ajax' 0 %}`.replace('0', critiqueId), {
+            // Send AJAX request to the correct URL
+            // The correct endpoint is /critiques/{id}/react/ajax/
+            const apiUrl = `/critiques/${critiqueId}/react/ajax/`;
+            console.log(`Sending reaction to: ${apiUrl}`);
+            
+            // Debug what's being submitted
+            console.log(`CSRF Token: ${csrfToken}`);
+            
+            fetch(apiUrl, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
@@ -967,8 +974,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     'reaction_type': reactionType
                 })
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.error('Error response:', text);
+                        throw new Error(`Error: ${response.status} - ${text}`);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Response data:', data);
                 if (data.error) {
                     showToast('Error', data.error, 'danger');
                     return;
@@ -976,6 +993,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Update button appearance based on toggle state
                 if (data.toggled) {
+                    // If reaction was added, update to filled button
                     this.classList.remove('btn-outline-success', 'btn-outline-primary', 'btn-outline-info');
                     if (reactionType === 'HELPFUL') {
                         this.classList.add('btn-success');
@@ -985,6 +1003,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         this.classList.add('btn-info');
                     }
                 } else {
+                    // If reaction was removed, update to outline button
                     this.classList.remove('btn-success', 'btn-primary', 'btn-info');
                     if (reactionType === 'HELPFUL') {
                         this.classList.add('btn-outline-success');
@@ -994,6 +1013,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         this.classList.add('btn-outline-info');
                     }
                 }
+                
+                // Show success toast notification
+                showToast('Success', data.message, 'success');
                 
                 // Update count badges
                 updateReactionCount(critiqueId, 'helpful', data.helpful_count);

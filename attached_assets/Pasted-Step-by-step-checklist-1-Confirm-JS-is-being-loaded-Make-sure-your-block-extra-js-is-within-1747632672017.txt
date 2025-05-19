@@ -1,0 +1,112 @@
+Step-by-step checklist
+✅ 1. Confirm JS is being loaded
+Make sure your {% block extra_js %} is within the layout (base.html) and is rendered correctly on the page. To check:
+
+Open browser dev tools > Console
+
+Type: console.log('Reaction JS loaded');
+
+Add that line at the top of your DOMContentLoaded block
+
+Reload the page and verify the message shows
+
+✅ 2. Confirm the buttons exist and have the right attributes
+You need buttons like this:
+
+html
+Copy
+Edit
+<button
+  data-reaction-critique-id="{{ critique.id }}"
+  data-reaction-type="HELPFUL"
+  class="btn btn-sm btn-outline-success"
+>
+  Helpful
+</button>
+Do a quick check in browser dev tools > Elements tab and inspect that data-reaction-critique-id and data-reaction-type are both present.
+
+🛠 Fixes for common issues:
+✅ 3. Fix incorrect URL building in fetch
+In your JS:
+
+js
+Copy
+Edit
+fetch(`{% url 'critique:toggle_reaction_ajax' 0 %}`.replace('0', critiqueId), { ...
+This line only works if the critique:toggle_reaction_ajax URL takes an integer and is defined like this in your urls.py:
+
+py
+Copy
+Edit
+path('critiques/<int:critique_id>/react/', toggle_reaction_ajax, name='toggle_reaction_ajax')
+✅ Make sure this view exists
+✅ Make sure the route ends with /react/
+✅ Test the full URL manually like: /api/critiques/14/react/ — it should allow POST
+
+If it doesn’t, you can hardcode temporarily to debug:
+
+js
+Copy
+Edit
+fetch(`/api/critiques/${critiqueId}/react/`, {
+✅ 4. Check the event handler is being attached
+Make sure you only have one DOMContentLoaded block, or that they’re all wrapped like:
+
+js
+Copy
+Edit
+document.addEventListener('DOMContentLoaded', function () {
+  const reactionButtons = document.querySelectorAll('[data-reaction-critique-id]');
+  reactionButtons.forEach(button => {
+    button.addEventListener('click', function (e) {
+      e.preventDefault();
+      console.log('Reaction button clicked');
+
+      // continue with AJAX...
+    });
+  });
+});
+If console.log('Reaction button clicked') never appears, your script is not binding — likely due to:
+
+JS errors earlier in the file
+
+Elements not existing at time of script execution
+
+You’re inside a duplicated DOMContentLoaded or a scope issue
+
+✅ 5. Test CSRF token
+Confirm this line is returning the right token:
+
+js
+Copy
+Edit
+'X-CSRFToken': getCookie('csrftoken')
+Add:
+
+js
+Copy
+Edit
+console.log('CSRF:', getCookie('csrftoken'));
+🔧 If still stuck: Add this test handler
+js
+Copy
+Edit
+document.addEventListener('DOMContentLoaded', function () {
+  document.querySelectorAll('[data-reaction-critique-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      alert(`Clicked on reaction for critique ${btn.dataset.reactionCritiqueId} - type: ${btn.dataset.reactionType}`);
+    });
+  });
+});
+If this doesn’t trigger, your buttons don’t exist when the script loads — try wrapping your entire <script> in:
+
+html
+Copy
+Edit
+{% block extra_js %}
+<script defer>
+  // ... your code ...
+</script>
+{% endblock %}
+Or move it to the bottom of base.html above </body>
+
