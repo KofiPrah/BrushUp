@@ -939,20 +939,31 @@ function getCookie(name) {
 
 // Reaction AJAX handling
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing reaction buttons');
+    
     // Get all reaction buttons with data attribute
     const reactionButtons = document.querySelectorAll('[data-reaction-critique-id]');
+    console.log(`Found ${reactionButtons.length} reaction buttons`);
     
     reactionButtons.forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
+            
+            // Add visual feedback that the button was clicked
+            this.classList.add('active');
+            setTimeout(() => this.classList.remove('active'), 200);
             
             const critiqueId = this.getAttribute('data-reaction-critique-id');
             const reactionType = this.getAttribute('data-reaction-type');
             
             console.log(`Toggling reaction: ${reactionType} for critique: ${critiqueId}`);
             
-            // Get CSRF token 
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            // Get CSRF token - try different methods to ensure we get it
+            let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            if (!csrfToken) {
+                csrfToken = getCookie('csrftoken');
+                console.log('Using cookie for CSRF token');
+            }
             
             // Send AJAX request to the correct URL
             // The correct endpoint is /critiques/{id}/react/ajax/
@@ -961,6 +972,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Debug what's being submitted
             console.log(`CSRF Token: ${csrfToken}`);
+            
+            // Add a direct form submission approach as a fallback
+            // This ensures the buttons work even if fetch fails
+            const formData = new FormData();
+            formData.append('reaction_type', reactionType);
+            formData.append('csrfmiddlewaretoken', csrfToken);
             
             fetch(apiUrl, {
                 method: 'POST',
