@@ -1,75 +1,69 @@
+#!/usr/bin/env python3
 """
 HTTP-only server for Brush Up application
-This script runs Django in HTTP mode without SSL certificates
+Fixes SSL issues with Replit's load balancer
 """
-import os
-import sys
-import subprocess
-import socket
-import time
-import logging
-import signal
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import os
+import subprocess
+import sys
+import time
+import signal
 
 def print_banner(message):
     """Print a formatted banner message"""
-    line = "-" * len(message)
-    logger.info("\n%s\n%s\n%s", line, message, line)
+    width = len(message) + 4
+    print("\n" + "=" * width)
+    print(f"  {message}")
+    print("=" * width + "\n")
 
-def is_port_in_use(port):
-    """Check if a port is already in use"""
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        return s.connect_ex(('localhost', port)) == 0
-
-def signal_handler(sig, frame):
-    """Handle termination signals"""
-    print_banner("Shutting down server...")
-    if 'process' in globals():
-        process.terminate()
+def handle_signal(sig, frame):
+    """Handle termination signals gracefully"""
+    print("\nShutting down server...")
     sys.exit(0)
 
-def run_django_server():
-    """Run Django server directly without SSL"""
-    signal.signal(signal.SIGINT, signal_handler)
-    signal.signal(signal.SIGTERM, signal_handler)
+def main():
+    """Run the server in HTTP-only mode"""
+    # Set up signal handlers
+    signal.signal(signal.SIGINT, handle_signal)
+    signal.signal(signal.SIGTERM, handle_signal)
     
-    # Kill any process that might be using port 8000
-    if is_port_in_use(8000):
-        print_banner("Port 8000 is already in use. Attempting to free it...")
-        try:
-            subprocess.run(['pkill', '-f', 'runserver'], check=False)
-            time.sleep(1)
-        except Exception as e:
-            logger.error("Error killing existing process: %s", e)
+    print_banner("Setting up HTTP-only server")
     
-    # Run Django in HTTP mode
-    print_banner("Starting Django server in HTTP mode")
+    # Kill any existing server processes
+    subprocess.run("pkill -f 'gunicorn|runserver' || true", shell=True)
     
-    # Set environment variables to disable SSL
+    # Make empty SSL certificates
+    for filename in ['cert.pem', 'key.pem']:
+        with open(filename, 'w') as f:
+            f.write("")
+    
+    # Start the server in HTTP-only mode
+    print_banner("Starting HTTP-only server")
+    
+    # Set environment variables for HTTP mode
     env = os.environ.copy()
     env['SSL_ENABLED'] = 'false'
+    env['HTTPS'] = 'off'
+    env['wsgi.url_scheme'] = 'http'
+    env['SECURE_SSL_REDIRECT'] = 'false'
     
-    # Use Python's runserver directly (no SSL)
+    # Run gunicorn without SSL parameters
     cmd = [
-        sys.executable,
-        'manage.py',
-        'runserver',
-        '0.0.0.0:8000',
+        "gunicorn",
+        "--bind", "0.0.0.0:5000",
+        "--reuse-port",
+        "--reload",
+        "main:app"
     ]
     
-    global process
-    process = subprocess.Popen(cmd, env=env)
-    
+    print(f"Running: {' '.join(cmd)}")
     try:
-        process.wait()
+        subprocess.run(cmd, env=env)
     except KeyboardInterrupt:
-        print_banner("Keyboard interrupt received")
-        process.terminate()
-        process.wait()
-        print_banner("Server stopped")
+        print("\nServer shutdown requested")
+    
+    return 0
 
 if __name__ == "__main__":
-    print_banner("Running Brush Up in HTTP-only mode")
-    run_django_server()
+    sys.exit(main())
