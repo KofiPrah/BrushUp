@@ -580,6 +580,42 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Define the showToast function if it doesn't exist
+    function showToast(title, message, type = 'info') {
+        const toastContainer = document.createElement('div');
+        toastContainer.style.position = 'fixed';
+        toastContainer.style.bottom = '20px';
+        toastContainer.style.right = '20px';
+        toastContainer.style.zIndex = '1050';
+        
+        const toast = document.createElement('div');
+        toast.className = `toast bg-${type} text-white`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        toast.innerHTML = `
+            <div class="toast-header bg-${type} text-white">
+                <strong class="me-auto">${title}</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ${message}
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        document.body.appendChild(toastContainer);
+        
+        const bsToast = new bootstrap.Toast(toast, {
+            delay: 3000
+        });
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', function () {
+            document.body.removeChild(toastContainer);
+        });
+    }
+    
     // Set up the unhide critique modal functionality
     const unhideCritiqueModal = document.getElementById('unhideCritiqueModal');
     if (unhideCritiqueModal) {
@@ -590,65 +626,59 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('unhideCritiqueId').value = critiqueId;
         });
         
-        // Handle form submission
-        const unhideCritiqueForm = document.getElementById('unhideCritiqueForm');
-        unhideCritiqueForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const critiqueId = document.getElementById('unhideCritiqueId').value;
-            console.log('Unhiding critique with ID:', critiqueId);
-            
-            // Get CSRF token
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            
-            // Send the request to unhide the critique
-            fetch(`/api/critiques/${critiqueId}/unhide/`, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Error status:', response.status);
-                    return response.text().then(text => {
-                        throw new Error(`Error: ${response.status} - ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Unhide successful:', data);
-                
-                // Show success toast notification
-                showToast('Success', 'Critique has been successfully unhidden.', 'success');
-                
-                // Close the modal
-                const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
-                modal.hide();
-                
-                // Refresh the page to show updated state
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1000);
-            })
-            .catch(error => {
-                console.error('Error unhiding critique:', error);
-                
-                // Show error toast
-                showToast('Error', 'There was an error unhiding this critique. Please try again.', 'danger');
-            });
-        });
-        
-        // Also add a direct event listener to the unhide button for redundancy
+        // Direct event listener to the confirm button
         const confirmUnhideBtn = unhideCritiqueModal.querySelector('button[type="submit"]');
         if (confirmUnhideBtn) {
-            confirmUnhideBtn.addEventListener('click', function() {
-                // Trigger the form submission
-                unhideCritiqueForm.dispatchEvent(new Event('submit'));
+            confirmUnhideBtn.addEventListener('click', function(e) {
+                // Prevent default form submission
+                e.preventDefault();
+                
+                const critiqueId = document.getElementById('unhideCritiqueId').value;
+                console.log('Unhiding critique with ID:', critiqueId);
+                
+                // Get CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                // Send the request to unhide the critique
+                fetch(`/api/critiques/${critiqueId}/unhide/`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.error('Error status:', response.status);
+                        return response.text().then(text => {
+                            throw new Error(`Error: ${response.status} - ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Unhide successful:', data);
+                    
+                    // Show success toast notification
+                    showToast('Success', 'Critique has been successfully unhidden.', 'success');
+                    
+                    // Close the modal
+                    const modal = bootstrap.Modal.getInstance(unhideCritiqueModal);
+                    modal.hide();
+                    
+                    // Refresh the page to show updated state
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1000);
+                })
+                .catch(error => {
+                    console.error('Error unhiding critique:', error);
+                    
+                    // Show error toast
+                    showToast('Error', 'There was an error unhiding this critique. Please try again.', 'danger');
+                });
             });
         }
     }
