@@ -1,0 +1,52 @@
+Thanks for the detailed context. From your implementation and the behavior you're seeing:
+
+### Problem:
+
+Your unhide endpoint (`/api/critiques/14/unhide/`) returns a **JSON response** instead of redirecting or staying within the modal, even when called from your frontend.
+
+### Why This Happens:
+
+The DRF view for `/unhide/` returns a JSON response because it's a **Django REST Framework action**, not a regular HTML view. So when you submit the unhide form with a standard `<form method="POST">`, it actually navigates the browser to a JSON response endpoint, which looks broken or redirects away from your intended page.
+
+---
+
+### ✅ Solution:
+
+You should submit the **unhide request via AJAX**, just like you're already doing for `hide`, `flag`, and `reply`. You already have the modal (`#unhideCritiqueModal`) and form (`#unhideCritiqueForm`), but your unhide button in the HTML is using a standard `<form action="/api/critiques/{{ critique.id }}/unhide/" method="POST">`.
+
+---
+
+### 🔧 Fix: Update the Unhide Button
+
+Replace this part:
+
+```html
+<form method="POST" action="/api/critiques/{{ critique.id }}/unhide/" class="d-inline me-2">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-sm btn-outline-success">
+        <i class="bi bi-eye"></i> Unhide
+    </button>
+</form>
+```
+
+With this trigger for the modal:
+
+```html
+<button type="button" 
+        class="btn btn-sm btn-outline-success" 
+        data-bs-toggle="modal" 
+        data-bs-target="#unhideCritiqueModal" 
+        data-critique-id="{{ critique.id }}">
+    <i class="bi bi-eye"></i> Unhide
+</button>
+```
+
+---
+
+### 🧠 Reminder:
+
+Since you're already using JavaScript to intercept and handle AJAX requests inside `#unhideCritiqueForm`, that modal and JS will now work correctly with this new trigger.
+
+If you still want help debugging the `403 Forbidden` error on `/unhide/`, you might need to double-check the `@action` permissions in your `CritiqueViewSet`.
+
+Let me know if you want help reviewing the `@action` code in your DRF view!
