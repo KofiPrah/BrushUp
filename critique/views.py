@@ -544,15 +544,23 @@ def toggle_reaction(request, critique_id):
     critique = get_object_or_404(Critique, pk=critique_id)
     artwork_id = critique.artwork.id
     
+    # Debug info
+    print(f"DEBUG: Toggle reaction for critique {critique_id} by user {request.user.username}")
+    print(f"DEBUG: Artwork author is {critique.artwork.author.username}")
+    print(f"DEBUG: Critique author is {critique.author.username}")
+    
     # Allow both GET and POST requests
     if request.method == 'POST':
         reaction_type = request.POST.get('reaction_type')
+        print(f"DEBUG: POST request with reaction_type={reaction_type}")
     else:  # GET
         reaction_type = request.GET.get('reaction_type')
+        print(f"DEBUG: GET request with reaction_type={reaction_type}")
         
     # Validate reaction type
     if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
         messages.error(request, "Invalid reaction type.")
+        print(f"DEBUG: Invalid reaction type: {reaction_type}")
         return redirect('critique:artwork_detail', pk=artwork_id)
     
     # Check if user already gave this reaction
@@ -562,9 +570,11 @@ def toggle_reaction(request, critique_id):
         reaction_type=reaction_type
     ).first()
     
+    # Allow all users to react, including the artwork author
     if existing_reaction:
         # User already gave this reaction, so remove it
         existing_reaction.delete()
+        print(f"DEBUG: Removed {reaction_type} reaction")
         messages.success(request, f"Removed {reaction_type.lower()} reaction.")
     else:
         # User hasn't given this reaction, so add it
@@ -574,6 +584,7 @@ def toggle_reaction(request, critique_id):
             reaction_type=reaction_type
         )
         reaction.save()
+        print(f"DEBUG: Added {reaction_type} reaction")
         messages.success(request, f"Added {reaction_type.lower()} reaction.")
     
     # Redirect back to the artwork detail page
