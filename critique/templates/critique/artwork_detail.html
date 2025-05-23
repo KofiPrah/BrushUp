@@ -1140,9 +1140,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <label for="compositionScore" class="form-label">Composition Score</label>
                                 <select class="form-select bg-dark text-white" id="compositionScore" name="composition_score">
                                     <option value="">- Not Rated -</option>
-                                    {% for i in "12345678910"|make_list %}
+                                    {% for i in "123456789"|make_list %}
                                     <option value="{{ i }}">{{ i }}</option>
                                     {% endfor %}
+                                    <option value="10">10</option>
                                 </select>
                             </div>
                         </div>
@@ -1151,9 +1152,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <label for="techniqueScore" class="form-label">Technique Score</label>
                                 <select class="form-select bg-dark text-white" id="techniqueScore" name="technique_score">
                                     <option value="">- Not Rated -</option>
-                                    {% for i in "12345678910"|make_list %}
+                                    {% for i in "123456789"|make_list %}
                                     <option value="{{ i }}">{{ i }}</option>
                                     {% endfor %}
+                                    <option value="10">10</option>
                                 </select>
                             </div>
                         </div>
@@ -1162,9 +1164,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <label for="originalityScore" class="form-label">Originality Score</label>
                                 <select class="form-select bg-dark text-white" id="originalityScore" name="originality_score">
                                     <option value="">- Not Rated -</option>
-                                    {% for i in "12345678910"|make_list %}
+                                    {% for i in "123456789"|make_list %}
                                     <option value="{{ i }}">{{ i }}</option>
                                     {% endfor %}
+                                    <option value="10">10</option>
                                 </select>
                             </div>
                         </div>
