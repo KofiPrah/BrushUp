@@ -1,7 +1,8 @@
 #!/bin/bash
-# Start the HTTP-only server for Brush Up application
-# This script runs the server without SSL certificates
-# which avoids the SSL errors when running in Replit
+# Start the Django server in HTTP mode without SSL certificates
 
-echo "Starting Brush Up in HTTP-only mode..."
-python fix_server_ssl.py
+echo "Starting Brush Up in HTTP-only mode"
+echo "This will fix the reaction button issues"
+
+# Use the HTTP server script
+gunicorn --bind 0.0.0.0:5000 --reload http_server:app

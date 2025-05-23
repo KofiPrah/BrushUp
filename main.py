@@ -4,6 +4,12 @@ HTTP-only version to prevent SSL errors
 
 This file loads the Django WSGI application and configures the required reaction methods
 """
+import os
+import sys
+# Force HTTP mode - disable SSL
+os.environ['DJANGO_INSECURE'] = 'true'
+os.environ['DJANGO_DEVELOPMENT'] = 'true'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
 
 import os
 import sys

@@ -544,40 +544,42 @@ def toggle_reaction(request, critique_id):
     critique = get_object_or_404(Critique, pk=critique_id)
     artwork_id = critique.artwork.id
     
+    # Allow both GET and POST requests
     if request.method == 'POST':
         reaction_type = request.POST.get('reaction_type')
+    else:  # GET
+        reaction_type = request.GET.get('reaction_type')
         
-        # Validate reaction type
-        if reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
-            messages.error(request, "Invalid reaction type.")
-            return redirect('critique:artwork_detail', pk=artwork_id)
-        
-        # Check if user already gave this reaction
-        existing_reaction = Reaction.objects.filter(
+    # Validate reaction type
+    if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+        messages.error(request, "Invalid reaction type.")
+        return redirect('critique:artwork_detail', pk=artwork_id)
+    
+    # Check if user already gave this reaction
+    existing_reaction = Reaction.objects.filter(
+        user=request.user,
+        critique=critique,
+        reaction_type=reaction_type
+    ).first()
+    
+    if existing_reaction:
+        # User already gave this reaction, so remove it
+        existing_reaction.delete()
+        messages.success(request, f"Removed {reaction_type.lower()} reaction.")
+    else:
+        # User hasn't given this reaction, so add it
+        reaction = Reaction(
             user=request.user,
             critique=critique,
             reaction_type=reaction_type
-        ).first()
-        
-        if existing_reaction:
-            # User already gave this reaction, so remove it
-            existing_reaction.delete()
-            messages.success(request, f"Removed {reaction_type.lower()} reaction.")
-        else:
-            # User hasn't given this reaction, so add it
-            reaction = Reaction(
-                user=request.user,
-                critique=critique,
-                reaction_type=reaction_type
-            )
-            reaction.save()
-            messages.success(request, f"Added {reaction_type.lower()} reaction.")
+        )
+        reaction.save()
+        messages.success(request, f"Added {reaction_type.lower()} reaction.")
     
     # Redirect back to the artwork detail page
     return redirect('critique:artwork_detail', pk=artwork_id)
 
 
-@login_required
 @login_required
 def unhide_critique(request, critique_id):
     """Unhide a previously hidden critique."""
