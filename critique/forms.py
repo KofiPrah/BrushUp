@@ -1,5 +1,5 @@
 from django import forms
-from .models import Comment, Review, ArtWork, Profile
+from .models import Comment, ArtWork, Profile
 
 class CommentForm(forms.ModelForm):
     """

@@ -1,45 +1,74 @@
-#!/usr/bin/env python
 """
 HTTP-only server for Brush Up application
 
-This script runs the Django server directly using the development server,
-completely bypassing the SSL configuration issues.
+This script runs the Django app directly in HTTP mode without SSL.
 """
 import os
 import sys
 import django
-import inspect
-from pathlib import Path
+from django.core.management import call_command
 
-# Ensure we're using the correct Django settings
+# Configure Django settings
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")
+os.environ["HTTPS"] = "off"
+os.environ["USE_SSL"] = "false"
+
+# Disable SSL
+print("Disabling SSL for HTTP-only mode...")
+with open("cert.pem.disabled", "w") as f:
+    f.write("# SSL disabled for HTTP mode")
+with open("key.pem.disabled", "w") as f:
+    f.write("# SSL disabled for HTTP mode")
+
+# Setup Django
 django.setup()
 
-# Fix missing method in CritiqueSerializer if needed
-from critique.api.serializers import CritiqueSerializer
-
-def add_missing_method():
-    """Add missing get_reactions_count method to CritiqueSerializer if needed"""
+# Fix serializer methods
+try:
+    from critique.api.serializers import CritiqueSerializer
+    
+    # Add missing methods to CritiqueSerializer
     if not hasattr(CritiqueSerializer, 'get_reactions_count'):
-        # Define the method
         def get_reactions_count(self, obj):
             """Return the total count of all reactions for this critique."""
             return obj.reactions.count()
-        
-        # Add the method to the class
-        setattr(CritiqueSerializer, 'get_reactions_count', get_reactions_count)
-        print("✓ Added missing get_reactions_count method to CritiqueSerializer")
-    else:
-        print("✓ CritiqueSerializer already has get_reactions_count method")
-
-# Run the method to fix the serializer
-add_missing_method()
-
-# Now run the Django server directly
-if __name__ == "__main__":
-    from django.core.management import execute_from_command_line
+        CritiqueSerializer.get_reactions_count = get_reactions_count
     
-    print("\n===== Starting Brush Up in HTTP-only mode =====\n")
+    if not hasattr(CritiqueSerializer, 'get_helpful_count'):
+        def get_helpful_count(self, obj):
+            """Return the count of HELPFUL reactions for this critique."""
+            return obj.reactions.filter(reaction_type='HELPFUL').count()
+        CritiqueSerializer.get_helpful_count = get_helpful_count
     
-    # Run the development server
-    execute_from_command_line(["manage.py", "runserver", "0.0.0.0:8000"])
+    if not hasattr(CritiqueSerializer, 'get_inspiring_count'):
+        def get_inspiring_count(self, obj):
+            """Return the count of INSPIRING reactions for this critique."""
+            return obj.reactions.filter(reaction_type='INSPIRING').count()
+        CritiqueSerializer.get_inspiring_count = get_inspiring_count
+    
+    if not hasattr(CritiqueSerializer, 'get_detailed_count'):
+        def get_detailed_count(self, obj):
+            """Return the count of DETAILED reactions for this critique."""
+            return obj.reactions.filter(reaction_type='DETAILED').count()
+        CritiqueSerializer.get_detailed_count = get_detailed_count
+    
+    if not hasattr(CritiqueSerializer, 'get_user_reactions'):
+        def get_user_reactions(self, obj):
+            """Return the user's reactions to this critique."""
+            user = self.context.get('request').user if self.context.get('request') else None
+            if not user or not user.is_authenticated:
+                return []
+            return obj.reactions.filter(user=user).values_list('reaction_type', flat=True)
+        CritiqueSerializer.get_user_reactions = get_user_reactions
+    
+    print("Serializer methods added successfully!")
+except Exception as e:
+    print(f"Error adding serializer methods: {str(e)}")
+
+# Run the Django server
+print("\n=================================")
+print("| Starting Brush Up in HTTP mode |")
+print("=================================\n")
+
+sys.argv = ["manage.py", "runserver", "0.0.0.0:5000"]
+call_command("runserver", "0.0.0.0:5000")

@@ -7,8 +7,8 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
-from .models import ArtWork, Review, Profile, Comment, KarmaEvent, Critique, Reaction
-from .forms import CommentForm, ReplyForm
+from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction
+from .forms import CommentForm
 from .karma import award_like_karma, award_critique_karma
 import json
 
@@ -20,7 +20,7 @@ def index(request):
     """
     # Count objects for display
     artwork_count = ArtWork.objects.count()
-    review_count = Review.objects.count()
+    critique_count = Critique.objects.count()
     
     # Award daily visit karma if user is logged in
     if request.user.is_authenticated:
@@ -29,7 +29,7 @@ def index(request):
     
     context = {
         'artwork_count': artwork_count,
-        'review_count': review_count,
+        'critique_count': critique_count,
         'app_name': 'Brush Up Platform',
         'app_version': '1.0.0',
     }
@@ -97,14 +97,14 @@ def profile_view(request):
     artworks = ArtWork.objects.filter(author=request.user).order_by('-created_at')
     
     # Get activity statistics
-    reviews_count = Review.objects.filter(reviewer=request.user).count()
+    critiques_count = Critique.objects.filter(author=request.user).count()
     likes_count = ArtWork.objects.filter(likes=request.user).count()
     
     context = {
         'profile': profile,
         'user': request.user,
         'artworks': artworks,
-        'reviews_count': reviews_count,
+        'critiques_count': critiques_count,
         'likes_count': likes_count,
         'is_own_profile': True,  # Flag to indicate this is the user's own profile
     }
@@ -122,7 +122,7 @@ def user_profile_view(request, username):
     artworks = ArtWork.objects.filter(author=profile_user).order_by('-created_at')
     
     # Get activity statistics
-    reviews_count = Review.objects.filter(reviewer=profile_user).count()
+    critiques_count = Critique.objects.filter(author=profile_user).count()
     likes_count = ArtWork.objects.filter(likes=profile_user).count()
     
     # Check if this is the user's own profile
@@ -132,7 +132,7 @@ def user_profile_view(request, username):
         'profile': profile,
         'user': profile_user,
         'artworks': artworks,
-        'reviews_count': reviews_count,
+        'critiques_count': critiques_count,
         'likes_count': likes_count,
         'is_own_profile': is_own_profile,
     }

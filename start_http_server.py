@@ -1,115 +1,110 @@
-#!/usr/bin/env python
 """
-HTTP-only server starter for Brush Up application
+Simple HTTP server for Brush Up application
 
-This script runs the Django application in HTTP-only mode,
-bypassing SSL certificate requirements that cause issues in Replit.
+This script runs Django directly without SSL certificates to fix common issues.
 """
 import os
 import sys
 import subprocess
+import signal
+import time
 
 def print_banner(message):
-    """Print a styled banner message"""
-    print("\n" + "=" * 80)
-    print(f" {message} ".center(80, "*"))
-    print("=" * 80 + "\n")
+    """Print a formatted banner message"""
+    line = "=" * (len(message) + 4)
+    print(f"\n{line}")
+    print(f"| {message} |")
+    print(f"{line}\n")
 
-def fix_critique_serializer():
-    """Add missing get_reactions_count method to CritiqueSerializer if needed"""
-    from critique.api.serializers import CritiqueSerializer
-    
-    # Check if the method already exists
-    if hasattr(CritiqueSerializer, 'get_reactions_count'):
-        print("✓ CritiqueSerializer already has get_reactions_count method")
-        return
-    
-    # Add the missing method
-    def get_reactions_count(self, obj):
-        """Return the total count of all reactions for this critique."""
-        return obj.reactions.count()
-    
-    # Add the method to the class
-    setattr(CritiqueSerializer, 'get_reactions_count', get_reactions_count)
-    print("✓ Added missing get_reactions_count method to CritiqueSerializer")
+def signal_handler(sig, frame):
+    """Handle termination signals gracefully"""
+    print_banner("Shutting down Brush Up server...")
+    sys.exit(0)
 
-def check_database_tables():
-    """Check if necessary database tables exist and create them if needed"""
-    import django
-    from django.db import connection
+def main():
+    """Run Django directly in HTTP mode"""
+    # Register signal handlers
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     
-    # Set up Django environment
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")
-    django.setup()
+    print_banner("Starting Brush Up in HTTP-only mode")
     
-    def check_table_exists(table_name):
-        """Check if a table exists in the database"""
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT EXISTS (
-                    SELECT FROM information_schema.tables 
-                    WHERE table_schema = 'public'
-                    AND table_name = %s
-                );
-                """, 
-                [table_name]
-            )
-            return cursor.fetchone()[0]
+    # Set environment variables to use HTTP
+    os.environ["DJANGO_SETTINGS_MODULE"] = "artcritique.settings"
+    os.environ["HTTPS"] = "off"
+    os.environ["USE_SSL"] = "false"
     
-    # Check for required tables
-    required_tables = [
-        'critique_karmaevent',
-        'critique_reaction',
-        'critique_critique'
-    ]
-    
-    missing_tables = []
-    for table in required_tables:
-        if not check_table_exists(table):
-            missing_tables.append(table)
-    
-    if missing_tables:
-        print(f"! Missing tables: {', '.join(missing_tables)}")
-        print("Running Django migrations to create missing tables...")
-        from django.core.management import call_command
-        call_command('migrate')
-        print("✓ Migrations completed")
-    else:
-        print("✓ All required database tables exist")
-
-def start_http_server():
-    """Start the Django application with gunicorn in HTTP mode"""
-    print_banner("Starting Brush Up in HTTP Mode")
-    
-    # Fix the serializer if needed
+    # Fix serializer methods issue
+    print("Ensuring serializer methods are available...")
     try:
-        fix_critique_serializer()
+        # Import Django modules to fix serializer methods
+        import django
+        django.setup()
+        
+        # Fix the serializer methods
+        from critique.api.serializers import CritiqueSerializer
+        
+        # Check if the methods already exist
+        if not hasattr(CritiqueSerializer, 'get_reactions_count'):
+            def get_reactions_count(self, obj):
+                """Return the total count of all reactions for this critique."""
+                return obj.reactions.count()
+            CritiqueSerializer.get_reactions_count = get_reactions_count
+        
+        if not hasattr(CritiqueSerializer, 'get_helpful_count'):
+            def get_helpful_count(self, obj):
+                """Return the count of HELPFUL reactions for this critique."""
+                return obj.reactions.filter(reaction_type='HELPFUL').count()
+            CritiqueSerializer.get_helpful_count = get_helpful_count
+        
+        if not hasattr(CritiqueSerializer, 'get_inspiring_count'):
+            def get_inspiring_count(self, obj):
+                """Return the count of INSPIRING reactions for this critique."""
+                return obj.reactions.filter(reaction_type='INSPIRING').count()
+            CritiqueSerializer.get_inspiring_count = get_inspiring_count
+        
+        if not hasattr(CritiqueSerializer, 'get_detailed_count'):
+            def get_detailed_count(self, obj):
+                """Return the count of DETAILED reactions for this critique."""
+                return obj.reactions.filter(reaction_type='DETAILED').count()
+            CritiqueSerializer.get_detailed_count = get_detailed_count
+        
+        if not hasattr(CritiqueSerializer, 'get_user_reactions'):
+            def get_user_reactions(self, obj):
+                """Return the user's reactions to this critique."""
+                user = self.context.get('request').user if self.context.get('request') else None
+                if not user or not user.is_authenticated:
+                    return []
+                return obj.reactions.filter(user=user).values_list('reaction_type', flat=True)
+            CritiqueSerializer.get_user_reactions = get_user_reactions
+        
+        print("Serializer methods fixed successfully!")
     except Exception as e:
-        print(f"! Error fixing serializer: {e}")
+        print(f"Error fixing serializer methods: {str(e)}")
     
-    # Check database tables
-    try:
-        check_database_tables()
-    except Exception as e:
-        print(f"! Error checking database tables: {e}")
-    
-    # Start the Django application with gunicorn
-    print_banner("Starting Django with Gunicorn (HTTP Mode)")
-    gunicorn_command = [
+    # Run Django using gunicorn on HTTP
+    print_banner("Starting Django server on HTTP port 5000")
+    cmd = [
         "gunicorn",
         "--bind", "0.0.0.0:5000",
-        "--reuse-port",
+        "--workers", "1",
+        "--threads", "4",
         "--reload",
         "artcritique.wsgi:application"
     ]
     
     try:
-        subprocess.run(gunicorn_command)
+        process = subprocess.Popen(cmd)
+        print(f"Server running on port 5000")
+        # Keep the script running
+        while True:
+            time.sleep(1)
     except KeyboardInterrupt:
-        print("\nServer stopped by user")
-    except Exception as e:
-        print(f"Error starting server: {e}")
+        print_banner("Shutting down server...")
+    finally:
+        if 'process' in locals():
+            process.terminate()
+            process.wait()
 
 if __name__ == "__main__":
-    start_http_server()
+    main()
