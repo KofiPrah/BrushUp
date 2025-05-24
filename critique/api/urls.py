@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import (
     UserViewSet, ProfileViewSet, ArtWorkViewSet, 
-    ReviewViewSet, CritiqueViewSet, health_check,
+    CritiqueViewSet, health_check,
     ReactionViewSet, NotificationViewSet
 )
 
@@ -11,7 +11,6 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'profiles', ProfileViewSet)
 router.register(r'artworks', ArtWorkViewSet)
-router.register(r'reviews', ReviewViewSet)
 router.register(r'critiques', CritiqueViewSet)
 router.register(r'reactions', ReactionViewSet)
 router.register(r'notifications', NotificationViewSet, basename='notification')

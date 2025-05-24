@@ -3,10 +3,10 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.db import models
-from critique.models import ArtWork, Review, Profile, Critique, Reaction, Notification, CritiqueReply
+from critique.models import ArtWork, Profile, Critique, Reaction, Notification, CritiqueReply
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
-    ArtWorkListSerializer, ReviewSerializer, CritiqueSerializer, CritiqueListSerializer,
+    ArtWorkListSerializer, CritiqueSerializer, CritiqueListSerializer,
     ReactionSerializer, NotificationSerializer, CritiqueReplySerializer
 )
 from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
@@ -176,19 +176,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
             artwork.likes.add(user)
             return Response({'status': 'liked'})
             
-    @action(detail=True, methods=['get'])
-    def reviews(self, request, pk=None):
-        """Get all reviews for this artwork."""
-        artwork = self.get_object()
-        reviews = artwork.reviews.all().order_by('-created_at')
-        
-        page = self.paginate_queryset(reviews)
-        if page is not None:
-            serializer = ReviewSerializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-            
-        serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
+
         
     @action(detail=False, methods=['get'])
     def by_tag(self, request):
@@ -308,36 +296,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         serializer = ArtWorkListSerializer(artworks, many=True)
         return Response(serializer.data)
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    """API endpoint for viewing and editing reviews.
-    
-    Allows list, retrieve, create, update, and delete operations on reviews.
-    Only authenticated users can create reviews, and only the review's author 
-    (or admins) can update or delete it.
-    """
-    queryset = Review.objects.all().order_by('-created_at')
-    serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['created_at', 'rating']
-    
-    def get_queryset(self):
-        """Optionally filter reviews by artwork ID."""
-        queryset = Review.objects.all().order_by('-created_at')
-        artwork_id = self.request.query_params.get('artwork', None)
-        if artwork_id is not None:
-            queryset = queryset.filter(artwork_id=artwork_id)
-        return queryset
-    
-    def get_serializer_context(self):
-        """Add the request to the serializer context."""
-        context = super().get_serializer_context()
-        context.update({"request": self.request})
-        return context
-        
-    def perform_create(self, serializer):
-        """Set the reviewer to the current user when creating a review."""
-        serializer.save(reviewer=self.request.user)
+
 
 
 class CritiqueViewSet(viewsets.ModelViewSet):
@@ -812,10 +771,10 @@ def health_check(request):
     # Count objects in the database
     try:
         artwork_count = ArtWork.objects.count()
-        review_count = Review.objects.count()
+        critique_count = Critique.objects.count()
         user_count = User.objects.count()
     except Exception as e:
-        artwork_count = review_count = user_count = f"ERROR: {str(e)}"
+        artwork_count = critique_count = user_count = f"ERROR: {str(e)}"
     
     # Compile response data
     data = {
@@ -825,7 +784,7 @@ def health_check(request):
             "status": db_status,
             "counts": {
                 "artworks": artwork_count,
-                "reviews": review_count,
+                "critiques": critique_count,
                 "users": user_count,
             }
         },

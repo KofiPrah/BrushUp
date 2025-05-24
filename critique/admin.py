@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
-from .models import ArtWork, Review, Profile, Comment
+from .models import ArtWork, Profile, Comment
 
 # Custom User admin with profile inline
 class ProfileInline(admin.StackedInline):
@@ -54,30 +54,7 @@ class ArtWorkAdmin(admin.ModelAdmin):
         return obj.likes.count()
     total_likes.short_description = 'Likes Count'
 
-@admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('artwork', 'reviewer', 'rating', 'created_at')
-    search_fields = ('content', 'artwork__title', 'reviewer__username')
-    list_filter = ('rating', 'created_at')
-    readonly_fields = ('created_at',)
-    
-    fieldsets = (
-        ('Review Information', {
-            'fields': ('artwork', 'reviewer', 'rating')
-        }),
-        ('Content', {
-            'fields': ('content',),
-            'classes': ('wide',)
-        }),
-        ('Metadata', {
-            'fields': ('created_at',),
-            'classes': ('collapse',)
-        }),
-    )
-    
-    def get_queryset(self, request):
-        """Optimize query by prefetching related objects"""
-        return super().get_queryset(request).select_related('artwork', 'reviewer')
+
 
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):

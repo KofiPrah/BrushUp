@@ -6,13 +6,12 @@ This module contains Django signal handlers to track user actions and award karm
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
-from .models import ArtWork, Comment, Review, Critique, KarmaEvent
+from .models import ArtWork, Comment, Critique, KarmaEvent
 from .karma import (
     award_artwork_upload_karma, 
     award_comment_karma, 
     award_like_karma,
-    award_critique_karma,
-    award_review_karma
+    award_critique_karma
 )
 
 
@@ -51,8 +50,3 @@ def award_karma_for_critique(sender, instance, created, **kwargs):
         award_critique_karma(instance)
 
 
-@receiver(post_save, sender=Review)
-def award_karma_for_review(sender, instance, created, **kwargs):
-    """Award karma points when a user reviews an artwork."""
-    if created:
-        award_review_karma(instance)

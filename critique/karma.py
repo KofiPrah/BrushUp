@@ -9,7 +9,7 @@ from django.db import transaction
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from .models import Profile, ArtWork, Comment, Review, Critique
+from .models import Profile, ArtWork, Comment, Critique
 
 # Karma point values for different actions
 KARMA_VALUES = {
@@ -20,8 +20,6 @@ KARMA_VALUES = {
     'like_given': 1,           # Liking someone's artwork
     'critique_received': 5,    # Someone provides a detailed critique
     'critique_posted': 3,      # Providing a detailed critique
-    'review_received': 3,      # Someone reviews your artwork
-    'review_posted': 2,        # Reviewing someone's artwork
     'daily_visit': 1,          # Daily visit bonus
 }
 
@@ -119,22 +117,7 @@ def award_critique_karma(critique):
             f"Received critique from {critique.author.username}"
         )
 
-def award_review_karma(review):
-    """Award karma for giving and receiving reviews"""
-    # Award reviewer
-    award_karma(
-        review.reviewer, 
-        'review_posted', 
-        f"Posted review on artwork: {review.artwork.title}"
-    )
-    
-    # Award artwork author for receiving review (if not self-review)
-    if review.reviewer != review.artwork.author:
-        award_karma(
-            review.artwork.author, 
-            'review_received', 
-            f"Received review from {review.reviewer.username}"
-        )
+
 
 def award_daily_visit_karma(user):
     """Award karma for daily site visits"""

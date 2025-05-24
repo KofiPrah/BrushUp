@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from critique.models import ArtWork, Review, Profile, Critique, Notification, Reaction, CritiqueReply
+from critique.models import ArtWork, Profile, Critique, Notification, Reaction, CritiqueReply
 from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -114,7 +114,6 @@ class ArtWorkSerializer(serializers.ModelSerializer):
     """Serializer for the ArtWork model with author information."""
     author = UserSerializer(read_only=True)
     likes_count = serializers.SerializerMethodField()
-    reviews_count = serializers.SerializerMethodField()
     critiques_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     image_display_url = serializers.SerializerMethodField()
@@ -125,10 +124,10 @@ class ArtWorkSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'image', 'image_url', 'image_display_url',
             'created_at', 'updated_at', 'author', 'medium', 'dimensions', 'tags', 
-            'likes_count', 'reviews_count', 'critiques_count', 'is_liked', 'critiques'
+            'likes_count', 'critiques_count', 'is_liked', 'critiques'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'author', 
-                           'likes_count', 'reviews_count', 'critiques_count', 
+                           'likes_count', 'critiques_count', 
                            'is_liked', 'image_display_url', 'critiques']
                            
     def get_image_display_url(self, obj):
@@ -141,9 +140,6 @@ class ArtWorkSerializer(serializers.ModelSerializer):
         """Return the number of likes for this artwork."""
         return obj.likes.count()
     
-    def get_reviews_count(self, obj):
-        """Return the number of reviews for this artwork."""
-        return obj.reviews.count()
         
     def get_critiques_count(self, obj):
         """Return the number of critiques for this artwork."""
@@ -176,14 +172,14 @@ class ArtWorkListSerializer(serializers.ModelSerializer):
     """Simplified serializer for listing artwork."""
     author_name = serializers.CharField(source='author.username', read_only=True)
     likes_count = serializers.SerializerMethodField()
-    reviews_count = serializers.SerializerMethodField()
+
     tags_list = serializers.SerializerMethodField()
     image_display_url = serializers.SerializerMethodField()
     
     class Meta:
         model = ArtWork
         fields = ['id', 'title', 'image_display_url', 'author_name', 'created_at', 
-                 'medium', 'likes_count', 'reviews_count', 'tags_list']
+                 'medium', 'likes_count', 'tags_list']
                  
     def get_image_display_url(self, obj):
         """Return the URL to display the image, prioritizing S3 storage."""
@@ -195,30 +191,13 @@ class ArtWorkListSerializer(serializers.ModelSerializer):
         """Return the number of likes for this artwork."""
         return obj.likes.count()
     
-    def get_reviews_count(self, obj):
-        """Return the number of reviews for this artwork."""
-        return obj.reviews.count()
-        
     def get_tags_list(self, obj):
         """Return the tags as a list."""
         if not obj.tags:
             return []
         return [tag.strip() for tag in obj.tags.split(',') if tag.strip()]
 
-class ReviewSerializer(serializers.ModelSerializer):
-    """Serializer for the Review model with reviewer information."""
-    reviewer = UserSerializer(read_only=True)
-    
-    class Meta:
-        model = Review
-        fields = ['id', 'artwork', 'reviewer', 'content', 'rating', 'created_at']
-        read_only_fields = ['id', 'reviewer', 'created_at']
-    
-    def create(self, validated_data):
-        """Create a new review with the current user as reviewer."""
-        user = self.context['request'].user
-        review = Review.objects.create(reviewer=user, **validated_data)
-        return review
+
 
 class CritiqueReplySerializer(serializers.ModelSerializer):
     """Serializer for artist replies to critiques."""
@@ -485,8 +464,6 @@ class NotificationSerializer(serializers.ModelSerializer):
             return f"Artwork: {obj.target.title}"
         elif isinstance(obj.target, Critique):
             return f"Critique on: {obj.target.artwork.title}"
-        elif isinstance(obj.target, Review):
-            return f"Review on: {obj.target.artwork.title}"
         elif isinstance(obj.target, Reaction):
             return f"Reaction on critique for: {obj.target.critique.artwork.title}"
         elif isinstance(obj.target, User):
