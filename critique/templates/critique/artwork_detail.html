@@ -356,7 +356,7 @@
                                         {% if user.is_authenticated %}
                                         <form method="post" action="{% url 'critique:add_reply' artwork.id comment.id %}">
                                             {% csrf_token %}
-                                            {{ reply_form.content }}
+                                            <textarea name="content" class="form-control" placeholder="Your reply..." rows="3" required></textarea>
                                             <button type="submit" class="btn btn-sm btn-primary mt-2">Submit Reply</button>
                                             <button type="button" class="btn btn-sm btn-secondary mt-2 reply-cancel" 
                                                     data-comment-id="{{ comment.id }}">Cancel</button>

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Fix SSL certificate issues for Django in Replit
 
@@ -6,45 +5,46 @@ This script disables SSL by creating empty certificate files
 and then starts the Django server in HTTP mode.
 """
 import os
+import sys
 import subprocess
-from pathlib import Path
+import signal
 
 def main():
-    print("Creating dummy SSL certificates...")
+    # Print banner
+    print("\n" + "=" * 70)
+    print(" BRUSH UP - HTTP SERVER (SSL DISABLED) ".center(70, '='))
+    print("=" * 70)
+    
     # Create empty certificate files
-    Path("cert.pem").write_text("")
-    Path("key.pem").write_text("")
+    with open('cert.pem', 'w') as f:
+        f.write('')
+    with open('key.pem', 'w') as f:
+        f.write('')
     
-    print("Disabling SSL in main.py...")
-    # Create a simplified HTTP-only server
-    with open("main.py", "w") as f:
-        f.write("""#!/usr/bin/env python
-import os
-import django
-from django.core.management import execute_from_command_line
-
-# Set up Django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")
-django.setup()
-
-# Add necessary fixes to serializers
-from critique.api.serializers import CritiqueSerializer
-
-# Add missing method if it doesn't already exist
-if not hasattr(CritiqueSerializer, 'get_reactions_count'):
-    def get_reactions_count(self, obj):
-        \"\"\"Return the total count of all reactions for this critique.\"\"\"
-        return obj.reactions.count()
+    print("Created empty certificate files to disable SSL")
     
-    setattr(CritiqueSerializer, 'get_reactions_count', get_reactions_count)
-    print("✓ Added missing get_reactions_count method to CritiqueSerializer")
-
-if __name__ == "__main__":
-    # Run server
-    execute_from_command_line(["manage.py", "runserver", "0.0.0.0:5000"])
-""")
+    # Set environment variables
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
+    os.environ['PYTHONUNBUFFERED'] = '1'
+    os.environ['DJANGO_DEVELOPMENT'] = 'true'
+    os.environ['DJANGO_DEBUG'] = 'true'
     
-    print("Setup complete. Run 'python main.py' to start the server in HTTP mode.")
+    # Run Django without SSL
+    print("Starting Django in HTTP mode on port 5000")
+    cmd = [sys.executable, 'manage.py', 'runserver', '0.0.0.0:5000']
+    process = subprocess.Popen(cmd)
+    
+    # Handle SIGINT and SIGTERM
+    def signal_handler(sig, frame):
+        print("\nShutting down server...")
+        process.terminate()
+        sys.exit(0)
+    
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
+    
+    # Wait for the process to complete
+    process.wait()
 
 if __name__ == "__main__":
     main()

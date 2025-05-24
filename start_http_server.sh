@@ -1,8 +1,20 @@
 #!/bin/bash
-# Start the Django server in HTTP mode without SSL certificates
 
-echo "Starting Brush Up in HTTP-only mode"
-echo "This will fix the reaction button issues"
+# Remove SSL certificates to force HTTP mode
+if [ -f cert.pem ]; then
+    mv cert.pem cert.pem.backup
+fi
+if [ -f key.pem ]; then
+    mv key.pem key.pem.backup
+fi
 
-# Use the HTTP server script
-gunicorn --bind 0.0.0.0:5000 --reload http_server:app
+# Create empty certificate files
+touch cert.pem
+touch key.pem
+
+echo "====================================="
+echo "Starting Django in HTTP-only mode..."
+echo "====================================="
+
+# Run Django development server directly
+PYTHONUNBUFFERED=1 python manage.py runserver 0.0.0.0:5000

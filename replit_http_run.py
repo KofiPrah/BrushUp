@@ -1,12 +1,11 @@
 """
-Simple HTTP server for Brush Up application
-
-This script completely disables SSL by removing certificate files and
-running Django's development server directly.
+Replit-compatible HTTP server for Brush Up application
+Disables SSL completely and runs Django in HTTP-only mode
 """
 import os
 import sys
 import signal
+import subprocess
 
 def signal_handler(sig, frame):
     """Handle termination signals gracefully"""
@@ -19,31 +18,35 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 def main():
     """Run Django in HTTP-only mode"""
-    # Set environment variables
+    # Set environment variables for Django
     os.environ['DJANGO_SETTINGS_MODULE'] = 'artcritique.settings'
     os.environ['PYTHONUNBUFFERED'] = '1'
     os.environ['DJANGO_DEVELOPMENT'] = 'true'
-    os.environ['DJANGO_INSECURE'] = 'true'
-    os.environ['SSL_ENABLED'] = 'false'
-    os.environ['HTTP_ONLY'] = 'true'
+    os.environ['DJANGO_DEBUG'] = 'true'
     
-    # Disable SSL certificates
-    if os.path.exists('cert.pem'):
-        os.rename('cert.pem', 'cert.pem.bak')
-    if os.path.exists('key.pem'):
-        os.rename('key.pem', 'key.pem.bak')
+    # Remove SSL certificates
+    try:
+        if os.path.exists('cert.pem'):
+            os.remove('cert.pem')
+        if os.path.exists('key.pem'):
+            os.remove('key.pem')
+    except Exception as e:
+        print(f"Error removing SSL certificates: {e}")
     
     # Print banner
     print("\n" + "=" * 70)
     print(" BRUSH UP - HTTP MODE ".center(70, '='))
     print("=" * 70)
     print("Starting Django development server on port 5000")
-    print("SSL certificates have been disabled")
     
     # Run Django development server
-    from django.core.management import execute_from_command_line
-    sys.argv = ['manage.py', 'runserver', '0.0.0.0:5000']
-    execute_from_command_line(sys.argv)
+    cmd = [sys.executable, 'manage.py', 'runserver', '0.0.0.0:5000']
+    env = os.environ.copy()
+    
+    try:
+        subprocess.run(cmd, env=env)
+    except Exception as e:
+        print(f"Error running Django server: {e}")
 
 if __name__ == "__main__":
     main()

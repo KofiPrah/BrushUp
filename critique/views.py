@@ -80,8 +80,7 @@ class ArtWorkDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         # Add comment form to context
         context['comment_form'] = CommentForm()
-        # Add reply form to context
-        context['reply_form'] = ReplyForm()
+        # No longer using ReplyForm since we've removed the Review functionality
         # Get only top-level comments (not replies)
         context['comments'] = self.object.comments.filter(parent=None).order_by('-created_at')
         # Add critiques to context
