@@ -15,6 +15,7 @@ from .permissions import (
     IsModeratorOrAdmin, IsAdminOnly
 )
 from .filters import ArtWorkFilter, CritiqueFilter
+from .pagination import CustomPageNumberPagination, InfiniteScrollPagination
 from django.db import connection
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -120,6 +121,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     queryset = ArtWork.objects.all().order_by('-created_at')
     serializer_class = ArtWorkSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ArtWorkFilter
     search_fields = ['title', 'description', 'tags', 'author__username']
@@ -220,6 +222,32 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def infinite_scroll(self, request):
+        """
+        Specialized endpoint for infinite scroll functionality.
+        
+        Optimized for loading additional pages with minimal metadata
+        for better performance in infinite scroll scenarios.
+        
+        Usage: /api/artworks/infinite_scroll/?page=2&search=landscape&medium=oil
+        """
+        # Temporarily use infinite scroll pagination
+        self.pagination_class = InfiniteScrollPagination
+        
+        # Apply the same filtering as the main list
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        # Paginate the results
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        # Fallback if pagination is disabled
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({'results': serializer.data, 'has_next': False})
         
     @action(detail=True, methods=['get'])
     def critiques(self, request, pk=None):

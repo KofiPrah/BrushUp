@@ -183,3 +183,86 @@
 [data-bs-theme="dark"] .stats-section {
   background-color: var(--bs-dark);
 }
+
+/* Pagination and Load More Styles */
+.progress {
+  border-radius: 8px;
+  background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, var(--bs-primary), var(--bs-info));
+  border-radius: 8px;
+  transition: width 0.3s ease;
+}
+
+/* Load More Button Enhancement */
+.btn-primary.px-5 {
+  border-radius: 50px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+.btn-primary.px-5:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(var(--bs-primary-rgb), 0.4);
+}
+
+.btn-primary.px-5:disabled {
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Pagination Button Enhancements */
+nav .btn-outline-secondary,
+nav .btn-primary {
+  border-radius: 6px;
+  font-weight: 500;
+  min-width: 40px;
+  transition: all 0.2s ease;
+}
+
+nav .btn-outline-secondary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+nav .btn-primary {
+  box-shadow: 0 2px 4px rgba(var(--bs-primary-rgb), 0.3);
+}
+
+/* Smooth transitions for content updates */
+.gallery-grid {
+  transition: opacity 0.3s ease;
+}
+
+.gallery-grid.loading {
+  opacity: 0.7;
+}
+
+/* Progress indicator styling */
+.text-muted {
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* Responsive pagination adjustments */
+@media (max-width: 768px) {
+  nav .d-flex {
+    gap: 1rem !important;
+    flex-wrap: wrap;
+  }
+  
+  nav .btn {
+    min-width: 36px;
+    font-size: 0.875rem;
+  }
+  
+  .btn-primary.px-5 {
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+    font-size: 0.95rem;
+  }
+}

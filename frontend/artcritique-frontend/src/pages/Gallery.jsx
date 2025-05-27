@@ -27,8 +27,15 @@ const Gallery = () => {
     count: 0,
     next: null,
     previous: null,
-    current_page: 1
+    current_page: 1,
+    total_pages: 1,
+    has_next: false,
+    has_previous: false
   });
+  
+  // Infinite scroll state
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [allArtworks, setAllArtworks] = useState([]); // For infinite scroll: accumulate all loaded artworks
 
   // Debounced search to avoid too many API calls
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -42,8 +49,13 @@ const Gallery = () => {
   }, [searchTerm]);
 
   // Fetch artworks from API
-  const fetchArtworks = useCallback(async (page = 1) => {
-    setLoading(true);
+  const fetchArtworks = useCallback(async (page = 1, append = false) => {
+    if (append) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+      setAllArtworks([]); // Reset for new search/filter
+    }
     setError(null);
 
     try {
@@ -66,18 +78,33 @@ const Gallery = () => {
 
       const response = await api.get(`/api/artworks/?${params.toString()}`);
       
-      setArtworks(response.data.results || []);
+      const newArtworks = response.data.results || [];
+      
+      if (append) {
+        // For "Load More" - append to existing artworks
+        setArtworks(prev => [...prev, ...newArtworks]);
+        setAllArtworks(prev => [...prev, ...newArtworks]);
+      } else {
+        // For new search/filter - replace artworks
+        setArtworks(newArtworks);
+        setAllArtworks(newArtworks);
+      }
+      
       setPagination({
         count: response.data.count || 0,
+        total_pages: response.data.total_pages || 1,
         next: response.data.next,
         previous: response.data.previous,
-        current_page: page
+        current_page: page,
+        has_next: response.data.has_next || false,
+        has_previous: response.data.has_previous || false
       });
     } catch (err) {
       console.error('Error fetching artworks:', err);
       setError('Failed to load artworks. Please try again.');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   }, [debouncedSearchTerm, filters]);
 
@@ -112,12 +139,37 @@ const Gallery = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Load more functionality for infinite scroll
+  const handleLoadMore = () => {
+    if (pagination.has_next && !loadingMore) {
+      fetchArtworks(pagination.current_page + 1, true);
+    }
+  };
+
+  // Infinite scroll detection
+  useEffect(() => {
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop
+        >= document.documentElement.offsetHeight - 1000 // Load when 1000px from bottom
+        && pagination.has_next
+        && !loading
+        && !loadingMore
+      ) {
+        handleLoadMore();
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [pagination.has_next, loading, loadingMore, pagination.current_page]);
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
   };
 
   const getTotalPages = () => {
-    return Math.ceil(pagination.count / 10); // Assuming 10 items per page
+    return pagination.total_pages || Math.ceil(pagination.count / 12);
   };
 
   return (
@@ -447,33 +499,155 @@ const Gallery = () => {
             )}
           </Row>
 
-          {/* Pagination */}
-          {pagination.count > 10 && (
+          {/* Load More Button and Pagination Controls */}
+          {pagination.count > 12 && (
             <Row className="mt-4">
               <Col>
-                <nav aria-label="Artwork gallery pagination">
-                  <div className="d-flex justify-content-center align-items-center gap-2">
+                {/* Load More Button for Infinite Scroll */}
+                {pagination.has_next && (
+                  <div className="text-center mb-4">
                     <Button
-                      variant="outline-primary"
-                      disabled={!pagination.previous}
+                      variant="primary"
+                      size="lg"
+                      onClick={handleLoadMore}
+                      disabled={loadingMore}
+                      className="px-5"
+                    >
+                      {loadingMore ? (
+                        <>
+                          <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="me-2"
+                          />
+                          Loading more artworks...
+                        </>
+                      ) : (
+                        <>Load More ({pagination.count - artworks.length} remaining)</>
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+                {/* Progress Indicator */}
+                {pagination.count > 0 && (
+                  <div className="text-center mb-3">
+                    <div className="progress" style={{ height: '4px' }}>
+                      <div
+                        className="progress-bar"
+                        role="progressbar"
+                        style={{
+                          width: `${(artworks.length / pagination.count) * 100}%`
+                        }}
+                        aria-valuenow={artworks.length}
+                        aria-valuemin="0"
+                        aria-valuemax={pagination.count}
+                      ></div>
+                    </div>
+                    <small className="text-muted">
+                      Loaded {artworks.length} of {pagination.count} artworks
+                    </small>
+                  </div>
+                )}
+
+                {/* Traditional Pagination (Alternative Navigation) */}
+                <nav aria-label="Artwork gallery pagination">
+                  <div className="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                    <Button
+                      variant="outline-secondary"
+                      size="sm"
+                      disabled={!pagination.has_previous}
                       onClick={() => handlePageChange(pagination.current_page - 1)}
                     >
                       Previous
                     </Button>
                     
-                    <span className="px-3">
-                      Page {pagination.current_page} of {getTotalPages()}
-                    </span>
+                    {/* Page Numbers */}
+                    {getTotalPages() <= 7 ? (
+                      // Show all pages if 7 or fewer
+                      Array.from({ length: getTotalPages() }, (_, i) => i + 1).map(page => (
+                        <Button
+                          key={page}
+                          variant={page === pagination.current_page ? "primary" : "outline-secondary"}
+                          size="sm"
+                          onClick={() => handlePageChange(page)}
+                        >
+                          {page}
+                        </Button>
+                      ))
+                    ) : (
+                      // Show abbreviated pagination for many pages
+                      <>
+                        <Button
+                          variant={1 === pagination.current_page ? "primary" : "outline-secondary"}
+                          size="sm"
+                          onClick={() => handlePageChange(1)}
+                        >
+                          1
+                        </Button>
+                        
+                        {pagination.current_page > 3 && <span className="px-2">...</span>}
+                        
+                        {/* Show current page and surrounding pages */}
+                        {Array.from(
+                          { length: 3 },
+                          (_, i) => pagination.current_page - 1 + i
+                        )
+                          .filter(page => page > 1 && page < getTotalPages())
+                          .map(page => (
+                            <Button
+                              key={page}
+                              variant={page === pagination.current_page ? "primary" : "outline-secondary"}
+                              size="sm"
+                              onClick={() => handlePageChange(page)}
+                            >
+                              {page}
+                            </Button>
+                          ))}
+                        
+                        {pagination.current_page < getTotalPages() - 2 && <span className="px-2">...</span>}
+                        
+                        {getTotalPages() > 1 && (
+                          <Button
+                            variant={getTotalPages() === pagination.current_page ? "primary" : "outline-secondary"}
+                            size="sm"
+                            onClick={() => handlePageChange(getTotalPages())}
+                          >
+                            {getTotalPages()}
+                          </Button>
+                        )}
+                      </>
+                    )}
                     
                     <Button
-                      variant="outline-primary"
-                      disabled={!pagination.next}
+                      variant="outline-secondary"
+                      size="sm"
+                      disabled={!pagination.has_next}
                       onClick={() => handlePageChange(pagination.current_page + 1)}
                     >
                       Next
                     </Button>
                   </div>
+                  
+                  <div className="text-center mt-2">
+                    <small className="text-muted">
+                      Page {pagination.current_page} of {getTotalPages()}
+                    </small>
+                  </div>
                 </nav>
+              </Col>
+            </Row>
+          )}
+
+          {/* Loading More Indicator (for infinite scroll) */}
+          {loadingMore && (
+            <Row className="mt-3">
+              <Col className="text-center">
+                <Spinner animation="border" variant="primary" />
+                <p className="mt-2 text-muted">Loading more artworks...</p>
               </Col>
             </Row>
           )}
