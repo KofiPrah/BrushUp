@@ -118,15 +118,29 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     - Include 'image' field with the image file
     - Other fields (title, description, etc.) can be included in the same request
     """
-    queryset = ArtWork.objects.all().order_by('-created_at')
     serializer_class = ArtWorkSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_class = ArtWorkFilter
     search_fields = ['title', 'description', 'tags', 'author__username']
-    ordering_fields = ['created_at', 'updated_at', 'title', 'likes_count', 'critiques_count']
+    ordering_fields = ['created_at', 'updated_at', 'title', 'likes_count', 'critiques_count', 'popularity_score']
     ordering = ['-created_at']  # Default ordering
+    
+    def get_queryset(self):
+        """Return queryset with popularity annotations for API filtering."""
+        from django.db.models import Count
+        
+        queryset = ArtWork.objects.annotate(
+            critiques_count=Count('critique', distinct=True),
+            likes_count=Count('likes', distinct=True),
+            # Calculate popularity score: critiques * 2 + likes + reactions
+            popularity_score=Count('critique', distinct=True) * 2 + 
+                           Count('likes', distinct=True) + 
+                           Count('critique__reaction', distinct=True)
+        ).order_by('-created_at')
+        
+        return queryset
     parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     
     def get_permissions(self):

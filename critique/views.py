@@ -71,7 +71,18 @@ class ArtWorkListView(ListView):
 
     def get_queryset(self):
         """Return filtered and sorted queryset based on GET parameters."""
-        queryset = ArtWork.objects.all()
+        from django.db.models import Count, Q, Case, When, IntegerField
+        from critique.models import Critique, Reaction
+        
+        # Start with base queryset and add popularity annotations
+        queryset = ArtWork.objects.annotate(
+            critiques_count=Count('critique', distinct=True),
+            likes_count=Count('likes', distinct=True),
+            # Calculate popularity score: critiques * 2 + likes + reactions
+            popularity_score=Count('critique', distinct=True) * 2 + 
+                           Count('likes', distinct=True) + 
+                           Count('critique__reaction', distinct=True)
+        )
         
         # Get search parameters
         search_query = self.request.GET.get('search', '').strip()
@@ -83,7 +94,6 @@ class ArtWorkListView(ListView):
 
         # Apply search filter
         if search_query:
-            from django.db.models import Q
             queryset = queryset.filter(
                 Q(title__icontains=search_query) |
                 Q(description__icontains=search_query) |
@@ -105,8 +115,14 @@ class ArtWorkListView(ListView):
         if created_before:
             queryset = queryset.filter(created_at__date__lte=created_before)
 
-        # Apply ordering
-        valid_orderings = ['-created_at', 'created_at', '-likes_count', 'title', '-title']
+        # Apply ordering with new popularity options
+        valid_orderings = [
+            '-created_at', 'created_at', 
+            '-likes_count', 'likes_count',
+            '-critiques_count', 'critiques_count',
+            '-popularity_score', 'popularity_score',
+            'title', '-title'
+        ]
         if ordering in valid_orderings:
             queryset = queryset.order_by(ordering)
         else:

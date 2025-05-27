@@ -39,19 +39,25 @@
                                 <div class="col-md-4 mb-3">
                                     <select name="ordering" class="form-select bg-dark border-secondary text-white" onchange="this.form.submit()">
                                         <option value="-created_at" {% if request.GET.ordering == '-created_at' or not request.GET.ordering %}selected{% endif %}>
-                                            Newest First
+                                            📅 Newest First
                                         </option>
                                         <option value="created_at" {% if request.GET.ordering == 'created_at' %}selected{% endif %}>
-                                            Oldest First
+                                            📅 Oldest First
+                                        </option>
+                                        <option value="-popularity_score" {% if request.GET.ordering == '-popularity_score' %}selected{% endif %}>
+                                            🔥 Most Popular
                                         </option>
                                         <option value="-likes_count" {% if request.GET.ordering == '-likes_count' %}selected{% endif %}>
-                                            Most Liked
+                                            ❤️ Most Liked
+                                        </option>
+                                        <option value="-critiques_count" {% if request.GET.ordering == '-critiques_count' %}selected{% endif %}>
+                                            💬 Most Critiques
                                         </option>
                                         <option value="title" {% if request.GET.ordering == 'title' %}selected{% endif %}>
-                                            Title A-Z
+                                            🔤 Title A-Z
                                         </option>
                                         <option value="-title" {% if request.GET.ordering == '-title' %}selected{% endif %}>
-                                            Title Z-A
+                                            🔤 Title Z-A
                                         </option>
                                     </select>
                                 </div>
