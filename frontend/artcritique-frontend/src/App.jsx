@@ -4,6 +4,7 @@ import './App.css';
 
 // Pages
 import Home from './pages/Home';
+import Gallery from './pages/Gallery';
 import ArtworkList from './pages/ArtworkList';
 import ArtworkDetail from './pages/ArtworkDetail';
 import ArtworkUpload from './pages/ArtworkUpload';
@@ -60,6 +61,7 @@ const AppRoutes = () => {
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/artworks" element={<ArtworkList />} />
           <Route path="/artworks/:id" element={<ArtworkDetail />} />
           <Route 
@@ -162,9 +164,9 @@ const AppRoutes = () => {
           </div>
         </footer>
       </div>
-    </Router>
+    </div>
   );
-}
+};
 
 function App() {
   return (

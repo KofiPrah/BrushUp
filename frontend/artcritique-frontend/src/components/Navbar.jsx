@@ -46,6 +46,9 @@ const Navbar = () => {
               <Link className="nav-link" to="/">Home</Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/gallery">Gallery</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link" to="/artworks">Artworks</Link>
             </li>
             {isAuthenticated && (
