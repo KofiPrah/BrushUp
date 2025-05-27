@@ -4,11 +4,12 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
-from critique.models import ArtWork, Profile, Critique, Reaction, Notification, CritiqueReply
+from critique.models import ArtWork, Profile, Critique, Reaction, Notification, CritiqueReply, Folder
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
     ArtWorkListSerializer, CritiqueSerializer, CritiqueListSerializer,
-    ReactionSerializer, NotificationSerializer, CritiqueReplySerializer
+    ReactionSerializer, NotificationSerializer, CritiqueReplySerializer,
+    FolderSerializer, FolderListSerializer, FolderCreateUpdateSerializer
 )
 from .permissions import (
     IsAuthorOrReadOnly, IsOwnerOrReadOnly, IsModeratorOrOwner, 
@@ -1072,3 +1073,178 @@ class NotificationViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         
         return Response(serializer.data)
+
+# ============================================================================
+# FOLDER VIEWSET FOR PORTFOLIO MANAGEMENT
+# ============================================================================
+
+class FolderViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing portfolio folders.
+    
+    Provides comprehensive portfolio management with the following endpoints:
+    - GET /api/folders/ - List folders (filtered by ownership and visibility)
+    - POST /api/folders/ - Create new folder (authenticated users only)
+    - GET /api/folders/{id}/ - Get folder details with contents
+    - PUT/PATCH /api/folders/{id}/ - Update folder (owner only)
+    - DELETE /api/folders/{id}/ - Delete folder (owner only)
+    - GET /api/folders/{id}/artworks/ - List artworks in folder
+    - POST /api/folders/{id}/add_artwork/ - Add artwork to folder
+    - POST /api/folders/{id}/remove_artwork/ - Remove artwork from folder
+    """
+    serializer_class = FolderSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'description']
+    ordering_fields = ['created_at', 'updated_at', 'name']
+    ordering = ['-updated_at']
+    
+    def get_queryset(self):
+        """Return folders based on user permissions and visibility settings."""
+        user = self.request.user
+        
+        if user.is_authenticated:
+            # Authenticated users see their own folders + public folders from others
+            from django.db.models import Q
+            return Folder.objects.filter(
+                Q(owner=user) | Q(is_public=Folder.VISIBILITY_PUBLIC)
+            ).distinct()
+        else:
+            # Anonymous users only see public folders
+            return Folder.objects.filter(is_public=Folder.VISIBILITY_PUBLIC)
+    
+    def get_serializer_class(self):
+        """Return appropriate serializer based on action."""
+        if self.action == 'list':
+            return FolderListSerializer
+        elif self.action in ['create', 'update', 'partial_update']:
+            return FolderCreateUpdateSerializer
+        return FolderSerializer
+    
+    def perform_create(self, serializer):
+        """Create folder with current user as owner."""
+        serializer.save(owner=self.request.user)
+    
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'create':
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+        else:
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        
+        return [permission() for permission in permission_classes]
+    
+    @action(detail=True, methods=['get'])
+    def artworks(self, request, pk=None):
+        """Get all artworks in this folder."""
+        folder = self.get_object()
+        
+        # Check if user can view this folder
+        if not folder.is_viewable_by(request.user):
+            return Response(
+                {"error": "You don't have permission to view this folder"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        artworks = folder.artworks.all().order_by('-created_at')
+        
+        # Use the existing ArtWorkListSerializer for consistency
+        serializer = ArtWorkListSerializer(artworks, many=True, context={'request': request})
+        return Response({
+            'folder': FolderSerializer(folder, context={'request': request}).data,
+            'artworks': serializer.data,
+            'count': artworks.count()
+        })
+    
+    @action(detail=True, methods=['post'])
+    def add_artwork(self, request, pk=None):
+        """Add an artwork to this folder."""
+        folder = self.get_object()
+        
+        # Only folder owner can add artworks
+        if folder.owner != request.user:
+            return Response(
+                {"error": "Only the folder owner can add artworks"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        artwork_id = request.data.get('artwork_id')
+        if not artwork_id:
+            return Response(
+                {"error": "artwork_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+        except ArtWork.DoesNotExist:
+            return Response(
+                {"error": "Artwork not found or you don't own it"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Add artwork to folder
+        artwork.folder = folder
+        artwork.save()
+        
+        return Response({
+            "status": "success",
+            "message": f"Artwork '{artwork.title}' added to folder '{folder.name}'"
+        })
+    
+    @action(detail=True, methods=['post'])
+    def remove_artwork(self, request, pk=None):
+        """Remove an artwork from this folder."""
+        folder = self.get_object()
+        
+        # Only folder owner can remove artworks
+        if folder.owner != request.user:
+            return Response(
+                {"error": "Only the folder owner can remove artworks"},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        artwork_id = request.data.get('artwork_id')
+        if not artwork_id:
+            return Response(
+                {"error": "artwork_id is required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, folder=folder, author=request.user)
+        except ArtWork.DoesNotExist:
+            return Response(
+                {"error": "Artwork not found in this folder or you don't own it"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Remove artwork from folder
+        artwork.folder = None
+        artwork.save()
+        
+        return Response({
+            "status": "success",
+            "message": f"Artwork '{artwork.title}' removed from folder '{folder.name}'"
+        })
+    
+    @action(detail=False, methods=['get'])
+    def my_folders(self, request):
+        """Get all folders belonging to the current user."""
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        folders = Folder.objects.filter(owner=request.user).order_by('-updated_at')
+        serializer = FolderListSerializer(folders, many=True, context={'request': request})
+        
+        return Response({
+            'folders': serializer.data,
+            'count': folders.count()
+        })

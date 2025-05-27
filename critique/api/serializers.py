@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from critique.models import ArtWork, Profile, Critique, Notification, Reaction, CritiqueReply
+from critique.models import ArtWork, Profile, Critique, Notification, Reaction, CritiqueReply, Folder
 from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -471,3 +471,96 @@ class NotificationSerializer(serializers.ModelSerializer):
         
         # Default fallback
         return str(obj.target)
+
+# ============================================================================
+# FOLDER SERIALIZERS FOR PORTFOLIO MANAGEMENT
+# ============================================================================
+
+class FolderSerializer(serializers.ModelSerializer):
+    """Complete serializer for Folder model with portfolio management features."""
+    owner_username = serializers.CharField(source='owner.username', read_only=True)
+    artwork_count = serializers.SerializerMethodField()
+    cover_image_url = serializers.SerializerMethodField()
+    can_edit = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
+    url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Folder
+        fields = [
+            'id', 'name', 'description', 'owner', 'owner_username', 
+            'is_public', 'created_at', 'updated_at', 'cover_image', 
+            'cover_image_url', 'slug', 'artwork_count', 'can_edit', 
+            'can_delete', 'url'
+        ]
+        read_only_fields = ['id', 'owner', 'owner_username', 'created_at', 
+                           'updated_at', 'slug', 'artwork_count', 'can_edit', 
+                           'can_delete', 'url', 'cover_image_url']
+    
+    def get_artwork_count(self, obj):
+        """Return the number of artworks in this folder."""
+        return obj.artwork_count()
+    
+    def get_cover_image_url(self, obj):
+        """Return the URL for the folder's cover image."""
+        if obj.cover_image and hasattr(obj.cover_image, 'url'):
+            return obj.cover_image.url
+        return None
+    
+    def get_can_edit(self, obj):
+        """Check if the current user can edit this folder."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.owner == request.user
+    
+    def get_can_delete(self, obj):
+        """Check if the current user can delete this folder."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        return obj.owner == request.user
+    
+    def get_url(self, obj):
+        """Return the URL for this folder."""
+        return obj.get_absolute_url()
+
+class FolderListSerializer(serializers.ModelSerializer):
+    """Simplified serializer for listing folders in portfolios."""
+    owner_username = serializers.CharField(source='owner.username', read_only=True)
+    artwork_count = serializers.SerializerMethodField()
+    cover_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Folder
+        fields = [
+            'id', 'name', 'description', 'owner_username', 'is_public', 
+            'created_at', 'slug', 'artwork_count', 'cover_image_url'
+        ]
+        read_only_fields = ['id', 'owner_username', 'created_at', 'slug', 
+                           'artwork_count', 'cover_image_url']
+    
+    def get_artwork_count(self, obj):
+        """Return the number of artworks in this folder."""
+        return obj.artwork_count()
+    
+    def get_cover_image_url(self, obj):
+        """Return the URL for the folder's cover image."""
+        if obj.cover_image and hasattr(obj.cover_image, 'url'):
+            return obj.cover_image.url
+        return None
+
+class FolderCreateUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for creating and updating folders."""
+    
+    class Meta:
+        model = Folder
+        fields = ['name', 'description', 'is_public', 'cover_image']
+    
+    def validate_name(self, value):
+        """Validate that the folder name is not empty and reasonable length."""
+        if not value or not value.strip():
+            raise serializers.ValidationError("Folder name cannot be empty.")
+        if len(value.strip()) > 200:
+            raise serializers.ValidationError("Folder name cannot exceed 200 characters.")
+        return value.strip()
