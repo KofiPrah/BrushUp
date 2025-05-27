@@ -24,12 +24,12 @@ def health_check(request):
     return HttpResponse(status=200)
 
 urlpatterns = [
-    path('', health_check, name='health_check'),  # Root path health check
+    path('', include('critique.urls')),  # Main Brush Up art platform at root
+    path('health/', health_check, name='health_check'),  # Health check moved to /health/
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('allauth.urls')),
     path('api/', include('critique.api.urls')),  # DRF API endpoints
-    path('critique/', include('critique.urls')),  # Moved to /critique/ path
 ]
 
 # Serve static and media files in all environments since we're using local storage
