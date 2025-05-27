@@ -147,7 +147,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
             # Calculate popularity score: critiques * 2 + likes + reactions
             popularity_score=Count('critiques', distinct=True) * 2 + 
                            Count('likes', distinct=True) + 
-                           Count('critiques__reaction', distinct=True)
+                           Count('critiques__reactions', distinct=True)
         ).order_by('-created_at')
         
         return queryset
