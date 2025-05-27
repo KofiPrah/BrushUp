@@ -118,6 +118,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     - Include 'image' field with the image file
     - Other fields (title, description, etc.) can be included in the same request
     """
+    queryset = ArtWork.objects.all()
     serializer_class = ArtWorkSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = CustomPageNumberPagination
@@ -126,6 +127,15 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'description', 'tags', 'author__username']
     ordering_fields = ['created_at', 'updated_at', 'title', 'likes_count', 'critiques_count', 'popularity_score']
     ordering = ['-created_at']  # Default ordering
+    
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    pagination_class = CustomPageNumberPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = ArtWorkFilter
+    search_fields = ['title', 'description', 'tags', 'author__username']
+    ordering_fields = ['created_at', 'updated_at', 'title', 'likes_count', 'critiques_count', 'popularity_score']
+    ordering = ['-created_at']  # Default ordering
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     
     def get_queryset(self):
         """Return queryset with popularity annotations for API filtering."""
@@ -141,7 +151,6 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         ).order_by('-created_at')
         
         return queryset
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     
     def get_permissions(self):
         """
@@ -167,34 +176,6 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             return ArtWorkListSerializer
         return ArtWorkSerializer
-    
-    def get_queryset(self):
-        """
-        Return filtered queryset based on user permissions and visibility.
-        
-        For Phase 12 compatibility:
-        - Unauthenticated users only see public artworks
-        - Authenticated users see public artworks + their own private artworks
-        - Moderators/Admins see all artworks
-        """
-        queryset = ArtWork.objects.all().order_by('-created_at')
-        
-        # Future visibility filtering for Phase 12
-        # Currently all artworks are considered public
-        # When visibility field is added, uncomment and modify:
-        
-        # if not self.request.user.is_authenticated:
-        #     # Unauthenticated users only see public artworks
-        #     queryset = queryset.filter(visibility='public')
-        # elif not (self.request.user.profile.is_moderator_or_admin() if hasattr(self.request.user, 'profile') else False):
-        #     # Regular authenticated users see public artworks + their own
-        #     queryset = queryset.filter(
-        #         models.Q(visibility='public') | 
-        #         models.Q(author=self.request.user)
-        #     )
-        # Moderators and admins see all artworks (no filtering)
-        
-        return queryset
 
     def get_serializer_context(self):
         """Add the request to the serializer context."""
