@@ -143,6 +143,23 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Role checking helper functions
+  const isAdmin = () => {
+    return user && user.profile && user.profile.role === 'ADMIN';
+  };
+
+  const isModerator = () => {
+    return user && user.profile && (user.profile.role === 'MODERATOR' || user.profile.role === 'ADMIN');
+  };
+
+  const isModeratorOrAdmin = () => {
+    return user && user.profile && (user.profile.role === 'MODERATOR' || user.profile.role === 'ADMIN');
+  };
+
+  const hasRole = (role) => {
+    return user && user.profile && user.profile.role === role;
+  };
+
   // Provide the auth context value to consuming components
   const value = {
     user,
@@ -152,7 +169,11 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateUserInfo,
-    isAuthenticated: !!user
+    isAuthenticated: !!user,
+    isAdmin,
+    isModerator,
+    isModeratorOrAdmin,
+    hasRole
   };
 
   return (

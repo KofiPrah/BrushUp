@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
 import PlaceholderImage from '../components/PlaceholderImage';
+import RoleGuard from '../components/RoleGuard';
+import { useAuth } from '../context/AuthContext';
 
 const ArtworkDetail = () => {
   const { id } = useParams();
+  const { user, isAuthenticated, isAdmin, isModerator, isModeratorOrAdmin } = useAuth();
   const [artwork, setArtwork] = useState(null);
   const [critiques, setCritiques] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -239,6 +242,65 @@ const ArtworkDetail = () => {
               {artwork.critiques_count} {artwork.critiques_count === 1 ? 'Critique' : 'Critiques'}
             </span>
           </div>
+
+          {/* Role-based Action Buttons */}
+          <RoleGuard roles={['ADMIN', 'MODERATOR']}>
+            <div className="card border-warning mb-3">
+              <div className="card-header bg-warning text-dark">
+                <h6 className="mb-0">
+                  <i className="bi bi-shield-check me-2"></i>
+                  Moderation Actions
+                </h6>
+              </div>
+              <div className="card-body">
+                <div className="d-grid gap-2">
+                  <button 
+                    className="btn btn-outline-warning btn-sm"
+                    onClick={() => alert('Flag content for review')}
+                  >
+                    <i className="bi bi-flag me-1"></i>
+                    Flag Content
+                  </button>
+                  <button 
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => alert('Hide artwork from public view')}
+                  >
+                    <i className="bi bi-eye-slash me-1"></i>
+                    Hide Artwork
+                  </button>
+                  <RoleGuard roles={['ADMIN']}>
+                    <button 
+                      className="btn btn-outline-dark btn-sm"
+                      onClick={() => alert('Delete artwork permanently')}
+                    >
+                      <i className="bi bi-trash me-1"></i>
+                      Delete Artwork
+                    </button>
+                  </RoleGuard>
+                </div>
+              </div>
+            </div>
+          </RoleGuard>
+
+          {/* Admin Analytics */}
+          <RoleGuard roles={['ADMIN']}>
+            <div className="card border-info mb-3">
+              <div className="card-header bg-info text-white">
+                <h6 className="mb-0">
+                  <i className="bi bi-bar-chart me-2"></i>
+                  Admin Analytics
+                </h6>
+              </div>
+              <div className="card-body">
+                <small className="text-muted">
+                  <div>Views: 1,245</div>
+                  <div>Reports: 0</div>
+                  <div>Download attempts: 23</div>
+                  <div>Share count: 45</div>
+                </small>
+              </div>
+            </div>
+          </RoleGuard>
         </div>
       </div>
       
@@ -313,28 +375,77 @@ const ArtworkDetail = () => {
                     </div>
                   </div>
                   <div className="card-footer">
-                    <div className="d-flex">
-                      <button 
-                        className={`btn btn-sm me-2 ${critique.user_reactions.includes('HELPFUL') ? 'btn-success' : 'btn-outline-success'}`}
-                        onClick={() => handleReaction(critique.id, 'HELPFUL')}
-                      >
-                        <i className="bi bi-hand-thumbs-up me-1"></i>
-                        Helpful ({critique.helpful_count})
-                      </button>
-                      <button 
-                        className={`btn btn-sm me-2 ${critique.user_reactions.includes('INSPIRING') ? 'btn-primary' : 'btn-outline-primary'}`}
-                        onClick={() => handleReaction(critique.id, 'INSPIRING')}
-                      >
-                        <i className="bi bi-lightbulb me-1"></i>
-                        Inspiring ({critique.inspiring_count})
-                      </button>
-                      <button 
-                        className={`btn btn-sm ${critique.user_reactions.includes('DETAILED') ? 'btn-info' : 'btn-outline-info'}`}
-                        onClick={() => handleReaction(critique.id, 'DETAILED')}
-                      >
-                        <i className="bi bi-list-check me-1"></i>
-                        Detailed ({critique.detailed_count})
-                      </button>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div className="d-flex">
+                        <button 
+                          className={`btn btn-sm me-2 ${critique.user_reactions.includes('HELPFUL') ? 'btn-success' : 'btn-outline-success'}`}
+                          onClick={() => handleReaction(critique.id, 'HELPFUL')}
+                        >
+                          <i className="bi bi-hand-thumbs-up me-1"></i>
+                          Helpful ({critique.helpful_count})
+                        </button>
+                        <button 
+                          className={`btn btn-sm me-2 ${critique.user_reactions.includes('INSPIRING') ? 'btn-primary' : 'btn-outline-primary'}`}
+                          onClick={() => handleReaction(critique.id, 'INSPIRING')}
+                        >
+                          <i className="bi bi-lightbulb me-1"></i>
+                          Inspiring ({critique.inspiring_count})
+                        </button>
+                        <button 
+                          className={`btn btn-sm ${critique.user_reactions.includes('DETAILED') ? 'btn-info' : 'btn-outline-info'}`}
+                          onClick={() => handleReaction(critique.id, 'DETAILED')}
+                        >
+                          <i className="bi bi-list-check me-1"></i>
+                          Detailed ({critique.detailed_count})
+                        </button>
+                      </div>
+                      
+                      {/* Role-based Critique Moderation */}
+                      <RoleGuard roles={['ADMIN', 'MODERATOR']}>
+                        <div className="dropdown">
+                          <button 
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                            type="button" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                          >
+                            <i className="bi bi-shield me-1"></i>
+                            Moderate
+                          </button>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <button 
+                                className="dropdown-item" 
+                                onClick={() => alert(`Hide critique ${critique.id}`)}
+                              >
+                                <i className="bi bi-eye-slash me-1"></i>
+                                Hide Critique
+                              </button>
+                            </li>
+                            <li>
+                              <button 
+                                className="dropdown-item" 
+                                onClick={() => alert(`Flag critique ${critique.id}`)}
+                              >
+                                <i className="bi bi-flag me-1"></i>
+                                Flag for Review
+                              </button>
+                            </li>
+                            <RoleGuard roles={['ADMIN']}>
+                              <li><hr className="dropdown-divider" /></li>
+                              <li>
+                                <button 
+                                  className="dropdown-item text-danger" 
+                                  onClick={() => alert(`Delete critique ${critique.id}`)}
+                                >
+                                  <i className="bi bi-trash me-1"></i>
+                                  Delete Critique
+                                </button>
+                              </li>
+                            </RoleGuard>
+                          </ul>
+                        </div>
+                      </RoleGuard>
                     </div>
                   </div>
                 </div>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin, isModerator, isModeratorOrAdmin } = useAuth();
   const [isNavCollapsed, setIsNavCollapsed] = useState(true);
   const navigate = useNavigate();
   
@@ -57,6 +57,35 @@ const Navbar = () => {
                   <Link className="nav-link" to="/my-artworks">My Artworks</Link>
                 </li>
               </>
+            )}
+            
+            {/* Admin and Moderator Navigation */}
+            {isModeratorOrAdmin() && (
+              <li className="nav-item dropdown">
+                <a 
+                  className="nav-link dropdown-toggle" 
+                  href="#" 
+                  id="moderationDropdown" 
+                  role="button" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                >
+                  <i className="bi bi-shield-check me-1"></i>
+                  Moderation
+                </a>
+                <ul className="dropdown-menu" aria-labelledby="moderationDropdown">
+                  <li><Link className="dropdown-item" to="/moderation/reports">Review Reports</Link></li>
+                  <li><Link className="dropdown-item" to="/moderation/flagged-content">Flagged Content</Link></li>
+                  {isAdmin() && (
+                    <>
+                      <li><hr className="dropdown-divider" /></li>
+                      <li><Link className="dropdown-item" to="/admin/users">Manage Users</Link></li>
+                      <li><Link className="dropdown-item" to="/admin/dashboard">Admin Dashboard</Link></li>
+                      <li><Link className="dropdown-item" to="/admin/system-settings">System Settings</Link></li>
+                    </>
+                  )}
+                </ul>
+              </li>
             )}
           </ul>
           
