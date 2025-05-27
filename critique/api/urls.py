@@ -8,13 +8,13 @@ from .views import (
 
 # Create a router and register our viewsets with it
 router = DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'profiles', ProfileViewSet)
-router.register(r'artworks', ArtWorkViewSet)
-router.register(r'critiques', CritiqueViewSet)
-router.register(r'reactions', ReactionViewSet)
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'profiles', ProfileViewSet, basename='profile')
+router.register(r'artworks', ArtWorkViewSet, basename='artwork')
+router.register(r'critiques', CritiqueViewSet, basename='critique')
+router.register(r'reactions', ReactionViewSet, basename='reaction')
 router.register(r'notifications', NotificationViewSet, basename='notification')
-router.register(r'folders', FolderViewSet)
+router.register(r'folders', FolderViewSet, basename='folder')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [
