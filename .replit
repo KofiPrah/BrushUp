@@ -40,3 +40,7 @@ args = "gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 main:app"
 [env]
 SSL_ENABLED = "false"
 REPLIT_HEALTHCHECK_PATH = "/api/health/"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
