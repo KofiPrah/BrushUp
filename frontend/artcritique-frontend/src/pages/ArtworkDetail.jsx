@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { Container, Row, Col, Card, Form, Button, Badge, Spinner, InputGroup } from 'react-bootstrap';
 import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
 import PlaceholderImage from '../components/PlaceholderImage';
 import RoleGuard from '../components/RoleGuard';
 import { useAuth } from '../context/AuthContext';
+import api from '../services/api';
 
 const ArtworkDetail = () => {
   const { id } = useParams();
