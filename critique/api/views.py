@@ -9,7 +9,10 @@ from .serializers import (
     ArtWorkListSerializer, CritiqueSerializer, CritiqueListSerializer,
     ReactionSerializer, NotificationSerializer, CritiqueReplySerializer
 )
-from .permissions import IsAuthorOrReadOnly, IsOwnerOrReadOnly
+from .permissions import (
+    IsAuthorOrReadOnly, IsOwnerOrReadOnly, IsModeratorOrOwner, 
+    IsModeratorOrAdmin, IsAdminOnly
+)
 from django.db import connection
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -90,8 +93,13 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     """API endpoint for viewing and editing artworks.
     
     Allows list, retrieve, create, update, and delete operations on artworks.
-    Only authenticated users can create artworks, and only the artwork's author 
-    (or admins) can update or delete it.
+    Only authenticated users can create artworks.
+    
+    Permissions:
+    - Anyone can view artworks (GET)
+    - Only authenticated users can create artworks (POST)
+    - Only the artwork's author can update it (PUT/PATCH)
+    - Only the artwork's author or users with MODERATOR/ADMIN role can delete it (DELETE)
     
     For image uploads:
     - POST to /api/artworks/ with multipart/form-data
@@ -100,11 +108,30 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     """
     queryset = ArtWork.objects.all().order_by('-created_at')
     serializer_class = ArtWorkSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsAuthorOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['title', 'description', 'tags', 'author__username']
     ordering_fields = ['created_at', 'updated_at', 'title']
     parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
+    
+    def get_permissions(self):
+        """
+        Return different permission classes based on the action:
+        - create: IsAuthenticated
+        - update/partial_update: IsAuthorOrReadOnly (only author can edit)
+        - destroy: IsModeratorOrOwner (author or moderator/admin can delete)
+        - default: IsAuthenticatedOrReadOnly
+        """
+        if self.action == 'destroy':
+            permission_classes = [permissions.IsAuthenticated, IsModeratorOrOwner]
+        elif self.action in ['update', 'partial_update']:
+            permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
+        elif self.action == 'create':
+            permission_classes = [permissions.IsAuthenticated]
+        else:
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        
+        return [permission() for permission in permission_classes]
     
     def get_serializer_class(self):
         """Return different serializers for list and detail views."""
@@ -303,15 +330,44 @@ class CritiqueViewSet(viewsets.ModelViewSet):
     """API endpoint for viewing and editing critiques.
     
     Allows list, retrieve, create, update, and delete operations on critiques.
-    Only authenticated users can create critiques, and only the critique's author 
-    (or admins) can update or delete it.
+    
+    Permissions:
+    - Anyone can view critiques (GET)
+    - Only authenticated users can create critiques (POST)
+    - Only the critique's author can update it (PUT/PATCH)
+    - Only the critique's author or users with MODERATOR/ADMIN role can delete it (DELETE)
+    - Only the artwork's author can hide critiques (POST to /api/critiques/{id}/hide/)
+    - Only users with MODERATOR/ADMIN role can flag critiques as inappropriate (POST to /api/critiques/{id}/flag/)
     """
     queryset = Critique.objects.all().order_by('-created_at')
     serializer_class = CritiqueSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['text']
     ordering_fields = ['created_at', 'updated_at']
+    
+    def get_permissions(self):
+        """
+        Return different permission classes based on the action:
+        - create: IsAuthenticated
+        - update/partial_update: IsOwnerOrReadOnly (only author can edit)
+        - destroy: IsModeratorOrOwner (author or moderator/admin can delete)
+        - hide: Custom permission check in the method (only artwork owner can hide)
+        - flag: IsModeratorOrAdmin (only moderators/admins can flag as inappropriate)
+        - default: IsAuthenticatedOrReadOnly
+        """
+        if self.action == 'destroy':
+            permission_classes = [permissions.IsAuthenticated, IsModeratorOrOwner]
+        elif self.action in ['update', 'partial_update']:
+            permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+        elif self.action == 'create':
+            permission_classes = [permissions.IsAuthenticated]
+        elif self.action == 'flag':
+            permission_classes = [permissions.IsAuthenticated, IsModeratorOrAdmin]
+        else:
+            permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+        
+        return [permission() for permission in permission_classes]
     
     def get_queryset(self):
         """
@@ -435,18 +491,29 @@ class CritiqueViewSet(viewsets.ModelViewSet):
                 {"error": "Only the artwork owner can unhide critiques"},
                 status=status.HTTP_403_FORBIDDEN
             )
+            
+        # Make sure the critique is actually hidden
+        if not critique.is_hidden:
+            return Response(
+                {"error": "This critique is not hidden"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
         # Unhide the critique
         critique.unhide()
         
         serializer = self.get_serializer(critique)
-        return Response(serializer.data)
+        return Response({
+            "status": "success",
+            "message": "Critique has been unhidden successfully",
+            "critique": serializer.data
+        })
     
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated, IsModeratorOrAdmin])
     def flag(self, request, pk=None):
         """
         Flag a critique for moderation.
-        Any authenticated user can flag a critique.
+        Only users with MODERATOR or ADMIN role can flag critiques.
         
         Example: POST /api/critiques/5/flag/
         Payload: { "reason": "Offensive content" }
@@ -461,10 +528,13 @@ class CritiqueViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Flag the critique
+        # Flag the critique as a moderator action
         critique.flag(request.user, reason)
         
-        return Response({"status": "Critique has been flagged for moderation"})
+        return Response({
+            "status": "Critique has been flagged for moderation",
+            "message": "The critique has been flagged as inappropriate by a moderator"
+        })
     
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def reply(self, request, pk=None):

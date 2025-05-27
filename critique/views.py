@@ -101,7 +101,7 @@ def profile_view(request):
     
     context = {
         'profile': profile,
-        'user': request.user,
+        'profile_user': request.user,
         'artworks': artworks,
         'critiques_count': critiques_count,
         'likes_count': likes_count,
@@ -129,7 +129,7 @@ def user_profile_view(request, username):
     
     context = {
         'profile': profile,
-        'user': profile_user,
+        'profile_user': profile_user,
         'artworks': artworks,
         'critiques_count': critiques_count,
         'likes_count': likes_count,

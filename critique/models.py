@@ -18,8 +18,19 @@ else:
 class Profile(models.Model):
     """
     Extended user profile model with additional information about the user.
-    Includes karma points earned through positive contributions.
+    Includes karma points earned through positive contributions and user role.
     """
+    # User role choices
+    ROLE_USER = 'USER'
+    ROLE_MODERATOR = 'MODERATOR'
+    ROLE_ADMIN = 'ADMIN'
+    
+    ROLE_CHOICES = [
+        (ROLE_USER, 'Regular User'),
+        (ROLE_MODERATOR, 'Moderator'),
+        (ROLE_ADMIN, 'Administrator'),
+    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=100, blank=True)
@@ -29,9 +40,23 @@ class Profile(models.Model):
     profile_picture_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field
     website = models.URLField(max_length=200, blank=True)
     karma = models.IntegerField(default=0, help_text="Points earned through positive contributions")
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default=ROLE_USER,
+        help_text="User role determines permissions in the system"
+    )
     
     def __str__(self):
         return f"{self.user.username}'s profile"
+    
+    def is_moderator_or_admin(self):
+        """Check if the user is a moderator or administrator."""
+        return self.role in [self.ROLE_MODERATOR, self.ROLE_ADMIN] or self.user.is_superuser
+    
+    def is_admin(self):
+        """Check if the user is an administrator."""
+        return self.role == self.ROLE_ADMIN or self.user.is_superuser
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
