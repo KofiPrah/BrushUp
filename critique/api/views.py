@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.db import models
+from django_filters.rest_framework import DjangoFilterBackend
 from critique.models import ArtWork, Profile, Critique, Reaction, Notification, CritiqueReply
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
@@ -13,6 +14,7 @@ from .permissions import (
     IsAuthorOrReadOnly, IsOwnerOrReadOnly, IsModeratorOrOwner, 
     IsModeratorOrAdmin, IsAdminOnly
 )
+from .filters import ArtWorkFilter, CritiqueFilter
 from django.db import connection
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -90,7 +92,7 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 class ArtWorkViewSet(viewsets.ModelViewSet):
-    """API endpoint for viewing and editing artworks.
+    """API endpoint for viewing and editing artworks with comprehensive search and filtering.
     
     Allows list, retrieve, create, update, and delete operations on artworks.
     Only authenticated users can create artworks.
@@ -101,6 +103,15 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     - Only the artwork's author can update it (PUT/PATCH)
     - Only the artwork's author or users with MODERATOR/ADMIN role can delete it (DELETE)
     
+    Search and Filtering:
+    - Search: ?search=query (searches title, description, tags, author username)
+    - Filter by author: ?author=user_id or ?author__username=username
+    - Filter by medium: ?medium=acrylic
+    - Filter by tags: ?tags=landscape
+    - Filter by date: ?created_after=2024-01-01&created_before=2024-12-31
+    - Filter by popularity: ?min_likes=5&min_critiques=3
+    - Ordering: ?ordering=-created_at (prefix with - for descending)
+    
     For image uploads:
     - POST to /api/artworks/ with multipart/form-data
     - Include 'image' field with the image file
@@ -109,9 +120,11 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     queryset = ArtWork.objects.all().order_by('-created_at')
     serializer_class = ArtWorkSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = ArtWorkFilter
     search_fields = ['title', 'description', 'tags', 'author__username']
-    ordering_fields = ['created_at', 'updated_at', 'title']
+    ordering_fields = ['created_at', 'updated_at', 'title', 'likes_count', 'critiques_count']
+    ordering = ['-created_at']  # Default ordering
     parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     
     def get_permissions(self):
@@ -139,6 +152,34 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
             return ArtWorkListSerializer
         return ArtWorkSerializer
     
+    def get_queryset(self):
+        """
+        Return filtered queryset based on user permissions and visibility.
+        
+        For Phase 12 compatibility:
+        - Unauthenticated users only see public artworks
+        - Authenticated users see public artworks + their own private artworks
+        - Moderators/Admins see all artworks
+        """
+        queryset = ArtWork.objects.all().order_by('-created_at')
+        
+        # Future visibility filtering for Phase 12
+        # Currently all artworks are considered public
+        # When visibility field is added, uncomment and modify:
+        
+        # if not self.request.user.is_authenticated:
+        #     # Unauthenticated users only see public artworks
+        #     queryset = queryset.filter(visibility='public')
+        # elif not (self.request.user.profile.is_moderator_or_admin() if hasattr(self.request.user, 'profile') else False):
+        #     # Regular authenticated users see public artworks + their own
+        #     queryset = queryset.filter(
+        #         models.Q(visibility='public') | 
+        #         models.Q(author=self.request.user)
+        #     )
+        # Moderators and admins see all artworks (no filtering)
+        
+        return queryset
+
     def get_serializer_context(self):
         """Add the request to the serializer context."""
         context = super().get_serializer_context()
@@ -148,6 +189,37 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Set the author to the current user when creating an artwork."""
         serializer.save(author=self.request.user)
+    
+    @action(detail=False, methods=['get'])
+    def my_artworks(self, request):
+        """Get the current user's artworks."""
+        if not request.user.is_authenticated:
+            return Response({'detail': 'Authentication required.'}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        queryset = self.get_queryset().filter(author=request.user)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def search_by_author(self, request):
+        """Search artworks by author username."""
+        username = request.query_params.get('username', '')
+        if not username:
+            return Response({'detail': 'Username parameter is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        queryset = self.get_queryset().filter(author__username__icontains=username)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
         
     @action(detail=True, methods=['get'])
     def critiques(self, request, pk=None):
@@ -327,7 +399,7 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
 
 
 class CritiqueViewSet(viewsets.ModelViewSet):
-    """API endpoint for viewing and editing critiques.
+    """API endpoint for viewing and editing critiques with comprehensive search and filtering.
     
     Allows list, retrieve, create, update, and delete operations on critiques.
     
@@ -338,13 +410,25 @@ class CritiqueViewSet(viewsets.ModelViewSet):
     - Only the critique's author or users with MODERATOR/ADMIN role can delete it (DELETE)
     - Only the artwork's author can hide critiques (POST to /api/critiques/{id}/hide/)
     - Only users with MODERATOR/ADMIN role can flag critiques as inappropriate (POST to /api/critiques/{id}/flag/)
+    
+    Search and Filtering:
+    - Search: ?search=query (searches critique text)
+    - Filter by author: ?author=user_id or ?author__username=username
+    - Filter by artwork: ?artwork=artwork_id or ?artwork__title=title
+    - Filter by scores: ?min_composition_score=7&min_technique_score=8
+    - Filter by date: ?created_after=2024-01-01&created_before=2024-12-31
+    - Filter by reactions: ?min_helpful_reactions=5
+    - Hide status: ?is_hidden=false (show only visible critiques)
+    - Ordering: ?ordering=-created_at (prefix with - for descending)
     """
     queryset = Critique.objects.all().order_by('-created_at')
     serializer_class = CritiqueSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
-    search_fields = ['text']
-    ordering_fields = ['created_at', 'updated_at']
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_class = CritiqueFilter
+    search_fields = ['text', 'author__username', 'artwork__title']
+    ordering_fields = ['created_at', 'updated_at', 'composition_score', 'technique_score', 'originality_score']
+    ordering = ['-created_at']  # Default ordering
     
     def get_permissions(self):
         """
