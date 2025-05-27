@@ -139,8 +139,8 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
     parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
     
     def get_queryset(self):
-        """Return queryset with popularity annotations for API filtering."""
-        from django.db.models import Count
+        """Return queryset with popularity annotations and folder visibility filtering."""
+        from django.db.models import Count, Q
         
         queryset = ArtWork.objects.annotate(
             critiques_count=Count('critiques', distinct=True),
@@ -151,7 +151,44 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
                            Count('critiques__reactions', distinct=True)
         ).order_by('-created_at')
         
+        # Filter out artworks in private folders unless user is the folder owner
+        user = self.request.user
+        if user.is_authenticated:
+            # Authenticated users see:
+            # 1. Artworks not in any folder
+            # 2. Artworks in public folders
+            # 3. Artworks in their own folders (any visibility)
+            # 4. Artworks in unlisted folders (direct access allowed)
+            queryset = queryset.filter(
+                Q(folder__isnull=True) |  # Not in any folder
+                Q(folder__is_public=Folder.VISIBILITY_PUBLIC) |  # Public folders
+                Q(folder__is_public=Folder.VISIBILITY_UNLISTED) |  # Unlisted folders
+                Q(folder__owner=user)  # User's own folders
+            )
+        else:
+            # Anonymous users only see:
+            # 1. Artworks not in any folder
+            # 2. Artworks in public folders
+            queryset = queryset.filter(
+                Q(folder__isnull=True) |  # Not in any folder
+                Q(folder__is_public=Folder.VISIBILITY_PUBLIC)  # Public folders only
+            )
+        
         return queryset
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to enforce artwork and folder visibility rules."""
+        artwork = self.get_object()
+        
+        # Check if artwork is in a folder and if user can view that folder
+        if artwork.folder and not artwork.folder.is_viewable_by(request.user):
+            return Response(
+                {"detail": "Not found."},  # Don't reveal artwork exists
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = self.get_serializer(artwork)
+        return Response(serializer.data)
     
     def get_permissions(self):
         """
@@ -1105,6 +1142,7 @@ class FolderViewSet(viewsets.ModelViewSet):
         
         if user.is_authenticated:
             # Authenticated users see their own folders + public folders from others
+            # Note: Unlisted folders are handled by direct access only, not in listings
             from django.db.models import Q
             return Folder.objects.filter(
                 Q(owner=user) | Q(is_public=Folder.VISIBILITY_PUBLIC)
@@ -1112,6 +1150,20 @@ class FolderViewSet(viewsets.ModelViewSet):
         else:
             # Anonymous users only see public folders
             return Folder.objects.filter(is_public=Folder.VISIBILITY_PUBLIC)
+    
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to enforce folder visibility rules."""
+        folder = self.get_object()
+        
+        # Check if user can view this folder
+        if not folder.is_viewable_by(request.user):
+            return Response(
+                {"detail": "Not found."},  # Don't reveal folder exists
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        serializer = self.get_serializer(folder)
+        return Response(serializer.data)
     
     def get_serializer_class(self):
         """Return appropriate serializer based on action."""
