@@ -111,24 +111,28 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return Notification.objects.filter(recipient=obj, is_read=False).count()
 
 class ArtWorkSerializer(serializers.ModelSerializer):
-    """Serializer for the ArtWork model with author information."""
+    """Serializer for the ArtWork model with author information and folder assignment."""
     author = UserSerializer(read_only=True)
     likes_count = serializers.SerializerMethodField()
     critiques_count = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     image_display_url = serializers.SerializerMethodField()
     critiques = serializers.SerializerMethodField()
+    folder_name = serializers.CharField(source='folder.name', read_only=True)
+    folder_slug = serializers.CharField(source='folder.slug', read_only=True)
     
     class Meta:
         model = ArtWork
         fields = [
             'id', 'title', 'description', 'image', 'image_url', 'image_display_url',
             'created_at', 'updated_at', 'author', 'medium', 'dimensions', 'tags', 
+            'folder', 'folder_name', 'folder_slug',
             'likes_count', 'critiques_count', 'is_liked', 'critiques'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at', 'author', 
                            'likes_count', 'critiques_count', 
-                           'is_liked', 'image_display_url', 'critiques']
+                           'is_liked', 'image_display_url', 'critiques',
+                           'folder_name', 'folder_slug']
                            
     def get_image_display_url(self, obj):
         """Return the URL to display the image, prioritizing S3 storage."""
@@ -161,12 +165,34 @@ class ArtWorkSerializer(serializers.ModelSerializer):
             return obj.likes.filter(id=request.user.id).exists()
         return False
     
+    def validate_folder(self, value):
+        """Validate that the user can only assign artwork to their own folders."""
+        if value is not None:
+            request = self.context.get('request')
+            if request and hasattr(request, 'user') and request.user.is_authenticated:
+                if value.owner != request.user:
+                    raise serializers.ValidationError(
+                        "You can only assign artworks to your own folders."
+                    )
+        return value
+    
     def create(self, validated_data):
         """Create a new artwork with the current user as author."""
         # Author is now being set in the view via perform_create method
         # so we don't need to set it here to avoid the duplicate argument error
         artwork = ArtWork.objects.create(**validated_data)
         return artwork
+    
+    def update(self, instance, validated_data):
+        """Update artwork, ensuring folder assignment validation."""
+        # Additional check: ensure the artwork being updated belongs to the current user
+        request = self.context.get('request')
+        if request and hasattr(request, 'user') and request.user.is_authenticated:
+            if instance.author != request.user:
+                raise serializers.ValidationError(
+                    "You can only modify your own artworks."
+                )
+        return super().update(instance, validated_data)
 
 class ArtWorkListSerializer(serializers.ModelSerializer):
     """Simplified serializer for listing artwork."""
@@ -484,6 +510,7 @@ class FolderSerializer(serializers.ModelSerializer):
     can_edit = serializers.SerializerMethodField()
     can_delete = serializers.SerializerMethodField()
     url = serializers.SerializerMethodField()
+    artworks = serializers.SerializerMethodField()
     
     class Meta:
         model = Folder
@@ -491,11 +518,11 @@ class FolderSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'owner', 'owner_username', 
             'is_public', 'created_at', 'updated_at', 'cover_image', 
             'cover_image_url', 'slug', 'artwork_count', 'can_edit', 
-            'can_delete', 'url'
+            'can_delete', 'url', 'artworks'
         ]
         read_only_fields = ['id', 'owner', 'owner_username', 'created_at', 
                            'updated_at', 'slug', 'artwork_count', 'can_edit', 
-                           'can_delete', 'url', 'cover_image_url']
+                           'can_delete', 'url', 'cover_image_url', 'artworks']
     
     def get_artwork_count(self, obj):
         """Return the number of artworks in this folder."""
@@ -524,6 +551,12 @@ class FolderSerializer(serializers.ModelSerializer):
     def get_url(self, obj):
         """Return the URL for this folder."""
         return obj.get_absolute_url()
+    
+    def get_artworks(self, obj):
+        """Return the artworks in this folder."""
+        # Use ArtWorkListSerializer to avoid circular imports and provide efficient listing
+        artworks = obj.artworks.all().order_by('-created_at')
+        return ArtWorkListSerializer(artworks, many=True, context=self.context).data
 
 class FolderListSerializer(serializers.ModelSerializer):
     """Simplified serializer for listing folders in portfolios."""
