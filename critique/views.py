@@ -61,12 +61,65 @@ def auth_test(request):
 
 class ArtWorkListView(ListView):
     """
-    View for displaying a list of all artworks.
+    View for displaying a list of all artworks with search and filtering capabilities.
     """
     model = ArtWork
     template_name = 'critique/artwork_list.html'
     context_object_name = 'artworks'
+    paginate_by = 12
     ordering = ['-created_at']
+
+    def get_queryset(self):
+        """Return filtered and sorted queryset based on GET parameters."""
+        queryset = ArtWork.objects.all()
+        
+        # Get search parameters
+        search_query = self.request.GET.get('search', '').strip()
+        artist_filter = self.request.GET.get('artist', '').strip()
+        medium_filter = self.request.GET.get('medium', '').strip()
+        created_after = self.request.GET.get('created_after', '')
+        created_before = self.request.GET.get('created_before', '')
+        ordering = self.request.GET.get('ordering', '-created_at')
+
+        # Apply search filter
+        if search_query:
+            from django.db.models import Q
+            queryset = queryset.filter(
+                Q(title__icontains=search_query) |
+                Q(description__icontains=search_query) |
+                Q(author__username__icontains=search_query) |
+                Q(tags__icontains=search_query)
+            )
+
+        # Apply artist filter
+        if artist_filter:
+            queryset = queryset.filter(author__username__icontains=artist_filter)
+
+        # Apply medium filter
+        if medium_filter:
+            queryset = queryset.filter(medium__icontains=medium_filter)
+
+        # Apply date filters
+        if created_after:
+            queryset = queryset.filter(created_at__date__gte=created_after)
+        if created_before:
+            queryset = queryset.filter(created_at__date__lte=created_before)
+
+        # Apply ordering
+        valid_orderings = ['-created_at', 'created_at', '-likes_count', 'title', '-title']
+        if ordering in valid_orderings:
+            queryset = queryset.order_by(ordering)
+        else:
+            queryset = queryset.order_by('-created_at')
+
+        return queryset.distinct()
+
+    def get_context_data(self, **kwargs):
+        """Add search parameters to context for template rendering."""
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['current_ordering'] = self.request.GET.get('ordering', '-created_at')
+        return context
 
 class ArtWorkDetailView(DetailView):
     """

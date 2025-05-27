@@ -3,9 +3,121 @@
 {% block title %}Artworks - Brush Up{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Artwork Gallery</h1>
-    
-    {% if artworks %}
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="mb-4 text-center">Artwork Gallery</h1>
+                
+                <!-- Enhanced Search and Filter Section -->
+                <div class="card bg-dark border-secondary mb-4">
+                    <div class="card-body">
+                        <form method="GET" action="{% url 'critique:artwork_list' %}" class="mb-3">
+                            <div class="row">
+                                <!-- Main Search Bar -->
+                                <div class="col-md-8 mb-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-secondary border-secondary">
+                                            <i class="bi bi-search text-white"></i>
+                                        </span>
+                                        <input 
+                                            type="text" 
+                                            class="form-control bg-dark border-secondary text-white" 
+                                            name="search" 
+                                            placeholder="Search artworks by title, description, or artist..."
+                                            value="{{ request.GET.search }}"
+                                            id="searchInput"
+                                        >
+                                        {% if request.GET.search %}
+                                            <a href="{% url 'critique:artwork_list' %}" class="btn btn-outline-secondary">
+                                                Clear
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Sort Dropdown -->
+                                <div class="col-md-4 mb-3">
+                                    <select name="ordering" class="form-select bg-dark border-secondary text-white" onchange="this.form.submit()">
+                                        <option value="-created_at" {% if request.GET.ordering == '-created_at' or not request.GET.ordering %}selected{% endif %}>
+                                            Newest First
+                                        </option>
+                                        <option value="created_at" {% if request.GET.ordering == 'created_at' %}selected{% endif %}>
+                                            Oldest First
+                                        </option>
+                                        <option value="-likes_count" {% if request.GET.ordering == '-likes_count' %}selected{% endif %}>
+                                            Most Liked
+                                        </option>
+                                        <option value="title" {% if request.GET.ordering == 'title' %}selected{% endif %}>
+                                            Title A-Z
+                                        </option>
+                                        <option value="-title" {% if request.GET.ordering == '-title' %}selected{% endif %}>
+                                            Title Z-A
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Advanced Filters Row -->
+                            <div class="row" id="advancedFilters" style="display: none;">
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label text-white-50">Artist</label>
+                                    <input type="text" name="artist" class="form-control bg-dark border-secondary text-white" 
+                                           placeholder="Artist username" value="{{ request.GET.artist }}">
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label text-white-50">Medium</label>
+                                    <input type="text" name="medium" class="form-control bg-dark border-secondary text-white" 
+                                           placeholder="e.g., Oil, Digital" value="{{ request.GET.medium }}">
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label text-white-50">Created After</label>
+                                    <input type="date" name="created_after" class="form-control bg-dark border-secondary text-white" 
+                                           value="{{ request.GET.created_after }}">
+                                </div>
+                                <div class="col-md-3 mb-2">
+                                    <label class="form-label text-white-50">Created Before</label>
+                                    <input type="date" name="created_before" class="form-control bg-dark border-secondary text-white" 
+                                           value="{{ request.GET.created_before }}">
+                                </div>
+                            </div>
+                            
+                            <!-- Filter Controls -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-outline-info btn-sm me-2" onclick="toggleAdvancedFilters()">
+                                        <i class="bi bi-funnel"></i> Advanced Filters
+                                    </button>
+                                    <button type="submit" class="btn btn-primary btn-sm me-2">
+                                        <i class="bi bi-search"></i> Search
+                                    </button>
+                                    {% if request.GET %}
+                                        <a href="{% url 'critique:artwork_list' %}" class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-arrow-clockwise"></i> Clear All
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </form>
+                        
+                        <!-- Search Results Summary -->
+                        {% if request.GET.search %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> 
+                                Showing results for: <strong>"{{ request.GET.search }}"</strong>
+                                {% if artworks|length == 0 %}
+                                    - No artworks found.
+                                {% else %}
+                                    - Found {{ artworks|length }} artwork{{ artworks|length|pluralize }}.
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Results Grid -->
+        {% if artworks %}
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for artwork in artworks %}
                 <div class="col">
@@ -36,8 +148,75 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="alert alert-info">
-            <p>No artworks have been added yet.</p>
-        </div>
-    {% endif %}
+            <div class="alert alert-info">
+                <p>No artworks have been added yet. <a href="{% url 'critique:artwork_upload' %}" class="btn btn-primary btn-sm ms-2">Upload First Artwork</a></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript for Enhanced Search Functionality -->
+    <script>
+        function toggleAdvancedFilters() {
+            const filtersDiv = document.getElementById('advancedFilters');
+            const isHidden = filtersDiv.style.display === 'none';
+            filtersDiv.style.display = isHidden ? 'block' : 'none';
+            
+            // Update button text
+            const button = event.target;
+            if (isHidden) {
+                button.innerHTML = '<i class="bi bi-funnel-fill"></i> Hide Advanced Filters';
+            } else {
+                button.innerHTML = '<i class="bi bi-funnel"></i> Advanced Filters';
+            }
+        }
+
+        // Auto-submit form when sorting changes
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const form = searchInput.closest('form');
+            
+            // Add search on Enter key
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    form.submit();
+                }
+            });
+
+            // Auto-focus search input if there's a search query
+            if (searchInput.value) {
+                searchInput.focus();
+            }
+
+            // Show advanced filters if any advanced filter has a value
+            const advancedInputs = document.querySelectorAll('#advancedFilters input');
+            let hasAdvancedValue = false;
+            advancedInputs.forEach(input => {
+                if (input.value) {
+                    hasAdvancedValue = true;
+                }
+            });
+            
+            if (hasAdvancedValue) {
+                toggleAdvancedFilters();
+            }
+        });
+
+        // Live search functionality (optional - for better UX)
+        function setupLiveSearch() {
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    if (this.value.length >= 3 || this.value.length === 0) {
+                        this.closest('form').submit();
+                    }
+                }, 500); // Wait 500ms after user stops typing
+            });
+        }
+        
+        // Uncomment the line below to enable live search
+        // setupLiveSearch();
+    </script>
 {% endblock %}

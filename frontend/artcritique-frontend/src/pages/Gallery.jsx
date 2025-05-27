@@ -37,8 +37,13 @@ const Gallery = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [allArtworks, setAllArtworks] = useState([]); // For infinite scroll: accumulate all loaded artworks
 
-  // Debounced search to avoid too many API calls
+  // Enhanced search state
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [popularTags, setPopularTags] = useState([]);
+  const [searchHistory, setSearchHistory] = useState([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -112,6 +117,83 @@ const Gallery = () => {
   useEffect(() => {
     fetchArtworks(1);
   }, [fetchArtworks]);
+
+  // Load search enhancements on component mount
+  useEffect(() => {
+    loadRecentSearches();
+    fetchPopularTags();
+  }, []);
+
+  // Load recent searches from localStorage
+  const loadRecentSearches = () => {
+    try {
+      const stored = localStorage.getItem('artworkSearchHistory');
+      if (stored) {
+        setRecentSearches(JSON.parse(stored).slice(0, 5)); // Keep only 5 most recent
+      }
+    } catch (error) {
+      console.error('Error loading search history:', error);
+    }
+  };
+
+  // Save search to history
+  const saveSearchToHistory = (searchTerm) => {
+    if (!searchTerm.trim()) return;
+    
+    try {
+      const existing = JSON.parse(localStorage.getItem('artworkSearchHistory') || '[]');
+      const updated = [searchTerm, ...existing.filter(term => term !== searchTerm)].slice(0, 10);
+      localStorage.setItem('artworkSearchHistory', JSON.stringify(updated));
+      setRecentSearches(updated.slice(0, 5));
+    } catch (error) {
+      console.error('Error saving search history:', error);
+    }
+  };
+
+  // Fetch popular tags from API
+  const fetchPopularTags = async () => {
+    try {
+      const response = await api.get('/api/artworks/by_tag/');
+      // Extract unique tags from artworks (this would be better with a dedicated endpoint)
+      const tags = ['landscape', 'portrait', 'abstract', 'digital', 'traditional', 'nature', 'urban', 'fantasy'];
+      setPopularTags(tags);
+    } catch (error) {
+      console.error('Error fetching popular tags:', error);
+      // Fallback to common tags
+      setPopularTags(['landscape', 'portrait', 'abstract', 'digital', 'traditional']);
+    }
+  };
+
+  // Generate search suggestions based on input
+  const generateSearchSuggestions = useCallback(async (query) => {
+    if (query.length < 2) {
+      setSearchSuggestions([]);
+      return;
+    }
+
+    try {
+      // In a real implementation, this would be a dedicated autocomplete API
+      const suggestions = [];
+      
+      // Add matching popular tags
+      const matchingTags = popularTags.filter(tag => 
+        tag.toLowerCase().includes(query.toLowerCase())
+      ).map(tag => ({ type: 'tag', value: tag, label: `Tag: ${tag}` }));
+      
+      // Add recent searches that match
+      const matchingRecent = recentSearches.filter(search => 
+        search.toLowerCase().includes(query.toLowerCase())
+      ).map(search => ({ type: 'recent', value: search, label: `Recent: ${search}` }));
+
+      // Combine suggestions
+      suggestions.push(...matchingTags.slice(0, 3));
+      suggestions.push(...matchingRecent.slice(0, 2));
+
+      setSearchSuggestions(suggestions.slice(0, 5));
+    } catch (error) {
+      console.error('Error generating suggestions:', error);
+    }
+  }, [popularTags, recentSearches]);
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({
@@ -189,28 +271,76 @@ const Gallery = () => {
         <Col>
           <Card className="border-0 shadow-sm">
             <Card.Body>
-              {/* Search Bar */}
+              {/* Enhanced Search Bar */}
               <Row className="mb-3">
                 <Col md={8}>
-                  <InputGroup>
-                    <InputGroup.Text>
-                      <Search />
-                    </InputGroup.Text>
-                    <Form.Control
-                      type="text"
-                      placeholder="Search artworks by title, description, tags, or artist..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    {searchTerm && (
-                      <Button
-                        variant="outline-secondary"
-                        onClick={() => setSearchTerm('')}
-                      >
-                        Clear
-                      </Button>
+                  <div className="position-relative">
+                    <InputGroup>
+                      <InputGroup.Text>
+                        <Search />
+                      </InputGroup.Text>
+                      <Form.Control
+                        type="text"
+                        placeholder="Search artworks by title, description, tags, or artist..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                          setSearchTerm(e.target.value);
+                          generateSearchSuggestions(e.target.value);
+                          setShowSuggestions(true);
+                        }}
+                        onFocus={() => {
+                          if (searchTerm.length >= 2) {
+                            generateSearchSuggestions(searchTerm);
+                            setShowSuggestions(true);
+                          }
+                        }}
+                        onBlur={() => {
+                          setTimeout(() => setShowSuggestions(false), 200);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && searchTerm.trim()) {
+                            saveSearchToHistory(searchTerm.trim());
+                            setShowSuggestions(false);
+                          }
+                        }}
+                      />
+                      {searchTerm && (
+                        <Button
+                          variant="outline-secondary"
+                          onClick={() => {
+                            setSearchTerm('');
+                            setShowSuggestions(false);
+                          }}
+                        >
+                          Clear
+                        </Button>
+                      )}
+                    </InputGroup>
+
+                    {/* Search Suggestions Dropdown */}
+                    {showSuggestions && searchSuggestions.length > 0 && (
+                      <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1" style={{ zIndex: 1000 }}>
+                        {searchSuggestions.map((suggestion, index) => (
+                          <div
+                            key={index}
+                            className="p-2 cursor-pointer border-bottom hover-bg-light"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => {
+                              setSearchTerm(suggestion.value);
+                              saveSearchToHistory(suggestion.value);
+                              setShowSuggestions(false);
+                            }}
+                            onMouseDown={(e) => e.preventDefault()}
+                          >
+                            <small className="text-muted me-2">
+                              {suggestion.type === 'tag' ? '🏷️' : '🕐'}
+                            </small>
+                            {suggestion.label}
+                          </div>
+                        ))}
+                      </div>
                     )}
-                  </InputGroup>
+                  </div>
                 </Col>
                 <Col md={4} className="d-flex gap-2">
                   <Button
@@ -245,6 +375,64 @@ const Gallery = () => {
                   </Dropdown>
                 </Col>
               </Row>
+
+              {/* Quick Search Helpers */}
+              {!showFilters && (popularTags.length > 0 || recentSearches.length > 0) && (
+                <Row className="mb-3">
+                  <Col>
+                    {/* Popular Tags */}
+                    {popularTags.length > 0 && (
+                      <div className="mb-2">
+                        <small className="text-muted me-2">Popular tags:</small>
+                        {popularTags.slice(0, 6).map((tag) => (
+                          <Badge
+                            key={tag}
+                            bg="light"
+                            text="dark"
+                            className="me-1 mb-1 cursor-pointer"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => {
+                              setSearchTerm(tag);
+                              saveSearchToHistory(tag);
+                            }}
+                          >
+                            #{tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Recent Searches */}
+                    {recentSearches.length > 0 && (
+                      <div>
+                        <small className="text-muted me-2">Recent searches:</small>
+                        {recentSearches.map((search, index) => (
+                          <Badge
+                            key={index}
+                            bg="outline-secondary"
+                            className="me-1 mb-1 cursor-pointer border"
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => setSearchTerm(search)}
+                          >
+                            {search}
+                          </Badge>
+                        ))}
+                        <Button
+                          variant="link"
+                          size="sm"
+                          className="p-0 ms-2"
+                          onClick={() => {
+                            localStorage.removeItem('artworkSearchHistory');
+                            setRecentSearches([]);
+                          }}
+                        >
+                          <small>Clear history</small>
+                        </Button>
+                      </div>
+                    )}
+                  </Col>
+                </Row>
+              )}
 
               {/* Advanced Filters */}
               {showFilters && (
