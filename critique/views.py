@@ -76,12 +76,12 @@ class ArtWorkListView(ListView):
         
         # Start with base queryset and add popularity annotations
         queryset = ArtWork.objects.annotate(
-            critiques_count=Count('critique', distinct=True),
+            critiques_count=Count('critiques', distinct=True),
             likes_count=Count('likes', distinct=True),
             # Calculate popularity score: critiques * 2 + likes + reactions
-            popularity_score=Count('critique', distinct=True) * 2 + 
+            popularity_score=Count('critiques', distinct=True) * 2 + 
                            Count('likes', distinct=True) + 
-                           Count('critique__reaction', distinct=True)
+                           Count('critiques__reaction', distinct=True)
         )
         
         # Get search parameters
