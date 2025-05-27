@@ -69,6 +69,104 @@ def save_user_profile(sender, instance, **kwargs):
     """Save the Profile instance when the User is saved."""
     instance.profile.save()
 
+class Folder(models.Model):
+    """
+    Model representing a portfolio folder that groups artworks together.
+    Allows users to organize their artworks into themed collections.
+    """
+    # Visibility choices
+    VISIBILITY_PUBLIC = 'public'
+    VISIBILITY_PRIVATE = 'private'
+    VISIBILITY_UNLISTED = 'unlisted'  # Can be accessed with direct link but not publicly listed
+    
+    VISIBILITY_CHOICES = [
+        (VISIBILITY_PUBLIC, 'Public'),
+        (VISIBILITY_PRIVATE, 'Private'),
+        (VISIBILITY_UNLISTED, 'Unlisted'),
+    ]
+    
+    name = models.CharField(
+        max_length=200, 
+        help_text="Name of the portfolio folder (e.g., 'Landscape Series', 'Abstract Works')"
+    )
+    description = models.TextField(
+        blank=True, 
+        help_text="Optional description of this portfolio folder"
+    )
+    owner = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='folders',
+        help_text="The user who owns this portfolio folder"
+    )
+    is_public = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_CHOICES,
+        default=VISIBILITY_PUBLIC,
+        help_text="Visibility level of this portfolio folder"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # Optional fields for enhanced portfolio features
+    cover_image = models.ImageField(
+        upload_to='folder_covers/', 
+        blank=True, 
+        null=True,
+        storage=s3_storage if settings.USE_S3 else None,
+        help_text="Optional cover image for the portfolio folder"
+    )
+    slug = models.SlugField(
+        max_length=250, 
+        blank=True,
+        help_text="URL-friendly version of the folder name"
+    )
+    
+    class Meta:
+        ordering = ['-updated_at', '-created_at']
+        unique_together = ['owner', 'slug']  # Ensure unique slugs per user
+        verbose_name = 'Portfolio Folder'
+        verbose_name_plural = 'Portfolio Folders'
+    
+    def __str__(self):
+        return f"{self.owner.username}'s {self.name}"
+    
+    def get_absolute_url(self):
+        """Return the URL for this folder."""
+        return f"/profile/{self.owner.username}/folder/{self.slug}/"
+    
+    def artwork_count(self):
+        """Return the number of artworks in this folder."""
+        return self.artworks.count()
+    
+    def is_viewable_by(self, user):
+        """Check if a user can view this folder."""
+        if self.is_public == self.VISIBILITY_PUBLIC:
+            return True
+        elif self.is_public == self.VISIBILITY_PRIVATE:
+            return user == self.owner
+        elif self.is_public == self.VISIBILITY_UNLISTED:
+            return True  # Accessible with direct link
+        return False
+    
+    def save(self, *args, **kwargs):
+        """Override save to auto-generate slug if not provided."""
+        if not self.slug:
+            from django.utils.text import slugify
+            import uuid
+            base_slug = slugify(self.name)
+            unique_slug = base_slug
+            counter = 1
+            
+            # Ensure slug uniqueness for this user
+            while Folder.objects.filter(owner=self.owner, slug=unique_slug).exists():
+                unique_slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            self.slug = unique_slug
+        
+        super().save(*args, **kwargs)
+
 class ArtWork(models.Model):
     """
     Model representing an artwork submitted by a user.
@@ -91,6 +189,16 @@ class ArtWork(models.Model):
     medium = models.CharField(max_length=100, blank=True)  # e.g., "Oil painting", "Digital art"
     dimensions = models.CharField(max_length=100, blank=True)  # e.g., "24x36 inches"
     tags = models.CharField(max_length=200, blank=True)  # Comma-separated tags
+    
+    # Portfolio folder organization
+    folder = models.ForeignKey(
+        Folder,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='artworks',
+        help_text="Optional portfolio folder this artwork belongs to"
+    )
     
     # Users who liked this artwork
     likes = models.ManyToManyField(
