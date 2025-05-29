@@ -25,7 +25,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --reuse-port --reload main:app"
+args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 waitForPort = 5000
 
 [[workflows.workflow]]
@@ -40,7 +40,3 @@ args = "gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 main:app"
 [env]
 SSL_ENABLED = "false"
 REPLIT_HEALTHCHECK_PATH = "/api/health/"
-
-[[ports]]
-localPort = 5000
-externalPort = 80

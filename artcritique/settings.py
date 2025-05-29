@@ -26,11 +26,11 @@ SECRET_KEY = 'django-insecure-1234567890abcdefghijklmnopqrstuvwxyz'
 DEBUG = True
 
 # Allow all hosts
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*', '.replit.app']
 
 # Get Replit domain from environment
 REPLIT_DOMAIN = os.environ.get('REPLIT_DOMAIN', '*')
-CSRF_TRUSTED_ORIGINS = [f'https://{REPLIT_DOMAIN}', f'https://*.{REPLIT_DOMAIN}']
+CSRF_TRUSTED_ORIGINS = [f'https://{REPLIT_DOMAIN}', f'https://*.{REPLIT_DOMAIN}', 'https://*.replit.app']
 
 # Configure SSL based on environment variable
 # Forced to False for Replit to work with the load balancer
