@@ -30,7 +30,14 @@ ALLOWED_HOSTS = ['*', '.replit.app']
 
 # Get Replit domain from environment
 REPLIT_DOMAIN = os.environ.get('REPLIT_DOMAIN', '*')
-CSRF_TRUSTED_ORIGINS = [f'https://{REPLIT_DOMAIN}', f'https://*.{REPLIT_DOMAIN}', 'https://*.replit.app']
+CSRF_TRUSTED_ORIGINS = [
+    'https://brushup.replit.app',
+    'https://*.replit.app',
+    'https://*.replit.dev',
+    'https://61dced89-3318-4924-8e29-81233afc8678-00-qa67r5b70zxi.worf.replit.dev',
+    f'https://{REPLIT_DOMAIN}',
+    f'https://*.{REPLIT_DOMAIN}'
+]
 
 # Configure SSL based on environment variable
 # Forced to False for Replit to work with the load balancer
