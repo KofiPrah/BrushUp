@@ -2,10 +2,11 @@ modules = ["python-3.11", "postgresql-16", "nodejs-20", "python3"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["awscli2", "cargo", "freetype", "jre17_minimal", "lcms2", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pkg-config", "postgresql", "rustc", "tcl", "tk", "zlib"]
+packages = ["awscli2", "cargo", "freetype", "jre17_minimal", "lcms2", "libiconv", "libimagequant", "libjpeg", "libtiff", "libwebp", "libxcrypt", "openjpeg", "openssl", "pkg-config", "postgresql", "rustc", "tcl", "tk", "zlib", "lsof"]
 
 [deployment]
 deploymentTarget = "autoscale"
+run = ["sh", "-c", "gunicorn --bind 0.0.0.0:${PORT:-8080} --workers 2 artcritique.wsgi:application"]
 
 [workflows]
 runButton = "HTTP Server"
@@ -35,7 +36,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "gunicorn --bind 0.0.0.0:5000 --workers 2 --threads 2 artcritique.wsgi:application"
+args = "gunicorn --bind 0.0.0.0:5000 --workers 2 --reload artcritique.wsgi:application"
 
 [env]
 SSL_ENABLED = "false"
@@ -44,3 +45,7 @@ REPLIT_HEALTHCHECK_PATH = "/api/health/"
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 8080
+externalPort = 8080
