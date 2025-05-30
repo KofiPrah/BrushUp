@@ -13,6 +13,8 @@ import Register from './pages/Register';
 
 // Components
 import Navbar from './components/Navbar';
+import ProfilePage from './components/ProfilePage';
+import ArtworkForm from './components/ArtworkForm';
 
 // Authentication Context
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -78,12 +80,13 @@ const AppRoutes = () => {
             path="/profile" 
             element={
               <ProtectedRoute>
-                <div className="container mt-5">
-                  <h2>Profile Page</h2>
-                  <p>This page will display your profile information</p>
-                </div>
+                <ProfilePage />
               </ProtectedRoute>
             } 
+          />
+          <Route 
+            path="/profile/:username" 
+            element={<ProfilePage />} 
           />
           <Route 
             path="/my-artworks" 
@@ -100,7 +103,15 @@ const AppRoutes = () => {
             path="/upload" 
             element={
               <ProtectedRoute>
-                <ArtworkUpload />
+                <ArtworkForm mode="create" />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/artwork/:id/edit" 
+            element={
+              <ProtectedRoute>
+                <ArtworkForm mode="edit" />
               </ProtectedRoute>
             } 
           />
@@ -132,38 +143,37 @@ const AppRoutes = () => {
         </Routes>
       </main>
         
-        <footer className="bg-dark text-light mt-5 py-4">
-          <div className="container">
-            <div className="row">
-              <div className="col-md-6">
-                <h5>Art Critique</h5>
-                <p>A community platform for artists to share work and receive constructive feedback.</p>
-              </div>
-              <div className="col-md-3">
-                <h5>Links</h5>
-                <ul className="list-unstyled">
-                  <li><a href="/" className="text-light">Home</a></li>
-                  <li><a href="/artworks" className="text-light">Browse Artworks</a></li>
-                  <li><a href="/login" className="text-light">Login</a></li>
-                </ul>
-              </div>
-              <div className="col-md-3">
-                <h5>Connect</h5>
-                <ul className="list-unstyled">
-                  <li><a href="#" className="text-light">About Us</a></li>
-                  <li><a href="#" className="text-light">Contact</a></li>
-                  <li><a href="#" className="text-light">Privacy Policy</a></li>
-                </ul>
-              </div>
+      <footer className="bg-dark text-light mt-5 py-4">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6">
+              <h5>Art Critique</h5>
+              <p>A community platform for artists to share work and receive constructive feedback.</p>
             </div>
-            <div className="row mt-3">
-              <div className="col-12 text-center">
-                <p className="mb-0">&copy; {new Date().getFullYear()} Art Critique. All rights reserved.</p>
-              </div>
+            <div className="col-md-3">
+              <h5>Links</h5>
+              <ul className="list-unstyled">
+                <li><a href="/" className="text-light">Home</a></li>
+                <li><a href="/artworks" className="text-light">Browse Artworks</a></li>
+                <li><a href="/login" className="text-light">Login</a></li>
+              </ul>
+            </div>
+            <div className="col-md-3">
+              <h5>Connect</h5>
+              <ul className="list-unstyled">
+                <li><a href="#" className="text-light">About Us</a></li>
+                <li><a href="#" className="text-light">Contact</a></li>
+                <li><a href="#" className="text-light">Privacy Policy</a></li>
+              </ul>
             </div>
           </div>
-        </footer>
-      </div>
+          <div className="row mt-3">
+            <div className="col-12 text-center">
+              <p className="mb-0">&copy; {new Date().getFullYear()} Art Critique. All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
