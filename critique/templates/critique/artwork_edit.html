@@ -47,6 +47,14 @@
                             <div class="form-text text-muted">Comma-separated tags (e.g., landscape, portrait, abstract)</div>
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="id_folder" class="form-label">Portfolio Folder (Optional)</label>
+                            <select class="form-control bg-dark text-white" id="id_folder" name="folder">
+                                <option value="">No folder (appears in main gallery)</option>
+                            </select>
+                            <div class="form-text text-muted">Choose a portfolio folder to organize your artwork</div>
+                        </div>
+                        
                         <div class="mb-4">
                             <label for="id_image" class="form-label">Artwork Image</label>
                             {% if artwork.image %}
@@ -73,4 +81,85 @@
         </div>
     </div>
 </div>
+
+<script>
+// CSRF Token helper function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadUserFoldersForEdit();
+});
+
+function loadUserFoldersForEdit() {
+    fetch('/api/folders/my_folders/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        return { folders: [] };
+    })
+    .then(data => {
+        const folderSelect = document.getElementById('id_folder');
+        const folders = data.folders || [];
+        
+        // Clear existing options except the first one
+        folderSelect.innerHTML = '<option value="">No folder (appears in main gallery)</option>';
+        
+        // Add user's folders
+        folders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder.id;
+            option.textContent = folder.name;
+            folderSelect.appendChild(option);
+        });
+
+        // Get current artwork's folder and select it
+        fetch('/api/artworks/{{ artwork.id }}/', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            credentials: 'same-origin'
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            return {};
+        })
+        .then(artwork => {
+            if (artwork.folder) {
+                folderSelect.value = artwork.folder;
+            }
+        })
+        .catch(error => {
+            console.log('Could not load current folder:', error);
+        });
+    })
+    .catch(error => {
+        console.log('Could not load folders for edit form:', error);
+    });
+}
+</script>
 {% endblock %}

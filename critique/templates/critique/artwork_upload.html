@@ -39,6 +39,14 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label for="folder" class="form-label">Portfolio Folder (Optional)</label>
+                        <select class="form-control" id="folder" name="folder">
+                            <option value="">No folder (appears in main gallery)</option>
+                        </select>
+                        <div class="form-text text-light">Choose a portfolio folder to organize your artwork</div>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="image" class="form-label">Artwork Image</label>
                         <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
                         <div class="form-text text-light">Upload an image of your artwork (JPG, PNG, etc.)</div>
@@ -70,7 +78,26 @@
 </div>
 
 <script>
+// CSRF Token helper function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Load user's folders for the dropdown
+    loadUserFoldersForUpload();
+    
     // Image preview functionality
     const imageInput = document.getElementById('image');
     const imagePreview = document.getElementById('image-preview');
@@ -260,5 +287,42 @@ document.addEventListener('DOMContentLoaded', function() {
     } // End of proceedWithUpload function
     
 });
+
+function loadUserFoldersForUpload() {
+    fetch('/api/folders/my_folders/', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        // If folders can't be loaded, just continue without them
+        return { folders: [] };
+    })
+    .then(data => {
+        const folderSelect = document.getElementById('folder');
+        const folders = data.folders || [];
+        
+        // Clear existing options except the first one
+        folderSelect.innerHTML = '<option value="">No folder (appears in main gallery)</option>';
+        
+        // Add user's folders
+        folders.forEach(folder => {
+            const option = document.createElement('option');
+            option.value = folder.id;
+            option.textContent = folder.name;
+            folderSelect.appendChild(option);
+        });
+    })
+    .catch(error => {
+        console.log('Could not load folders for upload form:', error);
+        // Silently fail - user can still upload without folder selection
+    });
+}
 </script>
 {% endblock %}

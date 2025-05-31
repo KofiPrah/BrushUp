@@ -376,7 +376,7 @@ function getVisibilityIcon(visibility) {
     }
 }
 
-// Handle folder creation form
+// Handle folder creation/edit form
 document.getElementById('createFolderForm').addEventListener('submit', function(e) {
     e.preventDefault();
     
@@ -387,8 +387,13 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
         is_public: formData.get('is_public')
     };
     
-    fetch('/api/folders/', {
-        method: 'POST',
+    const editId = e.target.dataset.editId;
+    const isEdit = !!editId;
+    const url = isEdit ? `/api/folders/${editId}/` : '/api/folders/';
+    const method = isEdit ? 'PATCH' : 'POST';
+    
+    fetch(url, {
+        method: method,
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
@@ -398,7 +403,7 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Failed to create folder');
+            throw new Error(`Failed to ${isEdit ? 'update' : 'create'} folder`);
         }
         return response.json();
     })
@@ -407,17 +412,55 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
         bootstrap.Modal.getInstance(document.getElementById('createFolderModal')).hide();
         loadUserFolders();
         
-        // Reset form
+        // Reset form and edit mode
         e.target.reset();
+        delete e.target.dataset.editId;
+        document.getElementById('createFolderModalLabel').textContent = 'Create New Portfolio Folder';
         
         // Show success message
-        showAlert('Folder created successfully!', 'success');
+        showAlert(`Folder ${isEdit ? 'updated' : 'created'} successfully!`, 'success');
     })
     .catch(error => {
-        console.error('Error creating folder:', error);
-        showAlert('Error creating folder', 'danger');
+        console.error(`Error ${isEdit ? 'updating' : 'creating'} folder:`, error);
+        showAlert(`Error ${isEdit ? 'updating' : 'creating'} folder`, 'danger');
     });
 });
+
+// Reset form when modal is closed
+document.getElementById('createFolderModal').addEventListener('hidden.bs.modal', function() {
+    const form = document.getElementById('createFolderForm');
+    form.reset();
+    delete form.dataset.editId;
+    document.getElementById('createFolderModalLabel').textContent = 'Create New Portfolio Folder';
+});
+
+function editFolder(folderId) {
+    // Fetch folder details and populate edit form
+    fetch(`/api/folders/${folderId}/`, {
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(folder => {
+        document.getElementById('folderName').value = folder.name;
+        document.getElementById('folderDescription').value = folder.description || '';
+        document.getElementById('folderVisibility').value = folder.is_public;
+        document.getElementById('createFolderModalLabel').textContent = 'Edit Folder';
+        
+        // Change form behavior to edit mode
+        const form = document.getElementById('createFolderForm');
+        form.dataset.editId = folderId;
+        
+        const modal = new bootstrap.Modal(document.getElementById('createFolderModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Error fetching folder:', error);
+        showAlert('Error loading folder details', 'danger');
+    });
+}
 
 function deleteFolder(folderId) {
     if (!confirm('Are you sure you want to delete this folder? Artworks will not be deleted, just moved out of the folder.')) {
