@@ -394,7 +394,7 @@ function displayFolders(folders) {
                             </ul>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body" style="cursor: pointer;" onclick="window.location.href='/folders/${folder.id}/'">
                         <div class="d-flex align-items-center mb-2">
                             ${visibilityIcon}
                             <span class="badge bg-secondary ms-2">${folder.artwork_count} artworks</span>
@@ -745,56 +745,8 @@ function assignSelectedArtworksToFolder() {
 }
 
 function viewFolderContents(folderId) {
-    // Show folder contents in the artwork management section
-    const container = document.getElementById('artwork-management-container');
-    container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading folder contents...</span></div></div>';
-    
-    fetch(`/api/folders/${folderId}/artworks/`, {
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const folder = data.folder;
-        const artworks = data.artworks || [];
-        
-        let html = `
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5>Contents of "${folder.name}" (${artworks.length} artworks)</h5>
-                <button class="btn btn-sm btn-secondary" onclick="loadUserArtworks()">Back to All Artworks</button>
-            </div>
-        `;
-        
-        if (artworks.length === 0) {
-            html += '<p class="text-muted text-center">This folder is empty.</p>';
-        } else {
-            html += '<div class="row row-cols-1 row-cols-md-3 g-3">';
-            artworks.forEach(artwork => {
-                const imageUrl = artwork.image_display_url || artwork.image_url || '/static/images/placeholder.jpg';
-                html += `
-                    <div class="col">
-                        <div class="card h-100">
-                            <img src="${imageUrl}" class="card-img-top" alt="${artwork.title}" style="height: 150px; object-fit: cover;">
-                            <div class="card-body">
-                                <h6 class="card-title">${artwork.title}</h6>
-                                <p class="card-text small text-muted">${artwork.description.substring(0, 60)}...</p>
-                                <a href="/artworks/${artwork.id}/" class="btn btn-sm btn-primary">View</a>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-        }
-        
-        container.innerHTML = html;
-    })
-    .catch(error => {
-        console.error('Error loading folder contents:', error);
-        container.innerHTML = '<div class="alert alert-danger">Error loading folder contents</div>';
-    });
+    // Navigate to the dedicated folder page
+    window.location.href = `/folders/${folderId}/`;
 }
 
 // Fix the bulk selection button references

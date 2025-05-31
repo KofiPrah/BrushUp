@@ -33,6 +33,9 @@ urlpatterns = [
     path('my-karma/', views.karma_view, name='my_karma'),
     path('leaderboard/', views.karma_leaderboard, name='karma_leaderboard'),
     
+    # Folder URLs
+    path('folders/<int:folder_id>/', views.folder_detail_view, name='folder_detail'),
+    
     # Authentication test
     path('auth-test/', views.auth_test, name='auth_test'),
 ]

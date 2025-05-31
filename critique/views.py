@@ -7,7 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
-from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction
+from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction, Folder
 from .forms import CommentForm
 from .karma import award_like_karma, award_critique_karma
 import json
@@ -734,3 +734,26 @@ def toggle_reaction_ajax(request, critique_id):
             return JsonResponse({'error': 'Invalid JSON'}, status=400)
     
     return JsonResponse({'error': 'Only POST method is allowed'}, status=405)
+
+def folder_detail_view(request, folder_id):
+    """
+    View for displaying folder contents with all artworks in the folder.
+    """
+    folder = get_object_or_404(Folder, id=folder_id)
+    
+    # Check if user can view this folder
+    if not folder.is_viewable_by(request.user):
+        messages.error(request, "You don't have permission to view this folder.")
+        return redirect('critique:profile')
+    
+    # Get artworks in this folder
+    artworks = folder.artworks.all().order_by('-created_at')
+    
+    context = {
+        'folder': folder,
+        'artworks': artworks,
+        'artwork_count': artworks.count(),
+        'is_owner': folder.owner == request.user,
+    }
+    
+    return render(request, 'critique/folder_detail.html', context)
