@@ -710,7 +710,12 @@ function assignSelectedArtworksToFolder() {
         return;
     }
     
+    console.log('Assigning artworks:', artworkIds, 'to folder:', folderId);
+    
     const promises = artworkIds.map(artworkId => {
+        const folderValue = folderId ? parseInt(folderId) : null;
+        console.log(`Updating artwork ${artworkId} with folder:`, folderValue);
+        
         return fetch(`/api/artworks/${artworkId}/`, {
             method: 'PATCH',
             headers: {
@@ -719,23 +724,38 @@ function assignSelectedArtworksToFolder() {
             },
             credentials: 'same-origin',
             body: JSON.stringify({
-                folder: folderId || null
+                folder: folderValue
             })
+        }).then(response => {
+            console.log(`Response for artwork ${artworkId}:`, response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error(`Error for artwork ${artworkId}:`, text);
+                    return { ok: false, error: text };
+                });
+            }
+            return response.json().then(data => {
+                console.log(`Success for artwork ${artworkId}:`, data);
+                return { ok: true, data };
+            });
         });
     });
     
     Promise.all(promises)
-        .then(responses => {
-            const successCount = responses.filter(r => r.ok).length;
-            if (successCount === artworkIds.length) {
+        .then(results => {
+            const successCount = results.filter(r => r.ok).length;
+            const failedResults = results.filter(r => !r.ok);
+            
+            if (failedResults.length > 0) {
+                console.error('Failed results:', failedResults);
+                showAlert(`Updated ${successCount} of ${artworkIds.length} artworks. Some failed.`, 'warning');
+            } else {
                 showAlert(`Successfully ${folderId ? 'moved' : 'removed'} ${successCount} artwork${successCount > 1 ? 's' : ''} ${folderId ? 'to folder' : 'from folders'}`, 'success');
                 
                 bootstrap.Modal.getInstance(document.getElementById('bulkFolderModal')).hide();
                 selectedArtworks.clear();
                 loadUserArtworks();
                 toggleBulkSelection();
-            } else {
-                showAlert(`Updated ${successCount} of ${artworkIds.length} artworks`, 'warning');
             }
         })
         .catch(error => {
