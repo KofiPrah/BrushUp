@@ -259,6 +259,23 @@
 <script>
 // Folder Management JavaScript
 {% if is_own_profile %}
+
+// CSRF Token helper function
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     loadUserFolders();
 });
@@ -272,10 +289,12 @@ function loadUserFolders() {
     const container = document.getElementById('folders-container');
     
     fetch('/api/folders/my_folders/', {
+        method: 'GET',
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'same-origin'
     })
     .then(response => response.json())
     .then(data => {
@@ -371,9 +390,10 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
     fetch('/api/folders/', {
         method: 'POST',
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token'),
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
         },
+        credentials: 'same-origin',
         body: JSON.stringify(folderData)
     })
     .then(response => {
@@ -407,8 +427,9 @@ function deleteFolder(folderId) {
     fetch(`/api/folders/${folderId}/`, {
         method: 'DELETE',
         headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem('token')
-        }
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        credentials: 'same-origin'
     })
     .then(response => {
         if (!response.ok) {
