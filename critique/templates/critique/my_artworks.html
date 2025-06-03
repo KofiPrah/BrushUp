@@ -788,30 +788,64 @@ function cancelBulkActions() {
 function togglePublishStatus(artworkId) {
     const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
     const currentStatus = artworkItem.dataset.status;
-    const newStatus = currentStatus === 'published' ? 'draft' : 'published';
     
-    // Update UI immediately for better UX
-    artworkItem.dataset.status = newStatus;
-    updateStatusBadges(artworkItem, newStatus);
-    
-    // TODO: Make API call to update status
-    console.log(`Toggling publish status for artwork ${artworkId}: ${currentStatus} -> ${newStatus}`);
-    
-    // Recalculate statistics
-    calculateStatistics();
+    // Make API call to toggle publish status
+    fetch(`/api/artworks/${artworkId}/toggle_publish_status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            const newStatus = data.status;
+            artworkItem.dataset.status = newStatus;
+            updateStatusBadges(artworkItem, newStatus);
+            calculateStatistics();
+            
+            // Show success feedback
+            showToast(`Artwork ${newStatus === 'published' ? 'published' : 'saved as draft'}`, 'success');
+        } else {
+            showToast('Failed to update status', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error toggling publish status:', error);
+        showToast('Failed to update status', 'error');
+    });
 }
 
 function toggleCritiqueRequest(artworkId) {
     const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
-    const currentSeeking = artworkItem.dataset.seekingCritique === 'true';
-    const newSeeking = !currentSeeking;
     
-    artworkItem.dataset.seekingCritique = newSeeking.toString();
-    updateCritiqueBadge(artworkItem, newSeeking);
-    
-    console.log(`Toggling critique request for artwork ${artworkId}: ${currentSeeking} -> ${newSeeking}`);
-    
-    calculateStatistics();
+    // Make API call to toggle critique request
+    fetch(`/api/artworks/${artworkId}/toggle_critique_request/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id !== undefined) {
+            const newSeeking = data.seeking_critique;
+            artworkItem.dataset.seekingCritique = newSeeking.toString();
+            updateCritiqueBadge(artworkItem, newSeeking);
+            calculateStatistics();
+            
+            // Show success feedback
+            showToast(`Critique requests ${newSeeking ? 'enabled' : 'disabled'}`, 'success');
+        } else {
+            showToast('Failed to update critique request', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error toggling critique request:', error);
+        showToast('Failed to update critique request', 'error');
+    });
 }
 
 function updateStatusBadges(artworkItem, status) {

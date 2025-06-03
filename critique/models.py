@@ -171,6 +171,17 @@ class ArtWork(models.Model):
     """
     Model representing an artwork submitted by a user.
     """
+    # Visibility choices
+    VISIBILITY_PUBLIC = 'public'
+    VISIBILITY_PRIVATE = 'private'
+    VISIBILITY_UNLISTED = 'unlisted'
+    
+    VISIBILITY_CHOICES = [
+        (VISIBILITY_PUBLIC, 'Public'),
+        (VISIBILITY_PRIVATE, 'Private'),
+        (VISIBILITY_UNLISTED, 'Unlisted'),
+    ]
+    
     title = models.CharField(max_length=200)
     description = models.TextField()
     image = models.ImageField(upload_to='artworks/', blank=True, null=True,
@@ -184,6 +195,20 @@ class ArtWork(models.Model):
         related_name='artworks',
         null=True,  # Allow null for migration purposes
     )
+    
+    # Draft/Published status
+    is_published = models.BooleanField(default=True, help_text="Whether this artwork is published and visible to others")
+    
+    # Visibility settings
+    visibility = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_CHOICES,
+        default=VISIBILITY_PUBLIC,
+        help_text="Who can see this artwork"
+    )
+    
+    # Critique request flag
+    seeking_critique = models.BooleanField(default=False, help_text="Whether the artist is actively seeking critique for this piece")
     
     # Additional optional fields
     medium = models.CharField(max_length=100, blank=True)  # e.g., "Oil painting", "Digital art"
@@ -213,6 +238,18 @@ class ArtWork(models.Model):
     def total_likes(self):
         """Return the total number of likes for this artwork."""
         return self.likes.count()
+    
+    @property
+    def tags_list(self):
+        """Return tags as a list."""
+        if self.tags:
+            return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
+        return []
+    
+    @property
+    def critique_count(self):
+        """Return the number of critiques for this artwork."""
+        return self.critiques.filter(is_hidden=False).count()
 
 
 class Comment(models.Model):

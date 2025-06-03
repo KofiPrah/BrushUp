@@ -225,6 +225,108 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         """Set the author to the current user when creating an artwork."""
         serializer.save(author=self.request.user)
 
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def toggle_publish_status(self, request, pk=None):
+        """Toggle the publish status of an artwork."""
+        artwork = self.get_object()
+        
+        # Only the author can toggle publish status
+        if artwork.author != request.user:
+            return Response(
+                {"detail": "You don't have permission to modify this artwork."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        artwork.is_published = not artwork.is_published
+        artwork.save()
+        
+        return Response({
+            "id": artwork.id,
+            "is_published": artwork.is_published,
+            "status": "published" if artwork.is_published else "draft"
+        })
+
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def toggle_critique_request(self, request, pk=None):
+        """Toggle the critique request status of an artwork."""
+        artwork = self.get_object()
+        
+        # Only the author can toggle critique request status
+        if artwork.author != request.user:
+            return Response(
+                {"detail": "You don't have permission to modify this artwork."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        artwork.seeking_critique = not artwork.seeking_critique
+        artwork.save()
+        
+        return Response({
+            "id": artwork.id,
+            "seeking_critique": artwork.seeking_critique
+        })
+
+    @action(detail=True, methods=['patch'], permission_classes=[permissions.IsAuthenticated])
+    def quick_edit(self, request, pk=None):
+        """Quick edit artwork fields (title, description, tags)."""
+        artwork = self.get_object()
+        
+        # Only the author can edit
+        if artwork.author != request.user:
+            return Response(
+                {"detail": "You don't have permission to modify this artwork."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Allow updating only specific fields
+        allowed_fields = ['title', 'description', 'tags']
+        update_data = {k: v for k, v in request.data.items() if k in allowed_fields}
+        
+        serializer = self.get_serializer(artwork, data=update_data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def bulk_actions(self, request):
+        """Perform bulk actions on multiple artworks."""
+        artwork_ids = request.data.get('artwork_ids', [])
+        action_type = request.data.get('action', '')
+        
+        if not artwork_ids:
+            return Response(
+                {"detail": "No artwork IDs provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Only get artworks owned by the current user
+        artworks = ArtWork.objects.filter(
+            id__in=artwork_ids,
+            author=request.user
+        )
+        
+        if action_type == 'publish':
+            artworks.update(is_published=True)
+        elif action_type == 'draft':
+            artworks.update(is_published=False)
+        elif action_type == 'toggle_critique':
+            for artwork in artworks:
+                artwork.seeking_critique = not artwork.seeking_critique
+                artwork.save()
+        elif action_type == 'delete':
+            artworks.delete()
+            return Response({"detail": f"Deleted {len(artwork_ids)} artworks."})
+        else:
+            return Response(
+                {"detail": "Invalid action type."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return Response({
+            "detail": f"Action '{action_type}' applied to {artworks.count()} artworks."
+        })
+
     @action(detail=False, methods=['get'])
     def my_artworks(self, request):
         """Get the current user's artworks."""
