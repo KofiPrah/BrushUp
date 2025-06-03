@@ -198,14 +198,16 @@ class ArtWorkListSerializer(serializers.ModelSerializer):
     """Simplified serializer for listing artwork."""
     author_name = serializers.CharField(source='author.username', read_only=True)
     likes_count = serializers.SerializerMethodField()
+    folder_name = serializers.CharField(source='folder.name', read_only=True)
+    folder_id = serializers.IntegerField(source='folder.id', read_only=True)
 
     tags_list = serializers.SerializerMethodField()
     image_display_url = serializers.SerializerMethodField()
     
     class Meta:
         model = ArtWork
-        fields = ['id', 'title', 'image_display_url', 'author_name', 'created_at', 
-                 'medium', 'likes_count', 'tags_list']
+        fields = ['id', 'title', 'description', 'image_display_url', 'author_name', 'created_at', 
+                 'medium', 'likes_count', 'tags_list', 'folder_name', 'folder_id']
                  
     def get_image_display_url(self, obj):
         """Return the URL to display the image, prioritizing S3 storage."""

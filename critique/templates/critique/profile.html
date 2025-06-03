@@ -560,6 +560,7 @@ let selectedArtworks = new Set();
 
 function loadUserArtworks() {
     const container = document.getElementById('artwork-management-container');
+    container.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"><span class="visually-hidden">Loading artworks...</span></div></div>';
     
     fetch('/api/artworks/', {
         method: 'GET',
@@ -576,10 +577,16 @@ function loadUserArtworks() {
         return response.json();
     })
     .then(data => {
+        console.log('API Response:', data);
+        console.log('Current user ID:', {{ user.id }});
+        
         // Filter artworks by current user
-        const userArtworks = (data.results || []).filter(artwork => 
-            artwork.author && artwork.author.id === {{ user.id }}
-        );
+        const userArtworks = (data.results || []).filter(artwork => {
+            console.log('Checking artwork:', artwork.id, 'Author name:', artwork.author_name);
+            return artwork.author_name === '{{ user.username }}';
+        });
+        
+        console.log('Filtered user artworks:', userArtworks);
         displayArtworksForManagement(userArtworks);
     })
     .catch(error => {
@@ -601,6 +608,7 @@ function displayArtworksForManagement(artworks) {
     artworks.forEach(artwork => {
         const imageUrl = artwork.image_display_url || artwork.image_url || '/static/images/placeholder.jpg';
         const folderBadge = artwork.folder_name ? `<span class="badge bg-info">${artwork.folder_name}</span>` : '<span class="badge bg-secondary">No folder</span>';
+        const description = artwork.description || 'No description';
         
         html += `
             <div class="col">
@@ -613,8 +621,11 @@ function displayArtworksForManagement(artworks) {
                     </div>
                     <div class="card-body">
                         <h6 class="card-title">${artwork.title}</h6>
-                        <p class="card-text small text-muted">${artwork.description.substring(0, 60)}...</p>
+                        <p class="card-text small text-muted">${description.substring(0, 60)}...</p>
                         ${folderBadge}
+                        <div class="mt-2">
+                            <small class="text-muted">Created: ${new Date(artwork.created_at).toLocaleDateString()}</small>
+                        </div>
                     </div>
                 </div>
             </div>
