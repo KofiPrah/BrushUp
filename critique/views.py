@@ -175,6 +175,7 @@ def profile_view(request):
         'critiques_count': critiques_count,
         'likes_count': likes_count,
         'is_own_profile': True,  # Flag to indicate this is the user's own profile
+        'public_folders': None,  # Own profile doesn't show public folders section
     }
     
     return render(request, 'critique/profile.html', context=context)
@@ -196,6 +197,14 @@ def user_profile_view(request, username):
     # Check if this is the user's own profile
     is_own_profile = request.user.is_authenticated and request.user == profile_user
     
+    # Get public folders for other users' profiles
+    public_folders = None
+    if not is_own_profile:
+        public_folders = Folder.objects.filter(
+            owner=profile_user, 
+            is_public=Folder.VISIBILITY_PUBLIC
+        ).order_by('-created_at')
+    
     context = {
         'profile': profile,
         'profile_user': profile_user,
@@ -203,6 +212,7 @@ def user_profile_view(request, username):
         'critiques_count': critiques_count,
         'likes_count': likes_count,
         'is_own_profile': is_own_profile,
+        'public_folders': public_folders,
     }
     
     return render(request, 'critique/profile.html', context=context)

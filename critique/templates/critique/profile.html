@@ -236,6 +236,48 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- Public Folders Section (for other users' profiles) -->
+            {% if not is_own_profile %}
+            <div class="card border-0 shadow-sm mt-4">
+                <div class="card-header bg-dark text-white">
+                    <h2 class="mb-0">{{ profile_user.username }}'s Public Folders</h2>
+                </div>
+                <div class="card-body">
+                    {% if public_folders %}
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                            {% for folder in public_folders %}
+                                <div class="col">
+                                    <div class="card h-100 folder-card" style="cursor: pointer;" onclick="window.location.href='{% url 'critique:folder_detail' folder.id %}'">
+                                        <div class="card-body">
+                                            <div class="d-flex align-items-center mb-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-folder text-warning me-2" viewBox="0 0 16 16">
+                                                    <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h4.672a2 2 0 0 1 2 2l-.04.87a1.99 1.99 0 0 1-.342 1.311l-1.446 2.169a1 1 0 0 1-.831.445H2.5a1 1 0 0 1-.83-.445L.224 5.181A1.99 1.99 0 0 1 .54 3.87z"/>
+                                                </svg>
+                                                <h5 class="card-title mb-0">{{ folder.name }}</h5>
+                                            </div>
+                                            {% if folder.description %}
+                                                <p class="card-text text-muted">{{ folder.description|truncatechars:100 }}</p>
+                                            {% endif %}
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    {{ folder.artworks.count }} artwork{{ folder.artworks.count|pluralize }}
+                                                </small>
+                                                <span class="badge bg-success">Public</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <p class="mb-0">{{ profile_user.username }} hasn't created any public folders yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
