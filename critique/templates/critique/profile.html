@@ -186,8 +186,10 @@
                     {% if is_own_profile %}
                         <!-- Dynamic artwork container for own profile -->
                         <div id="artwork-management-container">
-                            <div class="text-center py-4">
-                                <button class="btn btn-primary" onclick="loadUserArtworks()">Load My Artworks</button>
+                            <div class="d-flex justify-content-center py-4">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading artworks...</span>
+                                </div>
                             </div>
                         </div>
                     {% else %}
@@ -425,6 +427,10 @@ function getCookie(name) {
 
 document.addEventListener('DOMContentLoaded', function() {
     loadUserFolders();
+    // Automatically load artworks for own profile
+    {% if is_own_profile %}
+    loadUserArtworks();
+    {% endif %}
 });
 
 function showCreateFolderModal() {
