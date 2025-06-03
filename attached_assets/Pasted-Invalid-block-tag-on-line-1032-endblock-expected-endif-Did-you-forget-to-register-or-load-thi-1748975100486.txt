@@ -1,0 +1,39 @@
+Invalid block tag on line 1032: 'endblock', expected 'endif'. Did you forget to register or load this tag?
+Request Method:	GET
+Request URL:	https://brushup.replit.app/profile/
+Django Version:	5.2.1
+Exception Type:	TemplateSyntaxError
+Exception Value:	
+Invalid block tag on line 1032: 'endblock', expected 'endif'. Did you forget to register or load this tag?
+Exception Location:	/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py, line 567, in invalid_block_tag
+Raised during:	critique.views.profile_view
+Python Executable:	/nix/store/wqhkxzzlaswkj3gimqign99sshvllcg6-python-wrapped-0.1.0/bin/python3
+Python Version:	3.11.10
+Python Path:	
+['/home/runner/workspace',
+ '/home/runner/workspace/.pythonlibs/bin',
+ '/nix/store/lc7qv2ldzrs1aq3hbyzmbgvn0h2w26pl-sitecustomize/lib/python/site-packages',
+ '/nix/store/dfg63lldbvcj207iyr9z0xw21d8ax02n-python3.11-pip-24.0/lib/python3.11/site-packages',
+ '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python311.zip',
+ '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11',
+ '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/lib-dynload',
+ '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages',
+ '/nix/store/clx0mcir7qw8zk36zbr4jra789g3knf6-python3-3.11.10/lib/python3.11/site-packages',
+ '/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages',
+ '/nix/store/wblvmd5y7izx0z10d1w7ga7zc4apjxmb-python3.11-setuptools-75.1.1/lib/python3.11/site-packages']
+Server time:	Tue, 03 Jun 2025 18:24:35 +0000
+Error during template rendering
+In template /home/runner/workspace/critique/templates/critique/profile.html, error at line 1032
+
+Invalid block tag on line 1032: 'endblock', expected 'endif'. Did you forget to register or load this tag?
+1022	        });
+1023	        selectedArtworks.clear();
+1024	        button.innerHTML = 'Select Multiple';
+1025	        button.className = 'btn btn-sm btn-light me-2';
+1026	        bulkActionBtn.disabled = true;
+1027	        updateBulkActionButton();
+1028	    }
+1029	}
+1030	{% endif %}
+1031	</script>
+1032	{% endblock %}
