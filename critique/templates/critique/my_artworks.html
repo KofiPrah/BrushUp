@@ -5,6 +5,34 @@
 {% block extra_css %}
 <style>
 /* Studio Workspace Styling */
+.studio-filters-panel {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+    border: 1px solid #e9ecef !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+}
+
+.studio-filters-panel .form-label {
+    color: #0d6efd;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.studio-filters-panel .form-control,
+.studio-filters-panel .form-select {
+    border: 2px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.studio-filters-panel .form-control:focus,
+.studio-filters-panel .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15);
+}
+
+.studio-filters-panel .border-primary {
+    border-color: #0d6efd !important;
+}
+
 .artwork-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border: 1px solid #e0e0e0;
@@ -59,16 +87,6 @@
 .badge {
     font-size: 0.7rem;
     letter-spacing: 0.5px;
-}
-
-.bg-light {
-    background-color: #f8f9fa !important;
-    border: 1px solid #e9ecef;
-}
-
-.form-label.fw-semibold {
-    color: #495057;
-    font-size: 0.9rem;
 }
 
 /* Studio Statistics */
@@ -185,13 +203,18 @@
         
         <div class="card-body">
             <!-- Advanced Studio Filters -->
-            <div class="bg-light p-3 rounded mb-4">
-                <div class="row mb-3">
+            <div class="studio-filters-panel bg-white p-4 rounded-3 shadow-sm mb-4">
+                <div class="row g-3 mb-3">
                     <div class="col-md-4">
-                        <label class="form-label fw-semibold">Search & Filter</label>
+                        <label class="form-label fw-semibold text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search me-1" viewBox="0 0 16 16">
+                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            </svg>
+                            Search & Filter
+                        </label>
                         <div class="input-group">
-                            <input type="text" id="searchInput" class="form-control" placeholder="Search by title, tags, or description...">
-                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                            <input type="text" id="searchInput" class="form-control border-primary" placeholder="Search by title, tags, or description...">
+                            <button class="btn btn-primary" type="button" id="searchButton">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
                                     <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                                 </svg>
@@ -200,8 +223,14 @@
                     </div>
                     
                     <div class="col-md-2">
-                        <label class="form-label fw-semibold">Status</label>
-                        <select id="statusFilter" class="form-select">
+                        <label class="form-label fw-semibold text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-text me-1" viewBox="0 0 16 16">
+                                <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
+                                <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                            </svg>
+                            Status
+                        </label>
+                        <select id="statusFilter" class="form-select border-primary">
                             <option value="all">All Status</option>
                             <option value="draft">Drafts Only</option>
                             <option value="published">Published</option>
@@ -209,8 +238,14 @@
                     </div>
                     
                     <div class="col-md-2">
-                        <label class="form-label fw-semibold">Visibility</label>
-                        <select id="visibilityFilter" class="form-select">
+                        <label class="form-label fw-semibold text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye me-1" viewBox="0 0 16 16">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                            </svg>
+                            Visibility
+                        </label>
+                        <select id="visibilityFilter" class="form-select border-primary">
                             <option value="all">All Visibility</option>
                             <option value="public">Public</option>
                             <option value="private">Private</option>
@@ -219,8 +254,14 @@
                     </div>
                     
                     <div class="col-md-2">
-                        <label class="form-label fw-semibold">Critique Status</label>
-                        <select id="critiqueFilter" class="form-select">
+                        <label class="form-label fw-semibold text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots me-1" viewBox="0 0 16 16">
+                                <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+                            </svg>
+                            Critique Status
+                        </label>
+                        <select id="critiqueFilter" class="form-select border-primary">
                             <option value="all">All</option>
                             <option value="seeking">Seeking Critique</option>
                             <option value="not_seeking">Not Seeking</option>
@@ -228,8 +269,13 @@
                     </div>
                     
                     <div class="col-md-2">
-                        <label class="form-label fw-semibold">Sort By</label>
-                        <select id="sortDropdown" class="form-select">
+                        <label class="form-label fw-semibold text-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sort-down me-1" viewBox="0 0 16 16">
+                                <path d="M3.5 2.5a.5.5 0 0 0-1 0v8.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L3.5 11.293V2.5zm3.5 1a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM7.5 6a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zm0 3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1h-3zm0 3a.5.5 0 0 0 0 1h1a.5.5 0 0 0 0-1h-1z"/>
+                            </svg>
+                            Sort By
+                        </label>
+                        <select id="sortDropdown" class="form-select border-primary">
                             <option value="newest">Recent First</option>
                             <option value="oldest">Oldest First</option>
                             <option value="most_likes">Most Popular</option>
@@ -951,27 +997,195 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Placeholder bulk action functions - to be implemented with API calls
+// Bulk action functions with API calls
 function bulkPublish() {
-    console.log('Publishing selected artworks:', Array.from(selectedArtworks));
-    // TODO: Implement bulk publish API call
+    if (selectedArtworks.size === 0) return;
+    
+    fetch('/api/artworks/bulk_actions/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            artwork_ids: Array.from(selectedArtworks),
+            action: 'publish'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast(`Published ${selectedArtworks.size} artworks`, 'success');
+        // Update UI for selected artworks
+        selectedArtworks.forEach(id => {
+            const item = document.querySelector(`[data-artwork-id="${id}"]`);
+            if (item) {
+                item.dataset.status = 'published';
+                updateStatusBadges(item, 'published');
+            }
+        });
+        calculateStatistics();
+        cancelBulkActions();
+    })
+    .catch(error => {
+        console.error('Bulk publish error:', error);
+        showToast('Failed to publish artworks', 'error');
+    });
 }
 
 function bulkDraft() {
-    console.log('Marking selected artworks as draft:', Array.from(selectedArtworks));
-    // TODO: Implement bulk draft API call
+    if (selectedArtworks.size === 0) return;
+    
+    fetch('/api/artworks/bulk_actions/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            artwork_ids: Array.from(selectedArtworks),
+            action: 'draft'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast(`Marked ${selectedArtworks.size} artworks as draft`, 'success');
+        // Update UI for selected artworks
+        selectedArtworks.forEach(id => {
+            const item = document.querySelector(`[data-artwork-id="${id}"]`);
+            if (item) {
+                item.dataset.status = 'draft';
+                updateStatusBadges(item, 'draft');
+            }
+        });
+        calculateStatistics();
+        cancelBulkActions();
+    })
+    .catch(error => {
+        console.error('Bulk draft error:', error);
+        showToast('Failed to mark artworks as draft', 'error');
+    });
 }
 
 function bulkToggleCritique() {
-    console.log('Toggling critique requests for selected artworks:', Array.from(selectedArtworks));
-    // TODO: Implement bulk critique toggle API call
+    if (selectedArtworks.size === 0) return;
+    
+    fetch('/api/artworks/bulk_actions/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            artwork_ids: Array.from(selectedArtworks),
+            action: 'toggle_critique'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showToast(`Toggled critique requests for ${selectedArtworks.size} artworks`, 'success');
+        // Update UI for selected artworks
+        selectedArtworks.forEach(id => {
+            const item = document.querySelector(`[data-artwork-id="${id}"]`);
+            if (item) {
+                const currentSeeking = item.dataset.seekingCritique === 'true';
+                item.dataset.seekingCritique = (!currentSeeking).toString();
+                updateCritiqueBadge(item, !currentSeeking);
+            }
+        });
+        calculateStatistics();
+        cancelBulkActions();
+    })
+    .catch(error => {
+        console.error('Bulk critique toggle error:', error);
+        showToast('Failed to toggle critique requests', 'error');
+    });
 }
 
 function bulkDelete() {
+    if (selectedArtworks.size === 0) return;
+    
     if (confirm(`Are you sure you want to delete ${selectedArtworks.size} selected artworks? This action cannot be undone.`)) {
-        console.log('Deleting selected artworks:', Array.from(selectedArtworks));
-        // TODO: Implement bulk delete API call
+        fetch('/api/artworks/bulk_actions/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                artwork_ids: Array.from(selectedArtworks),
+                action: 'delete'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            showToast(`Deleted ${selectedArtworks.size} artworks`, 'success');
+            // Remove deleted artworks from UI
+            selectedArtworks.forEach(id => {
+                const item = document.querySelector(`[data-artwork-id="${id}"]`);
+                if (item) {
+                    item.remove();
+                }
+            });
+            calculateStatistics();
+            cancelBulkActions();
+        })
+        .catch(error => {
+            console.error('Bulk delete error:', error);
+            showToast('Failed to delete artworks', 'error');
+        });
     }
+}
+
+// Toast notification system
+function showToast(message, type = 'info') {
+    // Remove existing toasts
+    const existingToasts = document.querySelectorAll('.toast-notification');
+    existingToasts.forEach(toast => toast.remove());
+    
+    // Create toast element
+    const toast = document.createElement('div');
+    toast.className = `toast-notification alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed`;
+    toast.style.cssText = `
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: none;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+    `;
+    
+    toast.innerHTML = `
+        <div class="d-flex align-items-center">
+            <div class="me-2">
+                ${type === 'success' ? 
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-check-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M10.97 4.97a.235.235 0 0 0-.02.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-1.071-1.05z"/></svg>' :
+                type === 'error' ? 
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/></svg>' :
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-info-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/></svg>'
+                }
+            </div>
+            <div class="flex-grow-1">${message}</div>
+            <button type="button" class="btn-close ms-2" onclick="this.parentElement.parentElement.remove()"></button>
+        </div>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Animate in
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Auto remove after 4 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
 }
 </script>
 {% endblock %}
