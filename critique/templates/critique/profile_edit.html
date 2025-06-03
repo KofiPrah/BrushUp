@@ -10,7 +10,7 @@
                 <h2 class="mb-0">Edit Profile</h2>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     
                     {% if form.errors %}
@@ -29,9 +29,45 @@
                     {% endif %}
                     
                     <div class="mb-3">
-                        <label for="id_profile_picture" class="form-label">Profile Picture URL</label>
-                        <input type="url" name="profile_picture" class="form-control" id="id_profile_picture" value="{{ form.profile_picture.value|default:'' }}">
-                        <div class="form-text">Enter a URL to your profile picture (optional).</div>
+                        <label for="id_profile_picture" class="form-label">Profile Picture</label>
+                        
+                        <!-- Current profile picture preview -->
+                        {% if user.profile.profile_picture %}
+                        <div class="mb-3">
+                            <img src="{{ user.profile.profile_picture.url }}" alt="Current profile picture" 
+                                 class="rounded-circle" style="width: 80px; height: 80px; object-fit: cover;">
+                            <div class="form-text">Current profile picture</div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Drag and drop upload area -->
+                        <div id="profile-picture-upload" class="border border-2 border-dashed rounded p-4 text-center" 
+                             style="cursor: pointer; transition: all 0.3s ease;" 
+                             ondrop="handleProfilePictureDrop(event)" 
+                             ondragover="handleProfilePictureDragOver(event)"
+                             ondragleave="handleProfilePictureDragLeave(event)"
+                             onclick="document.getElementById('id_profile_picture').click()">
+                            <div id="upload-content">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-cloud-upload text-muted mb-2" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-3.941 2.339A3.5 3.5 0 0 0 2.5 10H6a.5.5 0 0 1 0 1H2.5A2.5 2.5 0 0 1 0 8.5c0-1.076.732-2.037 1.804-2.317A5.53 5.53 0 0 1 4.406 1.342z"/>
+                                    <path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                </svg>
+                                <div>
+                                    <strong>Click to upload</strong> or drag and drop
+                                </div>
+                                <div class="text-muted">JPG, PNG, GIF up to 5MB</div>
+                            </div>
+                            <div id="upload-preview" style="display: none;">
+                                <img id="preview-image" src="" alt="Preview" class="rounded" style="max-width: 200px; max-height: 200px;">
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearProfilePictureUpload()">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="file" name="profile_picture" class="form-control d-none" id="id_profile_picture" 
+                               accept="image/*" onchange="handleProfilePictureFileSelect(event)">
+                        <div class="form-text">Upload a profile picture (optional). Supported formats: JPG, PNG, GIF. Max size: 5MB.</div>
                     </div>
                     
                     <div class="mb-3">
@@ -67,4 +103,98 @@
         </div>
     </div>
 </div>
+
+<script>
+// Profile picture upload functionality
+function handleProfilePictureDragOver(event) {
+    event.preventDefault();
+    const uploadArea = document.getElementById('profile-picture-upload');
+    uploadArea.style.borderColor = '#0d6efd';
+    uploadArea.style.backgroundColor = '#f8f9fa';
+}
+
+function handleProfilePictureDragLeave(event) {
+    event.preventDefault();
+    const uploadArea = document.getElementById('profile-picture-upload');
+    uploadArea.style.borderColor = '#dee2e6';
+    uploadArea.style.backgroundColor = 'transparent';
+}
+
+function handleProfilePictureDrop(event) {
+    event.preventDefault();
+    const uploadArea = document.getElementById('profile-picture-upload');
+    uploadArea.style.borderColor = '#dee2e6';
+    uploadArea.style.backgroundColor = 'transparent';
+    
+    const files = event.dataTransfer.files;
+    if (files.length > 0) {
+        const file = files[0];
+        if (validateProfilePictureFile(file)) {
+            const fileInput = document.getElementById('id_profile_picture');
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+            showProfilePicturePreview(file);
+        }
+    }
+}
+
+function handleProfilePictureFileSelect(event) {
+    const file = event.target.files[0];
+    if (file && validateProfilePictureFile(file)) {
+        showProfilePicturePreview(file);
+    }
+}
+
+function validateProfilePictureFile(file) {
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Please select a valid image file (JPG, PNG, or GIF).');
+        return false;
+    }
+    
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+    if (file.size > maxSize) {
+        alert('File size must be less than 5MB.');
+        return false;
+    }
+    
+    return true;
+}
+
+function showProfilePicturePreview(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const uploadContent = document.getElementById('upload-content');
+        const uploadPreview = document.getElementById('upload-preview');
+        const previewImage = document.getElementById('preview-image');
+        
+        uploadContent.style.display = 'none';
+        uploadPreview.style.display = 'block';
+        previewImage.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function clearProfilePictureUpload() {
+    const fileInput = document.getElementById('id_profile_picture');
+    const uploadContent = document.getElementById('upload-content');
+    const uploadPreview = document.getElementById('upload-preview');
+    
+    fileInput.value = '';
+    uploadContent.style.display = 'block';
+    uploadPreview.style.display = 'none';
+}
+
+// Prevent default drag behaviors on the page
+document.addEventListener('dragover', function(e) {
+    e.preventDefault();
+});
+
+document.addEventListener('drop', function(e) {
+    e.preventDefault();
+});
+</script>
 {% endblock %}
