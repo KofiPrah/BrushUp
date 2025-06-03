@@ -967,23 +967,83 @@ function updateCritiqueBadge(artworkItem, seeking) {
             critiqueBadge.remove();
         }
     }
+    
+    // Update the button icon in quick actions
+    const quickActionsButton = artworkItem.querySelector('[onclick^="toggleCritiqueRequest"]');
+    if (quickActionsButton) {
+        const icon = quickActionsButton.querySelector('svg');
+        if (seeking) {
+            icon.classList.add('text-success');
+        } else {
+            icon.classList.remove('text-success');
+        }
+    }
+}
+
+function changeVisibility(artworkId, newVisibility) {
+    const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
+    
+    fetch(`/api/artworks/${artworkId}/`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            visibility: newVisibility
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            artworkItem.dataset.visibility = newVisibility;
+            updateVisibilityBadge(artworkItem, newVisibility);
+            calculateStatistics();
+            showToast(`Visibility changed to ${newVisibility}`, 'success');
+        } else {
+            showToast('Failed to update visibility', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating visibility:', error);
+        showToast('Failed to update visibility', 'error');
+    });
+}
+
+function updateVisibilityBadge(artworkItem, visibility) {
+    const statusContainer = artworkItem.querySelector('.position-absolute.top-0.end-0');
+    let visibilityBadge = statusContainer.querySelector('.badge.bg-info');
+    
+    // Remove existing visibility badge
+    if (visibilityBadge) {
+        visibilityBadge.remove();
+    }
+    
+    // Add new visibility badge if not public
+    if (visibility !== 'public') {
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-info';
+        badge.textContent = visibility.toUpperCase();
+        statusContainer.querySelector('.d-flex').appendChild(badge);
+    }
 }
 
 // Inline Editing
 function enableInlineEdit(element, fieldType) {
-    const artworkId = element.dataset.artworkId;
-    const currentValue = element.textContent.trim().replace(/\s*$/, ''); // Remove edit icon
+    const artworkCard = element.closest('.artwork-item');
+    const artworkId = artworkCard.dataset.artworkId;
+    const currentValue = element.textContent.trim().replace(/\s*✏️/, ''); // Remove edit icon
     
     // Create input element
     let inputElement;
     if (fieldType === 'description') {
         inputElement = document.createElement('textarea');
-        inputElement.className = 'form-control';
+        inputElement.className = 'form-control form-control-sm';
         inputElement.rows = 3;
     } else {
         inputElement = document.createElement('input');
         inputElement.type = 'text';
-        inputElement.className = 'form-control';
+        inputElement.className = 'form-control form-control-sm';
     }
     
     inputElement.value = currentValue.includes('Click to add') ? '' : currentValue;
@@ -992,17 +1052,47 @@ function enableInlineEdit(element, fieldType) {
     element.style.display = 'none';
     element.parentNode.insertBefore(inputElement, element.nextSibling);
     inputElement.focus();
+    inputElement.select();
     
     // Save on blur or Enter
     const saveEdit = () => {
         const newValue = inputElement.value.trim();
         
-        if (newValue && newValue !== currentValue) {
-            element.textContent = newValue;
-            console.log(`Updating ${fieldType} for artwork ${artworkId}: ${newValue}`);
-            // TODO: Make API call to save changes
+        if (newValue !== currentValue) {
+            // Make API call to save changes
+            const updateData = {};
+            updateData[fieldType] = newValue;
+            
+            fetch(`/api/artworks/${artworkId}/`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(updateData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    element.textContent = newValue || `Click to add ${fieldType}`;
+                    showToast(`${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)} updated`, 'success');
+                } else {
+                    showToast(`Failed to update ${fieldType}`, 'error');
+                    element.textContent = currentValue;
+                }
+            })
+            .catch(error => {
+                console.error(`Error updating ${fieldType}:`, error);
+                showToast(`Failed to update ${fieldType}`, 'error');
+                element.textContent = currentValue;
+            });
         }
         
+        inputElement.remove();
+        element.style.display = '';
+    };
+    
+    const cancelEdit = () => {
         inputElement.remove();
         element.style.display = '';
     };
@@ -1014,8 +1104,8 @@ function enableInlineEdit(element, fieldType) {
             saveEdit();
         }
         if (e.key === 'Escape') {
-            inputElement.remove();
-            element.style.display = '';
+            e.preventDefault();
+            cancelEdit();
         }
     });
 }
