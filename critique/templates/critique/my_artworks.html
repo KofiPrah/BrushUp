@@ -1,101 +1,437 @@
 {% extends "critique/base.html" %}
 
-{% block title %}My Artworks - Art Critique{% endblock %}
+{% block title %}Artist Studio - My Artworks{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Studio Workspace Styling */
+.artwork-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #e0e0e0;
+}
+
+.artwork-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.quick-actions {
+    backdrop-filter: blur(8px);
+    border-radius: 0 0 0.375rem 0.375rem;
+}
+
+.edit-icon {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.artwork-title:hover .edit-icon,
+.artwork-description:hover .edit-icon,
+.artwork-tags:hover .edit-icon {
+    opacity: 0.7;
+}
+
+.artwork-title,
+.artwork-description,
+.artwork-tags {
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.artwork-title:hover,
+.artwork-description:hover,
+.artwork-tags:hover {
+    background-color: rgba(0,123,255,0.1);
+}
+
+.bulk-checkbox {
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+}
+
+.bg-light {
+    background-color: #f8f9fa !important;
+    border: 1px solid #e9ecef;
+}
+
+.form-label.fw-semibold {
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+/* Studio Statistics */
+.border-end.border-light {
+    border-color: rgba(255,255,255,0.3) !important;
+}
+
+/* Filter buttons */
+.btn-outline-primary:hover,
+.btn-outline-success:hover,
+.btn-outline-warning:hover,
+.btn-outline-info:hover {
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .d-flex.gap-2 {
+        flex-wrap: wrap;
+    }
+    
+    .quick-actions {
+        padding: 1rem !important;
+    }
+    
+    .position-absolute.top-0.end-0 {
+        position: relative !important;
+        top: auto !important;
+        end: auto !important;
+        padding: 0.5rem !important;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Success/Error states */
+.status-success {
+    border-left: 4px solid #28a745;
+}
+
+.status-error {
+    border-left: 4px solid #dc3545;
+}
+
+/* Active filter indicator */
+.filter-active {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="container py-5">
     <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">My Artworks</h2>
-            <a href="{% url 'critique:artwork_upload' %}" class="btn btn-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload me-2" viewBox="0 0 16 16">
-                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                </svg>
-                Upload New Artwork
-            </a>
+        <div class="card-header bg-dark text-white">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-palette me-2" viewBox="0 0 16 16">
+                        <path d="M8 5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm4 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM5.5 7a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm.5 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                        <path d="M16 8c0 3.15-1.866 2.585-3.567 2.07C11.42 9.763 10.465 9.473 10 10c-.603.683-.475 1.819-.351 2.92C9.826 14.495 9.996 16 8 16a8 8 0 1 1 8-8z"/>
+                    </svg>
+                    Artist Studio - My Artworks
+                </h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-light btn-sm" onclick="toggleBulkActions()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
+                            <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                            <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
+                        </svg>
+                        Bulk Actions
+                    </button>
+                    <a href="{% url 'critique:artwork_upload' %}" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                        </svg>
+                        New Artwork
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Studio Statistics -->
+            <div class="row text-center">
+                <div class="col-6 col-md-3">
+                    <div class="border-end border-light">
+                        <h5 class="mb-0" id="total-artworks">{{ artworks.count|default:0 }}</h5>
+                        <small class="text-light">Total Pieces</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="border-end border-light">
+                        <h5 class="mb-0" id="draft-count">0</h5>
+                        <small class="text-light">Drafts</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="border-end border-light">
+                        <h5 class="mb-0" id="seeking-critique-count">0</h5>
+                        <small class="text-light">Seeking Critique</small>
+                    </div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <h5 class="mb-0" id="total-interactions">0</h5>
+                    <small class="text-light">Total Interactions</small>
+                </div>
+            </div>
         </div>
         
         <div class="card-body">
-            <!-- Filter and Sort Options -->
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <div class="input-group">
-                        <input type="text" id="searchInput" class="form-control" placeholder="Search your artworks...">
-                        <button class="btn btn-outline-secondary" type="button" id="searchButton">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                            </svg>
-                        </button>
+            <!-- Advanced Studio Filters -->
+            <div class="bg-light p-3 rounded mb-4">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Search & Filter</label>
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Search by title, tags, or description...">
+                            <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="d-flex justify-content-md-end mt-3 mt-md-0">
-                        <select id="sortDropdown" class="form-select" style="max-width: 200px;">
-                            <option value="newest">Newest First</option>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Status</label>
+                        <select id="statusFilter" class="form-select">
+                            <option value="all">All Status</option>
+                            <option value="draft">Drafts Only</option>
+                            <option value="published">Published</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Visibility</label>
+                        <select id="visibilityFilter" class="form-select">
+                            <option value="all">All Visibility</option>
+                            <option value="public">Public</option>
+                            <option value="private">Private</option>
+                            <option value="unlisted">Unlisted</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Critique Status</label>
+                        <select id="critiqueFilter" class="form-select">
+                            <option value="all">All</option>
+                            <option value="seeking">Seeking Critique</option>
+                            <option value="not_seeking">Not Seeking</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">Sort By</label>
+                        <select id="sortDropdown" class="form-select">
+                            <option value="newest">Recent First</option>
                             <option value="oldest">Oldest First</option>
-                            <option value="most_likes">Most Likes</option>
+                            <option value="most_likes">Most Popular</option>
+                            <option value="most_critiques">Most Critiques</option>
                             <option value="title_asc">Title (A-Z)</option>
                             <option value="title_desc">Title (Z-A)</option>
                         </select>
                     </div>
                 </div>
+                
+                <!-- Quick Action Buttons -->
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-sm btn-outline-primary" onclick="filterByTag('recent')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-clock me-1" viewBox="0 0 16 16">
+                            <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+                        </svg>
+                        Last 7 Days
+                    </button>
+                    <button class="btn btn-sm btn-outline-success" onclick="filterByCritiques('active')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chat-dots me-1" viewBox="0 0 16 16">
+                            <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                            <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+                        </svg>
+                        Active Critiques
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning" onclick="showDraftsOnly()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-file-earmark-text me-1" viewBox="0 0 16 16">
+                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/>
+                            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/>
+                        </svg>
+                        Drafts Only
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" onclick="clearAllFilters()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-arrow-clockwise me-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                        </svg>
+                        Clear Filters
+                    </button>
+                </div>
             </div>
             
             {% if artworks %}
-                <div class="row row-cols-1 row-cols-md-3 g-4" id="artworksContainer">
+                <!-- Bulk Actions Bar (Hidden by default) -->
+                <div id="bulk-actions-bar" class="alert alert-info d-none mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><span id="selected-count">0</span> artworks selected</span>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-success" onclick="bulkPublish()">Publish Selected</button>
+                            <button class="btn btn-sm btn-warning" onclick="bulkDraft()">Mark as Draft</button>
+                            <button class="btn btn-sm btn-info" onclick="bulkToggleCritique()">Toggle Critique Requests</button>
+                            <button class="btn btn-sm btn-danger" onclick="bulkDelete()">Delete Selected</button>
+                            <button class="btn btn-sm btn-secondary" onclick="cancelBulkActions()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="artworksContainer">
                     {% for artwork in artworks %}
-                        <div class="col artwork-item">
-                            <div class="card h-100">
-                                <a href="{% url 'critique:artwork_detail' artwork.id %}">
-                                    {% if artwork.image %}
-                                        <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 220px; object-fit: cover;">
-                                    {% elif artwork.image_url %}
-                                        <img src="{{ artwork.image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 220px; object-fit: cover;">
-                                    {% else %}
-                                        <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 220px;">
-                                            <span>No Image</span>
-                                        </div>
-                                    {% endif %}
-                                </a>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ artwork.title }}</h5>
-                                    <p class="card-text text-muted">{{ artwork.created_at|date:"M d, Y" }}</p>
-                                    <p class="card-text">{{ artwork.description|truncatechars:100 }}</p>
-                                    
-                                    {% if artwork.medium %}
-                                        <div class="mb-2">
-                                            <span class="badge bg-secondary">{{ artwork.medium }}</span>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    {% if artwork.tags %}
-                                        <div class="mb-2">
-                                            {% for tag in artwork.tags.split|slice:":3" %}
-                                                <span class="badge bg-primary me-1">{{ tag }}</span>
-                                            {% endfor %}
-                                        </div>
-                                    {% endif %}
+                        <div class="col artwork-item" data-artwork-id="{{ artwork.id }}" 
+                             data-status="{% if artwork.is_published %}published{% else %}draft{% endif %}"
+                             data-visibility="{{ artwork.visibility|default:'public' }}"
+                             data-seeking-critique="{% if artwork.seeking_critique %}true{% else %}false{% endif %}">
+                            <div class="card h-100 position-relative artwork-card">
+                                <!-- Bulk Selection Checkbox -->
+                                <div class="bulk-checkbox position-absolute top-0 start-0 p-2 d-none">
+                                    <input type="checkbox" class="form-check-input artwork-checkbox" onchange="updateBulkSelection()">
                                 </div>
-                                <div class="card-footer bg-transparent">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
-                                                <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
-                                            </svg>
-                                            {{ artwork.total_likes }} likes
-                                        </small>
-                                        <div>
-                                            <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-primary">View</a>
-                                            <a href="{% url 'critique:artwork_edit' artwork.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
-                                            <a href="{% url 'critique:artwork_delete' artwork.id %}" class="btn btn-sm btn-outline-danger">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                                </svg>
-                                            </a>
+                                
+                                <!-- Status Indicators -->
+                                <div class="position-absolute top-0 end-0 p-2">
+                                    <div class="d-flex flex-column gap-1">
+                                        {% if not artwork.is_published %}
+                                            <span class="badge bg-warning text-dark">DRAFT</span>
+                                        {% endif %}
+                                        {% if artwork.visibility == 'private' %}
+                                            <span class="badge bg-dark">PRIVATE</span>
+                                        {% elif artwork.visibility == 'unlisted' %}
+                                            <span class="badge bg-secondary">UNLISTED</span>
+                                        {% endif %}
+                                        {% if artwork.seeking_critique %}
+                                            <span class="badge bg-success">SEEKING CRITIQUE</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Image Container -->
+                                <div class="position-relative">
+                                    <a href="{% url 'critique:artwork_detail' artwork.id %}">
+                                        {% if artwork.image %}
+                                            <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover;">
+                                        {% elif artwork.image_url %}
+                                            <img src="{{ artwork.image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 200px;">
+                                                <span>No Image</span>
+                                            </div>
+                                        {% endif %}
+                                    </a>
+                                    
+                                    <!-- Quick Action Overlay -->
+                                    <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2 quick-actions" style="opacity: 0; transition: opacity 0.3s;">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex gap-1">
+                                                <button class="btn btn-sm btn-outline-light" onclick="togglePublishStatus({{ artwork.id }})" title="Toggle Publish Status">
+                                                    {% if artwork.is_published %}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-eye-slash" viewBox="0 0 16 16">
+                                                            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                                            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                                            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                                        </svg>
+                                                    {% else %}
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+                                                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                                                        </svg>
+                                                    {% endif %}
+                                                </button>
+                                                <button class="btn btn-sm btn-outline-light" onclick="toggleCritiqueRequest({{ artwork.id }})" title="Toggle Critique Request">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
+                                                        <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                                        <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                            <div class="d-flex gap-1">
+                                                <button class="btn btn-sm btn-outline-light" onclick="openQuickEdit({{ artwork.id }})" title="Quick Edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+                                                        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L10.5 8.207l-3-3L12.146.146zM11.207 9l-3-3L2.5 11.707V15h3.293L11.207 9zM13 2.5a.5.5 0 0 0-.5-.5h-2.797l-1.5 1.5h3.797V2.5z"/>
+                                                    </svg>
+                                                </button>
+                                                <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-light" title="View Details">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                                                    </svg>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
+                                </div>
+                                
+                                <!-- Card Body with Inline Editing -->
+                                <div class="card-body">
+                                    <!-- Editable Title -->
+                                    <h5 class="card-title artwork-title" data-artwork-id="{{ artwork.id }}" onclick="enableInlineEdit(this, 'title')">
+                                        {{ artwork.title }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-pencil ms-1 edit-icon" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L10.5 8.207l-3-3L12.146.146zM11.207 9l-3-3L2.5 11.707V15h3.293L11.207 9zM13 2.5a.5.5 0 0 0-.5-.5h-2.797l-1.5 1.5h3.797V2.5z"/>
+                                        </svg>
+                                    </h5>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <small class="text-muted">{{ artwork.created_at|date:"M d, Y" }}</small>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <small class="text-muted">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-heart me-1" viewBox="0 0 16 16">
+                                                    <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15z"/>
+                                                </svg>
+                                                {{ artwork.total_likes|default:0 }}
+                                            </small>
+                                            <small class="text-muted">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-chat-dots me-1" viewBox="0 0 16 16">
+                                                    <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                                    <path d="m2.165 15.803.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a10.97 10.97 0 0 0 .398-2z"/>
+                                                </svg>
+                                                {{ artwork.critique_count|default:0 }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Editable Description -->
+                                    <p class="card-text artwork-description" data-artwork-id="{{ artwork.id }}" onclick="enableInlineEdit(this, 'description')">
+                                        {{ artwork.description|truncatechars:120|default:"Click to add description..." }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-pencil ms-1 edit-icon" viewBox="0 0 16 16">
+                                            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L10.5 8.207l-3-3L12.146.146zM11.207 9l-3-3L2.5 11.707V15h3.293L11.207 9zM13 2.5a.5.5 0 0 0-.5-.5h-2.797l-1.5 1.5h3.797V2.5z"/>
+                                        </svg>
+                                    </p>
+                                    
+                                    <!-- Tags Section -->
+                                    <div class="mb-2">
+                                        <div class="artwork-tags" data-artwork-id="{{ artwork.id }}" onclick="enableInlineEdit(this, 'tags')">
+                                            {% if artwork.tags %}
+                                                {% for tag in artwork.tags_list|slice:":4" %}
+                                                    <span class="badge bg-primary me-1">{{ tag }}</span>
+                                                {% endfor %}
+                                                {% if artwork.tags_list|length > 4 %}
+                                                    <span class="badge bg-secondary">+{{ artwork.tags_list|length|add:"-4" }} more</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="text-muted small">Click to add tags...</span>
+                                            {% endif %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-pencil ms-1 edit-icon" viewBox="0 0 16 16">
+                                                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708L10.5 8.207l-3-3L12.146.146zM11.207 9l-3-3L2.5 11.707V15h3.293L11.207 9zM13 2.5a.5.5 0 0 0-.5-.5h-2.797l-1.5 1.5h3.797V2.5z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Medium Badge -->
+                                    {% if artwork.medium %}
+                                        <span class="badge bg-secondary">{{ artwork.medium }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -187,76 +523,421 @@
 </div>
 
 <script>
+let bulkActionsMode = false;
+let selectedArtworks = new Set();
+
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-    const sortDropdown = document.getElementById('sortDropdown');
-    const artworksContainer = document.getElementById('artworksContainer');
+    initializeStudioWorkspace();
+    calculateStatistics();
+    setupEventListeners();
+    setupHoverEffects();
+});
+
+function initializeStudioWorkspace() {
+    console.log('Initializing Artist Studio Workspace...');
     
-    if (searchInput && searchButton) {
-        // Simple client-side search
-        const searchArtworks = () => {
-            const searchTerm = searchInput.value.toLowerCase();
-            const artworkItems = document.querySelectorAll('.artwork-item');
-            
-            artworkItems.forEach(item => {
-                const title = item.querySelector('.card-title').textContent.toLowerCase();
-                const description = item.querySelector('.card-text:not(.text-muted)').textContent.toLowerCase();
-                
-                if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                    item.style.display = '';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        };
+    // Load user preferences from localStorage
+    const savedFilters = localStorage.getItem('studio_filters');
+    if (savedFilters) {
+        const filters = JSON.parse(savedFilters);
+        applyFilters(filters);
+    }
+}
+
+function calculateStatistics() {
+    const artworkItems = document.querySelectorAll('.artwork-item');
+    let totalArtworks = artworkItems.length;
+    let draftCount = 0;
+    let seekingCritiqueCount = 0;
+    let totalInteractions = 0;
+    
+    artworkItems.forEach(item => {
+        if (item.dataset.status === 'draft') draftCount++;
+        if (item.dataset.seekingCritique === 'true') seekingCritiqueCount++;
         
-        searchButton.addEventListener('click', searchArtworks);
+        const likes = parseInt(item.querySelector('.bi-heart').parentElement.textContent.match(/\d+/)?.[0] || 0);
+        const critiques = parseInt(item.querySelector('.bi-chat-dots').parentElement.textContent.match(/\d+/)?.[0] || 0);
+        totalInteractions += likes + critiques;
+    });
+    
+    document.getElementById('total-artworks').textContent = totalArtworks;
+    document.getElementById('draft-count').textContent = draftCount;
+    document.getElementById('seeking-critique-count').textContent = seekingCritiqueCount;
+    document.getElementById('total-interactions').textContent = totalInteractions;
+}
+
+function setupEventListeners() {
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const visibilityFilter = document.getElementById('visibilityFilter');
+    const critiqueFilter = document.getElementById('critiqueFilter');
+    const sortDropdown = document.getElementById('sortDropdown');
+    
+    // Advanced search and filtering
+    [searchInput, statusFilter, visibilityFilter, critiqueFilter, sortDropdown].forEach(element => {
+        if (element) {
+            element.addEventListener('change', applyFiltersAndSort);
+            element.addEventListener('input', applyFiltersAndSort);
+        }
+    });
+    
+    // Search on Enter key
+    if (searchInput) {
         searchInput.addEventListener('keyup', function(e) {
             if (e.key === 'Enter') {
-                searchArtworks();
+                applyFiltersAndSort();
             }
         });
     }
+}
+
+function setupHoverEffects() {
+    // Show quick actions on hover
+    document.querySelectorAll('.artwork-card').forEach(card => {
+        const quickActions = card.querySelector('.quick-actions');
+        if (quickActions) {
+            card.addEventListener('mouseenter', () => {
+                quickActions.style.opacity = '1';
+            });
+            card.addEventListener('mouseleave', () => {
+                quickActions.style.opacity = '0';
+            });
+        }
+    });
+}
+
+function applyFiltersAndSort() {
+    const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+    const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+    const visibilityFilter = document.getElementById('visibilityFilter')?.value || 'all';
+    const critiqueFilter = document.getElementById('critiqueFilter')?.value || 'all';
+    const sortBy = document.getElementById('sortDropdown')?.value || 'newest';
     
-    if (sortDropdown && artworksContainer) {
-        // Client-side sorting
-        sortDropdown.addEventListener('change', function() {
-            const sortValue = this.value;
-            const artworkItems = Array.from(document.querySelectorAll('.artwork-item'));
+    const artworkItems = Array.from(document.querySelectorAll('.artwork-item'));
+    
+    // Apply filters
+    artworkItems.forEach(item => {
+        let visible = true;
+        
+        // Search filter
+        if (searchTerm) {
+            const title = item.querySelector('.artwork-title').textContent.toLowerCase();
+            const description = item.querySelector('.artwork-description').textContent.toLowerCase();
+            const tags = item.querySelector('.artwork-tags').textContent.toLowerCase();
             
-            artworkItems.sort((a, b) => {
-                const titleA = a.querySelector('.card-title').textContent;
-                const titleB = b.querySelector('.card-title').textContent;
-                const dateA = new Date(a.querySelector('.text-muted').textContent);
-                const dateB = new Date(b.querySelector('.text-muted').textContent);
-                const likesA = parseInt(a.querySelector('small.text-muted').textContent.match(/\d+/)[0]);
-                const likesB = parseInt(b.querySelector('small.text-muted').textContent.match(/\d+/)[0]);
-                
-                switch(sortValue) {
-                    case 'newest':
-                        return dateB - dateA;
-                    case 'oldest':
-                        return dateA - dateB;
-                    case 'most_likes':
-                        return likesB - likesA;
-                    case 'title_asc':
-                        return titleA.localeCompare(titleB);
-                    case 'title_desc':
-                        return titleB.localeCompare(titleA);
-                    default:
-                        return 0;
-                }
-            });
-            
-            // Re-append sorted items
-            artworkItems.forEach(item => {
-                artworksContainer.appendChild(item);
-            });
+            visible = visible && (title.includes(searchTerm) || description.includes(searchTerm) || tags.includes(searchTerm));
+        }
+        
+        // Status filter
+        if (statusFilter !== 'all') {
+            visible = visible && item.dataset.status === statusFilter;
+        }
+        
+        // Visibility filter
+        if (visibilityFilter !== 'all') {
+            visible = visible && item.dataset.visibility === visibilityFilter;
+        }
+        
+        // Critique filter
+        if (critiqueFilter !== 'all') {
+            const seekingCritique = item.dataset.seekingCritique === 'true';
+            visible = visible && ((critiqueFilter === 'seeking' && seekingCritique) || (critiqueFilter === 'not_seeking' && !seekingCritique));
+        }
+        
+        item.style.display = visible ? '' : 'none';
+    });
+    
+    // Apply sorting
+    const visibleItems = artworkItems.filter(item => item.style.display !== 'none');
+    sortArtworks(visibleItems, sortBy);
+    
+    // Save filters to localStorage
+    const filters = { searchTerm, statusFilter, visibilityFilter, critiqueFilter, sortBy };
+    localStorage.setItem('studio_filters', JSON.stringify(filters));
+}
+
+function sortArtworks(items, sortBy) {
+    const container = document.getElementById('artworksContainer');
+    
+    items.sort((a, b) => {
+        const titleA = a.querySelector('.artwork-title').textContent.trim();
+        const titleB = b.querySelector('.artwork-title').textContent.trim();
+        
+        const dateA = new Date(a.querySelector('.text-muted').textContent);
+        const dateB = new Date(b.querySelector('.text-muted').textContent);
+        
+        const likesA = parseInt(a.querySelector('.bi-heart').parentElement.textContent.match(/\d+/)?.[0] || 0);
+        const likesB = parseInt(b.querySelector('.bi-heart').parentElement.textContent.match(/\d+/)?.[0] || 0);
+        
+        const critiquesA = parseInt(a.querySelector('.bi-chat-dots').parentElement.textContent.match(/\d+/)?.[0] || 0);
+        const critiquesB = parseInt(b.querySelector('.bi-chat-dots').parentElement.textContent.match(/\d+/)?.[0] || 0);
+        
+        switch(sortBy) {
+            case 'newest':
+                return dateB - dateA;
+            case 'oldest':
+                return dateA - dateB;
+            case 'most_likes':
+                return likesB - likesA;
+            case 'most_critiques':
+                return critiquesB - critiquesA;
+            case 'title_asc':
+                return titleA.localeCompare(titleB);
+            case 'title_desc':
+                return titleB.localeCompare(titleA);
+            default:
+                return 0;
+        }
+    });
+    
+    // Re-append sorted items
+    items.forEach(item => {
+        container.appendChild(item);
+    });
+}
+
+// Quick filter functions
+function filterByTag(tag) {
+    const searchInput = document.getElementById('searchInput');
+    if (tag === 'recent') {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        
+        document.querySelectorAll('.artwork-item').forEach(item => {
+            const dateText = item.querySelector('.text-muted').textContent;
+            const itemDate = new Date(dateText);
+            item.style.display = itemDate >= weekAgo ? '' : 'none';
         });
     }
+}
+
+function filterByCritiques(type) {
+    document.getElementById('critiqueFilter').value = type === 'active' ? 'seeking' : 'all';
+    applyFiltersAndSort();
+}
+
+function showDraftsOnly() {
+    document.getElementById('statusFilter').value = 'draft';
+    applyFiltersAndSort();
+}
+
+function clearAllFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('statusFilter').value = 'all';
+    document.getElementById('visibilityFilter').value = 'all';
+    document.getElementById('critiqueFilter').value = 'all';
+    document.getElementById('sortDropdown').value = 'newest';
     
-    // Edit functionality is now handled by direct links to the edit page
-});
+    document.querySelectorAll('.artwork-item').forEach(item => {
+        item.style.display = '';
+    });
+    
+    localStorage.removeItem('studio_filters');
+}
+
+// Bulk Actions
+function toggleBulkActions() {
+    bulkActionsMode = !bulkActionsMode;
+    const checkboxes = document.querySelectorAll('.bulk-checkbox');
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
+    
+    if (bulkActionsMode) {
+        checkboxes.forEach(cb => cb.classList.remove('d-none'));
+        bulkBar.classList.remove('d-none');
+        toggleBtn.classList.add('active');
+        toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg> Cancel';
+    } else {
+        cancelBulkActions();
+    }
+}
+
+function updateBulkSelection() {
+    const checkboxes = document.querySelectorAll('.artwork-checkbox:checked');
+    selectedArtworks.clear();
+    
+    checkboxes.forEach(cb => {
+        const artworkId = cb.closest('.artwork-item').dataset.artworkId;
+        selectedArtworks.add(artworkId);
+    });
+    
+    document.getElementById('selected-count').textContent = selectedArtworks.size;
+}
+
+function cancelBulkActions() {
+    bulkActionsMode = false;
+    selectedArtworks.clear();
+    
+    const checkboxes = document.querySelectorAll('.bulk-checkbox');
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
+    
+    checkboxes.forEach(cb => {
+        cb.classList.add('d-none');
+        cb.querySelector('input').checked = false;
+    });
+    
+    bulkBar.classList.add('d-none');
+    toggleBtn.classList.remove('active');
+    toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg> Bulk Actions';
+    
+    document.getElementById('selected-count').textContent = '0';
+}
+
+// Individual Artwork Actions
+function togglePublishStatus(artworkId) {
+    const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
+    const currentStatus = artworkItem.dataset.status;
+    const newStatus = currentStatus === 'published' ? 'draft' : 'published';
+    
+    // Update UI immediately for better UX
+    artworkItem.dataset.status = newStatus;
+    updateStatusBadges(artworkItem, newStatus);
+    
+    // TODO: Make API call to update status
+    console.log(`Toggling publish status for artwork ${artworkId}: ${currentStatus} -> ${newStatus}`);
+    
+    // Recalculate statistics
+    calculateStatistics();
+}
+
+function toggleCritiqueRequest(artworkId) {
+    const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
+    const currentSeeking = artworkItem.dataset.seekingCritique === 'true';
+    const newSeeking = !currentSeeking;
+    
+    artworkItem.dataset.seekingCritique = newSeeking.toString();
+    updateCritiqueBadge(artworkItem, newSeeking);
+    
+    console.log(`Toggling critique request for artwork ${artworkId}: ${currentSeeking} -> ${newSeeking}`);
+    
+    calculateStatistics();
+}
+
+function updateStatusBadges(artworkItem, status) {
+    const statusContainer = artworkItem.querySelector('.position-absolute.top-0.end-0');
+    const draftBadge = statusContainer.querySelector('.badge.bg-warning');
+    
+    if (status === 'draft') {
+        if (!draftBadge) {
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-warning text-dark';
+            badge.textContent = 'DRAFT';
+            statusContainer.querySelector('.d-flex').appendChild(badge);
+        }
+    } else {
+        if (draftBadge) {
+            draftBadge.remove();
+        }
+    }
+}
+
+function updateCritiqueBadge(artworkItem, seeking) {
+    const statusContainer = artworkItem.querySelector('.position-absolute.top-0.end-0');
+    const critiqueBadge = statusContainer.querySelector('.badge.bg-success');
+    
+    if (seeking) {
+        if (!critiqueBadge) {
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-success';
+            badge.textContent = 'SEEKING CRITIQUE';
+            statusContainer.querySelector('.d-flex').appendChild(badge);
+        }
+    } else {
+        if (critiqueBadge) {
+            critiqueBadge.remove();
+        }
+    }
+}
+
+// Inline Editing
+function enableInlineEdit(element, fieldType) {
+    const artworkId = element.dataset.artworkId;
+    const currentValue = element.textContent.trim().replace(/\s*$/, ''); // Remove edit icon
+    
+    // Create input element
+    let inputElement;
+    if (fieldType === 'description') {
+        inputElement = document.createElement('textarea');
+        inputElement.className = 'form-control';
+        inputElement.rows = 3;
+    } else {
+        inputElement = document.createElement('input');
+        inputElement.type = 'text';
+        inputElement.className = 'form-control';
+    }
+    
+    inputElement.value = currentValue.includes('Click to add') ? '' : currentValue;
+    
+    // Replace element with input
+    element.style.display = 'none';
+    element.parentNode.insertBefore(inputElement, element.nextSibling);
+    inputElement.focus();
+    
+    // Save on blur or Enter
+    const saveEdit = () => {
+        const newValue = inputElement.value.trim();
+        
+        if (newValue && newValue !== currentValue) {
+            element.textContent = newValue;
+            console.log(`Updating ${fieldType} for artwork ${artworkId}: ${newValue}`);
+            // TODO: Make API call to save changes
+        }
+        
+        inputElement.remove();
+        element.style.display = '';
+    };
+    
+    inputElement.addEventListener('blur', saveEdit);
+    inputElement.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            saveEdit();
+        }
+        if (e.key === 'Escape') {
+            inputElement.remove();
+            element.style.display = '';
+        }
+    });
+}
+
+// CSRF Token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Placeholder bulk action functions - to be implemented with API calls
+function bulkPublish() {
+    console.log('Publishing selected artworks:', Array.from(selectedArtworks));
+    // TODO: Implement bulk publish API call
+}
+
+function bulkDraft() {
+    console.log('Marking selected artworks as draft:', Array.from(selectedArtworks));
+    // TODO: Implement bulk draft API call
+}
+
+function bulkToggleCritique() {
+    console.log('Toggling critique requests for selected artworks:', Array.from(selectedArtworks));
+    // TODO: Implement bulk critique toggle API call
+}
+
+function bulkDelete() {
+    if (confirm(`Are you sure you want to delete ${selectedArtworks.size} selected artworks? This action cannot be undone.`)) {
+        console.log('Deleting selected artworks:', Array.from(selectedArtworks));
+        // TODO: Implement bulk delete API call
+    }
+}
 </script>
 {% endblock %}
