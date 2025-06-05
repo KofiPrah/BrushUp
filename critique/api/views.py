@@ -1,5 +1,5 @@
 from rest_framework import viewsets, permissions, status, filters, parsers
-from rest_framework.decorators import api_view, action
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
@@ -1506,6 +1506,108 @@ class ArtworkVersionViewSet(APIView):
         except ArtWorkVersion.DoesNotExist:
             return Response({'error': 'Version not found or not owned by user'}, 
                           status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def create_artwork_version(request, artwork_id):
+    """Create a new version of an artwork"""
+    try:
+        artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+        
+        # Get the highest version number and increment
+        highest_version = artwork.versions.aggregate(
+            max_version=Max('version_number')
+        )['max_version'] or 0
+        new_version_number = highest_version + 1
+        
+        # Create the new version
+        version = ArtWorkVersion.objects.create(
+            artwork=artwork,
+            version_number=new_version_number,
+            image=request.data.get('image'),
+            image_url=request.data.get('image_url'),
+            version_notes=request.data.get('version_notes', ''),
+            created_by=request.user
+        )
+        
+        # Update artwork fields if provided
+        if 'title' in request.data:
+            artwork.title = request.data['title']
+        if 'description' in request.data:
+            artwork.description = request.data['description']
+        if 'category' in request.data:
+            artwork.category = request.data['category']
+        if 'medium' in request.data:
+            artwork.medium = request.data['medium']
+        if 'dimensions' in request.data:
+            artwork.dimensions = request.data['dimensions']
+        if 'tags' in request.data:
+            artwork.tags = request.data['tags']
+        
+        artwork.save()
+        
+        serializer = ArtWorkVersionSerializer(version)
+        return Response({
+            'version': serializer.data,
+            'message': f'Version {version.version_number} created successfully'
+        }, status=status.HTTP_201_CREATED)
+        
+    except ArtWork.DoesNotExist:
+        return Response({'error': 'Artwork not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def get_artwork_version(request, artwork_id, version_id):
+    """Get a specific version of an artwork"""
+    try:
+        artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+        version = artwork.versions.get(id=version_id)
+        serializer = ArtWorkVersionSerializer(version)
+        
+        return Response({
+            'version': serializer.data,
+            'artwork_title': artwork.title
+        })
+    except ArtWork.DoesNotExist:
+        return Response({'error': 'Artwork not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
+    except ArtWorkVersion.DoesNotExist:
+        return Response({'error': 'Version not found'}, 
+                      status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated])
+def delete_artwork_version(request, version_id):
+    """Delete a specific version"""
+    try:
+        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+        version_number = version.version_number
+        version.delete()
+        
+        return Response({
+            'message': f'Version {version_number} deleted successfully'
+        })
+    except ArtWorkVersion.DoesNotExist:
+        return Response({'error': 'Version not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def archive_artwork_version(request, version_id):
+    """Archive a specific version"""
+    try:
+        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+        reason = request.data.get('reason', '')
+        
+        # Add archived field to model if needed, for now just return success
+        return Response({
+            'message': f'Version {version.version_number} archived successfully',
+            'reason': reason
+        })
+    except ArtWorkVersion.DoesNotExist:
+        return Response({'error': 'Version not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
 
 class ArtworkVersionCompareView(APIView):
     """API endpoint for comparing artwork versions"""

@@ -4,7 +4,9 @@ from .views import (
     UserViewSet, ProfileViewSet, ArtWorkViewSet, 
     CritiqueViewSet, health_check,
     ReactionViewSet, NotificationViewSet, FolderViewSet,
-    ArtworkVersionViewSet, ArtworkVersionCompareView, ArtworkVersionRestoreView
+    create_artwork_version, get_artwork_version, 
+    delete_artwork_version, archive_artwork_version,
+    ArtworkVersionCompareView, ArtworkVersionRestoreView
 )
 
 # Create a router and register our viewsets with it
