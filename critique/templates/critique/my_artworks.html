@@ -840,7 +840,9 @@ function clearAllFilters() {
 // Bulk Actions (remove duplicate declaration)
 bulkSelectionMode = false;
 
-function toggleBulkActions() {
+// Ensure function is available after DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+    window.toggleBulkActions = function() {
     console.log('toggleBulkActions called, current mode:', bulkSelectionMode);
     bulkSelectionMode = !bulkSelectionMode;
     const checkboxes = document.querySelectorAll('.artwork-checkbox');
@@ -867,42 +869,43 @@ function toggleBulkActions() {
         console.log('Disabling bulk selection mode');
         cancelBulkActions();
     }
-}
+    };
 
-function toggleArtworkSelection(artworkId, checkbox) {
-    if (checkbox.checked) {
-        selectedArtworks.add(artworkId);
-    } else {
-        selectedArtworks.delete(artworkId);
-    }
-    updateSelectedCount();
-}
+    window.toggleArtworkSelection = function(artworkId, checkbox) {
+        if (checkbox.checked) {
+            selectedArtworks.add(artworkId);
+        } else {
+            selectedArtworks.delete(artworkId);
+        }
+        updateSelectedCount();
+    };
 
-function updateSelectedCount() {
-    document.getElementById('selected-count').textContent = selectedArtworks.size;
-}
+    window.updateSelectedCount = function() {
+        document.getElementById('selected-count').textContent = selectedArtworks.size;
+    };
 
-function cancelBulkActions() {
-    bulkSelectionMode = false;
-    selectedArtworks.clear();
-    
-    const checkboxes = document.querySelectorAll('.artwork-checkbox');
-    const bulkBar = document.getElementById('bulk-actions-bar');
-    const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
-    
-    checkboxes.forEach(cb => {
-        cb.classList.remove('bulk-visible');
-        cb.classList.add('bulk-hidden', 'd-none');
-        const input = cb.querySelector('input');
-        if (input) input.checked = false;
-    });
-    
-    bulkBar.classList.add('d-none');
-    toggleBtn.classList.remove('active');
-    toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg> Bulk Actions';
-    
-    updateSelectedCount();
-}
+    window.cancelBulkActions = function() {
+        bulkSelectionMode = false;
+        selectedArtworks.clear();
+        
+        const checkboxes = document.querySelectorAll('.artwork-checkbox');
+        const bulkBar = document.getElementById('bulk-actions-bar');
+        const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
+        
+        checkboxes.forEach(cb => {
+            cb.classList.remove('bulk-visible');
+            cb.classList.add('bulk-hidden', 'd-none');
+            const input = cb.querySelector('input');
+            if (input) input.checked = false;
+        });
+        
+        bulkBar.classList.add('d-none');
+        toggleBtn.classList.remove('active');
+        toggleBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg> Bulk Actions';
+        
+        updateSelectedCount();
+    };
+});
 
 // Individual Artwork Actions
 function togglePublishStatus(artworkId) {
