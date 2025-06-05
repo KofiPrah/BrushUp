@@ -1,0 +1,106 @@
+Thanks for sharing the `artwork_detail.html`. Here’s what’s likely causing your issues and how to fix them:
+
+---
+
+### 🚨 Problem 1: `${imageSrc}` Not Replaced
+
+Inside your `artwork_detail.html`, you have this line:
+
+```html
+<img src="/artworks/31/${imageSrc}" class="img-fluid" alt="Artwork Image">
+```
+
+This uses JavaScript-style template syntax (`${...}`) **inside an HTML file**, which will not work unless you're dynamically injecting it via JS.
+
+---
+
+### ✅ Fix 1: Use Django Template Tags or JavaScript Properly
+
+If you're rendering with Django templates, replace that line with:
+
+```html
+<img src="{{ version.image_url }}" class="img-fluid" alt="Artwork Image">
+```
+
+Or if you’re rendering with JavaScript, inject the string using backticks:
+
+```js
+document.querySelector('#artwork-image').src = `/artworks/31/${imageSrc}`;
+```
+
+---
+
+### 🚨 Problem 2: `POST /api/versions/3/archive/` 404
+
+This happens because you're calling an endpoint that **doesn't exist** unless explicitly defined in your Django `ViewSet`.
+
+---
+
+### ✅ Fix 2: Add `archive` Custom Action in Django
+
+In your `views.py`:
+
+```python
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+class VersionViewSet(viewsets.ModelViewSet):
+    queryset = Version.objects.all()
+    serializer_class = VersionSerializer
+
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        version = self.get_object()
+        version.is_archived = True
+        version.save()
+        return Response({'status': 'archived'})
+```
+
+In `urls.py`:
+
+```python
+router.register(r'versions', VersionViewSet)
+```
+
+This gives you:
+
+```
+POST /api/versions/<id>/archive/
+```
+
+---
+
+### 🚨 Problem 3: Parsing HTML as JSON
+
+Your frontend expects JSON, but it receives an HTML error page instead — because the backend is sending a 404.
+
+---
+
+### ✅ Fix 3: Guard JSON Parsing in JavaScript
+
+Example:
+
+```js
+fetch(`/api/versions/${versionId}/archive/`, { method: 'POST' })
+  .then(res => {
+    if (!res.ok) throw new Error('Server returned an error');
+    return res.json();
+  })
+  .then(data => {
+    console.log("Archived:", data);
+  })
+  .catch(err => {
+    console.error("Archive failed:", err);
+    alert("Could not archive version.");
+  });
+```
+
+---
+
+### ✅ Summary of What to Do
+
+1. Replace `${imageSrc}` in `artwork_detail.html` with `{{ version.image_url }}` if using Django templates.
+2. Add `archive` as a custom `@action` in your Django `VersionViewSet`.
+3. Update JavaScript to check `res.ok` before trying to parse JSON.
+
+Would you like help modifying the backend view or testing the updated route?

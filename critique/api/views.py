@@ -1596,6 +1596,7 @@ def delete_artwork_version(request, version_id):
 class ArtworkVersionViewSet(viewsets.ModelViewSet):
     """ViewSet for artwork version management"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ArtWorkVersionSerializer
     
     def get_queryset(self):
         return ArtWorkVersion.objects.filter(artwork__author=self.request.user)
@@ -1607,21 +1608,23 @@ class ArtworkVersionViewSet(viewsets.ModelViewSet):
             version = self.get_object()
             reason = request.data.get('reason', '')
             
-            # Mark version as archived (simulated for now)
-            # version.is_archived = True
-            # version.archived_at = timezone.now()
-            # version.archive_reason = reason
-            # version.save()
+            # Add archive note to version notes
+            if version.version_notes:
+                version.version_notes = f"{version.version_notes}\n[ARCHIVED: {reason}]"
+            else:
+                version.version_notes = f"[ARCHIVED: {reason}]"
+            version.save()
             
             return Response({
                 'message': f'Version {version.version_number} archived successfully',
                 'reason': reason,
                 'success': True,
-                'status': 'archived'
+                'status': 'archived',
+                'version_id': version.id,
+                'version_number': version.version_number
             })
-        except ArtWorkVersion.DoesNotExist:
-            return Response({'error': 'Version not found or not owned by user'}, 
-                          status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['post'])
     def unarchive(self, request, pk=None):
@@ -1629,20 +1632,22 @@ class ArtworkVersionViewSet(viewsets.ModelViewSet):
         try:
             version = self.get_object()
             
-            # Mark version as unarchived (simulated for now)
-            # version.is_archived = False
-            # version.archived_at = None
-            # version.archive_reason = ''
-            # version.save()
+            # Remove archive notes from version notes
+            if version.version_notes and '[ARCHIVED:' in version.version_notes:
+                lines = version.version_notes.split('\n')
+                filtered_lines = [line for line in lines if not line.strip().startswith('[ARCHIVED:')]
+                version.version_notes = '\n'.join(filtered_lines).strip()
+                version.save()
             
             return Response({
                 'message': f'Version {version.version_number} unarchived successfully',
                 'success': True,
-                'status': 'unarchived'
+                'status': 'unarchived',
+                'version_id': version.id,
+                'version_number': version.version_number
             })
-        except ArtWorkVersion.DoesNotExist:
-            return Response({'error': 'Version not found or not owned by user'}, 
-                          status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ArtworkVersionCompareView(APIView):
     """API endpoint for comparing artwork versions"""
