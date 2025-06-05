@@ -994,6 +994,211 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Version Management Functions
+function openVersionManager(artworkId) {
+    // This could open a detailed version management modal
+    // For now, we'll just scroll to the version switcher
+    const versionSwitcher = document.querySelector('.version-thumbnail');
+    if (versionSwitcher) {
+        versionSwitcher.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function switchToVersion(artworkId, versionId) {
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Show loading state
+    const thumbnail = document.querySelector(`[data-version="${versionId}"]`);
+    if (thumbnail) {
+        thumbnail.style.opacity = '0.5';
+    }
+    
+    // Fetch version data
+    fetch(`/api/artworks/${artworkId}/versions/${versionId}/`, {
+        method: 'GET',
+        credentials: 'same-origin',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update the main artwork image
+        const mainImage = document.querySelector('.card-img-top');
+        if (mainImage && data.image_url) {
+            mainImage.src = data.image_url;
+            mainImage.alt = `${data.artwork_title} - Version ${data.version_number}`;
+        }
+        
+        // Update version label
+        const versionLabel = document.querySelector('.badge.bg-secondary');
+        if (versionLabel) {
+            versionLabel.innerHTML = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
+                    <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.942.313a7.023 7.023 0 0 0-.187-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-1.442 1.633c.263-.226.509-.467.740-.722l.724.69a8.026 8.026 0 0 1-.989.912l-.475-.88zm-2.266.97c.342-.14.677-.296.99-.49l.546.837a7.972 7.972 0 0 1-1.198.596l-.338-.943zm-2.137.339c.37-.042.741-.111 1.106-.207l.238.971a7.998 7.998 0 0 1-1.425.267l.081-.031z"/>
+                    <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                    <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                </svg>
+                Viewing v${data.version_number}${data.version_notes ? ` - ${data.version_notes}` : ''}
+            `;
+        }
+        
+        // Update active thumbnail state
+        document.querySelectorAll('.version-thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+        });
+        if (thumbnail) {
+            thumbnail.classList.add('active');
+            thumbnail.style.opacity = '1';
+        }
+        
+        // Show version notes if available
+        if (data.version_notes) {
+            showToast('Version Info', data.version_notes, 'info');
+        }
+        
+        // Add a "back to current" button
+        const backButton = document.querySelector('.back-to-current');
+        if (!backButton) {
+            const buttonHtml = `
+                <button class="btn btn-sm btn-outline-primary back-to-current mt-2" onclick="backToCurrent()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrow-left me-1" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                    </svg>
+                    Back to Current
+                </button>
+            `;
+            const versionCard = document.querySelector('.card.bg-secondary');
+            if (versionCard) {
+                versionCard.insertAdjacentHTML('afterend', buttonHtml);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error switching version:', error);
+        showToast('Error', 'Failed to load version. Please try again.', 'danger');
+        if (thumbnail) {
+            thumbnail.style.opacity = '1';
+        }
+    });
+}
+
+function backToCurrent() {
+    // Reload the page to return to current version
+    window.location.reload();
+}
+
+function openVersionComparison(artworkId) {
+    // Create comparison modal
+    const modalHtml = `
+        <div class="modal fade" id="versionComparisonModal" tabindex="-1" aria-labelledby="versionComparisonModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="versionComparisonModalLabel">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle me-2" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
+                                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+                            </svg>
+                            Version Comparison
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center mb-3">
+                            <p class="text-muted">Select two versions to compare side by side</p>
+                        </div>
+                        <div id="comparisonContent">
+                            <div class="row">
+                                <div class="col-md-6 text-center">
+                                    <h6>Select First Version</h6>
+                                    <div id="versionSelect1" class="version-selector mb-3"></div>
+                                    <div id="versionPreview1" class="version-preview"></div>
+                                </div>
+                                <div class="col-md-6 text-center">
+                                    <h6>Select Second Version</h6>
+                                    <div id="versionSelect2" class="version-selector mb-3"></div>
+                                    <div id="versionPreview2" class="version-preview"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('versionComparisonModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to page
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('versionComparisonModal'));
+    modal.show();
+    
+    // Load version selection options
+    loadVersionSelectors(artworkId);
+}
+
+function loadVersionSelectors(artworkId) {
+    // Get all versions and populate selectors
+    const versions = document.querySelectorAll('.version-thumbnail');
+    const selector1 = document.getElementById('versionSelect1');
+    const selector2 = document.getElementById('versionSelect2');
+    
+    versions.forEach(version => {
+        const versionId = version.getAttribute('data-version');
+        const versionImg = version.querySelector('img');
+        const versionLabel = version.querySelector('small').textContent;
+        
+        if (versionImg) {
+            const option1 = createVersionOption(versionId, versionImg.src, versionLabel, 1);
+            const option2 = createVersionOption(versionId, versionImg.src, versionLabel, 2);
+            
+            selector1.appendChild(option1);
+            selector2.appendChild(option2);
+        }
+    });
+}
+
+function createVersionOption(versionId, imageSrc, label, selectorNum) {
+    const option = document.createElement('div');
+    option.className = 'version-option cursor-pointer p-2 border rounded mb-2';
+    option.style.cursor = 'pointer';
+    option.innerHTML = `
+        <img src="${imageSrc}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+        <div class="mt-1">${label}</div>
+    `;
+    
+    option.addEventListener('click', function() {
+        // Update preview
+        const preview = document.getElementById(`versionPreview${selectorNum}`);
+        preview.innerHTML = `
+            <img src="${imageSrc}" class="img-fluid rounded" style="max-height: 300px;">
+            <div class="mt-2"><strong>${label}</strong></div>
+        `;
+        
+        // Update selection state
+        const selector = document.getElementById(`versionSelect${selectorNum}`);
+        selector.querySelectorAll('.version-option').forEach(opt => {
+            opt.classList.remove('border-primary');
+        });
+        option.classList.add('border-primary');
+    });
+    
+    return option;
+}
+
 // Helper function to get a cookie by name
 function getCookie(name) {
     let cookieValue = null;
