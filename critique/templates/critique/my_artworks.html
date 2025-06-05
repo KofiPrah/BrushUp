@@ -857,8 +857,11 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Enabling bulk selection mode');
         checkboxes.forEach((cb, index) => {
             console.log(`Setting checkbox ${index} to visible`);
+            console.log('Computed style before:', window.getComputedStyle(cb).display);
             cb.classList.remove('bulk-hidden', 'd-none');
             cb.classList.add('bulk-visible');
+            cb.style.setProperty('display', 'block', 'important');
+            console.log('Computed style after:', window.getComputedStyle(cb).display);
         });
         if (bulkBar) bulkBar.classList.remove('d-none');
         if (toggleBtn) {
