@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Reaction, Notification, CritiqueReply, Folder
 from .serializers import (

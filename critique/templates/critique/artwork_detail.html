@@ -54,16 +54,32 @@
                     {% if versions %}
                     <div class="card bg-secondary mb-3">
                         <div class="card-header d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0">Version History</h6>
-                            {% if versions.count > 1 %}
-                            <button class="btn btn-sm btn-outline-info" onclick="openVersionComparison({{ artwork.id }})">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-shuffle me-1" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                                    <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
-                                </svg>
-                                Compare Versions
-                            </button>
-                            {% endif %}
+                            <div class="d-flex align-items-center">
+                                <h6 class="mb-0 me-3">Version History</h6>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="showArchivedVersions" onchange="toggleArchivedVersions()">
+                                    <label class="form-check-label text-muted small" for="showArchivedVersions">
+                                        Show Archived
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="btn-group" role="group">
+                                {% if versions.count > 1 %}
+                                <button class="btn btn-sm btn-outline-info" onclick="openVersionComparison({{ artwork.id }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-shuffle me-1" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.90 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
+                                        <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+                                    </svg>
+                                    Compare
+                                </button>
+                                {% endif %}
+                                <button class="btn btn-sm btn-outline-success" onclick="showProgressView({{ artwork.id }})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-graph-up-arrow me-1" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0Zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5Z"/>
+                                    </svg>
+                                    Progress
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="d-flex align-items-center overflow-auto" style="gap: 8px;">
@@ -89,7 +105,9 @@
                                 
                                 <!-- Version History Thumbnails -->
                                 {% for version in versions reversed %}
-                                <div class="version-thumbnail me-3 mb-3" data-version="{{ version.id }}">
+                                <div class="version-thumbnail me-3 mb-3 {% if version.is_archived %}archived-version{% endif %}" 
+                                     data-version="{{ version.id }}" 
+                                     data-archived="{{ version.is_archived|yesno:'true,false' }}">
                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                         {% if version.image %}
                                             <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Version {{ version.version_number }}">
