@@ -391,7 +391,12 @@
                             <div class="card h-100 position-relative artwork-card">
                                 <!-- Bulk Selection Checkbox -->
                                 <div class="bulk-checkbox position-absolute top-0 start-0 p-2 d-none">
-                                    <input type="checkbox" class="form-check-input artwork-checkbox" onchange="updateBulkSelection()">
+                                    <input type="checkbox" 
+                                           class="form-check-input artwork-checkbox" 
+                                           id="checkbox-{{ artwork.id }}"
+                                           name="artwork_selection"
+                                           value="{{ artwork.id }}"
+                                           onchange="updateBulkSelection()">
                                 </div>
                                 
                                 <!-- Status Indicators -->
