@@ -6,12 +6,16 @@
     <div class="row">
         <div class="col-md-8">
             <div class="card mb-4 bg-dark text-white">
-                {% if artwork.image %}
-                    <img src="{{ artwork.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;">
+                {% if current_version and current_version.image %}
+                    <img src="{{ current_version.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                {% elif current_version and current_version.image_url %}
+                    <img src="{{ current_version.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                {% elif artwork.image %}
+                    <img src="{{ artwork.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
                 {% elif artwork.image_url %}
-                    <img src="{{ artwork.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;">
+                    <img src="{{ artwork.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
                 {% else %}
-                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 400px;">
+                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 400px;" id="main-artwork-image">
                         <span>No Image Available</span>
                     </div>
                 {% endif %}
@@ -1085,8 +1089,8 @@ function switchToVersion(artworkId, versionId) {
     .then(data => {
         if (data.image_url) {
             // Update main artwork display
-            const mainImage = document.querySelector('.card-img-top');
-            if (mainImage) {
+            const mainImage = document.getElementById('main-artwork-image');
+            if (mainImage && mainImage.tagName === 'IMG') {
                 mainImage.src = data.image_url;
             }
             
