@@ -1346,12 +1346,13 @@ function loadVersionSelectors(artworkId) {
         const versionImg = version.querySelector('img');
         const versionLabel = version.querySelector('small').textContent;
         
-        if (versionImg) {
+        if (versionImg && versionImg.src) {
             const option1 = createVersionOption(versionId, versionImg.src, versionLabel, 1);
             const option2 = createVersionOption(versionId, versionImg.src, versionLabel, 2);
             
-            selector1.appendChild(option1);
-            selector2.appendChild(option2);
+            // Only append if options were created successfully
+            if (option1) selector1.appendChild(option1);
+            if (option2) selector2.appendChild(option2);
         }
     });
 }
@@ -1360,8 +1361,15 @@ function createVersionOption(versionId, imageSrc, label, selectorNum) {
     const option = document.createElement('div');
     option.className = 'version-option cursor-pointer p-2 border rounded mb-2';
     option.style.cursor = 'pointer';
+    
+    // Validate image source - only proceed if we have a valid URL
+    if (!imageSrc || imageSrc === '${imageSrc}' || imageSrc.trim() === '') {
+        console.warn('Invalid image source for version:', versionId);
+        return null;
+    }
+    
     option.innerHTML = `
-        <img src="${imageSrc}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;">
+        <img src="${imageSrc}" class="img-thumbnail" style="width: 80px; height: 80px; object-fit: cover;" onerror="this.style.display='none';">
         <div class="mt-1">${label}</div>
     `;
     
@@ -1369,7 +1377,7 @@ function createVersionOption(versionId, imageSrc, label, selectorNum) {
         // Update preview
         const preview = document.getElementById(`versionPreview${selectorNum}`);
         preview.innerHTML = `
-            <img src="${imageSrc}" class="img-fluid rounded" style="max-height: 300px;">
+            <img src="${imageSrc}" class="img-fluid rounded" style="max-height: 300px;" onerror="this.style.display='none';">
             <div class="mt-2"><strong>${label}</strong></div>
         `;
         
