@@ -118,13 +118,17 @@
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     backdrop-filter: blur(4px);
     border: 2px solid rgba(0,0,0,0.1);
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.bulk-checkbox.d-none {
+    display: none !important;
 }
 
 .bulk-checkbox .form-check-input {
@@ -390,7 +394,7 @@
                              data-seeking-critique="{% if artwork.seeking_critique %}true{% else %}false{% endif %}">
                             <div class="card h-100 position-relative artwork-card">
                                 <!-- Bulk Selection Checkbox -->
-                                <div class="bulk-checkbox position-absolute top-0 start-0 p-2 d-none">
+                                <div class="bulk-checkbox position-absolute d-none" style="top: 8px; left: 8px;">
                                     <input type="checkbox" 
                                            class="form-check-input artwork-checkbox" 
                                            id="checkbox-{{ artwork.id }}"
