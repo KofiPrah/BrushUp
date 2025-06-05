@@ -1600,7 +1600,12 @@ def archive_artwork_version(request, version_id):
         version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
         reason = request.data.get('reason', '')
         
-        # Add archived field to model if needed, for now just return success
+        # Mark version as archived
+        version.is_archived = True
+        version.archived_at = timezone.now()
+        version.archive_reason = reason
+        version.save()
+        
         return Response({
             'message': f'Version {version.version_number} archived successfully',
             'reason': reason

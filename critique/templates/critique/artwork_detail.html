@@ -1468,6 +1468,127 @@ function confirmArchiveVersion(versionId) {
     });
 }
 
+// Function to switch to a different version
+function switchToVersion(artworkId, versionId) {
+    // Add visual feedback
+    const thumbnail = document.querySelector(`[data-version="${versionId}"]`);
+    if (thumbnail) {
+        thumbnail.style.opacity = '0.6';
+    }
+    
+    fetch(`/api/artworks/${artworkId}/versions/${versionId}/`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.version) {
+            // Update the main artwork image
+            const mainImage = document.querySelector('.artwork-image img');
+            if (mainImage && (data.version.image_url || data.version.image)) {
+                mainImage.src = data.version.image_url || data.version.image;
+            }
+            
+            // Update version display indicators
+            document.querySelectorAll('.version-thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+                const img = thumb.querySelector('.img-thumbnail');
+                if (img) {
+                    img.classList.remove('border-primary');
+                }
+            });
+            
+            // Mark selected version as active
+            const activeThumb = document.querySelector(`[data-version="${versionId}"]`);
+            if (activeThumb) {
+                activeThumb.classList.add('active');
+                const img = activeThumb.querySelector('.img-thumbnail');
+                if (img) {
+                    img.classList.add('border-primary');
+                }
+            }
+            
+            // Add version indicator and back button
+            const versionIndicator = document.querySelector('.version-indicator');
+            if (versionIndicator) {
+                versionIndicator.remove();
+            }
+            
+            const indicatorHtml = `
+                <div class="version-indicator alert alert-info d-flex justify-content-between align-items-center mb-3">
+                    <span>
+                        <strong>Viewing Version ${data.version.version_number}</strong>
+                        ${data.version.version_notes ? `<br><small>${data.version.version_notes}</small>` : ''}
+                    </span>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="backToCurrent()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                        </svg>
+                        Back to Current
+                    </button>
+                </div>
+            `;
+            
+            const artworkContainer = document.querySelector('.artwork-image').parentElement;
+            artworkContainer.insertAdjacentHTML('afterbegin', indicatorHtml);
+            
+            showToast('Success', `Switched to version ${data.version.version_number}`, 'success');
+        }
+        
+        if (thumbnail) {
+            thumbnail.style.opacity = '1';
+        }
+    })
+    .catch(error => {
+        console.error('Error switching version:', error);
+        showToast('Error', 'Failed to switch version. Please try again.', 'danger');
+        if (thumbnail) {
+            thumbnail.style.opacity = '1';
+        }
+    });
+}
+
+function backToCurrent() {
+    // Remove version indicator
+    const versionIndicator = document.querySelector('.version-indicator');
+    if (versionIndicator) {
+        versionIndicator.remove();
+    }
+    
+    // Reset to current version
+    const currentThumbnail = document.querySelector('[data-version="current"]');
+    if (currentThumbnail) {
+        const currentImage = currentThumbnail.querySelector('img');
+        if (currentImage) {
+            const mainImage = document.querySelector('.artwork-image img');
+            if (mainImage) {
+                mainImage.src = currentImage.src;
+            }
+        }
+        
+        // Update active states
+        document.querySelectorAll('.version-thumbnail').forEach(thumb => {
+            thumb.classList.remove('active');
+            const img = thumb.querySelector('.img-thumbnail');
+            if (img) {
+                img.classList.remove('border-primary');
+            }
+        });
+        
+        currentThumbnail.classList.add('active');
+        const currentImg = currentThumbnail.querySelector('.img-thumbnail');
+        if (currentImg) {
+            currentImg.classList.add('border-primary');
+        }
+    }
+    
+    showToast('Success', 'Returned to current version', 'success');
+}
+
 // Toast notification function
 function showToast(title, message, type = 'info') {
     const toastHtml = `
