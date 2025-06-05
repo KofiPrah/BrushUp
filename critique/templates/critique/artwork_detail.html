@@ -1346,13 +1346,17 @@ function loadVersionSelectors(artworkId) {
         const versionImg = version.querySelector('img');
         const versionLabel = version.querySelector('small').textContent;
         
-        if (versionImg && versionImg.src) {
-            const option1 = createVersionOption(versionId, versionImg.src, versionLabel, 1);
-            const option2 = createVersionOption(versionId, versionImg.src, versionLabel, 2);
-            
-            // Only append if options were created successfully
-            if (option1) selector1.appendChild(option1);
-            if (option2) selector2.appendChild(option2);
+        if (versionImg) {
+            // Use the src attribute directly from the img element, ensuring proper URL
+            const imageSrc = versionImg.getAttribute('src');
+            if (imageSrc && imageSrc !== '' && !imageSrc.includes('${')) {
+                const option1 = createVersionOption(versionId, imageSrc, versionLabel, 1);
+                const option2 = createVersionOption(versionId, imageSrc, versionLabel, 2);
+                
+                // Only append if options were created successfully
+                if (option1) selector1.appendChild(option1);
+                if (option2) selector2.appendChild(option2);
+            }
         }
     });
 }
@@ -1363,8 +1367,8 @@ function createVersionOption(versionId, imageSrc, label, selectorNum) {
     option.style.cursor = 'pointer';
     
     // Validate image source - only proceed if we have a valid URL
-    if (!imageSrc || imageSrc === '${imageSrc}' || imageSrc.trim() === '') {
-        console.warn('Invalid image source for version:', versionId);
+    if (!imageSrc || imageSrc === '${imageSrc}' || imageSrc.trim() === '' || imageSrc.includes('${')) {
+        console.warn('Invalid image source for version:', versionId, 'Source:', imageSrc);
         return null;
     }
     
