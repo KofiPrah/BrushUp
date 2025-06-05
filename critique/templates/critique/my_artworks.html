@@ -829,9 +829,8 @@ function clearAllFilters() {
     localStorage.removeItem('studio_filters');
 }
 
-// Bulk Actions
-let bulkSelectionMode = false;
-let selectedArtworks = new Set();
+// Bulk Actions (remove duplicate declaration)
+bulkSelectionMode = false;
 
 function toggleBulkActions() {
     bulkSelectionMode = !bulkSelectionMode;
