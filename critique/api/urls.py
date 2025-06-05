@@ -3,7 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     UserViewSet, ProfileViewSet, ArtWorkViewSet, 
     CritiqueViewSet, health_check,
-    ReactionViewSet, NotificationViewSet, FolderViewSet
+    ReactionViewSet, NotificationViewSet, FolderViewSet,
+    ArtworkVersionViewSet, ArtworkVersionCompareView, ArtworkVersionRestoreView
 )
 
 # Create a router and register our viewsets with it

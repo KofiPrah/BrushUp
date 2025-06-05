@@ -1,12 +1,13 @@
 from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.db import models
 from django_filters.rest_framework import DjangoFilterBackend
-from critique.models import ArtWork, Profile, Critique, Reaction, Notification, CritiqueReply, Folder
+from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Reaction, Notification, CritiqueReply, Folder
 from .serializers import (
-    UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, 
+    UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, ArtWorkVersionSerializer,
     ArtWorkListSerializer, CritiqueSerializer, CritiqueListSerializer,
     ReactionSerializer, NotificationSerializer, CritiqueReplySerializer,
     FolderSerializer, FolderListSerializer, FolderCreateUpdateSerializer
@@ -1402,3 +1403,196 @@ class FolderViewSet(viewsets.ModelViewSet):
             'folders': serializer.data,
             'count': folders.count()
         })
+
+
+class ArtworkVersionViewSet(APIView):
+    """API endpoints for managing artwork versions"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request, artwork_id):
+        """List all versions for a specific artwork"""
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            versions = artwork.versions.all()
+            serializer = ArtWorkVersionSerializer(versions, many=True)
+            
+            return Response({
+                'versions': serializer.data,
+                'artwork_title': artwork.title,
+                'total_versions': versions.count()
+            })
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+    
+    def post(self, request, artwork_id):
+        """Create a new version of an artwork"""
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            version_notes = request.data.get('version_notes', '')
+            
+            # Create version with current artwork state
+            version = artwork.create_version(version_notes=version_notes)
+            
+            # Update artwork with new data if provided
+            if 'title' in request.data:
+                artwork.title = request.data['title']
+            if 'description' in request.data:
+                artwork.description = request.data['description']
+            if 'image' in request.data:
+                artwork.image = request.data['image']
+            if 'medium' in request.data:
+                artwork.medium = request.data['medium']
+            if 'dimensions' in request.data:
+                artwork.dimensions = request.data['dimensions']
+            if 'tags' in request.data:
+                artwork.tags = request.data['tags']
+            
+            artwork.save()
+            
+            serializer = ArtWorkVersionSerializer(version)
+            return Response({
+                'version': serializer.data,
+                'message': f'Version {version.version_number} created successfully'
+            }, status=status.HTTP_201_CREATED)
+            
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+
+class ArtworkVersionCompareView(APIView):
+    """API endpoint for comparing artwork versions"""
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, artwork_id):
+        """Compare two versions of an artwork"""
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            version1_id = request.query_params.get('version1')
+            version2_id = request.query_params.get('version2')
+            
+            if not version1_id or not version2_id:
+                return Response({'error': 'Both version1 and version2 parameters are required'}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            # Handle comparing with current version
+            if version1_id == 'current':
+                version1_data = {
+                    'id': 'current',
+                    'version_number': 'Current',
+                    'title': artwork.title,
+                    'description': artwork.description,
+                    'image_display_url': artwork.image.url if artwork.image else None,
+                    'medium': artwork.medium,
+                    'dimensions': artwork.dimensions,
+                    'tags': artwork.tags,
+                    'created_at': artwork.updated_at or artwork.created_at
+                }
+            else:
+                try:
+                    version1 = artwork.versions.get(id=version1_id)
+                    version1_data = ArtWorkVersionSerializer(version1).data
+                except ArtWorkVersion.DoesNotExist:
+                    return Response({'error': 'Version 1 not found'}, 
+                                  status=status.HTTP_404_NOT_FOUND)
+            
+            if version2_id == 'current':
+                version2_data = {
+                    'id': 'current',
+                    'version_number': 'Current',
+                    'title': artwork.title,
+                    'description': artwork.description,
+                    'image_display_url': artwork.image.url if artwork.image else None,
+                    'medium': artwork.medium,
+                    'dimensions': artwork.dimensions,
+                    'tags': artwork.tags,
+                    'created_at': artwork.updated_at or artwork.created_at
+                }
+            else:
+                try:
+                    version2 = artwork.versions.get(id=version2_id)
+                    version2_data = ArtWorkVersionSerializer(version2).data
+                except ArtWorkVersion.DoesNotExist:
+                    return Response({'error': 'Version 2 not found'}, 
+                                  status=status.HTTP_404_NOT_FOUND)
+            
+            # Generate comparison data
+            comparison = {
+                'artwork_title': artwork.title,
+                'version1': version1_data,
+                'version2': version2_data,
+                'differences': self._get_differences(version1_data, version2_data)
+            }
+            
+            return Response(comparison)
+            
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+    
+    def _get_differences(self, version1, version2):
+        """Calculate differences between two versions"""
+        differences = []
+        
+        fields_to_compare = ['title', 'description', 'medium', 'dimensions', 'tags']
+        
+        for field in fields_to_compare:
+            val1 = version1.get(field, '')
+            val2 = version2.get(field, '')
+            
+            if val1 != val2:
+                differences.append({
+                    'field': field,
+                    'version1_value': val1,
+                    'version2_value': val2
+                })
+        
+        # Check for image differences
+        img1 = version1.get('image_display_url')
+        img2 = version2.get('image_display_url')
+        
+        if img1 != img2:
+            differences.append({
+                'field': 'image',
+                'version1_value': img1,
+                'version2_value': img2
+            })
+        
+        return differences
+
+class ArtworkVersionRestoreView(APIView):
+    """API endpoint for restoring an artwork to a previous version"""
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, artwork_id, version_id):
+        """Restore artwork to a specific version"""
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            version = artwork.versions.get(id=version_id)
+            
+            # Create a backup of current state before restoring
+            current_backup = artwork.create_version(
+                version_notes=f"Backup before restoring to version {version.version_number}"
+            )
+            
+            # Restore artwork to the selected version
+            artwork.title = version.title
+            artwork.description = version.description
+            artwork.image = version.image
+            artwork.medium = version.medium
+            artwork.dimensions = version.dimensions
+            artwork.tags = version.tags
+            artwork.save()
+            
+            return Response({
+                'message': f'Artwork restored to version {version.version_number}',
+                'backup_version': current_backup.version_number,
+                'restored_version': version.version_number
+            })
+            
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+        except ArtWorkVersion.DoesNotExist:
+            return Response({'error': 'Version not found'}, 
+                          status=status.HTTP_404_NOT_FOUND)

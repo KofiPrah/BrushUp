@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from critique.models import ArtWork, Profile, Critique, Notification, Reaction, CritiqueReply, Folder
+from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Notification, Reaction, CritiqueReply, Folder
 from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -109,6 +109,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """Return the count of unread notifications for the user."""
         from critique.models import Notification
         return Notification.objects.filter(recipient=obj, is_read=False).count()
+
+class ArtWorkVersionSerializer(serializers.ModelSerializer):
+    """Serializer for artwork versions."""
+    artwork_title = serializers.CharField(source='artwork.title', read_only=True)
+    image_display_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ArtWorkVersion
+        fields = ['id', 'artwork', 'artwork_title', 'version_number', 'title', 'description', 
+                 'image', 'image_display_url', 'created_at', 'version_notes', 'medium', 'dimensions', 'tags']
+        read_only_fields = ['id', 'artwork_title', 'created_at', 'image_display_url']
+    
+    def get_image_display_url(self, obj):
+        """Return the URL to display the version image."""
+        if obj.image and hasattr(obj.image, 'url'):
+            return obj.image.url
+        return None
 
 class ArtWorkSerializer(serializers.ModelSerializer):
     """Serializer for the ArtWork model with author information and folder assignment."""

@@ -167,6 +167,29 @@ class Folder(models.Model):
         
         super().save(*args, **kwargs)
 
+class ArtWorkVersion(models.Model):
+    """Model to track different versions of artwork for comparison"""
+    artwork = models.ForeignKey('ArtWork', on_delete=models.CASCADE, related_name='versions')
+    version_number = models.PositiveIntegerField()
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    image = models.ImageField(upload_to='artwork_versions/', blank=True, null=True,
+                           storage=s3_storage if settings.USE_S3 else None)
+    created_at = models.DateTimeField(auto_now_add=True)
+    version_notes = models.TextField(blank=True, help_text="Notes about changes in this version")
+    
+    # Copy of artwork metadata at time of version creation
+    medium = models.CharField(max_length=100, blank=True)
+    dimensions = models.CharField(max_length=100, blank=True)
+    tags = models.CharField(max_length=200, blank=True)
+    
+    class Meta:
+        unique_together = ['artwork', 'version_number']
+        ordering = ['-version_number']
+    
+    def __str__(self):
+        return f"{self.artwork.title} - Version {self.version_number}"
+
 class ArtWork(models.Model):
     """
     Model representing an artwork submitted by a user.
@@ -250,6 +273,41 @@ class ArtWork(models.Model):
     def critique_count(self):
         """Return the number of critiques for this artwork."""
         return self.critiques.filter(is_hidden=False).count()
+    
+    def create_version(self, version_notes=""):
+        """Create a new version of this artwork with current state"""
+        next_version = self.get_next_version_number()
+        
+        version = ArtWorkVersion.objects.create(
+            artwork=self,
+            version_number=next_version,
+            title=self.title,
+            description=self.description,
+            image=self.image,
+            version_notes=version_notes,
+            medium=self.medium,
+            dimensions=self.dimensions,
+            tags=self.tags
+        )
+        return version
+    
+    def get_next_version_number(self):
+        """Get the next version number for this artwork"""
+        last_version = self.versions.first()
+        return (last_version.version_number + 1) if last_version else 1
+    
+    def get_latest_version(self):
+        """Get the most recent version of this artwork"""
+        return self.versions.first()
+    
+    def has_versions(self):
+        """Check if this artwork has any versions"""
+        return self.versions.exists()
+    
+    @property
+    def version_count(self):
+        """Return the number of versions for this artwork"""
+        return self.versions.count()
 
 
 class Comment(models.Model):
