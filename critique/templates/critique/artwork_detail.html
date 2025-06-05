@@ -1078,14 +1078,126 @@ function switchToVersion(artworkId, versionId) {
         credentials: 'same-origin',
         headers: {
             'X-CSRFToken': csrfToken,
-            'X-Requested-With': 'XMLHttpRequest'
+            'Content-Type': 'application/json'
         }
     })
     .then(response => response.json())
     .then(data => {
-        // Update the main artwork image
-        const mainImage = document.querySelector('.card-img-top');
-        if (mainImage && data.image_url) {
+        if (data.success) {
+            // Update main artwork display
+            const mainImage = document.querySelector('.card-img-top');
+            if (mainImage && data.image_url) {
+                mainImage.src = data.image_url;
+            }
+            
+            // Update active thumbnail
+            document.querySelectorAll('.version-thumbnail').forEach(thumb => {
+                thumb.classList.remove('active');
+                thumb.style.opacity = '1';
+            });
+            
+            if (thumbnail) {
+                thumbnail.classList.add('active');
+            }
+            
+            showToast('Success', `Switched to Version ${data.version_number}`, 'success');
+        } else {
+            showToast('Error', 'Failed to switch version', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error', 'Failed to switch version', 'error');
+        if (thumbnail) {
+            thumbnail.style.opacity = '1';
+        }
+    });
+}
+
+// Archive toggle functionality
+function toggleArchivedVersions() {
+    const checkbox = document.getElementById('showArchivedVersions');
+    const archivedVersions = document.querySelectorAll('.archived-version');
+    
+    archivedVersions.forEach(version => {
+        if (checkbox.checked) {
+            version.classList.add('show-archived');
+        } else {
+            version.classList.remove('show-archived');
+        }
+    });
+}
+
+// Archive version function
+function archiveVersion(versionId, versionNumber) {
+    if (confirm(`Are you sure you want to archive Version ${versionNumber}?`)) {
+        fetch(`/api/versions/${versionId}/archive/`, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                reason: 'Archived by user'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                showToast('Success', data.message, 'success');
+                location.reload();
+            } else {
+                showToast('Error', 'Failed to archive version', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Error', 'Failed to archive version', 'error');
+        });
+    }
+}
+
+// Unarchive version function
+function unarchiveVersion(versionId) {
+    fetch(`/api/versions/${versionId}/unarchive/`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            showToast('Success', data.message, 'success');
+            location.reload();
+        } else {
+            showToast('Error', 'Failed to unarchive version', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Error', 'Failed to unarchive version', 'error');
+    });
+}
+
+// Version comparison function
+function openVersionComparison(artworkId) {
+    window.open(`/artworks/${artworkId}/compare/`, '_blank');
+}
+
+// Compare to specific version
+function compareToVersion(versionId) {
+    const artworkId = window.location.pathname.split('/')[2];
+    window.open(`/artworks/${artworkId}/compare/?version=${versionId}`, '_blank');
+}
+
+// Show progress view
+function showProgressView(artworkId) {
+    window.open(`/artworks/${artworkId}/progress/`, '_blank');
+}
             mainImage.src = data.image_url;
             mainImage.alt = `${data.artwork_title} - Version ${data.version_number}`;
         }
