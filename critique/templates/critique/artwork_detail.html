@@ -1697,8 +1697,8 @@ function switchToVersion(artworkId, versionId) {
     .then(data => {
         if (data.version) {
             // Update the main artwork image
-            const mainImage = document.querySelector('.artwork-image img');
-            if (mainImage && (data.version.image_url || data.version.image)) {
+            const mainImage = document.getElementById('main-artwork-image');
+            if (mainImage && mainImage.tagName === 'IMG' && (data.version.image_url || data.version.image)) {
                 mainImage.src = data.version.image_url || data.version.image;
             }
             
