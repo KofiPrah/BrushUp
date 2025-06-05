@@ -24,7 +24,10 @@ urlpatterns = [
     path('health/', health_check, name='api-health-check'),
     
     # Artwork versioning endpoints
-    path('artworks/<int:artwork_id>/versions/', ArtworkVersionViewSet.as_view(), name='artwork-versions'),
+    path('artworks/<int:artwork_id>/versions/', create_artwork_version, name='artwork-versions'),
+    path('artworks/<int:artwork_id>/versions/<int:version_id>/', get_artwork_version, name='artwork-version-detail'),
     path('artworks/<int:artwork_id>/versions/compare/', ArtworkVersionCompareView.as_view(), name='artwork-versions-compare'),
     path('artworks/<int:artwork_id>/versions/<int:version_id>/restore/', ArtworkVersionRestoreView.as_view(), name='artwork-version-restore'),
+    path('artworks/versions/<int:version_id>/delete/', delete_artwork_version, name='artwork-version-delete'),
+    path('artworks/versions/<int:version_id>/archive/', archive_artwork_version, name='artwork-version-archive'),
 ]

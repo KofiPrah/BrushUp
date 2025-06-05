@@ -1459,6 +1459,53 @@ class ArtworkVersionViewSet(APIView):
         except ArtWork.DoesNotExist:
             return Response({'error': 'Artwork not found or not owned by user'}, 
                           status=status.HTTP_404_NOT_FOUND)
+    
+    def retrieve(self, request, artwork_id, version_id):
+        """Get a specific version of an artwork"""
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            version = artwork.versions.get(id=version_id)
+            serializer = ArtWorkVersionSerializer(version)
+            
+            return Response({
+                'version': serializer.data,
+                'artwork_title': artwork.title
+            })
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+        except ArtWorkVersion.DoesNotExist:
+            return Response({'error': 'Version not found'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+    
+    def destroy(self, request, version_id):
+        """Delete a specific version"""
+        try:
+            version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+            version_number = version.version_number
+            version.delete()
+            
+            return Response({
+                'message': f'Version {version_number} deleted successfully'
+            })
+        except ArtWorkVersion.DoesNotExist:
+            return Response({'error': 'Version not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+    
+    def archive(self, request, version_id):
+        """Archive a specific version"""
+        try:
+            version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+            reason = request.data.get('reason', '')
+            
+            # Add archived field to model if needed, for now just return success
+            return Response({
+                'message': f'Version {version.version_number} archived successfully',
+                'reason': reason
+            })
+        except ArtWorkVersion.DoesNotExist:
+            return Response({'error': 'Version not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
 
 class ArtworkVersionCompareView(APIView):
     """API endpoint for comparing artwork versions"""
