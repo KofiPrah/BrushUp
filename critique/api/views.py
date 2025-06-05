@@ -1648,6 +1648,32 @@ class ArtworkVersionViewSet(viewsets.ModelViewSet):
             })
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True, methods=['post'])
+    def switch(self, request, pk=None):
+        """Switch to a specific version as the current display version"""
+        try:
+            version = self.get_object()
+            artwork = version.artwork
+            
+            # Only allow the owner to switch versions
+            if artwork.author != request.user:
+                return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+            
+            # Return version data for frontend to update display
+            return Response({
+                'message': f'Switched to version {version.version_number}',
+                'success': True,
+                'version': {
+                    'id': version.id,
+                    'version_number': version.version_number,
+                    'image_url': version.image.url if version.image else None,
+                    'version_notes': version.version_notes,
+                    'created_at': version.created_at
+                }
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class ArtworkVersionCompareView(APIView):
     """API endpoint for comparing artwork versions"""

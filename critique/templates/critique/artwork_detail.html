@@ -1669,8 +1669,8 @@ function switchToVersion(artworkId, versionId) {
         thumbnail.style.opacity = '0.6';
     }
     
-    fetch(`/api/artworks/${artworkId}/versions/${versionId}/`, {
-        method: 'GET',
+    fetch(`/api/versions/${versionId}/switch/`, {
+        method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/json',

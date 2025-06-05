@@ -1,0 +1,117 @@
+Thanks for sharing your `views.py`. I now see the root causes of both your issues:
+
+---
+
+## ✅ **Issue 1: Artwork image not loading due to `${imageSrc}`**
+
+### Cause:
+
+Your HTML file includes a literal `${imageSrc}` placeholder that is never interpolated.
+
+### Solution:
+
+In `ArtWorkDetailView.get_context_data`, you already fetch all `ArtWorkVersion` objects:
+
+```python
+versions = ArtWorkVersion.objects.filter(artwork=self.object).order_by('version_number')
+```
+
+But you’re missing a field like `image_url` in your context. So in your template (`artwork_detail.html`), add:
+
+```html
+<img src="{{ versions.last.image.url }}" class="img-fluid" alt="Artwork">
+```
+
+Or set a `current_version` in your context:
+
+```python
+context['current_version'] = versions.last()  # Or however you define the latest version
+```
+
+Then in HTML:
+
+```html
+<img src="{{ current_version.image.url }}" class="img-fluid" alt="Artwork Image">
+```
+
+✅ This will eliminate the `${imageSrc}` literal and resolve the `404`.
+
+---
+
+## ✅ **Issue 2: Switching version returns "Failed to switch"**
+
+### Cause:
+
+There is **no view defined** in `views.py` for switching versions. No function or route like:
+
+```
+POST /api/versions/<id>/switch/
+```
+
+### Solution:
+
+You need to define a **new view** to handle switching, e.g. mark a version as the current one.
+
+Add this to `views.py` (or `critique/api/views.py` if you’re keeping APIs separate):
+
+```python
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@login_required
+def switch_version(request, version_id):
+    """
+    Switch the currently active version of an artwork to the given version ID.
+    """
+    from .models import ArtWorkVersion, ArtWork
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST allowed'}, status=405)
+
+    try:
+        version = ArtWorkVersion.objects.get(pk=version_id)
+        artwork = version.artwork
+
+        # Only allow the owner to switch versions
+        if artwork.author != request.user:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        # Mark all other versions as inactive
+        ArtWorkVersion.objects.filter(artwork=artwork).update(is_active=False)
+
+        # Activate this one
+        version.is_active = True
+        version.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Switched version'})
+    except ArtWorkVersion.DoesNotExist:
+        return JsonResponse({'error': 'Version not found'}, status=404)
+```
+
+Then in `urls.py`:
+
+```python
+path('api/versions/<int:version_id>/switch/', views.switch_version, name='switch_version'),
+```
+
+✅ This endpoint will allow your JS to POST to it.
+
+---
+
+### 🧪 Test It
+
+Once added:
+
+```js
+fetch(`/api/versions/${versionId}/switch/`, { method: 'POST' })
+  .then(res => {
+    if (!res.ok) throw new Error('Request failed');
+    return res.json();
+  })
+  .then(data => console.log("Switched!", data))
+  .catch(err => alert("Failed to switch version"));
+```
+
+---
+
+Would you also like a version archiving endpoint (`/archive/`) alongside this?
