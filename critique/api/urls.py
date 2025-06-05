@@ -22,4 +22,9 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/', include('critique.api.auth_urls')),  # Authentication endpoints
     path('health/', health_check, name='api-health-check'),
+    
+    # Artwork versioning endpoints
+    path('artworks/<int:artwork_id>/versions/', ArtworkVersionViewSet.as_view(), name='artwork-versions'),
+    path('artworks/<int:artwork_id>/versions/compare/', ArtworkVersionCompareView.as_view(), name='artwork-versions-compare'),
+    path('artworks/<int:artwork_id>/versions/<int:version_id>/restore/', ArtworkVersionRestoreView.as_view(), name='artwork-version-restore'),
 ]

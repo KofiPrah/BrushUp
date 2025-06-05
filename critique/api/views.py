@@ -1462,7 +1462,7 @@ class ArtworkVersionViewSet(APIView):
 
 class ArtworkVersionCompareView(APIView):
     """API endpoint for comparing artwork versions"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request, artwork_id):
         """Compare two versions of an artwork"""
@@ -1562,7 +1562,7 @@ class ArtworkVersionCompareView(APIView):
 
 class ArtworkVersionRestoreView(APIView):
     """API endpoint for restoring an artwork to a previous version"""
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request, artwork_id, version_id):
         """Restore artwork to a specific version"""
