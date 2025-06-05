@@ -1502,6 +1502,132 @@ function displayComparisonResults(comparisonData) {
     resultsContainer.style.display = 'block';
 }
 
+function previewVersion(versionId, artworkId) {
+    let url;
+    if (versionId === 'current') {
+        // Preview current artwork
+        url = `/artwork/${artworkId}/`;
+    } else {
+        // Fetch version data and show preview modal
+        fetch(`/api/artworks/${artworkId}/versions/`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const version = data.versions.find(v => v.id == versionId);
+            if (version) {
+                showVersionPreviewModal(version, artworkId);
+            } else {
+                showToast('Version not found', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading version:', error);
+            showToast('Failed to load version preview', 'error');
+        });
+        return;
+    }
+    
+    // Open current artwork in new tab
+    window.open(url, '_blank');
+}
+
+function showVersionPreviewModal(version, artworkId) {
+    const modalHtml = `
+        <div class="modal fade" id="versionPreviewModal" tabindex="-1" aria-labelledby="versionPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header border-secondary">
+                        <h5 class="modal-title" id="versionPreviewModalLabel">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye me-2" viewBox="0 0 16 16">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                            </svg>
+                            Preview Version ${version.version_number}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                ${version.image_display_url ? 
+                                    `<img src="${version.image_display_url}" class="img-fluid rounded" alt="${version.title}">` : 
+                                    '<div class="bg-secondary d-flex align-items-center justify-content-center rounded" style="height: 300px;"><span class="text-muted">No Image</span></div>'
+                                }
+                            </div>
+                            <div class="col-md-6">
+                                <h4 class="text-primary">${version.title}</h4>
+                                <p class="text-muted mb-3">Version ${version.version_number} • ${new Date(version.created_at).toLocaleDateString()}</p>
+                                
+                                <div class="mb-3">
+                                    <h6 class="text-info">Description</h6>
+                                    <p>${version.description}</p>
+                                </div>
+                                
+                                ${version.version_notes ? `
+                                    <div class="mb-3">
+                                        <h6 class="text-warning">Version Notes</h6>
+                                        <p class="text-light">${version.version_notes}</p>
+                                    </div>
+                                ` : ''}
+                                
+                                ${version.medium ? `
+                                    <div class="mb-2">
+                                        <strong>Medium:</strong> ${version.medium}
+                                    </div>
+                                ` : ''}
+                                
+                                ${version.dimensions ? `
+                                    <div class="mb-2">
+                                        <strong>Dimensions:</strong> ${version.dimensions}
+                                    </div>
+                                ` : ''}
+                                
+                                ${version.tags ? `
+                                    <div class="mb-3">
+                                        <strong>Tags:</strong> 
+                                        <div class="mt-1">
+                                            ${version.tags.split(',').map(tag => `<span class="badge bg-secondary me-1">${tag.trim()}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="d-flex gap-2 mt-4">
+                                    <button class="btn btn-warning" onclick="restoreVersion(${artworkId}, ${version.id}); bootstrap.Modal.getInstance(document.getElementById('versionPreviewModal')).hide();">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise me-1" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                                        </svg>
+                                        Restore This Version
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="openVersionComparison(${artworkId}); bootstrap.Modal.getInstance(document.getElementById('versionPreviewModal')).hide();">
+                                        Compare Versions
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if present
+    const existingModal = document.getElementById('versionPreviewModal');
+    if (existingModal) existingModal.remove();
+    
+    // Add new modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('versionPreviewModal'));
+    modal.show();
+}
+
 function updateCritiqueBadge(artworkItem, seeking) {
     const statusContainer = artworkItem.querySelector('.position-absolute.top-0.end-0');
     const critiqueBadge = statusContainer.querySelector('.badge.bg-success');
