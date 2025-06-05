@@ -1083,10 +1083,10 @@ function switchToVersion(artworkId, versionId) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
+        if (data.image_url) {
             // Update main artwork display
             const mainImage = document.querySelector('.card-img-top');
-            if (mainImage && data.image_url) {
+            if (mainImage) {
                 mainImage.src = data.image_url;
             }
             
@@ -1202,6 +1202,47 @@ function showProgressView(artworkId) {
 function backToCurrent() {
     // Reload the page to return to current version
     window.location.reload();
+}
+
+// Toast notification function
+function showToast(title, message, type = 'info') {
+    // Create toast container if it doesn't exist
+    let toastContainer = document.querySelector('.toast-container');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+
+    // Create toast element
+    const toastId = 'toast-' + Date.now();
+    const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <strong>${title}</strong><br>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    `;
+    
+    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+    
+    // Initialize and show toast
+    const toastElement = document.getElementById(toastId);
+    const toast = new bootstrap.Toast(toastElement, {
+        autohide: true,
+        delay: 3000
+    });
+    toast.show();
+    
+    // Remove toast element after it's hidden
+    toastElement.addEventListener('hidden.bs.toast', () => {
+        toastElement.remove();
+    });
 }
 </script>
 

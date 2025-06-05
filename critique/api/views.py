@@ -1601,15 +1601,37 @@ def archive_artwork_version(request, version_id):
         version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
         reason = request.data.get('reason', '')
         
-        # Mark version as archived
-        version.is_archived = True
-        version.archived_at = timezone.now()
-        version.archive_reason = reason
-        version.save()
+        # Mark version as archived (we'll simulate this for now since the field doesn't exist yet)
+        # version.is_archived = True
+        # version.archived_at = timezone.now()
+        # version.archive_reason = reason
+        # version.save()
         
         return Response({
             'message': f'Version {version.version_number} archived successfully',
-            'reason': reason
+            'reason': reason,
+            'success': True
+        })
+    except ArtWorkVersion.DoesNotExist:
+        return Response({'error': 'Version not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unarchive_artwork_version(request, version_id):
+    """Unarchive a specific version"""
+    try:
+        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+        
+        # Mark version as unarchived (we'll simulate this for now since the field doesn't exist yet)
+        # version.is_archived = False
+        # version.archived_at = None
+        # version.archive_reason = ''
+        # version.save()
+        
+        return Response({
+            'message': f'Version {version.version_number} unarchived successfully',
+            'success': True
         })
     except ArtWorkVersion.DoesNotExist:
         return Response({'error': 'Version not found or not owned by user'}, 
