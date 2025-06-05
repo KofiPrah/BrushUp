@@ -308,6 +308,11 @@ class ArtWork(models.Model):
     def version_count(self):
         """Return the number of versions for this artwork"""
         return self.versions.count()
+    
+    def get_current_version_number(self):
+        """Get the current version number (latest version + 1, or 1 if no versions)"""
+        latest_version = self.get_latest_version()
+        return (latest_version.version_number + 1) if latest_version else 1
 
 
 class Comment(models.Model):
