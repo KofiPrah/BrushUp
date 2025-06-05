@@ -121,9 +121,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 20;
+    z-index: 1000;
     backdrop-filter: blur(4px);
     border: 2px solid rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .bulk-checkbox .form-check-input {
@@ -835,15 +836,10 @@ function toggleBulkActions() {
     const bulkBar = document.getElementById('bulk-actions-bar');
     const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
     
-    console.log('Bulk actions mode:', bulkActionsMode);
-    console.log('Found checkboxes:', checkboxes.length);
-    
     if (bulkActionsMode) {
         checkboxes.forEach((cb, index) => {
-            console.log(`Checkbox ${index}:`, cb, 'Classes before:', cb.className);
             cb.classList.remove('d-none');
             cb.style.display = 'flex'; // Force display
-            console.log('Classes after:', cb.className);
         });
         bulkBar.classList.remove('d-none');
         toggleBtn.classList.add('active');
