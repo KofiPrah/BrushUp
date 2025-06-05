@@ -114,27 +114,25 @@
 }
 
 .artwork-checkbox {
-    background: rgba(255,255,255,0.9) !important;
-    border-radius: 8px !important;
-    z-index: 1000 !important;
-    backdrop-filter: blur(4px) !important;
-    border: 1px solid rgba(0,0,0,0.1) !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
-    position: absolute !important;
-    top: 8px !important;
-    left: 8px !important;
-    padding: 8px !important;
+    background: rgba(255,255,255,0.9);
+    border-radius: 8px;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-.artwork-checkbox[style*="display: block"] {
+.artwork-checkbox.bulk-hidden {
+    display: none !important;
+}
+
+.artwork-checkbox.bulk-visible {
     display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
 }
 
 .artwork-checkbox .form-check-input {
-    margin: 0 !important;
-    transform: scale(1.2) !important;
+    margin: 0;
+    transform: scale(1.2);
 }
 
 .badge {
@@ -395,7 +393,7 @@
                              data-seeking-critique="{% if artwork.seeking_critique %}true{% else %}false{% endif %}">
                             <div class="card h-100 position-relative artwork-card">
                                 <!-- Bulk Selection Checkbox -->
-                                <div class="artwork-checkbox position-absolute top-0 start-0 p-2" style="display: none;">
+                                <div class="artwork-checkbox position-absolute top-0 start-0 p-2 d-none bulk-hidden">
                                     <input type="checkbox" 
                                            class="form-check-input" 
                                            id="checkbox-{{ artwork.id }}"
@@ -856,10 +854,9 @@ function toggleBulkActions() {
     if (bulkSelectionMode) {
         console.log('Enabling bulk selection mode');
         checkboxes.forEach((cb, index) => {
-            console.log(`Setting checkbox ${index} display to block`);
-            cb.style.display = 'block';
-            cb.style.visibility = 'visible';
-            cb.style.opacity = '1';
+            console.log(`Setting checkbox ${index} to visible`);
+            cb.classList.remove('bulk-hidden', 'd-none');
+            cb.classList.add('bulk-visible');
         });
         if (bulkBar) bulkBar.classList.remove('d-none');
         if (toggleBtn) {
@@ -894,7 +891,8 @@ function cancelBulkActions() {
     const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
     
     checkboxes.forEach(cb => {
-        cb.style.display = 'none';
+        cb.classList.remove('bulk-visible');
+        cb.classList.add('bulk-hidden', 'd-none');
         const input = cb.querySelector('input');
         if (input) input.checked = false;
     });
