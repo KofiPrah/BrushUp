@@ -1,0 +1,96 @@
+Yes — if you apply the following **two targeted fixes**, they will solve **both** of your reported problems:
+
+---
+
+## ✅ Problem 1: Image not loading (`${imageSrc}` shows up and triggers 404)
+
+### 🔧 Fix:
+
+Update your `artwork_detail.html` to **use Django template syntax** instead of an unparsed JS-style variable.
+
+You currently have:
+
+```html
+<img src="/artworks/31/${imageSrc}" class="img-fluid">
+```
+
+Replace with:
+
+```html
+<img src="{{ current_version.image.url }}" class="img-fluid">
+```
+
+And in your `ArtWorkDetailView.get_context_data`, add:
+
+```python
+context['current_version'] = versions.last()  # Or your logic for picking the displayed version
+```
+
+✅ This fixes the broken image request like:
+
+```
+GET /artworks/31/${imageSrc} → 404
+```
+
+Because now the actual image URL will be rendered into the HTML.
+
+---
+
+## ✅ Problem 2: “Failed to switch version” on button click
+
+### 🔧 Fix:
+
+You're missing a view and route for this line to succeed:
+
+```js
+POST /api/versions/<id>/switch/
+```
+
+**Solution:** Add the view below to `views.py` or `critique/api/views.py`:
+
+```python
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from .models import ArtWorkVersion
+
+@csrf_exempt
+@login_required
+def switch_version(request, version_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Only POST allowed'}, status=405)
+
+    try:
+        version = ArtWorkVersion.objects.get(pk=version_id)
+        artwork = version.artwork
+
+        if artwork.author != request.user:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        # Deactivate all others and activate this one
+        ArtWorkVersion.objects.filter(artwork=artwork).update(is_active=False)
+        version.is_active = True
+        version.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Switched version'})
+    except ArtWorkVersion.DoesNotExist:
+        return JsonResponse({'error': 'Version not found'}, status=404)
+```
+
+And register it in your `urls.py`:
+
+```python
+path('api/versions/<int:version_id>/switch/', views.switch_version, name='switch_version')
+```
+
+✅ This resolves the POST failure and ensures switching version logic is handled server-side.
+
+---
+
+### ✅ Summary
+
+| Issue                     | Fix                                                                  |
+| ------------------------- | -------------------------------------------------------------------- |
+| ❌ Broken image from `${}` | Use `{{ current_version.image.url }}` in Django template             |
+| ❌ Switch version 404      | Create `switch_version` view + route at `/api/versions/<id>/switch/` |
+
+Let me know if you also need to implement **archiving** or **undo switching**, and I can provide that too.

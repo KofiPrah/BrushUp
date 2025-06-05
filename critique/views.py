@@ -161,6 +161,12 @@ class ArtWorkDetailView(DetailView):
         context['total_versions'] = versions.count()
         context['current_version_number'] = self.object.get_current_version_number()
         
+        # Add current version for image display
+        if versions.exists():
+            context['current_version'] = versions.last()
+        else:
+            context['current_version'] = None
+        
         return context
 
 @login_required
