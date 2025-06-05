@@ -1,0 +1,73 @@
+Your bulk checkbox display logic is almost complete, but the issue seems to stem from **missing or misfired JavaScript logic to unhide the checkboxes** when bulk mode is toggled.
+
+From your HTML and JavaScript, the checkbox containers are inside:
+
+```html
+<div class="artwork-checkbox position-absolute top-0 start-0 p-2" style="display: none;">
+```
+
+### ✅ Fix Steps:
+
+1. **Ensure the toggle function runs properly on click.**
+   You do have `onclick="toggleBulkActions()"` — so the next suspect is that it doesn't correctly flip the `.artwork-checkbox` elements' display.
+
+2. **Bug in checkbox display logic?**
+   Your `toggleBulkActions()` function contains this:
+
+```js
+checkboxes.forEach(cb => cb.style.display = 'block');
+```
+
+But the `artwork-checkbox` elements are `.artwork-checkbox`, not actual `<input>` checkboxes, so `cb.style.display` should be applied to the **parent container** with the `artwork-checkbox` class.
+
+If for some reason `document.querySelectorAll('.artwork-checkbox')` is selecting nothing, double check that your script runs **after** the DOM is fully loaded. You already wrap `initializeStudioWorkspace()` inside a `DOMContentLoaded` event, but `toggleBulkActions()` is not.
+
+3. ✅ **Recommended Fix:**
+
+Ensure the bulk toggle logic includes:
+
+```js
+function toggleBulkActions() {
+    bulkSelectionMode = !bulkSelectionMode;
+    const checkboxes = document.querySelectorAll('.artwork-checkbox');
+    const bulkBar = document.getElementById('bulk-actions-bar');
+    const toggleBtn = document.querySelector('[onclick="toggleBulkActions()"]');
+    
+    if (bulkSelectionMode) {
+        checkboxes.forEach(cb => {
+            cb.style.display = 'block';
+        });
+        bulkBar.classList.remove('d-none');
+        toggleBtn.classList.add('active');
+        toggleBtn.innerHTML = /* your cancel icon */;
+    } else {
+        cancelBulkActions();
+    }
+}
+```
+
+4. ✅ **Verify this runs *after* the DOM is ready.**
+   If needed, you can wrap the `toggleBulkActions()` declaration inside:
+
+```js
+document.addEventListener('DOMContentLoaded', function() {
+    window.toggleBulkActions = function() {
+        ...
+    };
+});
+```
+
+5. ✅ **Fallback: Add a console log**
+   Just for debugging:
+
+```js
+console.log('Found checkboxes:', checkboxes.length);
+```
+
+---
+
+### Final Tip:
+
+If `.artwork-checkbox` is still not showing, inspect your rendered DOM with dev tools — sometimes Django templates or filters (`{% if artworks %}`) block the content if the dataset is empty.
+
+Let me know if you'd like me to walk through rewriting the toggle logic as a robust snippet or diagnose further with screenshots.
