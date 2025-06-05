@@ -1,0 +1,107 @@
+Here’s a breakdown of what’s going wrong with your **version switch** and **archive artwork** functionality, based on your logs:
+
+---
+
+### 🚨 Issues Identified
+
+#### 1. **Invalid Image Source in GET Request**
+
+```text
+GET https://brushup.replit.app/artworks/31/$%7BimageSrc%7D 404 (Not Found)
+```
+
+* You’re trying to load an image with a path like `${imageSrc}` — which means:
+
+  * You **did not interpolate the variable** properly in your template or React/JS.
+  * Instead of using `${imageSrc}`, you're literally sending the string `"${imageSrc}"`.
+
+✅ **Fix:**
+Make sure you're using template literals (backticks in JS) or proper string interpolation:
+
+```js
+img.src = `/artworks/31/${imageSrc}`; // WRONG if imageSrc is not defined
+img.src = `/artworks/31/${someImageVariable}`; // ✅
+```
+
+---
+
+#### 2. **Archive POST Returning 404**
+
+```text
+POST https://brushup.replit.app/api/versions/3/archive/ 404 (Not Found)
+```
+
+* The endpoint `/api/versions/3/archive/` doesn't exist on your Django backend.
+
+✅ **Fix:**
+You need to:
+
+1. Define a custom route in your Django REST framework viewset (e.g., using `@action`).
+2. Make sure your frontend is calling the correct URL.
+
+Example (Django DRF):
+
+```python
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+class VersionViewSet(viewsets.ModelViewSet):
+    ...
+
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        version = self.get_object()
+        version.is_archived = True
+        version.save()
+        return Response({'status': 'archived'})
+```
+
+And in `urls.py`:
+
+```python
+router.register(r'versions', VersionViewSet)
+```
+
+This will give you the correct route:
+
+```
+/api/versions/<id>/archive/
+```
+
+Make sure the frontend sends a `POST` to that path.
+
+---
+
+#### 3. **JSON Parsing Error**
+
+```text
+Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+```
+
+* This happens when the frontend tries to parse an **HTML error page** as JSON (likely a 404 or 500 error from Django).
+
+✅ **Fix:**
+
+* Wrap your `fetch()` or `axios` call in a `try/catch` and handle non-200 status codes before calling `.json()`.
+
+Example:
+
+```js
+fetch('/api/versions/3/archive/', { method: 'POST' })
+  .then(res => {
+    if (!res.ok) throw new Error('Request failed');
+    return res.json();
+  })
+  .then(data => console.log(data))
+  .catch(err => console.error('Archive error', err));
+```
+
+---
+
+### ✅ Next Steps
+
+* [ ] Fix template literal interpolation in image loading
+* [ ] Create or verify your Django route for `archive` (use `@action`)
+* [ ] Update your frontend to gracefully handle non-JSON responses
+
+Let me know if you want help writing the Django `archive()` method or debugging the React side.

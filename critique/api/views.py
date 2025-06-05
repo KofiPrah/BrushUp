@@ -1593,49 +1593,56 @@ def delete_artwork_version(request, version_id):
         return Response({'error': 'Version not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def archive_artwork_version(request, version_id):
-    """Archive a specific version"""
-    try:
-        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
-        reason = request.data.get('reason', '')
-        
-        # Mark version as archived (we'll simulate this for now since the field doesn't exist yet)
-        # version.is_archived = True
-        # version.archived_at = timezone.now()
-        # version.archive_reason = reason
-        # version.save()
-        
-        return Response({
-            'message': f'Version {version.version_number} archived successfully',
-            'reason': reason,
-            'success': True
-        })
-    except ArtWorkVersion.DoesNotExist:
-        return Response({'error': 'Version not found or not owned by user'}, 
-                      status=status.HTTP_404_NOT_FOUND)
-
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def unarchive_artwork_version(request, version_id):
-    """Unarchive a specific version"""
-    try:
-        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
-        
-        # Mark version as unarchived (we'll simulate this for now since the field doesn't exist yet)
-        # version.is_archived = False
-        # version.archived_at = None
-        # version.archive_reason = ''
-        # version.save()
-        
-        return Response({
-            'message': f'Version {version.version_number} unarchived successfully',
-            'success': True
-        })
-    except ArtWorkVersion.DoesNotExist:
-        return Response({'error': 'Version not found or not owned by user'}, 
-                      status=status.HTTP_404_NOT_FOUND)
+class ArtworkVersionViewSet(viewsets.ModelViewSet):
+    """ViewSet for artwork version management"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return ArtWorkVersion.objects.filter(artwork__author=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def archive(self, request, pk=None):
+        """Archive a specific version"""
+        try:
+            version = self.get_object()
+            reason = request.data.get('reason', '')
+            
+            # Mark version as archived (simulated for now)
+            # version.is_archived = True
+            # version.archived_at = timezone.now()
+            # version.archive_reason = reason
+            # version.save()
+            
+            return Response({
+                'message': f'Version {version.version_number} archived successfully',
+                'reason': reason,
+                'success': True,
+                'status': 'archived'
+            })
+        except ArtWorkVersion.DoesNotExist:
+            return Response({'error': 'Version not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
+    
+    @action(detail=True, methods=['post'])
+    def unarchive(self, request, pk=None):
+        """Unarchive a specific version"""
+        try:
+            version = self.get_object()
+            
+            # Mark version as unarchived (simulated for now)
+            # version.is_archived = False
+            # version.archived_at = None
+            # version.archive_reason = ''
+            # version.save()
+            
+            return Response({
+                'message': f'Version {version.version_number} unarchived successfully',
+                'success': True,
+                'status': 'unarchived'
+            })
+        except ArtWorkVersion.DoesNotExist:
+            return Response({'error': 'Version not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
 
 class ArtworkVersionCompareView(APIView):
     """API endpoint for comparing artwork versions"""
