@@ -68,14 +68,14 @@
                         <div class="card-body">
                             <div class="d-flex align-items-center overflow-auto" style="gap: 8px;">
                                 <!-- Current Version -->
-                                <div class="version-thumbnail active" data-version="current">
+                                <div class="version-thumbnail active me-3 mb-3" data-version="current">
                                     <div class="position-relative">
                                         {% if artwork.image %}
-                                            <img src="{{ artwork.image.url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Current">
+                                            <img src="{{ artwork.image.url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">
                                         {% elif artwork.image_url %}
-                                            <img src="{{ artwork.image_url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Current">
+                                            <img src="{{ artwork.image_url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">
                                         {% else %}
-                                            <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 0.375rem;">
+                                            <div class="bg-dark d-flex align-items-center justify-content-center border border-primary" style="width: 90px; height: 90px; border-radius: 0.375rem;">
                                                 <span class="text-muted small">No Img</span>
                                             </div>
                                         {% endif %}
@@ -83,19 +83,20 @@
                                             Current
                                         </span>
                                     </div>
-                                    <small class="text-center d-block mt-1">v{{ current_version_number }}</small>
+                                    <small class="text-center d-block mt-2 fw-bold text-primary">Current</small>
+                                    <small class="text-center d-block text-muted" style="font-size: 0.75rem;">v{{ current_version_number }}</small>
                                 </div>
                                 
                                 <!-- Version History Thumbnails -->
                                 {% for version in versions reversed %}
-                                <div class="version-thumbnail" data-version="{{ version.id }}">
+                                <div class="version-thumbnail me-3 mb-3" data-version="{{ version.id }}">
                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                         {% if version.image %}
-                                            <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Version {{ version.version_number }}">
+                                            <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 90px; height: 90px; object-fit: cover;" alt="Version {{ version.version_number }}">
                                         {% elif version.image_url %}
-                                            <img src="{{ version.image_url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Version {{ version.version_number }}">
+                                            <img src="{{ version.image_url }}" class="img-thumbnail" style="width: 90px; height: 90px; object-fit: cover;" alt="Version {{ version.version_number }}">
                                         {% else %}
-                                            <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 0.375rem;">
+                                            <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 90px; height: 90px; border-radius: 0.375rem;">
                                                 <span class="text-muted small">No Img</span>
                                             </div>
                                         {% endif %}
@@ -143,9 +144,9 @@
                                         </div>
                                         {% endif %}
                                     </div>
-                                    <small class="text-center d-block mt-1">v{{ version.version_number }}</small>
+                                    <small class="text-center d-block mt-2">v{{ version.version_number }}</small>
                                     {% if version.created_at %}
-                                    <small class="text-center d-block text-muted" style="font-size: 0.6rem;">{{ version.created_at|date:"M d, Y" }}</small>
+                                    <small class="text-center d-block text-muted" style="font-size: 0.75rem;">{{ version.created_at|date:"M d, Y" }}</small>
                                     {% endif %}
                                 </div>
                                 {% endfor %}
