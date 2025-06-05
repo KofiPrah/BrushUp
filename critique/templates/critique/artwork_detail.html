@@ -17,6 +17,29 @@
                 {% endif %}
                 <div class="card-body">
                     <h1 class="card-title">{{ artwork.title }}</h1>
+                    
+                    <!-- Version Label -->
+                    {% if total_versions > 0 %}
+                    <div class="mb-2">
+                        <span class="badge bg-secondary me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
+                                <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.942.313a7.023 7.023 0 0 0-.187-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-1.442 1.633c.263-.226.509-.467.740-.722l.724.69a8.026 8.026 0 0 1-.989.912l-.475-.88zm-2.266.97c.342-.14.677-.296.99-.49l.546.837a7.972 7.972 0 0 1-1.198.596l-.338-.943zm-2.137.339c.37-.042.741-.111 1.106-.207l.238.971a7.998 7.998 0 0 1-1.425.267l.081-.031z"/>
+                                <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                                <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                            Current ({{ current_version_number }} of {{ total_versions|add:1 }})
+                        </span>
+                        {% if user.is_authenticated and user == artwork.author %}
+                        <button class="btn btn-sm btn-outline-info" onclick="openVersionManager({{ artwork.id }})">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                            Manage Versions
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
                     <p class="card-text">{{ artwork.description }}</p>
                     <p class="card-text">
                         {% if artwork.medium %}<span class="badge bg-info me-2">{{ artwork.medium }}</span>{% endif %}
@@ -25,6 +48,71 @@
                     <p class="card-text"><small class="text-muted">Created: {{ artwork.created_at|date:"F d, Y" }}</small></p>
                     {% if artwork.author %}
                     <p class="card-text"><small class="text-muted">Artist: <a href="{% url 'critique:user_profile' artwork.author.username %}" class="text-info">{{ artwork.author.username }}</a></small></p>
+                    {% endif %}
+                    
+                    <!-- Version Switcher Component -->
+                    {% if versions %}
+                    <div class="card bg-secondary mb-3">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Version History</h6>
+                            {% if versions.count > 1 %}
+                            <button class="btn btn-sm btn-outline-info" onclick="openVersionComparison({{ artwork.id }})">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-shuffle me-1" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
+                                    <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
+                                </svg>
+                                Compare Versions
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex align-items-center overflow-auto" style="gap: 8px;">
+                                <!-- Current Version -->
+                                <div class="version-thumbnail active" data-version="current">
+                                    <div class="position-relative">
+                                        {% if artwork.image %}
+                                            <img src="{{ artwork.image.url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Current">
+                                        {% elif artwork.image_url %}
+                                            <img src="{{ artwork.image_url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Current">
+                                        {% else %}
+                                            <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 0.375rem;">
+                                                <span class="text-muted small">No Img</span>
+                                            </div>
+                                        {% endif %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">
+                                            Current
+                                        </span>
+                                    </div>
+                                    <small class="text-center d-block mt-1">v{{ current_version_number }}</small>
+                                </div>
+                                
+                                <!-- Version History Thumbnails -->
+                                {% for version in versions reversed %}
+                                <div class="version-thumbnail" data-version="{{ version.id }}" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
+                                    <div class="position-relative cursor-pointer">
+                                        {% if version.image %}
+                                            <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Version {{ version.version_number }}">
+                                        {% elif version.image_url %}
+                                            <img src="{{ version.image_url }}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover;" alt="Version {{ version.version_number }}">
+                                        {% else %}
+                                            <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 0.375rem;">
+                                                <span class="text-muted small">No Img</span>
+                                            </div>
+                                        {% endif %}
+                                        {% if version.version_notes %}
+                                        <span class="position-absolute top-0 end-0 badge bg-warning" title="{{ version.version_notes }}">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-sticky" viewBox="0 0 16 16">
+                                                <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h6.086a1.5 1.5 0 0 0 1.06-.44l4.915-4.914A1.5 1.5 0 0 0 15 8.586V2.5A1.5 1.5 0 0 0 13.5 1h-11zM2 2.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 .5.5V8H9.5A1.5 1.5 0 0 0 8 9.5V14H2.5a.5.5 0 0 1-.5-.5v-11zm7 11.293V9.5a.5.5 0 0 1 .5-.5h4.293L9 13.793z"/>
+                                            </svg>
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                    <small class="text-center d-block mt-1">v{{ version.version_number }}</small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                     {% endif %}
                     
                     <div class="d-flex justify-content-between align-items-center">
@@ -132,7 +220,28 @@
                         {% for critique in critiques %}
                             <div class="card mb-4 bg-dark border border-secondary {% if critique.is_hidden %}border-danger{% endif %}">
                                 <div class="card-header d-flex justify-content-between">
-                                    <h5 class="card-title mb-0"><a href="{% url 'critique:user_profile' critique.author.username %}" class="text-info">{{ critique.author.username }}</a></h5>
+                                    <div>
+                                        <h5 class="card-title mb-0"><a href="{% url 'critique:user_profile' critique.author.username %}" class="text-info">{{ critique.author.username }}</a></h5>
+                                        {% if critique.artwork_version %}
+                                        <span class="badge bg-info mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
+                                                <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.942.313a7.023 7.023 0 0 0-.187-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-1.442 1.633c.263-.226.509-.467.740-.722l.724.69a8.026 8.026 0 0 1-.989.912l-.475-.88zm-2.266.97c.342-.14.677-.296.99-.49l.546.837a7.972 7.972 0 0 1-1.198.596l-.338-.943zm-2.137.339c.37-.042.741-.111 1.106-.207l.238.971a7.998 7.998 0 0 1-1.425.267l.081-.031z"/>
+                                                <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                                                <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                                            </svg>
+                                            Comment on v{{ critique.artwork_version.version_number }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-secondary mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
+                                                <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.942.313a7.023 7.023 0 0 0-.187-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-1.442 1.633c.263-.226.509-.467.740-.722l.724.69a8.026 8.026 0 0 1-.989.912l-.475-.88zm-2.266.97c.342-.14.677-.296.99-.49l.546.837a7.972 7.972 0 0 1-1.198.596l-.338-.943zm-2.137.339c.37-.042.741-.111 1.106-.207l.238.971a7.998 7.998 0 0 1-1.425.267l.081-.031z"/>
+                                                <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                                                <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                                            </svg>
+                                            Comment on Current
+                                        </span>
+                                        {% endif %}
+                                    </div>
                                     <div>
                                         {% if critique.is_hidden %}
                                             <span class="badge bg-danger me-2">Hidden Critique</span>

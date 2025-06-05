@@ -7,7 +7,7 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
-from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction, Folder
+from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction, Folder, ArtWorkVersion
 from .forms import CommentForm
 from .karma import award_like_karma, award_critique_karma
 import json
@@ -154,6 +154,13 @@ class ArtWorkDetailView(DetailView):
         context['comments'] = self.object.comments.filter(parent=None).order_by('-created_at')
         # Add critiques to context
         context['critiques'] = Critique.objects.filter(artwork=self.object).order_by('-created_at')
+        
+        # Add version information
+        versions = ArtWorkVersion.objects.filter(artwork=self.object).order_by('version_number')
+        context['versions'] = versions
+        context['total_versions'] = versions.count()
+        context['current_version_number'] = self.object.get_current_version_number()
+        
         return context
 
 @login_required
