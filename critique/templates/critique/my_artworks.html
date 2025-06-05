@@ -143,6 +143,9 @@
     position: relative !important;
     z-index: 9999 !important;
     transform: scale(1.2) !important;
+    appearance: auto !important;
+    -webkit-appearance: checkbox !important;
+    -moz-appearance: checkbox !important;
 }
 
 .badge {
@@ -867,11 +870,20 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Enabling bulk selection mode');
         checkboxes.forEach((cb, index) => {
             console.log(`Setting checkbox ${index} to visible`);
-            console.log('Computed style before:', window.getComputedStyle(cb).display);
             cb.classList.remove('bulk-hidden', 'd-none');
             cb.classList.add('bulk-visible');
             cb.style.setProperty('display', 'block', 'important');
-            console.log('Computed style after:', window.getComputedStyle(cb).display);
+            
+            const input = cb.querySelector('input[type="checkbox"]');
+            if (input) {
+                input.style.setProperty('opacity', '1', 'important');
+                input.style.setProperty('width', '20px', 'important');
+                input.style.setProperty('height', '20px', 'important');
+                input.style.setProperty('z-index', '9999', 'important');
+                input.style.setProperty('position', 'relative', 'important');
+                input.style.setProperty('appearance', 'auto', 'important');
+                console.log('Checkbox input styled:', input);
+            }
         });
         if (bulkBar) bulkBar.classList.remove('d-none');
         if (toggleBtn) {

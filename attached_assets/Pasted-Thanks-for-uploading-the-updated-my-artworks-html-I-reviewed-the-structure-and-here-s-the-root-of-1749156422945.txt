@@ -1,0 +1,79 @@
+Thanks for uploading the updated `my_artworks.html`. I reviewed the structure and here's the root of your issue:
+
+---
+
+### 🧨 Root Cause
+
+Your `.artwork-checkbox` container is correctly displayed, but the `<input>` element inside it is not visible **because it has no dimensions or is being overridden by Bootstrap styles**.
+
+---
+
+### ✅ Step-by-Step Fix (Minimal Changes)
+
+1. **Fix the checkbox display directly inside your inline script**
+
+Find this section inside your JavaScript:
+
+```js
+checkboxes.forEach((cb, index) => {
+  console.log(`Setting checkbox ${index} to visible`);
+  cb.style.setProperty('display', 'block', 'important');
+});
+```
+
+Replace it with:
+
+```js
+checkboxes.forEach((cb, index) => {
+  console.log(`Setting checkbox ${index} to visible`);
+  cb.style.setProperty('display', 'block', 'important');
+
+  const input = cb.querySelector('input[type="checkbox"]');
+  if (input) {
+    input.style.setProperty('opacity', '1', 'important');
+    input.style.setProperty('width', '20px', 'important');
+    input.style.setProperty('height', '20px', 'important');
+    input.style.setProperty('z-index', '9999', 'important');
+    input.style.setProperty('position', 'relative', 'important');
+    input.style.setProperty('appearance', 'auto', 'important'); // force default look
+  }
+});
+```
+
+2. **Add this CSS (either in a `<style>` block or CSS file):**
+
+```css
+.artwork-checkbox {
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.artwork-checkbox .form-check-input {
+  opacity: 1 !important;
+  width: 20px !important;
+  height: 20px !important;
+  appearance: auto !important;
+}
+```
+
+---
+
+### ✅ Bonus (Confirm Your HTML Structure)
+
+Make sure your checkbox structure inside `.artwork-checkbox` is like this:
+
+```html
+<div class="artwork-checkbox position-absolute top-0 start-0 p-2" style="display: none;">
+  <div class="form-check">
+    <input class="form-check-input" type="checkbox">
+  </div>
+</div>
+```
+
+If all the above is in place, the checkboxes **will appear on click**, styled properly, and visible.
+
+Let me know if you'd like the checkboxes to float more subtly (e.g., glassy background, smaller size, hover scale) — I can design a style variant for that too.
