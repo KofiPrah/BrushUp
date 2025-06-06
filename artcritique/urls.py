@@ -18,10 +18,27 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.http import HttpResponse
+from django.http import JsonResponse
+from django.db import connection
 
 def health_check(request):
-    return HttpResponse(status=200)
+    """Health check endpoint for deployment monitoring"""
+    try:
+        # Test database connection
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+        
+        return JsonResponse({
+            "status": "healthy",
+            "database": "connected",
+            "service": "artcritique"
+        }, status=200)
+    except Exception as e:
+        return JsonResponse({
+            "status": "unhealthy",
+            "error": str(e),
+            "service": "artcritique"
+        }, status=503)
 
 urlpatterns = [
     path('', include('critique.urls')),  # Main Brush Up art platform at root
