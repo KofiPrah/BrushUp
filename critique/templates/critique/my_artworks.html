@@ -1205,7 +1205,7 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                 </button>
                             </div>
                             <div class="col-md-6 text-end">
-                                <button class="btn btn-outline-info" onclick="openVersionComparison(${artworkId})" 
+                                <button class="btn btn-outline-info" onclick="openVersionComparison(' + artworkId + ')" 
                                         ${versions.length < 1 ? 'disabled' : ''} 
                                         title="${versions.length < 1 ? 'Create at least one version to enable comparison' : 'Compare different versions side-by-side to see what changed'}" 
                                         data-bs-toggle="tooltip" data-bs-placement="top">
@@ -1229,7 +1229,7 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                     <div class="card-body">
                                         <p class="text-sm mb-2">This is the current published state of your artwork</p>
                                         <div class="d-flex gap-2">
-                                            <button class="btn btn-sm btn-outline-light" onclick="previewVersion('current', ${artworkId})" 
+                                            <button class="btn btn-sm btn-outline-light" onclick="previewVersion('current', ' + artworkId + ')" 
                                                     title="View the current version details" 
                                                     data-bs-toggle="tooltip" data-bs-placement="top">
                                                 Preview
@@ -1240,33 +1240,33 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                             </div>
                             
                             <!-- Version History -->
-                            ${versions.map((version, index) => `
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-secondary text-white h-100">
-                                        <div class="card-header d-flex justify-content-between align-items-center">
-                                            <h6 class="mb-0">Version ${version.version_number}</h6>
-                                            <small class="text-light">${new Date(version.created_at).toLocaleDateString()}</small>
-                                        </div>
-                                        <div class="card-body">
-                                            <h6 class="card-title">${version.title}</h6>
-                                            <p class="card-text text-sm">${version.description.substring(0, 100)}${version.description.length > 100 ? '...' : ''}</p>
-                                            ${version.version_notes ? `<p class="text-warning text-sm"><strong>Notes:</strong> ${version.version_notes}</p>` : ''}
-                                            <div class="d-flex gap-2 flex-wrap">
-                                                <button class="btn btn-sm btn-outline-light" onclick="previewVersion(${version.id}, ${artworkId})" 
-                                                        title="View this version in detail" 
-                                                        data-bs-toggle="tooltip" data-bs-placement="top">
-                                                    Preview
-                                                </button>
-                                                <button class="btn btn-sm btn-warning" onclick="restoreVersion(${artworkId}, ${version.id})" 
-                                                        title="Make this version your current artwork (creates backup of current)" 
-                                                        data-bs-toggle="tooltip" data-bs-placement="top">
-                                                    Restore
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
+                            ' + versions.map(function(version, index) {
+                                return '<div class="col-md-4 mb-3">' +
+                                    '<div class="card bg-secondary text-white h-100">' +
+                                        '<div class="card-header d-flex justify-content-between align-items-center">' +
+                                            '<h6 class="mb-0">Version ' + version.version_number + '</h6>' +
+                                            '<small class="text-light">' + new Date(version.created_at).toLocaleDateString() + '</small>' +
+                                        '</div>' +
+                                        '<div class="card-body">' +
+                                            '<h6 class="card-title">' + version.title + '</h6>' +
+                                            '<p class="card-text text-sm">' + version.description.substring(0, 100) + (version.description.length > 100 ? '...' : '') + '</p>' +
+                                            (version.version_notes ? '<p class="text-warning text-sm"><strong>Notes:</strong> ' + version.version_notes + '</p>' : '') +
+                                            '<div class="d-flex gap-2 flex-wrap">' +
+                                                '<button class="btn btn-sm btn-outline-light" onclick="previewVersion(' + version.id + ', ' + artworkId + ')" ' +
+                                                        'title="View this version in detail" ' +
+                                                        'data-bs-toggle="tooltip" data-bs-placement="top">' +
+                                                    'Preview' +
+                                                '</button>' +
+                                                '<button class="btn btn-sm btn-warning" onclick="restoreVersion(' + artworkId + ', ' + version.id + ')" ' +
+                                                        'title="Make this version your current artwork (creates backup of current)" ' +
+                                                        'data-bs-toggle="tooltip" data-bs-placement="top">' +
+                                                    'Restore' +
+                                                '</button>' +
+                                            '</div>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>';
+                            }).join('') + '
                         </div>
                     </div>
                 </div>
@@ -1381,51 +1381,54 @@ function openVersionComparison(artworkId) {
 }
 
 function showVersionComparisonModal(artworkId, versions, artworkTitle) {
-    const modalHtml = `
-        <div class="modal fade" id="versionComparisonModal" tabindex="-1" aria-labelledby="versionComparisonModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content bg-dark text-light">
-                    <div class="modal-header border-secondary">
-                        <h5 class="modal-title" id="versionComparisonModalLabel">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-shuffle me-2" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>
-                                <path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>
-                            </svg>
-                            Compare Versions: ${artworkTitle}
-                        </h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Select First Version:</label>
-                                <select class="form-select bg-dark text-light border-secondary" id="version1Select">
-                                    <option value="current">Current Version</option>
-                                    ${versions.map(v => `<option value="${v.id}">Version ${v.version_number} - ${v.title}</option>`).join('')}
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Select Second Version:</label>
-                                <select class="form-select bg-dark text-light border-secondary" id="version2Select">
-                                    <option value="">Select version to compare</option>
-                                    <option value="current">Current Version</option>
-                                    ${versions.map(v => `<option value="${v.id}">Version ${v.version_number} - ${v.title}</option>`).join('')}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-12 text-center">
-                                <button class="btn btn-primary" onclick="performVersionComparison(${artworkId})">
-                                    Compare Selected Versions
-                                </button>
-                            </div>
-                        </div>
-                        <div id="comparisonResults" class="mt-4" style="display: none;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    const versionOptions = versions.map(function(v) {
+        return '<option value="' + v.id + '">Version ' + v.version_number + ' - ' + v.title + '</option>';
+    }).join('');
+    
+    const modalHtml = 
+        '<div class="modal fade" id="versionComparisonModal" tabindex="-1" aria-labelledby="versionComparisonModalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog modal-xl">' +
+                '<div class="modal-content bg-dark text-light">' +
+                    '<div class="modal-header border-secondary">' +
+                        '<h5 class="modal-title" id="versionComparisonModalLabel">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-shuffle me-2" viewBox="0 0 16 16">' +
+                                '<path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>' +
+                                '<path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>' +
+                            '</svg>' +
+                            'Compare Versions: ' + artworkTitle +
+                        '</h5>' +
+                        '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                    '</div>' +
+                    '<div class="modal-body">' +
+                        '<div class="row mb-3">' +
+                            '<div class="col-md-6">' +
+                                '<label class="form-label">Select First Version:</label>' +
+                                '<select class="form-select bg-dark text-light border-secondary" id="version1Select">' +
+                                    '<option value="current">Current Version</option>' +
+                                    versionOptions +
+                                '</select>' +
+                            '</div>' +
+                            '<div class="col-md-6">' +
+                                '<label class="form-label">Select Second Version:</label>' +
+                                '<select class="form-select bg-dark text-light border-secondary" id="version2Select">' +
+                                    '<option value="">Select version to compare</option>' +
+                                    '<option value="current">Current Version</option>' +
+                                    versionOptions +
+                                '</select>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="row mb-3">' +
+                            '<div class="col-12 text-center">' +
+                                '<button class="btn btn-primary" onclick="performVersionComparison(' + artworkId + ')">' +
+                                    'Compare Selected Versions' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div id="comparisonResults" class="mt-4" style="display: none;"></div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
     
     // Remove existing modal if present
     const existingModal = document.getElementById('versionComparisonModal');
@@ -1453,7 +1456,7 @@ function performVersionComparison(artworkId) {
         return;
     }
     
-    fetch(`/api/artworks/${artworkId}/versions/compare/?version1=${version1}&version2=${version2}`, {
+    fetch('/api/artworks/' + artworkId + '/versions/compare/?version1=' + version1 + '&version2=' + version2, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -1477,64 +1480,107 @@ function performVersionComparison(artworkId) {
 function displayComparisonResults(comparisonData) {
     const resultsContainer = document.getElementById('comparisonResults');
     
-    const resultsHtml = `
-        <div class="card bg-secondary text-light">
-            <div class="card-header">
-                <h6 class="mb-0">Comparison Results</h6>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6 class="text-info">Version ${comparisonData.version1.version_number || 'Current'}</h6>
-                        ${comparisonData.version1.image_display_url ? `<img src="${comparisonData.version1.image_display_url}" class="img-fluid mb-2" alt="Version 1">` : '<div class="bg-dark p-3 mb-2 text-center">No Image</div>'}
-                        <p><strong>Title:</strong> ${comparisonData.version1.title}</p>
-                        <p><strong>Description:</strong> ${comparisonData.version1.description}</p>
-                        ${comparisonData.version1.medium ? `<p><strong>Medium:</strong> ${comparisonData.version1.medium}</p>` : ''}
-                        ${comparisonData.version1.dimensions ? `<p><strong>Dimensions:</strong> ${comparisonData.version1.dimensions}</p>` : ''}
-                        ${comparisonData.version1.tags ? `<p><strong>Tags:</strong> ${comparisonData.version1.tags}</p>` : ''}
-                    </div>
-                    <div class="col-md-6">
-                        <h6 class="text-warning">Version ${comparisonData.version2.version_number || 'Current'}</h6>
-                        ${comparisonData.version2.image_display_url ? `<img src="${comparisonData.version2.image_display_url}" class="img-fluid mb-2" alt="Version 2">` : '<div class="bg-dark p-3 mb-2 text-center">No Image</div>'}
-                        <p><strong>Title:</strong> ${comparisonData.version2.title}</p>
-                        <p><strong>Description:</strong> ${comparisonData.version2.description}</p>
-                        ${comparisonData.version2.medium ? `<p><strong>Medium:</strong> ${comparisonData.version2.medium}</p>` : ''}
-                        ${comparisonData.version2.dimensions ? `<p><strong>Dimensions:</strong> ${comparisonData.version2.dimensions}</p>` : ''}
-                        ${comparisonData.version2.tags ? `<p><strong>Tags:</strong> ${comparisonData.version2.tags}</p>` : ''}
-                    </div>
-                </div>
-                
-                ${comparisonData.differences.length > 0 ? `
-                    <div class="mt-4">
-                        <h6 class="text-danger">Differences Found:</h6>
-                        <ul class="list-group list-group-flush">
-                            ${comparisonData.differences.map(diff => `
-                                <li class="list-group-item bg-dark text-light border-secondary">
-                                    <strong>${diff.field.charAt(0).toUpperCase() + diff.field.slice(1)}:</strong>
-                                    <div class="row mt-2">
-                                        <div class="col-md-6">
-                                            <span class="badge bg-info me-2">Version 1</span>
-                                            ${diff.field === 'image' ? 
-                                                (diff.version1_value ? `<img src="${diff.version1_value}" class="img-thumbnail" style="max-width: 100px;">` : 'No image') :
-                                                diff.version1_value || 'Empty'
-                                            }
-                                        </div>
-                                        <div class="col-md-6">
-                                            <span class="badge bg-warning me-2">Version 2</span>
-                                            ${diff.field === 'image' ? 
-                                                (diff.version2_value ? `<img src="${diff.version2_value}" class="img-thumbnail" style="max-width: 100px;">` : 'No image') :
-                                                diff.version2_value || 'Empty'
-                                            }
-                                        </div>
-                                    </div>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                ` : '<div class="alert alert-success mt-4">No differences found between these versions.</div>'}
-            </div>
-        </div>
-    `;
+    // Build version 1 content
+    const version1Image = comparisonData.version1.image_display_url ? 
+        '<img src="' + comparisonData.version1.image_display_url + '" class="img-fluid mb-2" alt="Version 1">' : 
+        '<div class="bg-dark p-3 mb-2 text-center">No Image</div>';
+    
+    const version1Medium = comparisonData.version1.medium ? 
+        '<p><strong>Medium:</strong> ' + comparisonData.version1.medium + '</p>' : '';
+    
+    const version1Dimensions = comparisonData.version1.dimensions ? 
+        '<p><strong>Dimensions:</strong> ' + comparisonData.version1.dimensions + '</p>' : '';
+    
+    const version1Tags = comparisonData.version1.tags ? 
+        '<p><strong>Tags:</strong> ' + comparisonData.version1.tags + '</p>' : '';
+    
+    // Build version 2 content
+    const version2Image = comparisonData.version2.image_display_url ? 
+        '<img src="' + comparisonData.version2.image_display_url + '" class="img-fluid mb-2" alt="Version 2">' : 
+        '<div class="bg-dark p-3 mb-2 text-center">No Image</div>';
+    
+    const version2Medium = comparisonData.version2.medium ? 
+        '<p><strong>Medium:</strong> ' + comparisonData.version2.medium + '</p>' : '';
+    
+    const version2Dimensions = comparisonData.version2.dimensions ? 
+        '<p><strong>Dimensions:</strong> ' + comparisonData.version2.dimensions + '</p>' : '';
+    
+    const version2Tags = comparisonData.version2.tags ? 
+        '<p><strong>Tags:</strong> ' + comparisonData.version2.tags + '</p>' : '';
+    
+    // Build differences section
+    let differencesHtml = '';
+    if (comparisonData.differences.length > 0) {
+        const differencesList = comparisonData.differences.map(function(diff) {
+            const fieldName = diff.field.charAt(0).toUpperCase() + diff.field.slice(1);
+            
+            let version1Content, version2Content;
+            if (diff.field === 'image') {
+                version1Content = diff.version1_value ? 
+                    '<img src="' + diff.version1_value + '" class="img-thumbnail" style="max-width: 100px;">' : 
+                    'No image';
+                version2Content = diff.version2_value ? 
+                    '<img src="' + diff.version2_value + '" class="img-thumbnail" style="max-width: 100px;">' : 
+                    'No image';
+            } else {
+                version1Content = diff.version1_value || 'Empty';
+                version2Content = diff.version2_value || 'Empty';
+            }
+            
+            return '<li class="list-group-item bg-dark text-light border-secondary">' +
+                '<strong>' + fieldName + ':</strong>' +
+                '<div class="row mt-2">' +
+                    '<div class="col-md-6">' +
+                        '<span class="badge bg-info me-2">Version 1</span>' +
+                        version1Content +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                        '<span class="badge bg-warning me-2">Version 2</span>' +
+                        version2Content +
+                    '</div>' +
+                '</div>' +
+            '</li>';
+        }).join('');
+        
+        differencesHtml = '<div class="mt-4">' +
+            '<h6 class="text-danger">Differences Found:</h6>' +
+            '<ul class="list-group list-group-flush">' +
+                differencesList +
+            '</ul>' +
+        '</div>';
+    } else {
+        differencesHtml = '<div class="alert alert-success mt-4">No differences found between these versions.</div>';
+    }
+    
+    const resultsHtml = 
+        '<div class="card bg-secondary text-light">' +
+            '<div class="card-header">' +
+                '<h6 class="mb-0">Comparison Results</h6>' +
+            '</div>' +
+            '<div class="card-body">' +
+                '<div class="row">' +
+                    '<div class="col-md-6">' +
+                        '<h6 class="text-info">Version ' + (comparisonData.version1.version_number || 'Current') + '</h6>' +
+                        version1Image +
+                        '<p><strong>Title:</strong> ' + comparisonData.version1.title + '</p>' +
+                        '<p><strong>Description:</strong> ' + comparisonData.version1.description + '</p>' +
+                        version1Medium +
+                        version1Dimensions +
+                        version1Tags +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                        '<h6 class="text-warning">Version ' + (comparisonData.version2.version_number || 'Current') + '</h6>' +
+                        version2Image +
+                        '<p><strong>Title:</strong> ' + comparisonData.version2.title + '</p>' +
+                        '<p><strong>Description:</strong> ' + comparisonData.version2.description + '</p>' +
+                        version2Medium +
+                        version2Dimensions +
+                        version2Tags +
+                    '</div>' +
+                '</div>' +
+                differencesHtml +
+            '</div>' +
+        '</div>';
     
     resultsContainer.innerHTML = resultsHtml;
     resultsContainer.style.display = 'block';
@@ -1544,7 +1590,7 @@ function previewVersion(versionId, artworkId) {
     let url;
     if (versionId === 'current') {
         // Preview current artwork
-        url = `/artwork/${artworkId}/`;
+        url = '/artwork/' + artworkId + '/';
     } else {
         // Fetch version data and show preview modal
         fetch(`/api/artworks/${artworkId}/versions/`, {
