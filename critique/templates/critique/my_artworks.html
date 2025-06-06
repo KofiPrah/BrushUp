@@ -942,11 +942,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Individual Artwork Actions
 function togglePublishStatus(artworkId) {
-    const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
+    const artworkItem = document.querySelector('[data-artwork-id="' + artworkId + '"]');
     const currentStatus = artworkItem.dataset.status;
     
     // Make API call to toggle publish status
-    fetch(`/api/artworks/${artworkId}/toggle_publish_status/`, {
+    fetch('/api/artworks/' + artworkId + '/toggle_publish_status/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -962,7 +962,7 @@ function togglePublishStatus(artworkId) {
             calculateStatistics();
             
             // Show success feedback
-            showToast(`Artwork ${newStatus === 'published' ? 'published' : 'saved as draft'}`, 'success');
+            showToast('Artwork ' + (newStatus === 'published' ? 'published' : 'saved as draft'), 'success');
         } else {
             showToast('Failed to update status', 'error');
         }
@@ -974,10 +974,10 @@ function togglePublishStatus(artworkId) {
 }
 
 function toggleCritiqueRequest(artworkId) {
-    const artworkItem = document.querySelector(`[data-artwork-id="${artworkId}"]`);
+    const artworkItem = document.querySelector('[data-artwork-id="' + artworkId + '"]');
     
     // Make API call to toggle critique request
-    fetch(`/api/artworks/${artworkId}/toggle_critique_request/`, {
+    fetch('/api/artworks/' + artworkId + '/toggle_critique_request/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -993,7 +993,7 @@ function toggleCritiqueRequest(artworkId) {
             calculateStatistics();
             
             // Show success feedback
-            showToast(`Critique requests ${newSeeking ? 'enabled' : 'disabled'}`, 'success');
+            showToast('Critique requests ' + (newSeeking ? 'enabled' : 'disabled'), 'success');
         } else {
             showToast('Failed to update critique request', 'error');
         }
@@ -1357,7 +1357,7 @@ function restoreVersion(artworkId, versionId) {
 }
 
 function openVersionComparison(artworkId) {
-    fetch(`/api/artworks/${artworkId}/versions/`, {
+    fetch('/api/artworks/' + artworkId + '/versions/', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
