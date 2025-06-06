@@ -1,0 +1,115 @@
+Thanks for sharing the latest version of `artwork_detail.html`. I reviewed it carefully — the **broken HTML at the bottom** is being caused by multiple empty or incomplete template strings in your JavaScript, **especially these**:
+
+---
+
+### ❌ Problem Lines (Empty Template Strings)
+
+#### Line 1367 (inside `openVersionComparison`)
+
+```js
+const modalHtml = ` `;
+```
+
+#### Line 1471 (inside `deleteVersion`)
+
+```js
+const modalHtml = ` `;
+```
+
+#### Line 1535 (inside `archiveVersion`)
+
+```js
+const modalHtml = ` `;
+```
+
+#### Line 1959 (`showToast`)
+
+```js
+const toastHtml = ` `;
+```
+
+These empty template literals are injected into the DOM using:
+
+```js
+document.body.insertAdjacentHTML('beforeend', modalHtml);
+```
+
+So you're literally injecting ` ` into your page — over and over — which results in visible, malformed junk at the bottom of the screen.
+
+---
+
+## ✅ How to Fix This (Quickest Way)
+
+### 🔧 1. Replace each `modalHtml = \` \`\` block with a real modal
+
+#### Example Fix – Archive Modal (`archiveVersion`)
+
+Replace:
+
+```js
+const modalHtml = ` `;
+```
+
+With:
+
+```js
+const modalHtml = `
+<div class="modal fade" id="archiveVersionModal" tabindex="-1" aria-labelledby="archiveLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="archiveLabel">Archive Version</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to archive this version?</p>
+        <input type="text" id="archiveReason" class="form-control" placeholder="Optional reason">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-warning" onclick="confirmArchiveVersion(${versionId})">Archive</button>
+      </div>
+    </div>
+  </div>
+</div>`;
+```
+
+Do this for all three modal functions.
+
+---
+
+### 🔧 2. Fix `toastHtml = \` \``in`showToast()\`
+
+Replace:
+
+```js
+const toastHtml = ` `;
+```
+
+With this working Bootstrap toast:
+
+```js
+const toastHtml = `
+<div class="toast align-items-center text-bg-${type} border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="d-flex">
+    <div class="toast-body">
+      <strong>${title}</strong>: ${message}
+    </div>
+    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+  </div>
+</div>`;
+```
+
+---
+
+## ✅ Optional: Temporarily Disable Until You Replace
+
+If you're not ready to populate all modals now, **just comment out the injection lines**:
+
+```js
+// document.body.insertAdjacentHTML('beforeend', modalHtml);
+```
+
+---
+
+Would you like a complete version of `artwork_detail.html` with these four modals already filled in and cleanly formatted? I can return it as a corrected file.
