@@ -780,3 +780,65 @@ def folder_detail_view(request, folder_id):
     }
     
     return render(request, 'critique/folder_detail.html', context)
+
+def artwork_compare_view(request, pk):
+    """
+    View for comparing different versions of an artwork side by side.
+    """
+    artwork = get_object_or_404(ArtWork, pk=pk)
+    versions = ArtWorkVersion.objects.filter(artwork=artwork).order_by('version_number')
+    
+    # Get specific versions to compare if provided
+    version1_id = request.GET.get('version1')
+    version2_id = request.GET.get('version2')
+    version_id = request.GET.get('version')  # Single version parameter
+    
+    selected_version1 = None
+    selected_version2 = None
+    
+    if version1_id:
+        selected_version1 = get_object_or_404(ArtWorkVersion, id=version1_id, artwork=artwork)
+    
+    if version2_id:
+        selected_version2 = get_object_or_404(ArtWorkVersion, id=version2_id, artwork=artwork)
+    elif version_id:
+        # If only one version specified, compare with current
+        selected_version2 = get_object_or_404(ArtWorkVersion, id=version_id, artwork=artwork)
+        if versions.exists():
+            selected_version1 = versions.last()  # Current version
+    
+    context = {
+        'artwork': artwork,
+        'versions': versions,
+        'selected_version1': selected_version1,
+        'selected_version2': selected_version2,
+        'total_versions': versions.count(),
+    }
+    
+    return render(request, 'critique/artwork_compare.html', context)
+
+def artwork_progress_view(request, pk):
+    """
+    View for showing artwork progress over time with all versions.
+    """
+    artwork = get_object_or_404(ArtWork, pk=pk)
+    versions = ArtWorkVersion.objects.filter(artwork=artwork).order_by('version_number')
+    
+    # Get critique counts for each version
+    version_data = []
+    for version in versions:
+        critiques = Critique.objects.filter(artwork=artwork, version=version)
+        version_data.append({
+            'version': version,
+            'critique_count': critiques.count(),
+            'critiques': critiques.order_by('-created_at')[:3]  # Latest 3 critiques
+        })
+    
+    context = {
+        'artwork': artwork,
+        'versions': versions,
+        'version_data': version_data,
+        'total_versions': versions.count(),
+    }
+    
+    return render(request, 'critique/artwork_progress.html', context)

@@ -1,0 +1,138 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}Compare Versions - {{ artwork.title }} - Brush Up{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'critique:artwork_list' %}">Artworks</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'critique:artwork_detail' artwork.id %}">{{ artwork.title }}</a></li>
+                    <li class="breadcrumb-item active">Compare Versions</li>
+                </ol>
+            </nav>
+            <h2>Compare Versions: {{ artwork.title }}</h2>
+            <p class="text-muted">Side-by-side comparison of artwork versions</p>
+        </div>
+    </div>
+
+    {% if versions.count >= 2 %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h5>Version 1</h5>
+                    <select id="version1Select" class="form-select">
+                        {% for version in versions %}
+                        <option value="{{ version.id }}" {% if selected_version1 and selected_version1.id == version.id %}selected{% endif %}>
+                            Version {{ version.version_number }}{% if version.version_notes %} - {{ version.version_notes }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="card-body text-center" id="version1Display">
+                    {% if selected_version1 %}
+                        {% if selected_version1.image %}
+                            <img src="{{ selected_version1.image.url }}" class="img-fluid" alt="Version {{ selected_version1.version_number }}">
+                        {% elif selected_version1.image_url %}
+                            <img src="{{ selected_version1.image_url }}" class="img-fluid" alt="Version {{ selected_version1.version_number }}">
+                        {% else %}
+                            <div class="bg-secondary p-4">No Image Available</div>
+                        {% endif %}
+                        <p class="mt-2"><strong>Version {{ selected_version1.version_number }}</strong></p>
+                        {% if selected_version1.version_notes %}
+                            <p class="text-muted">{{ selected_version1.version_notes }}</p>
+                        {% endif %}
+                    {% else %}
+                        <div class="bg-secondary p-4">Select a version to compare</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <h5>Version 2</h5>
+                    <select id="version2Select" class="form-select">
+                        {% for version in versions %}
+                        <option value="{{ version.id }}" {% if selected_version2 and selected_version2.id == version.id %}selected{% endif %}>
+                            Version {{ version.version_number }}{% if version.version_notes %} - {{ version.version_notes }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="card-body text-center" id="version2Display">
+                    {% if selected_version2 %}
+                        {% if selected_version2.image %}
+                            <img src="{{ selected_version2.image.url }}" class="img-fluid" alt="Version {{ selected_version2.version_number }}">
+                        {% elif selected_version2.image_url %}
+                            <img src="{{ selected_version2.image_url }}" class="img-fluid" alt="Version {{ selected_version2.version_number }}">
+                        {% else %}
+                            <div class="bg-secondary p-4">No Image Available</div>
+                        {% endif %}
+                        <p class="mt-2"><strong>Version {{ selected_version2.version_number }}</strong></p>
+                        {% if selected_version2.version_notes %}
+                            <p class="text-muted">{{ selected_version2.version_notes }}</p>
+                        {% endif %}
+                    {% else %}
+                        <div class="bg-secondary p-4">Select a version to compare</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 text-center">
+            <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                </svg>
+                Back to Artwork
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <h5>Not enough versions to compare</h5>
+                <p>This artwork needs at least 2 versions to enable comparison. Upload more versions to see them here.</p>
+                <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-primary">Back to Artwork</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const version1Select = document.getElementById('version1Select');
+    const version2Select = document.getElementById('version2Select');
+    
+    if (version1Select) {
+        version1Select.addEventListener('change', function() {
+            updateComparison();
+        });
+    }
+    
+    if (version2Select) {
+        version2Select.addEventListener('change', function() {
+            updateComparison();
+        });
+    }
+    
+    function updateComparison() {
+        const version1Id = version1Select.value;
+        const version2Id = version2Select.value;
+        
+        if (version1Id && version2Id) {
+            window.location.href = `?version1=${version1Id}&version2=${version2Id}`;
+        }
+    }
+});
+</script>
+{% endblock %}
