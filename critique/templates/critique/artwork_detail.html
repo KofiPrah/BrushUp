@@ -1753,11 +1753,17 @@ function switchToVersion(artworkId, versionId) {
                 versionIndicator.remove();
             }
             
+            // Build version notes HTML separately to avoid nested template literals
+            let versionNotesHtml = '';
+            if (data.version.version_notes) {
+                versionNotesHtml = '<br><small>' + data.version.version_notes + '</small>';
+            }
+            
             const indicatorHtml = `
                 <div class="version-indicator alert alert-info d-flex justify-content-between align-items-center mb-3">
                     <span>
                         <strong>Viewing Version ${data.version.version_number}</strong>
-                        ${data.version.version_notes ? `<br><small>${data.version.version_notes}</small>` : ''}
+                        ${versionNotesHtml}
                     </span>
                     <button class="btn btn-sm btn-outline-secondary" onclick="backToCurrent()">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-1" viewBox="0 0 16 16">
