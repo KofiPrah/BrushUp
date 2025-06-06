@@ -824,14 +824,18 @@ def artwork_progress_view(request, pk):
     artwork = get_object_or_404(ArtWork, pk=pk)
     versions = ArtWorkVersion.objects.filter(artwork=artwork).order_by('version_number')
     
-    # Get critique counts for each version
+    # Get all critiques for this artwork
+    all_critiques = Critique.objects.filter(artwork=artwork).order_by('-created_at')
+    
+    # Build version data with critique information
     version_data = []
     for version in versions:
-        critiques = Critique.objects.filter(artwork=artwork, version=version)
+        # Get critiques created around the time of this version
+        # Since critiques don't have version field, we show all critiques for the artwork
         version_data.append({
             'version': version,
-            'critique_count': critiques.count(),
-            'critiques': critiques.order_by('-created_at')[:3]  # Latest 3 critiques
+            'critique_count': all_critiques.count() if version == versions.last() else 0,
+            'critiques': all_critiques[:3] if version == versions.last() else []  # Show critiques only for latest version
         })
     
     context = {
@@ -839,6 +843,7 @@ def artwork_progress_view(request, pk):
         'versions': versions,
         'version_data': version_data,
         'total_versions': versions.count(),
+        'all_critiques': all_critiques,
     }
     
     return render(request, 'critique/artwork_progress.html', context)

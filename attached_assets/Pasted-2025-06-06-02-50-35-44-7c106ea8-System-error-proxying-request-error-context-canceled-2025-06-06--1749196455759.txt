@@ -1,0 +1,156 @@
+2025-06-06 02:50:35.44
+7c106ea8
+System
+error proxying request error=context canceled
+2025-06-06 02:50:37.67
+7c106ea8
+System
+error proxying request error=context canceled
+2025-06-06 02:50:40.89
+7c106ea8
+System
+error proxying request error=context canceled
+2025-06-06 02:53:44.55
+7c106ea8
+User
+Internal Server Error: /artworks/31/progress/
+2025-06-06 02:53:44.55
+7c106ea8
+User
+Traceback (most recent call last):
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+2025-06-06 02:53:44.55
+7c106ea8
+User
+response = get_response(request)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/core/handlers/base.py", line 197, in _get_response
+2025-06-06 02:53:44.55
+7c106ea8
+User
+response = wrapped_callback(request, *callback_args, **callback_kwargs)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/critique/views.py", line 830, in artwork_progress_view
+2025-06-06 02:53:44.55
+7c106ea8
+User
+critiques = Critique.objects.filter(artwork=artwork, version=version)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/manager.py", line 87, in manager_method
+2025-06-06 02:53:44.55
+7c106ea8
+User
+return getattr(self.get_queryset(), name)(*args, **kwargs)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/query.py", line 1491, in filter
+2025-06-06 02:53:44.55
+7c106ea8
+User
+return self._filter_or_exclude(False, args, kwargs)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/query.py", line 1509, in _filter_or_exclude
+2025-06-06 02:53:44.55
+7c106ea8
+User
+clone._filter_or_exclude_inplace(negate, args, kwargs)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/query.py", line 1516, in _filter_or_exclude_inplace
+2025-06-06 02:53:44.55
+7c106ea8
+User
+self._query.add_q(Q(*args, **kwargs))
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1643, in add_q
+2025-06-06 02:53:44.55
+7c106ea8
+User
+clause, _ = self._add_q(q_object, can_reuse)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1675, in _add_q
+2025-06-06 02:53:44.55
+7c106ea8
+User
+child_clause, needed_inner = self.build_filter(
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1523, in build_filter
+2025-06-06 02:53:44.55
+7c106ea8
+User
+lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1330, in solve_lookup_type
+2025-06-06 02:53:44.55
+7c106ea8
+User
+_, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+2025-06-06 02:53:44.55
+7c106ea8
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-06 02:53:44.55
+7c106ea8
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/db/models/sql/query.py", line 1802, in names_to_path
+2025-06-06 02:53:44.55
+7c106ea8
+User
+raise FieldError(
+2025-06-06 02:53:44.55
+7c106ea8
+User
+django.core.exceptions.FieldError: Cannot resolve keyword 'version' into field. Choices are: artwork, artwork_id, author, author_id, composition_score, created_at, flag_reason, flagged_by, hidden_at, hidden_by, hidden_by_id, hidden_reason, id, is_flagged, is_hidden, moderation_status, originality_score, reactions, replies, technique_score, text, updated_at
