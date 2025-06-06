@@ -111,7 +111,8 @@
                                 {% for version in versions reversed %}
                                 <div class="version-thumbnail me-3 mb-3 {% if version.is_archived %}archived-version{% endif %}" 
                                      data-version="{{ version.id }}" 
-                                     data-archived="{{ version.is_archived|yesno:'true,false' }}">
+                                     data-archived="{{ version.is_archived|yesno:'true,false' }}"
+                                     data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}">
                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                         {% if version.image %}
                                             <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Version {{ version.version_number }}">
@@ -1347,20 +1348,19 @@ function loadVersionSelectors(artworkId) {
     
     versions.forEach(version => {
         const versionId = version.getAttribute('data-version');
-        const versionImg = version.querySelector('img');
+        const imageSrc = version.getAttribute('data-image-url');
         const versionLabel = version.querySelector('small').textContent;
         
-        if (versionImg) {
-            // Use the src attribute directly from the img element, ensuring proper URL
-            const imageSrc = versionImg.getAttribute('src');
-            if (imageSrc && imageSrc !== '' && !imageSrc.includes('${')) {
-                const option1 = createVersionOption(versionId, imageSrc, versionLabel, 1);
-                const option2 = createVersionOption(versionId, imageSrc, versionLabel, 2);
-                
-                // Only append if options were created successfully
-                if (option1) selector1.appendChild(option1);
-                if (option2) selector2.appendChild(option2);
-            }
+        // Use data attribute for image URL instead of reading src
+        if (imageSrc && imageSrc !== '' && !imageSrc.includes('${') && !imageSrc.includes('%7B')) {
+            const option1 = createVersionOption(versionId, imageSrc, versionLabel, 1);
+            const option2 = createVersionOption(versionId, imageSrc, versionLabel, 2);
+            
+            // Only append if options were created successfully
+            if (option1) selector1.appendChild(option1);
+            if (option2) selector2.appendChild(option2);
+        } else {
+            console.warn('Skipping version with invalid image URL:', versionId, imageSrc);
         }
     });
 }

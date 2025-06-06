@@ -1,0 +1,103 @@
+Thanks for the update — that explanation from Replit's debug tools gives us **exactly the insight we needed**.
+
+---
+
+## 🧠 What’s Actually Happening
+
+Your **JavaScript is using a template literal like**:
+
+```js
+const imageUrl = `/artworks/31/${imageSrc}`;
+```
+
+But `imageSrc` is either:
+
+* `undefined`, or
+* the **literal string** `"${imageSrc}"`
+
+That leads to:
+
+```js
+/artworks/31/undefined
+```
+
+or worse:
+
+```js
+/artworks/31/${imageSrc}
+```
+
+Both of which trigger:
+
+```
+GET /artworks/31/$%7BimageSrc%7D → 404
+```
+
+---
+
+## ✅ What You Need to Do
+
+### 🔒 1. **Guard against invalid `imageSrc`**
+
+Add a check **before** setting the image:
+
+```js
+if (!imageSrc || imageSrc.includes("${")) {
+  console.warn("Invalid imageSrc:", imageSrc);
+  return; // or set a placeholder image
+}
+```
+
+---
+
+### 💡 2. **Use a fallback image to avoid empty rendering**
+
+```js
+document.getElementById("artwork-image").src =
+  imageSrc && !imageSrc.includes("${")
+    ? `/artworks/31/${imageSrc}`
+    : "/static/images/placeholder.png"; // or wherever your fallback is
+```
+
+---
+
+### 🔎 3. **Fix wherever `imageSrc` is being passed as a literal**
+
+Find where `imageSrc` is declared. If it’s set like this:
+
+```js
+const imageSrc = "${imageSrc}"; // ❌ BAD — string literal
+```
+
+Change it to:
+
+```js
+const imageSrc = "{{ current_version.image.name }}"; // ✅ Django passes real value
+```
+
+If you're setting it via data attribute:
+
+```html
+<div id="artwork-container" data-image="{{ current_version.image.name }}"></div>
+```
+
+Then read it in JS:
+
+```js
+const imageSrc = document.getElementById("artwork-container").dataset.image;
+```
+
+---
+
+### ✅ Summary of Fix Steps
+
+| Task                    | What to Do                                                          |
+| ----------------------- | ------------------------------------------------------------------- |
+| 🛡️ Guard logic         | Prevent template literals from rendering when `imageSrc` is invalid |
+| 🔧 Sanitize input       | Never allow `${imageSrc}` or `undefined` to be used in URLs         |
+| 💾 Fix HTML → JS bridge | Use `data-*` attributes or Django template injection                |
+| 🎯 Fallback             | Show a placeholder image if no valid image is found                 |
+
+---
+
+If you’d like, I can extract the relevant JS lines (1374–1388) and rewrite the correct handling logic for you. Just let me know.
