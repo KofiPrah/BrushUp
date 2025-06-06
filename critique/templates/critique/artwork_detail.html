@@ -1126,8 +1126,10 @@ function toggleArchivedVersions() {
     
     archivedVersions.forEach(version => {
         if (checkbox.checked) {
+            version.style.display = 'block';
             version.classList.add('show-archived');
         } else {
+            version.style.display = 'none';
             version.classList.remove('show-archived');
         }
     });
@@ -1190,18 +1192,18 @@ function unarchiveVersion(versionId) {
 
 // Version comparison function
 function openVersionComparison(artworkId) {
-    window.open(`/artworks/${artworkId}/compare/`, '_blank');
+    window.location.href = `/artworks/${artworkId}/compare/`;
 }
 
 // Compare to specific version
 function compareToVersion(versionId) {
     const artworkId = window.location.pathname.split('/')[2];
-    window.open(`/artworks/${artworkId}/compare/?version=${versionId}`, '_blank');
+    window.location.href = `/artworks/${artworkId}/compare/?version=${versionId}`;
 }
 
 // Show progress view
 function showProgressView(artworkId) {
-    window.open(`/artworks/${artworkId}/progress/`, '_blank');
+    window.location.href = `/artworks/${artworkId}/progress/`;
 }
 
 function backToCurrent() {
