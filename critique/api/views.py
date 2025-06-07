@@ -1835,24 +1835,31 @@ class ArtworkVersionRestoreView(APIView):
             artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
             version = artwork.versions.get(id=version_id)
             
-            # Create a backup of current state before restoring
-            current_backup = artwork.create_version(
-                version_notes=f"Backup before restoring to version {version.version_number}"
-            )
+            # Store the old values for the response
+            old_title = artwork.title
             
             # Restore artwork to the selected version
             artwork.title = version.title
             artwork.description = version.description
             artwork.image = version.image
-            artwork.medium = version.medium
-            artwork.dimensions = version.dimensions
-            artwork.tags = version.tags
+            if hasattr(version, 'medium') and version.medium:
+                artwork.medium = version.medium
+            if hasattr(version, 'dimensions') and version.dimensions:
+                artwork.dimensions = version.dimensions
+            if hasattr(version, 'tags') and version.tags:
+                artwork.tags = version.tags
             artwork.save()
             
             return Response({
                 'message': f'Artwork restored to version {version.version_number}',
-                'backup_version': current_backup.version_number,
-                'restored_version': version.version_number
+                'restored_version': version.version_number,
+                'success': True,
+                'artwork': {
+                    'id': artwork.id,
+                    'title': artwork.title,
+                    'description': artwork.description,
+                    'image_url': artwork.image.url if artwork.image else None
+                }
             })
             
         except ArtWork.DoesNotExist:
