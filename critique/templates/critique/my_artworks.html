@@ -1372,6 +1372,18 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                     'Upload New Version' +
                                 '</button>' +
                             '</div>' +
+                            '<div class="col-md-4">' +
+                                '<button class="btn btn-warning" onclick="toggleReorderMode(' + artworkId + ')" ' +
+                                        (versions.length < 2 ? 'disabled' : '') + ' ' +
+                                        'title="' + (versions.length < 2 ? 'Need at least 2 versions to reorder' : 'Drag and drop to reorder version numbers') + '" ' +
+                                        'data-bs-toggle="tooltip" data-bs-placement="top" id="reorderToggleBtn">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-ol me-1" viewBox="0 0 16 16">' +
+                                        '<path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5z"/>' +
+                                        '<path d="M1.713 11.865v-.474H2c.217 0 .363-.137.363-.317 0-.185-.158-.31-.361-.31-.223 0-.367.152-.373.31h-.59c.016-.467.373-.787.986-.787.588-.002.954.291.957.703a.595.595 0 0 1-.492.594v.033a.615.615 0 0 1 .569.631c.003.533-.502.8-1.051.8-.656 0-1-.37-1.008-.794h.582c.008.178.186.306.422.309.254 0 .424-.145.422-.35-.002-.195-.155-.348-.414-.348h-.3zm-.004-4.699h-.604v-.035c0-.408.295-.844.958-.844.583 0 .96.326.96.756 0 .389-.257.617-.476.848l-.537.572v.03h1.054V9H1.143v-.395l.957-.99c.138-.142.293-.304.293-.508 0-.18-.147-.32-.342-.32a.33.33 0 0 0-.342.338v.041zM2.564 5h-.635V2.924h-.031l-.598.42v-.567l.629-.443h.635V5z"/>' +
+                                    '</svg>' +
+                                    'Reorder' +
+                                '</button>' +
+                            '</div>' +
                             '<div class="col-md-4 text-end">' +
                                 '<button class="btn btn-outline-info" onclick="toggleComparisonMode(' + artworkId + ')" ' +
                                         compareButtonDisabled + ' ' +
@@ -1437,6 +1449,42 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                         '<path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>' +
                                     '</svg>' +
                                     'Clear Selection' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div id="reorderArea" class="reorder-area mb-3" style="display: none;">' +
+                            '<div class="alert alert-info border-info bg-dark text-light">' +
+                                '<div class="d-flex">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrows-move me-2 flex-shrink-0 mt-1" viewBox="0 0 16 16">' +
+                                        '<path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10zM.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8z"/>' +
+                                    '</svg>' +
+                                    '<div>' +
+                                        '<strong>Drag & Drop Reorder Mode</strong><br>' +
+                                        '<small>Drag version cards up and down to reorder their version numbers. Higher positions get higher version numbers.</small>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div id="reorderableVersions" class="reorderable-container">' +
+                                '<div class="text-center p-4">' +
+                                    '<div class="spinner-border text-primary" role="status">' +
+                                        '<span class="visually-hidden">Loading versions...</span>' +
+                                    '</div>' +
+                                    '<p class="mt-2 text-muted">Loading versions for reordering...</p>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="text-center mt-3">' +
+                                '<button class="btn btn-success me-2" id="saveReorderBtn" onclick="saveVersionOrder(' + artworkId + ')" disabled>' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-circle-fill me-1" viewBox="0 0 16 16">' +
+                                        '<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.061L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>' +
+                                    '</svg>' +
+                                    'Save New Order' +
+                                '</button>' +
+                                '<button class="btn btn-outline-secondary" onclick="cancelReorderMode(' + artworkId + ')">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle me-1" viewBox="0 0 16 16">' +
+                                        '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                                        '<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>' +
+                                    '</svg>' +
+                                    'Cancel' +
                                 '</button>' +
                             '</div>' +
                         '</div>' +
@@ -2996,6 +3044,259 @@ function createVersionWithUpload(artworkId) {
         
         console.error('Error creating version with upload:', error);
         showToast('Failed to create version with upload', 'error');
+    });
+}
+
+// Global variables for reorder mode
+let isReorderMode = false;
+let reorderableVersions = [];
+let currentReorderArtworkId = null;
+
+function toggleReorderMode(artworkId) {
+    const reorderArea = document.getElementById('reorderArea');
+    const comparisonArea = document.getElementById('comparisonArea');
+    const reorderBtn = document.getElementById('reorderToggleBtn');
+    
+    if (!isReorderMode) {
+        // Enter reorder mode
+        isReorderMode = true;
+        currentReorderArtworkId = artworkId;
+        
+        // Hide comparison area if open
+        comparisonArea.style.display = 'none';
+        
+        // Show reorder area
+        reorderArea.style.display = 'block';
+        
+        // Update button appearance
+        reorderBtn.innerHTML = reorderBtn.innerHTML.replace('Reorder', 'Exit Reorder');
+        reorderBtn.classList.remove('btn-warning');
+        reorderBtn.classList.add('btn-danger');
+        
+        // Load versions for reordering
+        loadVersionsForReordering(artworkId);
+        
+    } else {
+        // Exit reorder mode
+        cancelReorderMode(artworkId);
+    }
+}
+
+function cancelReorderMode(artworkId) {
+    isReorderMode = false;
+    currentReorderArtworkId = null;
+    
+    const reorderArea = document.getElementById('reorderArea');
+    const reorderBtn = document.getElementById('reorderToggleBtn');
+    
+    // Hide reorder area
+    reorderArea.style.display = 'none';
+    
+    // Reset button appearance
+    reorderBtn.innerHTML = reorderBtn.innerHTML.replace('Exit Reorder', 'Reorder');
+    reorderBtn.classList.remove('btn-danger');
+    reorderBtn.classList.add('btn-warning');
+    
+    // Clear reorderable versions
+    reorderableVersions = [];
+    document.getElementById('saveReorderBtn').disabled = true;
+}
+
+function loadVersionsForReordering(artworkId) {
+    const container = document.getElementById('reorderableVersions');
+    
+    // Show loading state
+    container.innerHTML = 
+        '<div class="text-center p-4">' +
+            '<div class="spinner-border text-primary" role="status">' +
+                '<span class="visually-hidden">Loading versions...</span>' +
+            '</div>' +
+            '<p class="mt-2 text-muted">Loading versions for reordering...</p>' +
+        '</div>';
+    
+    // Fetch artwork versions
+    fetch(`/api/artworks/${artworkId}/versions/`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.versions && data.versions.length > 0) {
+            reorderableVersions = [...data.versions].sort((a, b) => b.version_number - a.version_number);
+            renderReorderableVersions();
+        } else {
+            container.innerHTML = 
+                '<div class="text-center p-4">' +
+                    '<p class="text-muted">No versions found for reordering.</p>' +
+                '</div>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading versions for reordering:', error);
+        container.innerHTML = 
+            '<div class="text-center p-4">' +
+                '<p class="text-danger">Failed to load versions for reordering.</p>' +
+                '<button class="btn btn-outline-primary btn-sm" onclick="loadVersionsForReordering(' + artworkId + ')">Retry</button>' +
+            '</div>';
+    });
+}
+
+function renderReorderableVersions() {
+    const container = document.getElementById('reorderableVersions');
+    
+    let html = '<div class="reorder-list">';
+    
+    reorderableVersions.forEach((version, index) => {
+        html += 
+            '<div class="reorder-item mb-3" data-version-id="' + version.id + '" draggable="true">' +
+                '<div class="card bg-secondary text-light border-info">' +
+                    '<div class="card-header d-flex justify-content-between align-items-center">' +
+                        '<div class="d-flex align-items-center">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-grip-vertical me-2 text-muted" viewBox="0 0 16 16">' +
+                                '<path d="M7 2a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 5a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm-3 3a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>' +
+                            '</svg>' +
+                            '<h6 class="mb-0">Version ' + version.version_number + '</h6>' +
+                        '</div>' +
+                        '<span class="badge bg-info">' + (index + 1) + ' of ' + reorderableVersions.length + '</span>' +
+                    '</div>' +
+                    '<div class="card-body">' +
+                        '<div class="row">' +
+                            '<div class="col-md-3">' +
+                                '<img src="' + version.image_url + '" class="img-fluid rounded" alt="Version ' + version.version_number + '">' +
+                            '</div>' +
+                            '<div class="col-md-9">' +
+                                '<p class="mb-1"><strong>Description:</strong> ' + (version.description || 'No description') + '</p>' +
+                                '<p class="mb-1 text-muted"><small>Created: ' + new Date(version.created_at).toLocaleDateString() + '</small></p>' +
+                                (version.notes ? '<p class="mb-0 text-info"><small><strong>Notes:</strong> ' + version.notes + '</small></p>' : '') +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+    
+    // Initialize drag and drop
+    initializeReorderDragDrop();
+}
+
+function initializeReorderDragDrop() {
+    const reorderItems = document.querySelectorAll('.reorder-item');
+    
+    reorderItems.forEach(item => {
+        item.addEventListener('dragstart', handleReorderDragStart);
+        item.addEventListener('dragover', handleReorderDragOver);
+        item.addEventListener('drop', handleReorderDrop);
+        item.addEventListener('dragend', handleReorderDragEnd);
+    });
+}
+
+function handleReorderDragStart(e) {
+    e.dataTransfer.setData('text/plain', e.target.dataset.versionId);
+    e.target.classList.add('dragging');
+}
+
+function handleReorderDragOver(e) {
+    e.preventDefault();
+    const draggingItem = document.querySelector('.reorder-item.dragging');
+    const container = e.target.closest('.reorder-list');
+    const afterElement = getDragAfterElement(container, e.clientY);
+    
+    if (afterElement == null) {
+        container.appendChild(draggingItem);
+    } else {
+        container.insertBefore(draggingItem, afterElement);
+    }
+}
+
+function handleReorderDrop(e) {
+    e.preventDefault();
+    updateReorderPreview();
+    document.getElementById('saveReorderBtn').disabled = false;
+}
+
+function handleReorderDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+function getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.reorder-item:not(.dragging)')];
+    
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+function updateReorderPreview() {
+    const reorderItems = document.querySelectorAll('.reorder-item');
+    
+    reorderItems.forEach((item, index) => {
+        const badge = item.querySelector('.badge');
+        badge.textContent = (index + 1) + ' of ' + reorderItems.length;
+    });
+}
+
+function saveVersionOrder(artworkId) {
+    const btn = document.getElementById('saveReorderBtn');
+    const originalContent = btn.innerHTML;
+    
+    // Show loading state
+    btn.disabled = true;
+    btn.innerHTML = 
+        '<span class="spinner-border spinner-border-sm me-2" role="status"></span>' +
+        'Saving Order...';
+    
+    // Get new order
+    const reorderItems = document.querySelectorAll('.reorder-item');
+    const versionOrder = Array.from(reorderItems).map(item => item.dataset.versionId);
+    
+    // Send reorder request
+    fetch(`/api/artworks/${artworkId}/versions/reorder/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            version_order: versionOrder
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`Successfully reordered ${data.updated_versions.length} versions!`, 'success');
+            
+            // Exit reorder mode
+            cancelReorderMode(artworkId);
+            
+            // Refresh version manager if open
+            const versionModal = document.getElementById('versionManagerModal');
+            if (versionModal) {
+                const versionModalInstance = bootstrap.Modal.getInstance(versionModal);
+                if (versionModalInstance) {
+                    versionModalInstance.hide();
+                    setTimeout(() => openVersionManager(artworkId), 300);
+                }
+            }
+            
+        } else {
+            showToast(data.error || 'Failed to reorder versions', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error saving version order:', error);
+        showToast('Failed to save version order', 'error');
+    })
+    .finally(() => {
+        // Restore button
+        btn.disabled = false;
+        btn.innerHTML = originalContent;
     });
 }
 </script>

@@ -1868,3 +1868,43 @@ class ArtworkVersionRestoreView(APIView):
         except ArtWorkVersion.DoesNotExist:
             return Response({'error': 'Version not found'}, 
                           status=status.HTTP_404_NOT_FOUND)
+
+class ArtworkVersionReorderView(APIView):
+    """API endpoint for reordering artwork versions"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request, artwork_id):
+        """Reorder versions by updating their version numbers"""
+        try:
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            version_order = request.data.get('version_order', [])
+            
+            if not version_order:
+                return Response({'error': 'Version order data is required'}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            # Update version numbers based on new order
+            updated_versions = []
+            for index, version_id in enumerate(version_order):
+                try:
+                    version = artwork.versions.get(id=version_id)
+                    new_version_number = len(version_order) - index  # Reverse order (highest number = newest)
+                    version.version_number = new_version_number
+                    version.save()
+                    updated_versions.append({
+                        'id': version.id,
+                        'old_number': version.version_number,
+                        'new_number': new_version_number
+                    })
+                except ArtWorkVersion.DoesNotExist:
+                    continue
+            
+            return Response({
+                'message': f'Successfully reordered {len(updated_versions)} versions',
+                'updated_versions': updated_versions,
+                'success': True
+            })
+            
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
