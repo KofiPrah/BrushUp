@@ -88,7 +88,14 @@
                                         <div class="card-body">
                                             <div class="d-flex align-items-center overflow-auto" style="gap: 8px;">
                                                 <!-- Current Version -->
-                                                <div class="version-thumbnail active me-3 mb-3" data-version="current">
+                                                <div class="version-thumbnail active me-3 mb-3" 
+                                                     data-version="current" 
+                                                     data-version-id="current"
+                                                     data-version-number="{{ current_version_number }}"
+                                                     data-version-title="{{ artwork.title }}"
+                                                     data-version-description="{{ artwork.description }}"
+                                                     data-artwork-id="{{ artwork.id }}"
+                                                     draggable="true">
                                                     <div class="position-relative">
                                                         {% if current_version and current_version.image %}
                                                             <img src="{{ current_version.image.url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">
@@ -115,8 +122,14 @@
                                                 {% for version in versions reversed %}
                                                 <div class="version-thumbnail me-3 mb-3 {% if version.is_archived %}archived-version{% endif %}" 
                                                      data-version="{{ version.id }}" 
+                                                     data-version-id="{{ version.id }}"
+                                                     data-version-number="{{ version.version_number }}"
+                                                     data-version-title="{{ version.title }}"
+                                                     data-version-description="{{ version.description }}"
+                                                     data-artwork-id="{{ artwork.id }}"
                                                      data-archived="{{ version.is_archived|yesno:'true,false' }}"
-                                                     data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}">
+                                                     data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}"
+                                                     draggable="true">
                                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                                         {% if version.image %}
                                                             <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Version {{ version.version_number }}">
@@ -1267,6 +1280,52 @@
                     toastElement.addEventListener('hidden.bs.toast', () => {
                         toastElement.remove();
                     });
+                }
+
+                // Drag and Drop functionality for version comparison
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Add drag and drop event listeners to all version thumbnails
+                    const versionThumbnails = document.querySelectorAll('.version-thumbnail[draggable="true"]');
+                    
+                    versionThumbnails.forEach(thumbnail => {
+                        thumbnail.addEventListener('dragstart', handleDragStart);
+                        thumbnail.addEventListener('dragend', handleDragEnd);
+                    });
+
+                    // Add styles for dragging
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .version-thumbnail.dragging {
+                            opacity: 0.5;
+                            transform: rotate(5deg);
+                        }
+                        .drop-zone.drag-over {
+                            border-color: #0d6efd !important;
+                            background-color: rgba(13, 110, 253, 0.1) !important;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                });
+
+                function handleDragStart(e) {
+                    e.currentTarget.classList.add('dragging');
+                    
+                    // Get version data from data attributes
+                    const versionData = {
+                        id: e.currentTarget.dataset.versionId,
+                        number: e.currentTarget.dataset.versionNumber,
+                        title: e.currentTarget.dataset.versionTitle,
+                        description: e.currentTarget.dataset.versionDescription,
+                        artworkId: e.currentTarget.dataset.artworkId,
+                        imageUrl: e.currentTarget.dataset.imageUrl
+                    };
+                    
+                    e.dataTransfer.setData('text/plain', JSON.stringify(versionData));
+                    e.dataTransfer.effectAllowed = 'copy';
+                }
+
+                function handleDragEnd(e) {
+                    e.currentTarget.classList.remove('dragging');
                 }
                 </script>
 
