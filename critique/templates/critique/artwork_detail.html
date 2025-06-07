@@ -731,7 +731,7 @@
                         toast.setAttribute('aria-live', 'assertive');
                         toast.setAttribute('aria-atomic', 'true');
                         toast.innerHTML = `
-                            <div class="toast-header bg-' + type + ' text-white">
+                            <div class="toast-header bg-${type} text-white">
                                 <strong class="me-auto">' + title + '</strong>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
@@ -777,7 +777,7 @@
                                 const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
                                 // Send the request to unhide the critique
-                                fetch(`/api/critiques/' + critiqueId + '/unhide/`, {
+                                fetch(`/api/critiques/${critiqueId}/unhide/`, {
                                     method: 'POST',
                                     credentials: 'same-origin',
                                     headers: {
@@ -790,7 +790,7 @@
                                     if (!response.ok) {
                                         console.error('Error status:', response.status);
                                         return response.text().then(text => {
-                                            throw new Error(`Error: ' + response.status + ' - ' + text + '`);
+                                            throw new Error(`Error: ${response.status} - ' + text + '`);
                                         });
                                     }
                                     return response.json();
@@ -840,7 +840,7 @@
                                 return;
                             }
 
-                            fetch(`/api/critiques/' + critiqueId + '/flag/`, {
+                            fetch(`/api/critiques/${critiqueId}/flag/`, {
                                 method: 'POST',
                                 credentials: 'same-origin',
                                 headers: {
@@ -888,7 +888,7 @@
                                 return;
                             }
 
-                            fetch(`/api/critiques/' + critiqueId + '/reply/`, {
+                            fetch(`/api/critiques/${critiqueId}/reply/`, {
                                 method: 'POST',
                                 credentials: 'same-origin',
                                 headers: {
@@ -921,7 +921,7 @@
                     replyToggleButtons.forEach(button => {
                         button.addEventListener('click', function() {
                             const commentId = this.getAttribute('data-comment-id');
-                            const replyForm = document.getElementById(`reply-form-' + commentId + '`);
+                            const replyForm = document.getElementById(`reply-form-${commentId}`);
 
                             // Hide all other reply forms first
                             document.querySelectorAll('.reply-form').forEach(form => {
@@ -937,7 +937,7 @@
                     replyCancelButtons.forEach(button => {
                         button.addEventListener('click', function() {
                             const commentId = this.getAttribute('data-comment-id');
-                            const replyForm = document.getElementById(`reply-form-' + commentId + '`);
+                            const replyForm = document.getElementById(`reply-form-${commentId}`);
                             replyForm.style.display = 'none';
                         });
                     });
@@ -1072,13 +1072,13 @@
                     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
                     // Show loading state
-                    const thumbnail = document.querySelector(`[data-version="' + versionId + '"]`);
+                    const thumbnail = document.querySelector(`[data-version="${versionId}"]`);
                     if (thumbnail) {
                         thumbnail.style.opacity = '0.5';
                     }
 
                     // Fetch version data
-                    fetch(`/api/artworks/' + artworkId + '/versions/' + versionId + '/`, {
+                    fetch(`/api/artworks/${artworkId}/versions/${versionId}/`, {
                         method: 'GET',
                         credentials: 'same-origin',
                         headers: {
@@ -1105,7 +1105,7 @@
                                 thumbnail.classList.add('active');
                             }
 
-                            showToast('Success', `Switched to Version ' + data.version_number + '`, 'success');
+                            showToast('Success', `Switched to Version ${data.version_number}`, 'success');
                         } else {
                             showToast('Error', 'Failed to switch version', 'error');
                         }
@@ -1137,8 +1137,8 @@
 
                 // Archive version function
                 function archiveVersion(versionId, versionNumber) {
-                    if (confirm(`Are you sure you want to archive Version ' + versionNumber + '?`)) {
-                        fetch(`/api/versions/' + versionId + '/archive/`, {
+                    if (confirm(`Are you sure you want to archive Version ${versionNumber}?`)) {
+                        fetch(`/api/versions/${versionId}/archive/`, {
                             method: 'POST',
                             credentials: 'same-origin',
                             headers: {
@@ -1167,7 +1167,7 @@
 
                 // Unarchive version function
                 function unarchiveVersion(versionId) {
-                    fetch(`/api/versions/' + versionId + '/unarchive/`, {
+                    fetch(`/api/versions/${versionId}/unarchive/`, {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: {
@@ -1192,18 +1192,18 @@
 
                 // Version comparison function
                 function openVersionComparison(artworkId) {
-                    window.location.href = `/artworks/' + artworkId + '/compare/`;
+                    window.location.href = `/artworks/${artworkId}/compare/`;
                 }
 
                 // Compare to specific version
                 function compareToVersion(versionId) {
                     const artworkId = window.location.pathname.split('/')[2];
-                    window.location.href = `/artworks/' + artworkId + '/compare/?version=' + versionId + '`;
+                    window.location.href = `/artworks/${artworkId}/compare/?version=${versionId}`;
                 }
 
                 // Show progress view
                 function showProgressView(artworkId) {
-                    window.location.href = `/artworks/' + artworkId + '/progress/`;
+                    window.location.href = `/artworks/${artworkId}/progress/`;
                 }
 
                 function backToCurrent() {
@@ -1225,11 +1225,11 @@
                     // Create toast element
                     const toastId = 'toast-' + Date.now();
                     const toastHtml = `
-                        <div id="' + toastId + '" class="toast align-items-center text-bg-' + type + ' border-0" role="alert">
+                        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert">
                             <div class="d-flex">
                                 <div class="toast-body">
-                                    <strong>' + title + '</strong><br>
-                                    ' + message + '
+                                    <strong>${title}</strong><br>
+                                    ${message}
                                 </div>
                                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                             </div>
@@ -1373,7 +1373,7 @@
                     option.style.cursor = 'pointer';
 
                     // Validate image source - only proceed if we have a valid URL
-                    if (!imageSrc || imageSrc === '' + imageSrc + '' || imageSrc.trim() === '' || imageSrc.includes(') || imageSrc.includes('%7B')) {
+                    if (!imageSrc || imageSrc === '${imageSrc}' || imageSrc.trim() === '' || imageSrc.includes(') || imageSrc.includes('%7B')) {
                         console.warn('Invalid image source for version:', versionId, 'Source:', imageSrc);
                         return null;
                      + '
@@ -1416,7 +1416,7 @@
                         preview.appendChild(previewLabel);
 
                         // Update selection state
-                        const selector = document.getElementById(`versionSelect' + selectorNum + '`);
+                        const selector = document.getElementById(`versionSelect${selectorNum}`);
                         selector.querySelectorAll('.version-option').forEach(opt => {
                             opt.classList.remove('border-primary');
                         });
@@ -1439,7 +1439,7 @@
                                                 <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
                                                 <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
                                             </svg>
-                                            Delete Version ' + versionNumber + '
+                                            Delete Version ${versionNumber}
                                         </h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -1490,7 +1490,7 @@
                     deleteBtn.disabled = true;
 
                     // Send delete request
-                    fetch(`/api/artworks/versions/' + versionId + '/delete/`, {
+                    fetch(`/api/artworks/versions/${versionId}/delete/`, {
                         method: 'DELETE',
                         credentials: 'same-origin',
                         headers: {
@@ -1501,7 +1501,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP ' + response.status + ': ' + response.statusText + '`);
+                            throw new Error(`HTTP ${response.status}: ' + response.statusText + '`);
                         }
                         return response.json();
                     })
@@ -1514,7 +1514,7 @@
                         showToast('Success', 'Version deleted successfully.', 'success');
 
                         // Remove the version thumbnail from the page
-                        const versionThumbnail = document.querySelector(`[data-version="' + versionId + '"]`);
+                        const versionThumbnail = document.querySelector(`[data-version="${versionId}"]`);
                         if (versionThumbnail) {
                             versionThumbnail.remove();
                         }
@@ -1547,7 +1547,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive text-warning me-2" viewBox="0 0 16 16">
                                                 <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
                                             </svg>
-                                            Archive Version ' + versionNumber + '
+                                            Archive Version ${versionNumber}
                                         </h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -1599,7 +1599,7 @@
                     archiveBtn.disabled = true;
 
                     // Send archive request
-                    fetch(`/api/versions/' + versionId + '/archive/`, {
+                    fetch(`/api/versions/${versionId}/archive/`, {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: {
@@ -1613,7 +1613,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP ' + response.status + ': ' + response.statusText + '`);
+                            throw new Error(`HTTP ${response.status}: ' + response.statusText + '`);
                         }
                         return response.json();
                     })
@@ -1626,7 +1626,7 @@
                         showToast('Success', 'Version archived successfully.', 'success');
 
                         // Add archived badge to the version thumbnail
-                        const versionThumbnail = document.querySelector(`[data-version="' + versionId + '"]`);
+                        const versionThumbnail = document.querySelector(`[data-version="${versionId}"]`);
                         if (versionThumbnail) {
                             const archiveBadge = document.createElement('span');
                             archiveBadge.className = 'position-absolute top-0 start-0 badge bg-secondary';
@@ -1661,7 +1661,7 @@
                     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
                     // Send unarchive request
-                    fetch(`/api/versions/' + versionId + '/unarchive/`, {
+                    fetch(`/api/versions/${versionId}/unarchive/`, {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: {
@@ -1672,7 +1672,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP ' + response.status + ': ' + response.statusText + '`);
+                            throw new Error(`HTTP ${response.status}: ' + response.statusText + '`);
                         }
                         return response.json();
                     })
@@ -1681,7 +1681,7 @@
                         showToast('Success', 'Version unarchived successfully.', 'success');
 
                         // Remove archived badge from the version thumbnail
-                        const versionThumbnail = document.querySelector(`[data-version="' + versionId + '"]`);
+                        const versionThumbnail = document.querySelector(`[data-version="${versionId}"]`);
                         if (versionThumbnail) {
                             const archiveBadge = versionThumbnail.querySelector('.badge');
                             if (archiveBadge) {
@@ -1706,12 +1706,12 @@
                 // Function to switch to a different version
                 function switchToVersion(artworkId, versionId) {
                     // Add visual feedback
-                    const thumbnail = document.querySelector(`[data-version="' + versionId + '"]`);
+                    const thumbnail = document.querySelector(`[data-version="${versionId}"]`);
                     if (thumbnail) {
                         thumbnail.style.opacity = '0.6';
                     }
 
-                    fetch(`/api/versions/' + versionId + '/switch/`, {
+                    fetch(`/api/versions/${versionId}/switch/`, {
                         method: 'POST',
                         headers: {
                             'X-CSRFToken': getCookie('csrftoken'),
@@ -1738,7 +1738,7 @@
                             });
 
                             // Mark selected version as active
-                            const activeThumb = document.querySelector(`[data-version="' + versionId + '"]`);
+                            const activeThumb = document.querySelector(`[data-version="${versionId}"]`);
                             if (activeThumb) {
                                 activeThumb.classList.add('active');
                                 const img = activeThumb.querySelector('.img-thumbnail');
@@ -1756,7 +1756,7 @@
                             // Build version notes HTML separately to avoid nested template literals
                             let versionNotesHtml = '';
                             if (data.version.version_notes) {
-                                versionNotesHtml = '<br><small>' + data.version.version_notes + '</small>';
+                                versionNotesHtml = '<br><small>${data.version.version_notes}</small>';
                             }
 
                             const indicatorHtml = `
@@ -1777,7 +1777,7 @@
                             const artworkContainer = document.querySelector('.artwork-image').parentElement;
                             artworkContainer.insertAdjacentHTML('afterbegin', indicatorHtml);
 
-                            showToast('Success', `Switched to version ' + data.version.version_number + '`, 'success');
+                            showToast('Success', `Switched to version ${data.version.version_number}`, 'success');
                         }
 
                         if (thumbnail) {
@@ -1836,7 +1836,7 @@
                         <div class="toast align-items-center text-white bg-' + type === 'success' ? 'success' : type === 'danger' ? 'danger' : 'info' + ' border-0" role="alert" aria-live="assertive" aria-atomic="true">
                             <div class="d-flex">
                                 <div class="toast-body">
-                                    <strong>' + title + '</strong><br>' + message + '
+                                    <strong>${title}</strong><br>' + message + '
                                 </div>
                                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
@@ -1890,7 +1890,7 @@
 
                     // Get all reaction buttons with reaction-btn class
                     const reactionButtons = document.querySelectorAll('.reaction-btn');
-                    console.log(`Found ' + reactionButtons.length + ' reaction buttons`);
+                    console.log(`Found ${reactionButtons.length} reaction buttons`);
 
                     reactionButtons.forEach(button => {
                         button.addEventListener('click', function(e) {
@@ -1903,7 +1903,7 @@
                             const critiqueId = this.getAttribute('data-reaction-critique-id');
                             const reactionType = this.getAttribute('data-reaction-type');
 
-                            console.log(`Toggling reaction: ' + reactionType + ' for critique: ' + critiqueId + '`);
+                            console.log(`Toggling reaction: ${reactionType} for critique: ' + critiqueId + '`);
 
                             // Get CSRF token - try different methods to ensure we get it
                             let csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
@@ -1914,11 +1914,11 @@
 
                             // Send AJAX request to the correct URL
                             // The correct endpoint is /critiques/{id}/react/ajax/
-                            const apiUrl = `/critiques/' + critiqueId + '/react/ajax/`;
-                            console.log(`Sending reaction to: ' + apiUrl + '`);
+                            const apiUrl = `/critiques/${critiqueId}/react/ajax/`;
+                            console.log(`Sending reaction to: ${apiUrl}`);
 
                             // Debug what's being submitted
-                            console.log(`CSRF Token: ' + csrfToken + '`);
+                            console.log(`CSRF Token: ${csrfToken}`);
 
                             // Add a direct form submission approach as a fallback
                             // This ensures the buttons work even if fetch fails
@@ -1943,7 +1943,7 @@
                                 if (!response.ok) {
                                     return response.text().then(text => {
                                         console.error('Error response:', text);
-                                        throw new Error(`Error: ' + response.status + ' - ' + text + '`);
+                                        throw new Error(`Error: ${response.status} - ' + text + '`);
                                     });
                                 }
                                 return response.json();
@@ -1999,10 +1999,10 @@
                     // Helper function to update reaction count badge
                     function updateReactionCount(critiqueId, type, count) {
                         // Find the button for this critique and reaction type
-                        const button = document.querySelector(`[data-reaction-critique-id="' + critiqueId + '"][data-reaction-type="' + type.toUpperCase() + '"]`);
+                        const button = document.querySelector(`[data-reaction-critique-id="${critiqueId}"][data-reaction-type="' + type.toUpperCase() + '"]`);
                         if (button) {
                             // Find the count badge inside this button
-                            const countBadge = button.querySelector(`.' + type + '-count`);
+                            const countBadge = button.querySelector(`.${type}-count`);
                             if (countBadge) {
                                 countBadge.textContent = count;
                             }
@@ -2023,7 +2023,7 @@
                         toast.setAttribute('aria-live', 'assertive');
                         toast.setAttribute('aria-atomic', 'true');
                         toast.innerHTML = `
-                            <div class="toast-header bg-' + type + ' text-white">
+                            <div class="toast-header bg-${type} text-white">
                                 <strong class="me-auto">' + title + '</strong>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
