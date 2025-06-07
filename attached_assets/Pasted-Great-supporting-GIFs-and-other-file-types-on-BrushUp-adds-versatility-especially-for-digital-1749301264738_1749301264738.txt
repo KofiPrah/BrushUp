@@ -1,0 +1,46 @@
+Great — supporting GIFs and other file types on **BrushUp** adds versatility, especially for digital artists, animators, or mixed media creators. Here’s a breakdown of **file types you might want to allow**, **recommended handling**, and **limits you should enforce** to keep performance manageable:
+
+---
+
+### ✅ **Recommended File Types to Support**
+
+| File Type          | Use Case                                                   | Notes                                                              |
+| ------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------ |
+| **JPEG / JPG**     | Standard artwork and photography                           | Lossy but widely supported                                         |
+| **PNG**            | Artwork with transparency, crisp line art                  | Larger file sizes; good for digital illustrations                  |
+| **GIF**            | Animated or looping artwork                                | Limit frame count or file size to prevent performance issues       |
+| **WEBP**           | Alternative to PNG/JPEG; supports animation & transparency | Good compression, but not supported in older browsers              |
+| **SVG**            | Vector art and logos                                       | Useful for scalable vector uploads, but beware of embedded scripts |
+| **MP4**            | Optional, for time-lapse or animation previews             | Only if you allow short video uploads in future                    |
+| **ZIP** (optional) | Upload multiple files (e.g., sketch + reference)           | Use case-specific; not necessary for MVP                           |
+
+---
+
+### ⚙️ **Recommended Image Upload Rules**
+
+| Rule                                | Suggested Limit              | Reason                                                 |
+| ----------------------------------- | ---------------------------- | ------------------------------------------------------ |
+| **Max file size (JPEG/PNG/GIF)**    | 10–20 MB                     | Balance quality and server load                        |
+| **Max dimensions**                  | 5000×5000 px                 | Avoid massive uploads; resize if exceeded              |
+| **GIF max frame count or duration** | \~10 seconds or 100 frames   | Prevent heavy animated content from affecting UX       |
+| **SVG security**                    | Sanitize before accepting    | Prevent script injection via embedded SVG code         |
+| **Thumbnails**                      | Generate for all image types | Ensures gallery loads quickly (esp. for GIFs and PNGs) |
+
+---
+
+### 🛠️ Implementation Tips
+
+* **Preview display**: For GIFs, allow motion on detail view only (pause in feed view to save bandwidth).
+* **Storage handling**: Use AWS S3 or Firebase Storage with MIME-type filters to accept allowed formats.
+* **Conversion**: Consider converting uploads to WebP for gallery thumbnails to save space and bandwidth.
+* **Validation**: Check MIME type and enforce allowed extensions (`.jpg`, `.png`, `.gif`, `.svg`, etc.).
+
+---
+
+Would you like me to help you:
+
+1. Draft validation logic for Django?
+2. Define a table for supported MIME types?
+3. Plan how to generate thumbnails and previews per file type?
+
+Let me know what direction you’d like to take next.
