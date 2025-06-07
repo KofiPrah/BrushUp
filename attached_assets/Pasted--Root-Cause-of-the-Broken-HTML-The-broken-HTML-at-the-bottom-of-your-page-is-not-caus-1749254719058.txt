@@ -1,0 +1,94 @@
+### 🧨 Root Cause of the Broken HTML
+
+The **broken HTML at the bottom of your page** is **not caused by missing modal or toast templates** — those are well-formed.
+
+Instead, here’s what’s actually happening:
+
+---
+
+### ❗ Problem: Unescaped Template Literal in JavaScript Output
+
+You have JavaScript code like this:
+
+```javascript
+const toastHtml = `
+  <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : ...}">
+    ...
+  </div>
+`;
+```
+
+or
+
+```javascript
+const modalHtml = `
+  <div id="versionComparisonModal">...</div>
+`;
+```
+
+This is fine **in a `.js` file**.
+But you're injecting it **directly in an HTML template** using Jinja2 (`{% ... %}`), and mixing **JavaScript template literals (`${...}`)** with **Django/Jinja-style template interpolation (`{{ }}`)**.
+
+#### 🔥 What Happens?
+
+The server renders this file and sees `${versionId}` or `${imageSrc}` **as literal text**, because it's inside a `<script>` block.
+
+Then when the browser parses it, it tries to evaluate `fetch(`/api/versions/\${versionId}/archive/`)` — but if `versionId` isn't defined (e.g. due to script order or scoping), the browser renders that entire line into raw output like this:
+
+```html
+GET https://brushup.replit.app/api/versions/${versionId}/archive/
+```
+
+Which causes:
+
+* **404 errors**
+* **Unclosed tags**
+* **Malformed DOM at the bottom of the page**
+
+---
+
+### ✅ What Confirms It?
+
+The analysis shows:
+
+* No missing `</html>` or unclosed tags
+* The trailing content after `</html>` is **a huge chunk of unparsed HTML**, suggesting JS literals were never evaluated
+* Many literal `${...}` expressions present — meaning JavaScript is leaking into the rendered HTML
+
+---
+
+### ✅ How to Fix It
+
+Wrap all your template literals in a function **after** DOMContentLoaded — or escape the literal backticks in HTML so they’re not evaluated prematurely.
+
+#### ✅ Safer pattern:
+
+```html
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const modalHtml = String.raw`
+        <div class="modal" id="...">...</div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+});
+</script>
+```
+
+#### Or escape literals:
+
+```js
+const apiUrl = "/api/versions/" + versionId + "/archive/";
+```
+
+---
+
+### 📌 Summary
+
+| 🔍 Issue               | ✅ Explanation                                                   |
+| ---------------------- | --------------------------------------------------------------- |
+| `${...}` not evaluated | Caused 404s and raw JS in final HTML                            |
+| Script order or timing | Some functions run before variables exist                       |
+| No broken HTML tags    | Modals and toasts were structurally sound                       |
+| Real problem           | Interpolation inside `<script>` mixed with server-rendered HTML |
+
+Let me know if you'd like me to auto-refactor the offending sections to avoid this bug.
