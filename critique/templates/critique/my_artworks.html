@@ -876,7 +876,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (bulkSelectionMode) {
         console.log('Enabling bulk selection mode');
         checkboxes.forEach((cb, index) => {
-            console.log(`Setting checkbox ${index} to visible`);
+            console.log(`Setting checkbox ' + index + ' to visible`);
             cb.classList.remove('bulk-hidden', 'd-none');
             cb.classList.add('bulk-visible');
             cb.style.setProperty('display', 'block', 'important');
@@ -1312,7 +1312,7 @@ function createNewVersion(artworkId) {
     .then(response => response.json())
     .then(data => {
         if (data.version) {
-            showToast(`Version ${data.version.version_number} created successfully`, 'success');
+            showToast(`Version ' + data.version.version_number + ' created successfully`, 'success');
             // Refresh the version manager
             const modal = bootstrap.Modal.getInstance(document.getElementById('versionManagerModal'));
             modal.hide();
@@ -1755,7 +1755,7 @@ function changeVisibility(artworkId, newVisibility) {
             artworkItem.dataset.visibility = newVisibility;
             updateVisibilityBadge(artworkItem, newVisibility);
             calculateStatistics();
-            showToast(`Visibility changed to ${newVisibility}`, 'success');
+            showToast(`Visibility changed to ' + newVisibility + '`, 'success');
         } else {
             showToast('Failed to update visibility', 'error');
         }
@@ -1830,16 +1830,16 @@ function enableInlineEdit(element, fieldType) {
             .then(response => response.json())
             .then(data => {
                 if (data.id) {
-                    element.textContent = newValue || `Click to add ${fieldType}`;
-                    showToast(`${fieldType.charAt(0).toUpperCase() + fieldType.slice(1)} updated`, 'success');
+                    element.textContent = newValue || `Click to add ' + fieldType + '`;
+                    showToast(`' + fieldType.charAt(0).toUpperCase() + fieldType.slice(1) + ' updated`, 'success');
                 } else {
-                    showToast(`Failed to update ${fieldType}`, 'error');
+                    showToast(`Failed to update ' + fieldType + '`, 'error');
                     element.textContent = currentValue;
                 }
             })
             .catch(error => {
-                console.error(`Error updating ${fieldType}:`, error);
-                showToast(`Failed to update ${fieldType}`, 'error');
+                console.error(`Error updating ' + fieldType + ':`, error);
+                showToast(`Failed to update ' + fieldType + '`, 'error');
                 element.textContent = currentValue;
             });
         }
@@ -1899,10 +1899,10 @@ function bulkPublish() {
     })
     .then(response => response.json())
     .then(data => {
-        showToast(`Published ${selectedArtworks.size} artworks`, 'success');
+        showToast(`Published ' + selectedArtworks.size + ' artworks`, 'success');
         // Update UI for selected artworks
         selectedArtworks.forEach(id => {
-            const item = document.querySelector(`[data-artwork-id="${id}"]`);
+            const item = document.querySelector(`[data-artwork-id="' + id + '"]`);
             if (item) {
                 item.dataset.status = 'published';
                 updateStatusBadges(item, 'published');
@@ -1933,10 +1933,10 @@ function bulkDraft() {
     })
     .then(response => response.json())
     .then(data => {
-        showToast(`Marked ${selectedArtworks.size} artworks as draft`, 'success');
+        showToast(`Marked ' + selectedArtworks.size + ' artworks as draft`, 'success');
         // Update UI for selected artworks
         selectedArtworks.forEach(id => {
-            const item = document.querySelector(`[data-artwork-id="${id}"]`);
+            const item = document.querySelector(`[data-artwork-id="' + id + '"]`);
             if (item) {
                 item.dataset.status = 'draft';
                 updateStatusBadges(item, 'draft');
@@ -1967,10 +1967,10 @@ function bulkToggleCritique() {
     })
     .then(response => response.json())
     .then(data => {
-        showToast(`Toggled critique requests for ${selectedArtworks.size} artworks`, 'success');
+        showToast(`Toggled critique requests for ' + selectedArtworks.size + ' artworks`, 'success');
         // Update UI for selected artworks
         selectedArtworks.forEach(id => {
-            const item = document.querySelector(`[data-artwork-id="${id}"]`);
+            const item = document.querySelector(`[data-artwork-id="' + id + '"]`);
             if (item) {
                 const currentSeeking = item.dataset.seekingCritique === 'true';
                 item.dataset.seekingCritique = (!currentSeeking).toString();
@@ -1989,7 +1989,7 @@ function bulkToggleCritique() {
 function bulkDelete() {
     if (selectedArtworks.size === 0) return;
     
-    if (confirm(`Are you sure you want to delete ${selectedArtworks.size} selected artworks? This action cannot be undone.`)) {
+    if (confirm(`Are you sure you want to delete ' + selectedArtworks.size + ' selected artworks? This action cannot be undone.`)) {
         fetch('/api/artworks/bulk_actions/', {
             method: 'POST',
             headers: {
@@ -2003,10 +2003,10 @@ function bulkDelete() {
         })
         .then(response => response.json())
         .then(data => {
-            showToast(`Deleted ${selectedArtworks.size} artworks`, 'success');
+            showToast(`Deleted ' + selectedArtworks.size + ' artworks`, 'success');
             // Remove deleted artworks from UI
             selectedArtworks.forEach(id => {
-                const item = document.querySelector(`[data-artwork-id="${id}"]`);
+                const item = document.querySelector(`[data-artwork-id="' + id + '"]`);
                 if (item) {
                     item.remove();
                 }
