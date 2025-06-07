@@ -479,38 +479,39 @@ function displayFolders(folders) {
     
     folders.forEach(folder => {
         const visibilityIcon = getVisibilityIcon(folder.is_public);
-        html += `
-            <div class="col-md-6 mb-3">
-                <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-folder text-primary me-2" viewBox="0 0 16 16">
-                                <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h4.672a2 2 0 0 1 2 2l-.54.87a1 1 0 0 1-.91.59H1.46a1 1 0 0 1-.92-.59zM2.5 4h11l.062.128a.4.4 0 0 1-.062.157.93.93 0 0 1-.306.215l-11.228 6.132a.5.5 0 0 1-.708-.684L2.5 4z"/>
-                            </svg>
-                            <span class="fw-bold">${folder.name}</span>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                Actions
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="viewFolderContents(${folder.id})">View Contents</a></li>
-                                <li><a class="dropdown-item" href="#" onclick="editFolder(${folder.id})">Edit</a></li>
-                                <li><a class="dropdown-item text-danger" href="#" onclick="deleteFolder(${folder.id})">Delete</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="card-body" style="cursor: pointer;" onclick="window.location.href='/folders/${folder.id}/'">
-                        <div class="d-flex align-items-center mb-2">
-                            ${visibilityIcon}
-                            <span class="badge bg-secondary ms-2">${folder.artwork_count} artworks</span>
-                        </div>
-                        ${folder.description ? `<p class="text-muted">${folder.description}</p>` : ''}
-                        <small class="text-muted">Created ${new Date(folder.created_at).toLocaleDateString()}</small>
-                    </div>
-                </div>
-            </div>
-        `;
+        const descriptionHtml = folder.description ? '<p class="text-muted">' + folder.description + '</p>' : '';
+        
+        html += 
+            '<div class="col-md-6 mb-3">' +
+                '<div class="card h-100">' +
+                    '<div class="card-header d-flex justify-content-between align-items-center">' +
+                        '<div class="d-flex align-items-center">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-folder text-primary me-2" viewBox="0 0 16 16">' +
+                                '<path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h4.672a2 2 0 0 1 2 2l-.54.87a1 1 0 0 1-.91.59H1.46a1 1 0 0 1-.92-.59zM2.5 4h11l.062.128a.4.4 0 0 1-.062.157.93.93 0 0 1-.306.215l-11.228 6.132a.5.5 0 0 1-.708-.684L2.5 4z"/>' +
+                            '</svg>' +
+                            '<span class="fw-bold">' + folder.name + '</span>' +
+                        '</div>' +
+                        '<div class="dropdown">' +
+                            '<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">' +
+                                'Actions' +
+                            '</button>' +
+                            '<ul class="dropdown-menu">' +
+                                '<li><a class="dropdown-item" href="#" onclick="viewFolderContents(' + folder.id + ')">View Contents</a></li>' +
+                                '<li><a class="dropdown-item" href="#" onclick="editFolder(' + folder.id + ')">Edit</a></li>' +
+                                '<li><a class="dropdown-item text-danger" href="#" onclick="deleteFolder(' + folder.id + ')">Delete</a></li>' +
+                            '</ul>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="card-body" style="cursor: pointer;" onclick="window.location.href=\'/folders/' + folder.id + '/\'">' +
+                        '<div class="d-flex align-items-center mb-2">' +
+                            visibilityIcon +
+                            '<span class="badge bg-secondary ms-2">' + folder.artwork_count + ' artworks</span>' +
+                        '</div>' +
+                        descriptionHtml +
+                        '<small class="text-muted">Created ' + new Date(folder.created_at).toLocaleDateString() + '</small>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
     });
     
     html += '</div>';
@@ -543,7 +544,7 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
     
     const editId = e.target.dataset.editId;
     const isEdit = !!editId;
-    const url = isEdit ? `/api/folders/${editId}/` : '/api/folders/';
+    const url = isEdit ? '/api/folders/' + editId + '/' : '/api/folders/';
     const method = isEdit ? 'PATCH' : 'POST';
     
     fetch(url, {
@@ -557,7 +558,7 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error(`Failed to ${isEdit ? 'update' : 'create'} folder`);
+            throw new Error('Failed to ' + (isEdit ? 'update' : 'create') + ' folder');
         }
         return response.json();
     })
@@ -572,7 +573,7 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
         document.getElementById('createFolderModalLabel').textContent = 'Create New Portfolio Folder';
         
         // Show success message
-        showAlert(`Folder ${isEdit ? 'updated' : 'created'} successfully!`, 'success');
+        showAlert('Folder ' + (isEdit ? 'updated' : 'created') + ' successfully!', 'success');
     })
     .catch(error => {
         console.error(`Error ${isEdit ? 'updating' : 'creating'} folder:`, error);

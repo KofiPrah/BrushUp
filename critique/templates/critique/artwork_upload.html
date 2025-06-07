@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         throw new Error(JSON.stringify(data));
                     } catch (e) {
                         // If not JSON, return the text with status
-                        throw new Error(`HTTP error ${response.status}: ${text.substring(0, 100)}...`);
+                        throw new Error('HTTP error ' + response.status + ': ' + text.substring(0, 100) + '...');
                     }
                 });
             }
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             // Success handling
             successAlert.classList.remove('d-none');
-            resultLink.innerHTML = `<a href="/artworks/${data.id}/" class="alert-link">View your artwork</a>`;
+            resultLink.innerHTML = '<a href="/artworks/' + data.id + '/" class="alert-link">View your artwork</a>';
             
             // Reset form and button
             form.reset();
@@ -256,7 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (error.message.startsWith('{') || error.message.startsWith('[')) {
                     const errorData = JSON.parse(error.message);
                     errorText = Object.keys(errorData)
-                        .map(key => `${key}: ${errorData[key]}`)
+                        .map(key => key + ': ' + errorData[key])
                         .join(', ');
                 } else {
                     // Otherwise use the error message directly
