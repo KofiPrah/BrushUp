@@ -1172,7 +1172,12 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
         const deleteAction = hasCritiques ? 'archiveVersion' : 'deleteVersion';
         
         return '<div class="col-md-4 mb-3">' +
-            '<div class="card bg-secondary text-white h-100">' +
+            '<div class="card bg-secondary text-white h-100 version-card" draggable="true" ' +
+                 'data-version-id="' + version.id + '" ' +
+                 'data-version-number="' + version.version_number + '" ' +
+                 'data-version-title="' + version.title + '" ' +
+                 'data-version-description="' + version.description + '" ' +
+                 'data-artwork-id="' + artworkId + '">' +
                 '<div class="card-header d-flex justify-content-between align-items-center">' +
                     '<h6 class="mb-0">Version ' + version.version_number + '</h6>' +
                     '<small class="text-light">' + new Date(version.created_at).toLocaleDateString() + '</small>' +
@@ -1248,15 +1253,70 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                 '</button>' +
                             '</div>' +
                             '<div class="col-md-6 text-end">' +
-                                '<button class="btn btn-outline-info" onclick="openVersionComparison(' + artworkId + ')" ' +
+                                '<button class="btn btn-outline-info" onclick="toggleComparisonMode(' + artworkId + ')" ' +
                                         compareButtonDisabled + ' ' +
                                         'title="' + compareButtonTitle + '" ' +
-                                        'data-bs-toggle="tooltip" data-bs-placement="top">' +
+                                        'data-bs-toggle="tooltip" data-bs-placement="top" id="comparisonToggleBtn">' +
                                     '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-shuffle me-1" viewBox="0 0 16 16">' +
                                         '<path fill-rule="evenodd" d="M0 3.5A.5.5 0 0 1 .5 3H1c2.202 0 3.827 1.24 4.874 2.418.49.552.865 1.102 1.126 1.532.26-.43.636-.98 1.126-1.532C9.173 4.24 10.798 3 13 3v1c-1.798 0-3.173 1.01-4.126 2.082A9.624 9.624 0 0 0 7.556 8a9.624 9.624 0 0 0 1.317 1.918C9.828 10.99 11.204 12 13 12v1c-2.202 0-3.827-1.24-4.874-2.418A10.595 10.595 0 0 1 7 9.05c-.26.43-.636.98-1.126 1.532C4.827 11.76 3.202 13 1 13H.5a.5.5 0 0 1 0-1H1c1.798 0 3.173-1.01 4.126-2.082A9.624 9.624 0 0 0 6.444 8a9.624 9.624 0 0 0-1.317-1.918C4.172 5.01 2.796 4 1 4H.5a.5.5 0 0 1-.5-.5z"/>' +
                                         '<path d="M13 5.466V1.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192zm0 9v-3.932a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384l-2.36 1.966a.25.25 0 0 1-.41-.192z"/>' +
                                     '</svg>' +
                                     'Compare Versions' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div id="comparisonArea" class="comparison-area mb-3" style="display: none;">' +
+                            '<div class="alert alert-warning border-warning bg-dark text-light">' +
+                                '<div class="d-flex">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrows-move me-2 flex-shrink-0 mt-1" viewBox="0 0 16 16">' +
+                                        '<path fill-rule="evenodd" d="M7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10zM.146 8.354a.5.5 0 0 1 0-.708l2-2a.5.5 0 1 1 .708.708L1.707 7.5H5.5a.5.5 0 0 1 0 1H1.707l1.147 1.146a.5.5 0 0 1-.708.708l-2-2zM10 8a.5.5 0 0 1 .5-.5h3.793l-1.147-1.146a.5.5 0 0 1 .708-.708l2 2a.5.5 0 0 1 0 .708l-2 2a.5.5 0 0 1-.708-.708L14.293 8.5H10.5A.5.5 0 0 1 10 8z"/>' +
+                                    '</svg>' +
+                                    '<div>' +
+                                        '<strong>Drag & Drop Comparison Mode</strong><br>' +
+                                        '<small>Drag version cards from below into the comparison slots to see differences side-by-side.</small>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="row">' +
+                                '<div class="col-md-6">' +
+                                    '<div class="comparison-slot" id="comparisonSlot1" data-slot="1">' +
+                                        '<div class="drop-zone border border-dashed border-2 rounded p-4 text-center text-muted h-100 d-flex flex-column justify-content-center">' +
+                                            '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-cloud-arrow-down mx-auto mb-2" viewBox="0 0 16 16">' +
+                                                '<path fill-rule="evenodd" d="M7.646 10.854a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 9.293V5.5a.5.5 0 0 0-1 0v3.793L6.354 8.146a.5.5 0 1 0-.708.708l2 2z"/>' +
+                                                '<path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z"/>' +
+                                            '</svg>' +
+                                            '<h6>Version Slot 1</h6>' +
+                                            '<p class="mb-0">Drop a version here</p>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="col-md-6">' +
+                                    '<div class="comparison-slot" id="comparisonSlot2" data-slot="2">' +
+                                        '<div class="drop-zone border border-dashed border-2 rounded p-4 text-center text-muted h-100 d-flex flex-column justify-content-center">' +
+                                            '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-cloud-arrow-down mx-auto mb-2" viewBox="0 0 16 16">' +
+                                                '<path fill-rule="evenodd" d="M7.646 10.854a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 9.293V5.5a.5.5 0 0 0-1 0v3.793L6.354 8.146a.5.5 0 1 0-.708.708l2 2z"/>' +
+                                                '<path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z"/>' +
+                                            '</svg>' +
+                                            '<h6>Version Slot 2</h6>' +
+                                            '<p class="mb-0">Drop a version here</p>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="text-center mt-3">' +
+                                '<button class="btn btn-success me-2" id="compareSelectedBtn" onclick="compareSelectedVersions(' + artworkId + ')" disabled>' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-fill me-1" viewBox="0 0 16 16">' +
+                                        '<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>' +
+                                        '<path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>' +
+                                    '</svg>' +
+                                    'Compare Selected Versions' +
+                                '</button>' +
+                                '<button class="btn btn-outline-secondary" onclick="clearComparison()">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise me-1" viewBox="0 0 16 16">' +
+                                        '<path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>' +
+                                        '<path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>' +
+                                    '</svg>' +
+                                    'Clear Selection' +
                                 '</button>' +
                             '</div>' +
                         '</div>' +
@@ -1296,6 +1356,9 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('versionManagerModal'));
     modal.show();
+    
+    // Initialize drag and drop functionality
+    initializeDragAndDrop();
     
     // Initialize tooltips after modal is shown
     modal._element.addEventListener('shown.bs.modal', function () {
@@ -2145,6 +2208,295 @@ function archiveVersion(versionId, versionNumber, artworkId) {
             showToast(`Failed to archive Version ${versionNumber}`, 'error');
         });
     }
+}
+
+// Drag and Drop Version Comparison Functions
+let comparisonState = {
+    isActive: false,
+    slot1: null,
+    slot2: null
+};
+
+function toggleComparisonMode(artworkId) {
+    const comparisonArea = document.getElementById('comparisonArea');
+    const toggleBtn = document.getElementById('comparisonToggleBtn');
+    
+    if (comparisonState.isActive) {
+        // Exit comparison mode
+        comparisonArea.style.display = 'none';
+        comparisonState.isActive = false;
+        toggleBtn.innerHTML = toggleBtn.innerHTML.replace('Exit Comparison', 'Compare Versions');
+        toggleBtn.classList.remove('btn-warning');
+        toggleBtn.classList.add('btn-outline-info');
+        clearComparison();
+    } else {
+        // Enter comparison mode
+        comparisonArea.style.display = 'block';
+        comparisonState.isActive = true;
+        toggleBtn.innerHTML = toggleBtn.innerHTML.replace('Compare Versions', 'Exit Comparison');
+        toggleBtn.classList.remove('btn-outline-info');
+        toggleBtn.classList.add('btn-warning');
+    }
+}
+
+function initializeDragAndDrop() {
+    // Add drag event listeners to version cards
+    const versionCards = document.querySelectorAll('.version-card');
+    versionCards.forEach(card => {
+        card.addEventListener('dragstart', handleDragStart);
+        card.addEventListener('dragend', handleDragEnd);
+    });
+    
+    // Add drop event listeners to comparison slots
+    const comparisonSlots = document.querySelectorAll('.comparison-slot');
+    comparisonSlots.forEach(slot => {
+        slot.addEventListener('dragover', handleDragOver);
+        slot.addEventListener('drop', handleDrop);
+        slot.addEventListener('dragenter', handleDragEnter);
+        slot.addEventListener('dragleave', handleDragLeave);
+    });
+}
+
+function handleDragStart(e) {
+    if (!comparisonState.isActive) {
+        e.preventDefault();
+        return;
+    }
+    
+    const card = e.target.closest('.version-card');
+    card.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+        versionId: card.dataset.versionId,
+        versionNumber: card.dataset.versionNumber,
+        versionTitle: card.dataset.versionTitle,
+        versionDescription: card.dataset.versionDescription,
+        artworkId: card.dataset.artworkId
+    }));
+    e.dataTransfer.effectAllowed = 'copy';
+}
+
+function handleDragEnd(e) {
+    const card = e.target.closest('.version-card');
+    card.classList.remove('dragging');
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+}
+
+function handleDragEnter(e) {
+    e.preventDefault();
+    const slot = e.target.closest('.comparison-slot');
+    if (slot) {
+        slot.classList.add('drag-over');
+    }
+}
+
+function handleDragLeave(e) {
+    const slot = e.target.closest('.comparison-slot');
+    if (slot && !slot.contains(e.relatedTarget)) {
+        slot.classList.remove('drag-over');
+    }
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    const slot = e.target.closest('.comparison-slot');
+    slot.classList.remove('drag-over');
+    
+    try {
+        const versionData = JSON.parse(e.dataTransfer.getData('text/plain'));
+        const slotNumber = slot.dataset.slot;
+        
+        // Update comparison state
+        comparisonState[`slot${slotNumber}`] = versionData;
+        
+        // Update slot UI
+        updateComparisonSlot(slot, versionData);
+        
+        // Check if both slots are filled to enable comparison button
+        updateComparisonButton();
+        
+    } catch (error) {
+        console.error('Error handling drop:', error);
+        showToast('Failed to add version to comparison', 'error');
+    }
+}
+
+function updateComparisonSlot(slot, versionData) {
+    const slotContent = slot.querySelector('.drop-zone');
+    slotContent.innerHTML = 
+        '<div class="card bg-info text-white h-100">' +
+            '<div class="card-header d-flex justify-content-between align-items-center">' +
+                '<h6 class="mb-0">Version ' + versionData.versionNumber + '</h6>' +
+                '<button class="btn btn-sm btn-outline-light" onclick="removeFromSlot(' + slot.dataset.slot + ')" title="Remove from comparison">' +
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">' +
+                        '<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>' +
+                    '</svg>' +
+                '</button>' +
+            '</div>' +
+            '<div class="card-body">' +
+                '<h6 class="card-title">' + versionData.versionTitle + '</h6>' +
+                '<p class="card-text text-sm">' + versionData.versionDescription.substring(0, 80) + (versionData.versionDescription.length > 80 ? '...' : '') + '</p>' +
+            '</div>' +
+        '</div>';
+    
+    slotContent.classList.remove('border-dashed', 'text-muted');
+    slotContent.classList.add('border-solid');
+}
+
+function removeFromSlot(slotNumber) {
+    const slot = document.getElementById(`comparisonSlot${slotNumber}`);
+    const slotContent = slot.querySelector('.drop-zone');
+    
+    // Reset slot UI
+    slotContent.innerHTML = 
+        '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-cloud-arrow-down mx-auto mb-2" viewBox="0 0 16 16">' +
+            '<path fill-rule="evenodd" d="M7.646 10.854a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0-.708-.708L8.5 9.293V5.5a.5.5 0 0 0-1 0v3.793L6.354 8.146a.5.5 0 1 0-.708.708l2 2z"/>' +
+            '<path d="M4.406 3.342A5.53 5.53 0 0 1 8 2c2.69 0 4.923 2 5.166 4.579C14.758 6.804 16 8.137 16 9.773 16 11.569 14.502 13 12.687 13H3.781C1.708 13 0 11.366 0 9.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383zm.653.757c-.757.653-1.153 1.44-1.153 2.056v.448l-.445.049C2.064 6.805 1 7.952 1 9.318 1 10.785 2.23 12 3.781 12h8.906C13.98 12 15 10.988 15 9.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 4.825 10.328 3 8 3a4.53 4.53 0 0 0-2.941 1.1z"/>' +
+        '</svg>' +
+        '<h6>Version Slot ' + slotNumber + '</h6>' +
+        '<p class="mb-0">Drop a version here</p>';
+    
+    slotContent.classList.add('border-dashed', 'text-muted');
+    slotContent.classList.remove('border-solid');
+    
+    // Update comparison state
+    comparisonState[`slot${slotNumber}`] = null;
+    
+    // Update comparison button
+    updateComparisonButton();
+}
+
+function clearComparison() {
+    removeFromSlot(1);
+    removeFromSlot(2);
+}
+
+function updateComparisonButton() {
+    const compareBtn = document.getElementById('compareSelectedBtn');
+    const hasBothSlots = comparisonState.slot1 && comparisonState.slot2;
+    
+    compareBtn.disabled = !hasBothSlots;
+    
+    if (hasBothSlots) {
+        compareBtn.classList.remove('btn-outline-secondary');
+        compareBtn.classList.add('btn-success');
+    } else {
+        compareBtn.classList.remove('btn-success');
+        compareBtn.classList.add('btn-outline-secondary');
+    }
+}
+
+function compareSelectedVersions(artworkId) {
+    if (!comparisonState.slot1 || !comparisonState.slot2) {
+        showToast('Please select two versions to compare', 'error');
+        return;
+    }
+    
+    const version1Id = comparisonState.slot1.versionId;
+    const version2Id = comparisonState.slot2.versionId;
+    
+    // Call the existing comparison API
+    fetch(`/api/artworks/${artworkId}/versions/compare/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            version1_id: version1Id,
+            version2_id: version2Id
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        showVersionComparisonModal(data, comparisonState.slot1, comparisonState.slot2);
+    })
+    .catch(error => {
+        console.error('Error comparing versions:', error);
+        showToast('Failed to compare versions', 'error');
+    });
+}
+
+function showVersionComparisonModal(comparisonData, version1, version2) {
+    const differences = comparisonData.differences || [];
+    
+    let differencesHtml = '';
+    if (differences.length > 0) {
+        differencesHtml = differences.map(diff => 
+            '<div class="mb-3">' +
+                '<h6 class="text-warning">' + diff.field.charAt(0).toUpperCase() + diff.field.slice(1) + ' Changed</h6>' +
+                '<div class="row">' +
+                    '<div class="col-md-6">' +
+                        '<div class="card bg-danger text-white">' +
+                            '<div class="card-header">Version ' + version1.versionNumber + '</div>' +
+                            '<div class="card-body">' +
+                                '<p class="mb-0">' + (diff.version1_value || '<em>Not set</em>') + '</p>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="col-md-6">' +
+                        '<div class="card bg-success text-white">' +
+                            '<div class="card-header">Version ' + version2.versionNumber + '</div>' +
+                            '<div class="card-body">' +
+                                '<p class="mb-0">' + (diff.version2_value || '<em>Not set</em>') + '</p>' +
+                            '</div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        ).join('');
+    } else {
+        differencesHtml = '<div class="alert alert-info">No differences found between these versions.</div>';
+    }
+    
+    const modalHtml = 
+        '<div class="modal fade" id="versionComparisonModal" tabindex="-1" aria-labelledby="versionComparisonModalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog modal-xl">' +
+                '<div class="modal-content bg-dark text-light">' +
+                    '<div class="modal-header border-secondary">' +
+                        '<h5 class="modal-title" id="versionComparisonModalLabel">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrows-angle-expand me-2" viewBox="0 0 16 16">' +
+                                '<path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0L1.414 13.88 1 13.465V15.5a.5.5 0 0 0 .5.5h2.036l-.415-.414 3.707-3.707a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l3.707-3.707.415.414V.5a.5.5 0 0 0-.5-.5h-2.036l.415.414L8.172 4.121a.5.5 0 0 0 0 .707z"/>' +
+                            '</svg>' +
+                            'Version Comparison: ' + version1.versionNumber + ' vs ' + version2.versionNumber +
+                        '</h5>' +
+                        '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                    '</div>' +
+                    '<div class="modal-body">' +
+                        '<div class="alert alert-info border-info bg-dark text-light mb-4">' +
+                            '<div class="d-flex">' +
+                                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-info-circle me-2 flex-shrink-0 mt-1" viewBox="0 0 16 16">' +
+                                    '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                                    '<path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>' +
+                                '</svg>' +
+                                '<div>' +
+                                    '<strong>Side-by-Side Comparison</strong><br>' +
+                                    '<small>Red highlights show the older version, green shows the newer version. Only changed fields are displayed.</small>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        differencesHtml +
+                    '</div>' +
+                    '<div class="modal-footer border-secondary">' +
+                        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    
+    // Remove existing comparison modal if present
+    const existingComparisonModal = document.getElementById('versionComparisonModal');
+    if (existingComparisonModal) existingComparisonModal.remove();
+    
+    // Add new modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('versionComparisonModal'));
+    modal.show();
 }
 </script>
 {% endblock %}
