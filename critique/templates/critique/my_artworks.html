@@ -1587,7 +1587,7 @@ function previewVersion(versionId, artworkId) {
     let url;
     if (versionId === 'current') {
         // Preview current artwork
-        url = '/artwork/' + artworkId + '/';
+        url = '/artworks/' + artworkId + '/';
     } else {
         // Fetch version data and show preview modal
         fetch('/api/artworks/' + artworkId + '/versions/', {
