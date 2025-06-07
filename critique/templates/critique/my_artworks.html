@@ -1651,6 +1651,9 @@ function performVersionComparison(artworkId) {
         return;
     }
     
+    // Show artistic loading animation for comparison
+    showLoadingOverlay('palette', 'Comparing versions...', 'Analyzing differences between your artwork versions');
+    
     fetch('/api/artworks/' + artworkId + '/versions/compare/?version1=' + version1 + '&version2=' + version2, {
         method: 'GET',
         headers: {
@@ -1660,6 +1663,9 @@ function performVersionComparison(artworkId) {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide loading overlay
+        hideLoadingOverlay();
+        
         if (data.version1 && data.version2) {
             displayComparisonResults(data);
         } else {
@@ -1667,6 +1673,9 @@ function performVersionComparison(artworkId) {
         }
     })
     .catch(error => {
+        // Hide loading overlay
+        hideLoadingOverlay();
+        
         console.error('Error comparing versions:', error);
         showToast('Failed to compare versions', 'error');
     });
@@ -2849,6 +2858,12 @@ function createVersionWithUpload(artworkId) {
     })
     .then(response => response.json())
     .then(data => {
+        // Hide loading overlay
+        hideLoadingOverlay();
+        
+        // Restore button
+        restoreButton(btn);
+        
         if (data.id) {
             showToast('New version created and uploaded successfully!', 'success');
             
@@ -2872,12 +2887,14 @@ function createVersionWithUpload(artworkId) {
         }
     })
     .catch(error => {
+        // Hide loading overlay
+        hideLoadingOverlay();
+        
+        // Restore button
+        restoreButton(btn);
+        
         console.error('Error creating version with upload:', error);
         showToast('Failed to create version with upload', 'error');
-    })
-    .finally(() => {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
     });
 }
 </script>
