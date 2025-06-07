@@ -3273,7 +3273,7 @@ function saveVersionOrder(artworkId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken()
+            'X-CSRFToken': getCookie('csrftoken')
         },
         body: JSON.stringify({
             version_order: versionOrder
