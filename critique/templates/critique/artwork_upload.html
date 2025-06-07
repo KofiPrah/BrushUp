@@ -184,8 +184,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function proceedWithUpload() {
         const formData = new FormData(form);
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = 'Uploading...';
+        
+        // Show artistic loading animation
+        showLoadingOverlay('upload', 'Uploading your masterpiece...', 'Processing your artwork and preparing it for the gallery');
+        
+        // Set button loading state with artistic loader
+        setButtonLoading(submitBtn, 'brush', 'Upload Artwork');
+        
         successAlert.classList.add('d-none');
         errorAlert.classList.add('d-none');
         
@@ -242,15 +247,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return response.json();
         })
         .then(data => {
+            // Hide loading overlay
+            hideLoadingOverlay();
+            
+            // Restore button
+            restoreButton(submitBtn);
+            
             // Success handling
             successAlert.classList.remove('d-none');
             resultLink.innerHTML = '<a href="/artworks/' + data.id + '/" class="alert-link">View your artwork</a>';
             
-            // Reset form and button
+            // Reset form
             form.reset();
             previewContainer.classList.add('d-none');
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Upload Artwork';
             
             // Display the uploaded image from S3
             const resultImage = document.createElement('img');
@@ -263,9 +272,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Upload successful:', data);
         })
         .catch(error => {
+            // Hide loading overlay
+            hideLoadingOverlay();
+            
+            // Restore button
+            restoreButton(submitBtn);
+            
             // Error handling
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Upload Artwork';
             errorAlert.classList.remove('d-none');
             
             let errorText = 'An error occurred during upload.';

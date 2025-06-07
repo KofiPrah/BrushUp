@@ -2826,9 +2826,12 @@ function createVersionWithUpload(artworkId) {
     }
     
     const btn = document.getElementById('createVersionUploadBtn');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Creating...';
-    btn.disabled = true;
+    
+    // Show artistic loading overlay
+    showLoadingOverlay('version', 'Creating new version...', 'Processing your artwork iteration and preparing version history');
+    
+    // Set button loading state with artistic loader
+    setButtonLoading(btn, 'brush', 'Upload New Version');
     
     // Create FormData for multipart upload
     const formData = new FormData();
