@@ -1,0 +1,578 @@
+/* Artistic Loading Animations for BrushUp */
+
+/* Paintbrush Loading Animation */
+.paintbrush-loader {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+}
+
+.paintbrush-loader::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 8px;
+    background: #8B4513;
+    border-radius: 10px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    transform-origin: center;
+    animation: paintbrushStroke 2s infinite ease-in-out;
+}
+
+.paintbrush-loader::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 6px;
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4);
+    background-size: 200% 200%;
+    border-radius: 3px;
+    top: calc(50% - 15px);
+    left: calc(50% + 10px);
+    transform: translate(-50%, -50%) rotate(45deg);
+    animation: paintbrushStroke 2s infinite ease-in-out, colorFlow 3s infinite;
+}
+
+@keyframes paintbrushStroke {
+    0%, 100% {
+        transform: translate(-50%, -50%) rotate(45deg) translateX(0);
+    }
+    50% {
+        transform: translate(-50%, -50%) rotate(45deg) translateX(10px);
+    }
+}
+
+@keyframes colorFlow {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Palette Mixing Animation */
+.palette-loader {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    display: inline-block;
+}
+
+.palette-loader::before {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 40px;
+    background: #F0F0F0;
+    border-radius: 50% 0 0 50%;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+
+.palette-color {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: paletteColorMix 2s infinite ease-in-out;
+}
+
+.palette-color:nth-child(1) {
+    background: #FF6B6B;
+    top: 20%;
+    left: 15%;
+    animation-delay: 0s;
+}
+
+.palette-color:nth-child(2) {
+    background: #4ECDC4;
+    top: 40%;
+    left: 25%;
+    animation-delay: 0.3s;
+}
+
+.palette-color:nth-child(3) {
+    background: #45B7D1;
+    top: 60%;
+    left: 15%;
+    animation-delay: 0.6s;
+}
+
+.palette-color:nth-child(4) {
+    background: #96CEB4;
+    top: 45%;
+    left: 5%;
+    animation-delay: 0.9s;
+}
+
+@keyframes paletteColorMix {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 1;
+    }
+}
+
+/* Canvas Sketching Animation */
+.canvas-loader {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    display: inline-block;
+    background: #FAFAFA;
+    border: 2px solid #DDD;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.sketch-line {
+    position: absolute;
+    background: #333;
+    border-radius: 1px;
+    opacity: 0;
+    animation: sketchDraw 3s infinite ease-in-out;
+}
+
+.sketch-line:nth-child(1) {
+    width: 30px;
+    height: 2px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.sketch-line:nth-child(2) {
+    width: 25px;
+    height: 2px;
+    top: 35%;
+    left: 15%;
+    animation-delay: 0.5s;
+}
+
+.sketch-line:nth-child(3) {
+    width: 35px;
+    height: 2px;
+    top: 50%;
+    left: 5%;
+    animation-delay: 1s;
+}
+
+.sketch-line:nth-child(4) {
+    width: 20px;
+    height: 2px;
+    top: 65%;
+    left: 20%;
+    animation-delay: 1.5s;
+}
+
+@keyframes sketchDraw {
+    0% {
+        width: 0;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+/* Ink Splash Animation */
+.ink-splash-loader {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+}
+
+.ink-splash {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6C5CE7;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: inkSplash 2s infinite ease-out;
+}
+
+.ink-splash:nth-child(1) {
+    animation-delay: 0s;
+    background: #6C5CE7;
+}
+
+.ink-splash:nth-child(2) {
+    animation-delay: 0.2s;
+    background: #A29BFE;
+}
+
+.ink-splash:nth-child(3) {
+    animation-delay: 0.4s;
+    background: #FD79A8;
+}
+
+.ink-splash:nth-child(4) {
+    animation-delay: 0.6s;
+    background: #FDCB6E;
+}
+
+@keyframes inkSplash {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(3);
+        opacity: 0;
+    }
+}
+
+/* Easel Loading Animation */
+.easel-loader {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: inline-block;
+}
+
+.easel-stand {
+    position: absolute;
+    width: 4px;
+    height: 60px;
+    background: #8B4513;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.easel-stand::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 3px;
+    background: #8B4513;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-20deg);
+}
+
+.easel-stand::after {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 3px;
+    background: #8B4513;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(20deg);
+}
+
+.easel-canvas {
+    position: absolute;
+    width: 50px;
+    height: 40px;
+    background: #FAFAFA;
+    border: 2px solid #DDD;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: hidden;
+}
+
+.easel-painting {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, 
+        transparent 0%, 
+        #FF6B6B 25%, 
+        #4ECDC4 50%, 
+        #45B7D1 75%, 
+        transparent 100%);
+    background-size: 200% 200%;
+    animation: easelPainting 3s infinite ease-in-out;
+}
+
+@keyframes easelPainting {
+    0%, 100% {
+        background-position: -100% -100%;
+        opacity: 0.3;
+    }
+    50% {
+        background-position: 100% 100%;
+        opacity: 1;
+    }
+}
+
+/* Color Wheel Spinner */
+.color-wheel-loader {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    display: inline-block;
+    border-radius: 50%;
+    background: conic-gradient(
+        #FF0000 0deg,
+        #FF8000 45deg,
+        #FFFF00 90deg,
+        #80FF00 135deg,
+        #00FF00 180deg,
+        #00FF80 225deg,
+        #00FFFF 270deg,
+        #0080FF 315deg,
+        #FF0000 360deg
+    );
+    animation: colorWheelSpin 2s linear infinite;
+}
+
+.color-wheel-loader::before {
+    content: '';
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes colorWheelSpin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Pencil Sharpening Animation */
+.pencil-loader {
+    position: relative;
+    width: 80px;
+    height: 20px;
+    display: inline-block;
+}
+
+.pencil-body {
+    position: absolute;
+    width: 60px;
+    height: 8px;
+    background: linear-gradient(to right, #FFD700 0%, #FFA500 100%);
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    border-radius: 0 4px 4px 0;
+}
+
+.pencil-tip {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 15px solid #8B4513;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+}
+
+.pencil-shavings {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #DEB887;
+    border-radius: 50%;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    animation: pencilShavings 1.5s infinite ease-out;
+}
+
+.pencil-shavings:nth-child(3) {
+    animation-delay: 0.2s;
+    right: -5px;
+}
+
+.pencil-shavings:nth-child(4) {
+    animation-delay: 0.4s;
+    right: -10px;
+}
+
+@keyframes pencilShavings {
+    0% {
+        transform: translateY(-50%) scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-50%) translateX(20px) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Watercolor Wash Animation */
+.watercolor-loader {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    display: inline-block;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 107, 107, 0.3) 0%,
+        rgba(78, 205, 196, 0.3) 25%,
+        rgba(69, 183, 209, 0.3) 50%,
+        rgba(150, 206, 180, 0.3) 75%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    animation: watercolorWash 3s infinite ease-in-out;
+}
+
+.watercolor-loader::before {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 40px;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(253, 203, 110, 0.4) 0%,
+        rgba(162, 155, 254, 0.4) 50%,
+        transparent 100%
+    );
+    border-radius: 50%;
+    top: 25%;
+    left: 25%;
+    animation: watercolorWash 3s infinite ease-in-out reverse;
+}
+
+@keyframes watercolorWash {
+    0%, 100% {
+        transform: scale(0.8);
+        opacity: 0.6;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.9;
+    }
+}
+
+/* Utility Classes */
+.loader-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.loader-text {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    margin-top: 15px;
+    animation: loaderTextPulse 2s infinite ease-in-out;
+}
+
+@keyframes loaderTextPulse {
+    0%, 100% {
+        opacity: 0.7;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+/* Context-specific loader styles */
+.upload-loader .paintbrush-loader {
+    transform: scale(1.2);
+}
+
+.gallery-loader .palette-loader {
+    transform: scale(1.1);
+}
+
+.critique-loader .ink-splash-loader {
+    transform: scale(1.1);
+}
+
+.version-loader .easel-loader {
+    transform: scale(0.9);
+}
+
+/* Overlay Loading Screen */
+.artistic-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 26, 0.9);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.artistic-loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.artistic-loading-content {
+    text-align: center;
+    color: white;
+}
+
+.artistic-loading-content h3 {
+    margin-top: 20px;
+    font-weight: 300;
+    color: #f8f9fa;
+}
+
+.artistic-loading-content p {
+    margin-top: 10px;
+    color: #adb5bd;
+    font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .paintbrush-loader,
+    .palette-loader,
+    .canvas-loader,
+    .ink-splash-loader,
+    .easel-loader,
+    .color-wheel-loader,
+    .pencil-loader,
+    .watercolor-loader {
+        transform: scale(0.8);
+    }
+    
+    .loader-text {
+        font-size: 12px;
+    }
+}
