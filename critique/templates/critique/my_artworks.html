@@ -1350,7 +1350,7 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                             '</div>' +
                         '</div>' +
                         '<div class="row mb-3">' +
-                            '<div class="col-md-6">' +
+                            '<div class="col-md-4">' +
                                 '<button class="btn btn-primary" onclick="createNewVersion(' + artworkId + ')" ' +
                                         'title="Save the current state of your artwork as a new version" ' +
                                         'data-bs-toggle="tooltip" data-bs-placement="top">' +
@@ -1358,10 +1358,21 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                         '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
                                         '<path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>' +
                                     '</svg>' +
-                                    'Create New Version' +
+                                    'Create Version' +
                                 '</button>' +
                             '</div>' +
-                            '<div class="col-md-6 text-end">' +
+                            '<div class="col-md-4">' +
+                                '<button class="btn btn-success" onclick="showNewVersionUploadModal(' + artworkId + ')" ' +
+                                        'title="Create a new version with immediate file upload" ' +
+                                        'data-bs-toggle="tooltip" data-bs-placement="top">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload me-1" viewBox="0 0 16 16">' +
+                                        '<path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>' +
+                                        '<path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>' +
+                                    '</svg>' +
+                                    'Upload New Version' +
+                                '</button>' +
+                            '</div>' +
+                            '<div class="col-md-4 text-end">' +
                                 '<button class="btn btn-outline-info" onclick="toggleComparisonMode(' + artworkId + ')" ' +
                                         compareButtonDisabled + ' ' +
                                         'title="' + compareButtonTitle + '" ' +
@@ -2606,6 +2617,163 @@ function showVersionComparisonModal(comparisonData, version1, version2) {
     // Show modal
     const modal = new bootstrap.Modal(document.getElementById('versionComparisonModal'));
     modal.show();
+}
+
+// Show New Version Upload Modal
+function showNewVersionUploadModal(artworkId) {
+    const modalHtml = 
+        '<div class="modal fade" id="newVersionUploadModal" tabindex="-1" aria-labelledby="newVersionUploadModalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog modal-lg">' +
+                '<div class="modal-content bg-dark text-light">' +
+                    '<div class="modal-header border-secondary">' +
+                        '<h5 class="modal-title" id="newVersionUploadModalLabel">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cloud-upload me-2" viewBox="0 0 16 16">' +
+                                '<path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>' +
+                                '<path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>' +
+                            '</svg>' +
+                            'Create New Version with Upload' +
+                        '</h5>' +
+                        '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                    '</div>' +
+                    '<div class="modal-body">' +
+                        '<div class="alert alert-success border-success bg-dark text-light mb-4">' +
+                            '<div class="d-flex">' +
+                                '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-info-circle me-2 flex-shrink-0 mt-1" viewBox="0 0 16 16">' +
+                                    '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                                    '<path d="M8.93 6.588l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM9 4.5a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>' +
+                                '</svg>' +
+                                '<div>' +
+                                    '<strong>Streamlined Version Creation</strong><br>' +
+                                    '<small>This creates a new version and immediately allows you to upload the new artwork file. Perfect for iterating on your work!</small>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<form id="newVersionUploadForm" enctype="multipart/form-data">' +
+                            '<div class="mb-3">' +
+                                '<label for="versionTitle" class="form-label">Version Title</label>' +
+                                '<input type="text" class="form-control bg-secondary text-light border-secondary" id="versionTitle" placeholder="Enter version title" required>' +
+                            '</div>' +
+                            '<div class="mb-3">' +
+                                '<label for="versionDescription" class="form-label">Version Description</label>' +
+                                '<textarea class="form-control bg-secondary text-light border-secondary" id="versionDescription" rows="3" placeholder="Describe what changed in this version"></textarea>' +
+                            '</div>' +
+                            '<div class="mb-3">' +
+                                '<label for="versionNotes" class="form-label">Version Notes <small class="text-muted">(Optional)</small></label>' +
+                                '<textarea class="form-control bg-secondary text-light border-secondary" id="versionNotes" rows="2" placeholder="Add any notes about this version"></textarea>' +
+                            '</div>' +
+                            '<div class="mb-4">' +
+                                '<label for="newVersionFile" class="form-label">Upload New Artwork</label>' +
+                                '<input type="file" class="form-control bg-secondary text-light border-secondary" id="newVersionFile" accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml,image/bmp,image/tiff" required>' +
+                                '<div class="form-text text-muted mt-2">' +
+                                    '<small>' +
+                                        '<strong>Supported formats:</strong> JPEG, PNG, GIF, WebP, SVG, BMP, TIFF<br>' +
+                                        '<strong>Maximum size:</strong> 20MB' +
+                                    '</small>' +
+                                '</div>' +
+                            '</div>' +
+                        '</form>' +
+                    '</div>' +
+                    '<div class="modal-footer border-secondary">' +
+                        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>' +
+                        '<button type="button" class="btn btn-success" onclick="createVersionWithUpload(' + artworkId + ')" id="createVersionUploadBtn">' +
+                            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cloud-upload me-1" viewBox="0 0 16 16">' +
+                                '<path fill-rule="evenodd" d="M4.406 1.342A5.53 5.53 0 0 1 8 0c2.69 0 4.923 2 5.166 4.579C14.758 4.804 16 6.137 16 7.773 16 9.569 14.502 11 12.687 11H10a.5.5 0 0 1 0-1h2.688C13.979 10 15 8.988 15 7.773c0-1.216-1.02-2.228-2.313-2.228h-.5v-.5C12.188 2.825 10.328 1 8 1a4.53 4.53 0 0 0-2.941 1.1c-.757.652-1.153 1.438-1.153 2.055v.448l-.445.049C2.064 4.805 1 5.952 1 7.318 1 8.785 2.23 10 3.781 10H6a.5.5 0 0 1 0 1H3.781C1.708 11 0 9.366 0 7.318c0-1.763 1.266-3.223 2.942-3.593.143-.863.698-1.723 1.464-2.383z"/>' +
+                                '<path fill-rule="evenodd" d="M7.646 4.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V14.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3z"/>' +
+                            '</svg>' +
+                            'Create Version & Upload' +
+                        '</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    
+    // Remove existing modal if present
+    const existingModal = document.getElementById('newVersionUploadModal');
+    if (existingModal) existingModal.remove();
+    
+    // Add new modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('newVersionUploadModal'));
+    modal.show();
+}
+
+// Create Version with Upload
+function createVersionWithUpload(artworkId) {
+    const title = document.getElementById('versionTitle').value.trim();
+    const description = document.getElementById('versionDescription').value.trim();
+    const notes = document.getElementById('versionNotes').value.trim();
+    const fileInput = document.getElementById('newVersionFile');
+    const file = fileInput.files[0];
+    
+    if (!title) {
+        showToast('Please enter a version title', 'error');
+        return;
+    }
+    
+    if (!file) {
+        showToast('Please select a file to upload', 'error');
+        return;
+    }
+    
+    // Validate file size (20MB)
+    if (file.size > 20 * 1024 * 1024) {
+        showToast('File size must be less than 20MB', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('createVersionUploadBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Creating...';
+    btn.disabled = true;
+    
+    // Create FormData for multipart upload
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('version_notes', notes);
+    formData.append('image', file);
+    
+    fetch(`/api/artworks/${artworkId}/versions/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            showToast('New version created and uploaded successfully!', 'success');
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newVersionUploadModal'));
+            modal.hide();
+            
+            // Refresh the version manager if it's open
+            const versionModal = document.getElementById('versionManagerModal');
+            if (versionModal) {
+                const versionModalInstance = bootstrap.Modal.getInstance(versionModal);
+                if (versionModalInstance) {
+                    versionModalInstance.hide();
+                    // Reopen after a short delay to show updated versions
+                    setTimeout(() => openVersionManager(artworkId), 300);
+                }
+            }
+            
+        } else {
+            showToast(data.error || 'Failed to create version with upload', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error creating version with upload:', error);
+        showToast('Failed to create version with upload', 'error');
+    })
+    .finally(() => {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
 }
 </script>
 {% endblock %}
