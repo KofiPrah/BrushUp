@@ -5,7 +5,7 @@ from .views import (
     CritiqueViewSet, health_check,
     ReactionViewSet, NotificationViewSet, FolderViewSet,
     create_artwork_version, get_artwork_version, 
-    delete_artwork_version, ArtworkVersionViewSet,
+    delete_artwork_version, archive_artwork_version, ArtworkVersionViewSet,
     ArtworkVersionCompareView, ArtworkVersionRestoreView
 )
 
@@ -32,4 +32,5 @@ urlpatterns = [
     path('artworks/<int:artwork_id>/versions/compare/', ArtworkVersionCompareView.as_view(), name='artwork-versions-compare'),
     path('artworks/<int:artwork_id>/versions/<int:version_id>/restore/', ArtworkVersionRestoreView.as_view(), name='artwork-version-restore'),
     path('artworks/versions/<int:version_id>/delete/', delete_artwork_version, name='artwork-version-delete'),
+    path('artworks/versions/<int:version_id>/archive/', archive_artwork_version, name='artwork-version-archive'),
 ]

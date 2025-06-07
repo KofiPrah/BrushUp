@@ -1162,6 +1162,15 @@ function openVersionManager(artworkId) {
 
 function showVersionManagerModal(artworkId, versions, artworkTitle) {
     const versionCardsHtml = versions.map(function(version, index) {
+        // Determine if version has critiques (using critique_count if available)
+        const hasCritiques = version.critique_count > 0;
+        const deleteButtonClass = hasCritiques ? 'btn-outline-warning' : 'btn-outline-danger';
+        const deleteButtonText = hasCritiques ? 'Archive' : 'Delete';
+        const deleteButtonTitle = hasCritiques ? 
+            'Archive this version (has ' + version.critique_count + ' critique' + (version.critique_count === 1 ? '' : 's') + ')' :
+            'Permanently delete this version';
+        const deleteAction = hasCritiques ? 'archiveVersion' : 'deleteVersion';
+        
         return '<div class="col-md-4 mb-3">' +
             '<div class="card bg-secondary text-white h-100">' +
                 '<div class="card-header d-flex justify-content-between align-items-center">' +
@@ -1172,6 +1181,7 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                     '<h6 class="card-title">' + version.title + '</h6>' +
                     '<p class="card-text text-sm">' + version.description.substring(0, 100) + (version.description.length > 100 ? '...' : '') + '</p>' +
                     (version.version_notes ? '<p class="text-warning text-sm"><strong>Notes:</strong> ' + version.version_notes + '</p>' : '') +
+                    (hasCritiques ? '<p class="text-info text-sm"><i class="bi bi-chat-dots"></i> ' + version.critique_count + ' critique' + (version.critique_count === 1 ? '' : 's') + '</p>' : '') +
                     '<div class="d-flex gap-2 flex-wrap">' +
                         '<button class="btn btn-sm btn-outline-light" onclick="previewVersion(' + version.id + ', ' + artworkId + ')" ' +
                                 'title="View this version in detail" ' +
@@ -1182,6 +1192,11 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                 'title="Make this version your current artwork (creates backup of current)" ' +
                                 'data-bs-toggle="tooltip" data-bs-placement="top">' +
                             'Restore' +
+                        '</button>' +
+                        '<button class="btn btn-sm ' + deleteButtonClass + '" onclick="' + deleteAction + '(' + version.id + ', ' + version.version_number + ', ' + artworkId + ')" ' +
+                                'title="' + deleteButtonTitle + '" ' +
+                                'data-bs-toggle="tooltip" data-bs-placement="top">' +
+                            deleteButtonText +
                         '</button>' +
                     '</div>' +
                 '</div>' +
@@ -2074,6 +2089,62 @@ function showToast(message, type = 'info') {
         toast.style.transform = 'translateX(100%)';
         setTimeout(() => toast.remove(), 300);
     }, 4000);
+}
+
+// Version Delete/Archive Functions
+function deleteVersion(versionId, versionNumber, artworkId) {
+    if (confirm(`Are you sure you want to permanently delete Version ${versionNumber}? This action cannot be undone.`)) {
+        fetch(`/api/artworks/versions/${versionId}/delete/`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            showToast(`Version ${versionNumber} deleted successfully`, 'success');
+            // Close modal and refresh version manager
+            const modal = bootstrap.Modal.getInstance(document.getElementById('versionManagerModal'));
+            if (modal) modal.hide();
+            // Optionally reload version manager
+            setTimeout(() => openVersionManager(artworkId), 500);
+        })
+        .catch(error => {
+            console.error('Error deleting version:', error);
+            showToast(`Failed to delete Version ${versionNumber}`, 'error');
+        });
+    }
+}
+
+function archiveVersion(versionId, versionNumber, artworkId) {
+    const reason = prompt(`Archive Version ${versionNumber}?\n\nThis version has critiques and cannot be deleted. Please provide a reason for archiving (optional):`);
+    
+    if (reason !== null) { // User didn't cancel
+        fetch(`/api/artworks/versions/${versionId}/archive/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                reason: reason || 'No reason provided'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            showToast(`Version ${versionNumber} archived successfully`, 'success');
+            // Close modal and refresh version manager
+            const modal = bootstrap.Modal.getInstance(document.getElementById('versionManagerModal'));
+            if (modal) modal.hide();
+            // Optionally reload version manager
+            setTimeout(() => openVersionManager(artworkId), 500);
+        })
+        .catch(error => {
+            console.error('Error archiving version:', error);
+            showToast(`Failed to archive Version ${versionNumber}`, 'error');
+        });
+    }
 }
 </script>
 {% endblock %}

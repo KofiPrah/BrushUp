@@ -114,18 +114,25 @@ class ArtWorkVersionSerializer(serializers.ModelSerializer):
     """Serializer for artwork versions."""
     artwork_title = serializers.CharField(source='artwork.title', read_only=True)
     image_display_url = serializers.SerializerMethodField()
+    critique_count = serializers.SerializerMethodField()
     
     class Meta:
         model = ArtWorkVersion
         fields = ['id', 'artwork', 'artwork_title', 'version_number', 'title', 'description', 
-                 'image', 'image_display_url', 'created_at', 'version_notes', 'medium', 'dimensions', 'tags']
-        read_only_fields = ['id', 'artwork_title', 'created_at', 'image_display_url']
+                 'image', 'image_display_url', 'created_at', 'version_notes', 'medium', 'dimensions', 'tags', 'critique_count']
+        read_only_fields = ['id', 'artwork_title', 'created_at', 'image_display_url', 'critique_count']
     
     def get_image_display_url(self, obj):
         """Return the URL to display the version image."""
         if obj.image and hasattr(obj.image, 'url'):
             return obj.image.url
         return None
+    
+    def get_critique_count(self, obj):
+        """Return the number of critiques for this version's artwork."""
+        # Since critiques are linked to artwork, not specific versions,
+        # we'll count all critiques for the artwork
+        return obj.artwork.critiques.count()
 
 class ArtWorkSerializer(serializers.ModelSerializer):
     """Serializer for the ArtWork model with author information and folder assignment."""

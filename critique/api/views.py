@@ -1603,6 +1603,33 @@ def delete_artwork_version(request, version_id):
         return Response({'error': 'Version not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
 
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def archive_artwork_version(request, version_id):
+    """Archive a specific version"""
+    try:
+        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+        reason = request.data.get('reason', 'No reason provided')
+        
+        # Add archive note to version notes
+        if version.version_notes:
+            version.version_notes = f"{version.version_notes}\n[ARCHIVED: {reason}]"
+        else:
+            version.version_notes = f"[ARCHIVED: {reason}]"
+        version.save()
+        
+        return Response({
+            'message': f'Version {version.version_number} archived successfully',
+            'reason': reason,
+            'success': True,
+            'status': 'archived',
+            'version_id': version.id,
+            'version_number': version.version_number
+        })
+    except ArtWorkVersion.DoesNotExist:
+        return Response({'error': 'Version not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
+
 class ArtworkVersionViewSet(viewsets.ModelViewSet):
     """ViewSet for artwork version management"""
     permission_classes = [permissions.IsAuthenticated]
