@@ -1,0 +1,127 @@
+The broken HTML you're seeing — like `'+ artwork.title +'` appearing visibly in your **"My Artworks"** section and the malformed version modals on the **artwork detail page** — is due to a **mixing of JavaScript-style template literals with Django templates or static HTML**. Here's a clear breakdown of what's wrong:
+
+---
+
+### 🔴 **Cause #1: Incorrect Template Literal Syntax Left in `innerHTML` or Concatenated Strings**
+
+You have sections like this in your JavaScript:
+
+```javascript
+'<p class="card-text">' + description.length > 100 ? description.substring(0, 100) + '...' : description + '</p>'
+```
+
+This is **not grouped correctly**. Due to JavaScript operator precedence, it breaks down like this:
+
+```javascript
+'<p class="card-text">' + (description.length > 100) ? description.substring(0, 100) + '...' : description + '</p>'
+```
+
+Which evaluates to:
+
+* `'false' ? ... : ...` → **always picks the second operand**
+* OR worse, results in unexpected `<p class="card-text">true` or `false` being shown.
+
+✅ **Fix**:
+
+Wrap the entire ternary in parentheses:
+
+```javascript
+'<p class="card-text">' + (description.length > 100 ? description.substring(0, 100) + '...' : description) + '</p>';
+```
+
+OR better:
+
+Use **template literals** cleanly:
+
+```javascript
+const text = description.length > 100
+  ? `${description.substring(0, 100)}...`
+  : description;
+
+const html = `<p class="card-text">${text}</p>`;
+```
+
+---
+
+### 🔴 **Cause #2: HTML being rendered as plain text**
+
+Anywhere you have expressions like:
+
+```javascript
+'<a href="/artworks/' + artwork.id + '/">' + artwork.title + '</a>'
+```
+
+If these are mistakenly placed **inside Django templates** or `innerHTML` from JavaScript with improper escaping, they will **literally render** the `+ artwork.id +` instead of evaluating it.
+
+✅ **Fix**: Use template literals in JavaScript:
+
+```javascript
+const html = `<a href="/artworks/${artwork.id}/">${artwork.title}</a>`;
+```
+
+---
+
+### 🔴 **Cause #3: String concatenation inside template literals**
+
+You also have broken constructs like this:
+
+```javascript
+'<strong>' + title + '</strong><br>' + message
+```
+
+And inside template literals:
+
+```javascript
+const html = `
+  <strong>${title}</strong><br>' + message + '
+`;
+```
+
+⚠️ Mixing `+ message +` inside a template literal is invalid.
+
+✅ **Fix**:
+
+Only use `${}` inside template literals:
+
+```javascript
+const html = `
+  <strong>${title}</strong><br>${message}
+`;
+```
+
+---
+
+### 🔴 **Cause #4: Missing or broken string delimiters**
+
+If you have things like:
+
+```javascript
+if (!imageSrc || imageSrc === '${imageSrc}' || imageSrc.trim() === '' || imageSrc.includes('${') || imageSrc.includes('%7B'))
+```
+
+That’s from a failed attempt at using Django template tags inside JavaScript, **causing false positives or literal output**.
+
+✅ **Fix**: Ensure `imageSrc` is passed as a safe string (in `data-*` attributes), and never mixed with literal `'${}`.
+
+---
+
+### ✅ Summary of Actions to Fix
+
+1. **Audit all HTML built via JS**:
+
+   * Convert broken concatenations to **template literals** (`\`\${}\`\`).
+   * Fix ternary operator misuse.
+
+2. **Ensure HTML injected into the DOM is properly structured**:
+
+   * Use `insertAdjacentHTML()` with full elements (not fragments or improperly closed tags).
+
+3. **If you're using a Python/JS hybrid rendering approach (like with Django templates + AJAX)**:
+
+   * Separate logic cleanly.
+   * Let Django render HTML with `{% %}` and `{{ }}`.
+   * Let JavaScript handle DOM updates using clean JS strings.
+
+---
+
+If you'd like, I can **fix the specific broken section you screenshot** (the artwork card list in the profile) and give you a clean `displayArtworksForManagement()` function. Just let me know.
