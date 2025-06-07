@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const version2Id = version2Select.value;
         
         if (version1Id && version2Id) {
-            window.location.href = `?version1=${version1Id}&version2=${version2Id}`;
+            window.location.href = '?version1=' + version1Id + '&version2=' + version2Id;
         }
     }
 });

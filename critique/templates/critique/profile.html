@@ -576,8 +576,8 @@ document.getElementById('createFolderForm').addEventListener('submit', function(
         showAlert('Folder ' + (isEdit ? 'updated' : 'created') + ' successfully!', 'success');
     })
     .catch(error => {
-        console.error(`Error ${isEdit ? 'updating' : 'creating'} folder:`, error);
-        showAlert(`Error ${isEdit ? 'updating' : 'creating'} folder`, 'danger');
+        console.error('Error ' + (isEdit ? 'updating' : 'creating') + ' folder:', error);
+        showAlert('Error ' + (isEdit ? 'updating' : 'creating') + ' folder', 'danger');
     });
 });
 
@@ -591,7 +591,7 @@ document.getElementById('createFolderModal').addEventListener('hidden.bs.modal',
 
 function editFolder(folderId) {
     // Fetch folder details and populate edit form
-    fetch(`/api/folders/${folderId}/`, {
+    fetch('/api/folders/' + folderId + '/', {
         headers: {
             'X-CSRFToken': getCookie('csrftoken')
         },
@@ -622,7 +622,7 @@ function deleteFolder(folderId) {
         return;
     }
     
-    fetch(`/api/folders/${folderId}/`, {
+    fetch('/api/folders/' + folderId + '/', {
         method: 'DELETE',
         headers: {
             'X-CSRFToken': getCookie('csrftoken')
@@ -644,12 +644,11 @@ function deleteFolder(folderId) {
 
 function showAlert(message, type) {
     const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.className = 'alert alert-' + type + ' alert-dismissible fade show position-fixed';
     alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    alertDiv.innerHTML = 
+        message +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
     
     document.body.appendChild(alertDiv);
     

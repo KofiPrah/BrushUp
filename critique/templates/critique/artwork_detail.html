@@ -692,7 +692,7 @@
                             const critiqueId = document.getElementById('hideCritiqueId').value;
                             const reason = document.getElementById('hideReason').value;
 
-                            fetch(`/api/critiques/${critiqueId}/hide/`, {
+                            fetch('/api/critiques/' + critiqueId + '/hide/', {
                                 method: 'POST',
                                 credentials: 'same-origin',
                                 headers: {
