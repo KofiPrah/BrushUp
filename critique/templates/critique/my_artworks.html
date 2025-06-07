@@ -3065,6 +3065,13 @@ let reorderableVersions = [];
 let currentReorderArtworkId = null;
 
 function toggleReorderMode(artworkId) {
+    // Check if user is authenticated
+    const csrfToken = getCookie('csrftoken');
+    if (!csrfToken) {
+        showToast('Please log in to reorder versions', 'error');
+        return;
+    }
+    
     const reorderArea = document.getElementById('reorderArea');
     const comparisonArea = document.getElementById('comparisonArea');
     const reorderBtn = document.getElementById('reorderToggleBtn');
@@ -3279,7 +3286,22 @@ function saveVersionOrder(artworkId) {
             version_order: versionOrder
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            if (response.status === 403) {
+                throw new Error('Authentication required. Please log in to reorder versions.');
+            } else if (response.status === 500) {
+                // Get the HTML error page for debugging
+                return response.text().then(html => {
+                    console.error('Server error HTML:', html);
+                    throw new Error('Server error occurred while reordering versions');
+                });
+            } else {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             showToast(`Successfully reordered ${data.updated_versions.length} versions!`, 'success');
@@ -3303,7 +3325,7 @@ function saveVersionOrder(artworkId) {
     })
     .catch(error => {
         console.error('Error saving version order:', error);
-        showToast('Failed to save version order', 'error');
+        showToast(error.message || 'Failed to save version order', 'error');
     })
     .finally(() => {
         // Restore button

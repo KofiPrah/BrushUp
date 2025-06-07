@@ -1,0 +1,126 @@
+This error sequence is very telling. Here's what's going wrong and how to fix it:
+
+---
+
+## 🔍 Error Breakdown
+
+### 1. **`api/artworks/34/versions/reorder/ → 500`**
+
+This is the **backend endpoint** where you're POSTing the new version order.
+
+A **500 error** means:
+
+> The view (likely Django) is crashing on the server — not a routing problem (yet).
+
+---
+
+### 2. **`SyntaxError: Unexpected token '<'`**
+
+This tells us the JavaScript was expecting a JSON response, but instead got an **HTML error page**. That HTML starts with:
+
+```html
+<!DOCTYPE html>
+<html>...
+```
+
+So, your fetch is doing:
+
+```js
+fetch('/api/artworks/34/versions/reorder/', {...})
+  .then(response => response.json())  // ← fails here
+```
+
+But since the response isn't JSON (it's HTML), you get:
+
+```js
+SyntaxError: Unexpected token '<'
+```
+
+---
+
+## ✅ Step-by-Step Fix
+
+### ✅ 1. **Confirm Your Backend URL Pattern Exists**
+
+Check `urls.py` and ensure you have a pattern like:
+
+```python
+# in urls.py
+path('api/artworks/<int:artwork_id>/versions/reorder/', reorder_versions, name='reorder_versions'),
+```
+
+If it’s missing, you’ll get 404s or 500s depending on middleware behavior.
+
+---
+
+### ✅ 2. **Check the Django View for Exceptions**
+
+Your view function should look something like:
+
+```python
+@require_POST
+@csrf_exempt  # (or use proper CSRF token via JS)
+def reorder_versions(request, artwork_id):
+    try:
+        data = json.loads(request.body)
+        new_order = data.get("version_order")  # expecting a list
+        # Your logic to reorder here...
+        return JsonResponse({"status": "ok"})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+```
+
+Log or print exceptions inside the `except` block to reveal what’s crashing.
+
+---
+
+### ✅ 3. **Check Your JavaScript Request**
+
+Make sure you're sending valid JSON and headers:
+
+```js
+fetch(`/api/artworks/${artworkId}/versions/reorder/`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-CSRFToken": getCookie("csrftoken")
+  },
+  body: JSON.stringify({
+    version_order: versionIds  // example: [3, 1, 2]
+  })
+})
+```
+
+---
+
+### ✅ 4. **Temporarily Inspect the Actual HTML Response**
+
+To debug, insert this:
+
+```js
+fetch(url, ...)
+  .then(response => response.text())  // <— temporarily use text()
+  .then(data => console.log("HTML error page?", data));
+```
+
+If you see a Django error trace — you've found the real problem.
+
+---
+
+### ✅ 5. **Double-Check CSRF**
+
+If you're not exempting the view and didn't send a valid CSRF token, Django will return a **403 page wrapped in HTML**, which still causes the same JSON parse error.
+
+---
+
+## 🧪 Want Help Debugging the View?
+
+If you share the view code for `/versions/reorder/`, I can pinpoint the problem exactly. But based on your error:
+
+* You’re hitting the correct route (`POST /api/artworks/34/versions/reorder/`)
+* But your view is throwing an exception and returning an HTML error page
+* That HTML breaks your `.json()` expectation in JavaScript
+
+---
+
+Let me know if you want me to walk through rewriting the backend view to be fully robust.
