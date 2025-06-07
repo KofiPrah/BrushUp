@@ -790,7 +790,7 @@
                                     if (!response.ok) {
                                         console.error('Error status:', response.status);
                                         return response.text().then(text => {
-                                            throw new Error(`Error: ${response.status} - ' + text + '`);
+                                            throw new Error(`Error: ${response.status} - ${text}`);
                                         });
                                     }
                                     return response.json();
@@ -1396,7 +1396,7 @@
 
                     option.addEventListener('click', function() {
                         // Update preview
-                        const preview = document.getElementById(`versionPreview' + selectorNum + '`);
+                        const preview = document.getElementById(`versionPreview${selectorNum}`);;
                         preview.innerHTML = ''; // Clear existing content
 
                         // Create preview image safely
@@ -1447,12 +1447,12 @@
                                         <div class="alert alert-danger">
                                             <strong>Warning:</strong> This action cannot be undone.
                                         </div>
-                                        <p>Are you sure you want to delete <strong>Version ' + versionNumber + '</strong>?</p>
+                                        <p>Are you sure you want to delete <strong>Version ${versionNumber}</strong>?</p>
                                         <p class="text-muted">This will permanently remove the version and all associated data. Any critiques referencing this version will be updated to show "Deleted Version".</p>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <button type="button" class="btn btn-danger" onclick="confirmDeleteVersion(' + versionId + ')">
+                                        <button type="button" class="btn btn-danger" onclick="confirmDeleteVersion(${versionId})">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash me-1" viewBox="0 0 16 16">
                                                 <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
                                                 <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
@@ -1501,7 +1501,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ' + response.statusText + '`);
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
                         return response.json();
                     })
@@ -1613,7 +1613,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ' + response.statusText + '`);
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
                         return response.json();
                     })
@@ -1672,7 +1672,7 @@
                     })
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`HTTP ${response.status}: ' + response.statusText + '`);
+                            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                         }
                         return response.json();
                     })
@@ -1943,7 +1943,7 @@
                                 if (!response.ok) {
                                     return response.text().then(text => {
                                         console.error('Error response:', text);
-                                        throw new Error(`Error: ${response.status} - ' + text + '`);
+                                        throw new Error(`Error: ${response.status} - ${text}`);
                                     });
                                 }
                                 return response.json();
