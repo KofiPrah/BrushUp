@@ -48,8 +48,12 @@
                     
                     <div class="mb-3">
                         <label for="image" class="form-label">Artwork Image</label>
-                        <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
-                        <div class="form-text text-light">Upload an image of your artwork (JPG, PNG, etc.)</div>
+                        <input type="file" class="form-control" id="image" name="image" accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml,image/bmp,image/tiff" required>
+                        <div class="form-text text-light">
+                            <strong>Supported formats:</strong> JPEG, PNG, GIF, WebP, SVG, BMP, TIFF<br>
+                            <strong>Maximum size:</strong> 20MB<br>
+                            <strong>Special features:</strong> Animated GIFs and WebP supported
+                        </div>
                     </div>
                     
                     <div class="mb-3">
