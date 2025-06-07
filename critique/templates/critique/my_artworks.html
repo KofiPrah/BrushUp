@@ -1,6 +1,11 @@
 {% extends "critique/base.html" %}
+{% load static %}
 
 {% block title %}Artist Studio - My Artworks{% endblock %}
+
+{% block extra_head %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -754,6 +759,13 @@
 </div>
 
 <script>
+// Get CSRF token
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+           document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+           '{{ csrf_token }}';
+}
+
 let bulkActionsMode = false;
 let selectedArtworks = new Set();
 
@@ -3261,7 +3273,7 @@ function saveVersionOrder(artworkId) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            'X-CSRFToken': getCSRFToken()
         },
         body: JSON.stringify({
             version_order: versionOrder
