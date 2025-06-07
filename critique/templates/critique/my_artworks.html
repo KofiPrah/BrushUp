@@ -2878,4 +2878,39 @@ function createVersionWithUpload(artworkId) {
     });
 }
 </script>
+
+<style>
+.drag-drop-area {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px dashed #6c757d !important;
+}
+
+.drag-drop-area:hover {
+    border-color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.05) !important;
+}
+
+.drag-drop-area.drag-over {
+    border-color: #0d6efd !important;
+    background-color: rgba(13, 110, 253, 0.1) !important;
+    transform: scale(1.02);
+}
+
+.version-thumbnail {
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.version-thumbnail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.version-thumbnail.dragging {
+    opacity: 0.5;
+    transform: rotate(5deg) scale(1.05);
+    cursor: grabbing;
+}
+</style>
 {% endblock %}
