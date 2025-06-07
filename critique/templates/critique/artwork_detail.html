@@ -90,7 +90,11 @@
                                                 <!-- Current Version -->
                                                 <div class="version-thumbnail active me-3 mb-3" data-version="current">
                                                     <div class="position-relative">
-                                                        {% if artwork.image %}
+                                                        {% if current_version and current_version.image %}
+                                                            <img src="{{ current_version.image.url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">
+                                                        {% elif current_version and current_version.image_url %}
+                                                            <img src="{{ current_version.image_url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">
+                                                        {% elif artwork.image %}
                                                             <img src="{{ artwork.image.url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">
                                                         {% elif artwork.image_url %}
                                                             <img src="{{ artwork.image_url }}" class="img-thumbnail border-primary" style="width: 90px; height: 90px; object-fit: cover;" alt="Current">

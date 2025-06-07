@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.conf import settings
 from django.utils import timezone
+from .validators import validate_image_file
 
 # Import S3 storage backend for files if S3 is enabled
 if settings.USE_S3:
@@ -114,7 +115,8 @@ class Folder(models.Model):
         blank=True, 
         null=True,
         storage=s3_storage if settings.USE_S3 else None,
-        help_text="Optional cover image for the portfolio folder"
+        validators=[validate_image_file],
+        help_text="Optional cover image for the portfolio folder. Supported formats: JPEG, PNG, GIF, WebP, SVG, BMP, TIFF (max 20MB)"
     )
     slug = models.SlugField(
         max_length=250, 
@@ -174,7 +176,9 @@ class ArtWorkVersion(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     image = models.ImageField(upload_to='artwork_versions/', blank=True, null=True,
-                           storage=s3_storage if settings.USE_S3 else None)
+                           storage=s3_storage if settings.USE_S3 else None,
+                           validators=[validate_image_file],
+                           help_text="Supported formats: JPEG, PNG, GIF, WebP, SVG, BMP, TIFF (max 20MB)")
     created_at = models.DateTimeField(auto_now_add=True)
     version_notes = models.TextField(blank=True, help_text="Notes about changes in this version")
     
@@ -208,7 +212,9 @@ class ArtWork(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     image = models.ImageField(upload_to='artworks/', blank=True, null=True,
-                           storage=s3_storage if settings.USE_S3 else None)  # Image file
+                           storage=s3_storage if settings.USE_S3 else None,
+                           validators=[validate_image_file],
+                           help_text="Supported formats: JPEG, PNG, GIF, WebP, SVG, BMP, TIFF (max 20MB)")  # Image file
     image_url = models.URLField(max_length=1000, blank=True)  # Legacy URL field for backwards compatibility
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
