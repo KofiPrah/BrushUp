@@ -1536,12 +1536,12 @@ def create_artwork_version(request, artwork_id):
             version = ArtWorkVersion.objects.create(
                 artwork=artwork,
                 version_number=new_version_number,
-                title=artwork.title,
-                description=artwork.description,
-                image=artwork.image,
-                medium=getattr(artwork, 'medium', ''),
-                dimensions=getattr(artwork, 'dimensions', ''),
-                tags=getattr(artwork, 'tags', ''),
+                title=request.data.get('title', artwork.title),
+                description=request.data.get('description', artwork.description),
+                image=artwork.image,  # Start with current image
+                medium=request.data.get('medium', getattr(artwork, 'medium', '')),
+                dimensions=request.data.get('dimensions', getattr(artwork, 'dimensions', '')),
+                tags=request.data.get('tags', getattr(artwork, 'tags', '')),
                 version_notes=request.data.get('version_notes', '')
             )
             
@@ -1558,6 +1558,15 @@ def create_artwork_version(request, artwork_id):
                 artwork.dimensions = request.data['dimensions']
             if 'tags' in request.data:
                 artwork.tags = request.data['tags']
+            
+            # Handle new image upload - this is the key fix
+            if 'image' in request.FILES:
+                new_image = request.FILES['image']
+                # Update artwork with new image
+                artwork.image = new_image
+                # Also update the version with new image
+                version.image = new_image
+                version.save()
             
             artwork.save()
             
