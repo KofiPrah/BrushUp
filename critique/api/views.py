@@ -1508,50 +1508,60 @@ class ArtworkVersionViewSet(APIView):
             return Response({'error': 'Version not found or not owned by user'}, 
                           status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @permission_classes([permissions.IsAuthenticated])
 def create_artwork_version(request, artwork_id):
-    """Create a new version of an artwork"""
+    """Create a new version of an artwork or get all versions"""
     try:
         artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
         
-        # Get the highest version number and increment
-        highest_version = artwork.versions.aggregate(
-            max_version=Max('version_number')
-        )['max_version'] or 0
-        new_version_number = highest_version + 1
+        if request.method == 'GET':
+            # Return all versions for this artwork
+            versions = artwork.versions.all().order_by('-version_number')
+            serializer = ArtWorkVersionSerializer(versions, many=True)
+            return Response({
+                'versions': serializer.data,
+                'artwork_title': artwork.title
+            })
         
-        # Create the new version
-        version = ArtWorkVersion.objects.create(
-            artwork=artwork,
-            version_number=new_version_number,
-            image=request.data.get('image'),
-            image_url=request.data.get('image_url'),
-            version_notes=request.data.get('version_notes', ''),
-            created_by=request.user
-        )
-        
-        # Update artwork fields if provided
-        if 'title' in request.data:
-            artwork.title = request.data['title']
-        if 'description' in request.data:
-            artwork.description = request.data['description']
-        if 'category' in request.data:
-            artwork.category = request.data['category']
-        if 'medium' in request.data:
-            artwork.medium = request.data['medium']
-        if 'dimensions' in request.data:
-            artwork.dimensions = request.data['dimensions']
-        if 'tags' in request.data:
-            artwork.tags = request.data['tags']
-        
-        artwork.save()
-        
-        serializer = ArtWorkVersionSerializer(version)
-        return Response({
-            'version': serializer.data,
-            'message': f'Version {version.version_number} created successfully'
-        }, status=status.HTTP_201_CREATED)
+        elif request.method == 'POST':
+            # Get the highest version number and increment
+            highest_version = artwork.versions.aggregate(
+                max_version=Max('version_number')
+            )['max_version'] or 0
+            new_version_number = highest_version + 1
+            
+            # Create the new version
+            version = ArtWorkVersion.objects.create(
+                artwork=artwork,
+                version_number=new_version_number,
+                image=request.data.get('image'),
+                image_url=request.data.get('image_url'),
+                version_notes=request.data.get('version_notes', ''),
+                created_by=request.user
+            )
+            
+            # Update artwork fields if provided
+            if 'title' in request.data:
+                artwork.title = request.data['title']
+            if 'description' in request.data:
+                artwork.description = request.data['description']
+            if 'category' in request.data:
+                artwork.category = request.data['category']
+            if 'medium' in request.data:
+                artwork.medium = request.data['medium']
+            if 'dimensions' in request.data:
+                artwork.dimensions = request.data['dimensions']
+            if 'tags' in request.data:
+                artwork.tags = request.data['tags']
+            
+            artwork.save()
+            
+            serializer = ArtWorkVersionSerializer(version)
+            return Response({
+                'version': serializer.data,
+                'message': f'Version {version.version_number} created successfully'
+            }, status=status.HTTP_201_CREATED)
         
     except ArtWork.DoesNotExist:
         return Response({'error': 'Artwork not found or not owned by user'}, 
