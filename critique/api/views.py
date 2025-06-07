@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Max
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Reaction, Notification, CritiqueReply, Folder
@@ -1531,14 +1532,17 @@ def create_artwork_version(request, artwork_id):
             )['max_version'] or 0
             new_version_number = highest_version + 1
             
-            # Create the new version
+            # Create the new version with current artwork data
             version = ArtWorkVersion.objects.create(
                 artwork=artwork,
                 version_number=new_version_number,
-                image=request.data.get('image'),
-                image_url=request.data.get('image_url'),
-                version_notes=request.data.get('version_notes', ''),
-                created_by=request.user
+                title=artwork.title,
+                description=artwork.description,
+                image=artwork.image,
+                medium=getattr(artwork, 'medium', ''),
+                dimensions=getattr(artwork, 'dimensions', ''),
+                tags=getattr(artwork, 'tags', ''),
+                version_notes=request.data.get('version_notes', '')
             )
             
             # Update artwork fields if provided
