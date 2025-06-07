@@ -1888,12 +1888,13 @@ class ArtworkVersionReorderView(APIView):
             for index, version_id in enumerate(version_order):
                 try:
                     version = artwork.versions.get(id=version_id)
+                    old_version_number = version.version_number
                     new_version_number = len(version_order) - index  # Reverse order (highest number = newest)
                     version.version_number = new_version_number
                     version.save()
                     updated_versions.append({
                         'id': version.id,
-                        'old_number': version.version_number,
+                        'old_number': old_version_number,
                         'new_number': new_version_number
                     })
                 except ArtWorkVersion.DoesNotExist:
