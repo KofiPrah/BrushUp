@@ -205,6 +205,115 @@
     background-color: #0d6efd !important;
     color: white !important;
 }
+
+/* Drag and Drop Styling */
+.version-card {
+    cursor: grab;
+    transition: all 0.3s ease;
+}
+
+.version-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+.version-card.dragging {
+    opacity: 0.6;
+    transform: rotate(5deg) scale(0.95);
+    cursor: grabbing;
+}
+
+.comparison-area {
+    animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.comparison-slot {
+    transition: all 0.3s ease;
+}
+
+.comparison-slot .drop-zone {
+    min-height: 200px;
+    transition: all 0.3s ease;
+}
+
+.comparison-slot.drag-over .drop-zone {
+    border-color: #0dcaf0 !important;
+    background-color: rgba(13, 202, 240, 0.1);
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(13, 202, 240, 0.3);
+}
+
+.comparison-slot .drop-zone.border-solid {
+    border-style: solid !important;
+}
+
+.comparison-slot .drop-zone:hover {
+    border-color: #6c757d;
+}
+
+/* Visual feedback for active comparison mode */
+.version-card[draggable="true"]:not(.dragging) {
+    position: relative;
+}
+
+.version-card[draggable="true"]:not(.dragging)::before {
+    content: "⋮⋮";
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: rgba(255,255,255,0.7);
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 10;
+    pointer-events: none;
+}
+
+/* Button state transitions */
+#compareSelectedBtn {
+    transition: all 0.3s ease;
+}
+
+#compareSelectedBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Comparison modal styling */
+#versionComparisonModal .card {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+#versionComparisonModal .card-header {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* Enhanced visual hierarchy */
+.comparison-area .alert {
+    border-width: 2px;
+    font-weight: 500;
+}
+
+.comparison-slot .card {
+    transition: all 0.3s ease;
+}
+
+.comparison-slot .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
 </style>
 {% endblock %}
 
