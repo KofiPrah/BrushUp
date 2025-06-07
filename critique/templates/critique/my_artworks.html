@@ -2943,7 +2943,13 @@ function createVersionWithUpload(artworkId) {
         },
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.status === 201 || response.ok) {
+            return response.json();
+        } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+    })
     .then(data => {
         // Hide loading overlay
         hideLoadingOverlay();
@@ -2951,12 +2957,15 @@ function createVersionWithUpload(artworkId) {
         // Restore button
         restoreButton(btn);
         
-        if (data.id) {
-            showToast('New version created and uploaded successfully!', 'success');
+        // Check for successful response - API returns data.version.id for 201 status
+        if (data.version && data.version.id) {
+            showToast(`Version ${data.version.version_number} created and uploaded successfully!`, 'success');
             
             // Close modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('newVersionUploadModal'));
-            modal.hide();
+            if (modal) {
+                modal.hide();
+            }
             
             // Refresh the version manager if it's open
             const versionModal = document.getElementById('versionManagerModal');
@@ -2967,6 +2976,11 @@ function createVersionWithUpload(artworkId) {
                     // Reopen after a short delay to show updated versions
                     setTimeout(() => openVersionManager(artworkId), 300);
                 }
+            } else {
+                // If version manager is not open, refresh the page to show updates
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             }
             
         } else {
