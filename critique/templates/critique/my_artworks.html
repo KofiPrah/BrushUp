@@ -3224,11 +3224,18 @@ function handleReorderDragOver(e) {
     e.preventDefault();
     const draggingItem = document.querySelector('.reorder-item.dragging');
     const container = e.target.closest('.reorder-list');
+    
+    // Check if we have valid elements
+    if (!draggingItem || !container) {
+        return;
+    }
+    
     const afterElement = getDragAfterElement(container, e.clientY);
     
-    if (afterElement == null) {
+    // Only proceed if afterElement is null or a valid Node
+    if (afterElement === null) {
         container.appendChild(draggingItem);
-    } else {
+    } else if (afterElement && afterElement.nodeType === Node.ELEMENT_NODE) {
         container.insertBefore(draggingItem, afterElement);
     }
 }
@@ -3246,7 +3253,7 @@ function handleReorderDragEnd(e) {
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.reorder-item:not(.dragging)')];
     
-    return draggableElements.reduce((closest, child) => {
+    const result = draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
         
@@ -3255,7 +3262,9 @@ function getDragAfterElement(container, y) {
         } else {
             return closest;
         }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }, { offset: Number.NEGATIVE_INFINITY });
+    
+    return result.element || null;
 }
 
 function updateReorderPreview() {

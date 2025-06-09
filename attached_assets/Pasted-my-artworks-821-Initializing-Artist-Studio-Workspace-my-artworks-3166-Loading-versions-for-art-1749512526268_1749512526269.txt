@@ -1,0 +1,1753 @@
+my-artworks/:821 Initializing Artist Studio Workspace...
+my-artworks/:3166 Loading versions for artwork ID: 34
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3273 Uncaught TypeError: Failed to execute 'insertBefore' on 'Node': parameter 1 is not of type 'Node'.
+    at HTMLDivElement.handleReorderDragOver (my-artworks/:3273:19)
+handleReorderDragOver @ my-artworks/:3273
+my-artworks/:3312 Saving version order for artwork ID: 34
+my-artworks/:3332 Version order to save: (3) ['17', '21', '15']
