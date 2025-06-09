@@ -2674,17 +2674,13 @@ function compareSelectedVersions(artworkId) {
     const version1Id = comparisonState.slot1.versionId;
     const version2Id = comparisonState.slot2.versionId;
     
-    // Call the existing comparison API
-    fetch(`/api/artworks/${artworkId}/versions/compare/`, {
-        method: 'POST',
+    // Call the existing comparison API with GET method and query parameters
+    fetch(`/api/artworks/${artworkId}/versions/compare/?version1=${version1Id}&version2=${version2Id}`, {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify({
-            version1_id: version1Id,
-            version2_id: version2Id
-        })
+        }
     })
     .then(response => response.json())
     .then(data => {
