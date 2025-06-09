@@ -3184,7 +3184,7 @@ function renderReorderableVersions() {
                     '<div class="card-body">' +
                         '<div class="row">' +
                             '<div class="col-md-3">' +
-                                '<img src="' + version.image_url + '" class="img-fluid rounded" alt="Version ' + version.version_number + '">' +
+                                '<img src="' + (version.image_display_url || '/static/images/placeholder.png') + '" class="img-fluid rounded" alt="Version ' + version.version_number + '">' +
                             '</div>' +
                             '<div class="col-md-9">' +
                                 '<p class="mb-1"><strong>Description:</strong> ' + (version.description || 'No description') + '</p>' +
