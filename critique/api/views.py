@@ -1883,22 +1883,36 @@ class ArtworkVersionReorderView(APIView):
                 return Response({'error': 'Version order data is required'}, 
                               status=status.HTTP_400_BAD_REQUEST)
             
-            # Update version numbers based on new order
-            updated_versions = []
+            # Use temporary large numbers to avoid constraint violations
+            # First, assign temporary large numbers (starting from 1000)
+            temp_versions = []
             for index, version_id in enumerate(version_order):
                 try:
                     version = artwork.versions.get(id=version_id)
                     old_version_number = version.version_number
-                    new_version_number = len(version_order) - index  # Reverse order (highest number = newest)
-                    version.version_number = new_version_number
+                    temp_number = 1000 + index  # Use large numbers as temporary
+                    version.version_number = temp_number
                     version.save()
-                    updated_versions.append({
-                        'id': version.id,
+                    temp_versions.append({
+                        'version': version,
                         'old_number': old_version_number,
-                        'new_number': new_version_number
+                        'new_number': len(version_order) - index,  # Final number
+                        'temp_number': temp_number
                     })
                 except ArtWorkVersion.DoesNotExist:
                     continue
+            
+            # Now assign the final version numbers
+            updated_versions = []
+            for version_data in temp_versions:
+                version = version_data['version']
+                version.version_number = version_data['new_number']
+                version.save()
+                updated_versions.append({
+                    'id': version.id,
+                    'old_number': version_data['old_number'],
+                    'new_number': version_data['new_number']
+                })
             
             return Response({
                 'message': f'Successfully reordered {len(updated_versions)} versions',
