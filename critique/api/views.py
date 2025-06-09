@@ -1796,23 +1796,10 @@ class ArtworkVersionCompareView(APIView):
                           status=status.HTTP_404_NOT_FOUND)
     
     def _get_differences(self, version1, version2):
-        """Calculate differences between two versions"""
+        """Calculate meaningful differences between two versions"""
         differences = []
         
-        fields_to_compare = ['title', 'description', 'medium', 'dimensions', 'tags']
-        
-        for field in fields_to_compare:
-            val1 = version1.get(field, '')
-            val2 = version2.get(field, '')
-            
-            if val1 != val2:
-                differences.append({
-                    'field': field,
-                    'version1_value': val1,
-                    'version2_value': val2
-                })
-        
-        # Check for image differences
+        # Check for image differences first (most important)
         img1 = version1.get('image_display_url')
         img2 = version2.get('image_display_url')
         
@@ -1820,8 +1807,42 @@ class ArtworkVersionCompareView(APIView):
             differences.append({
                 'field': 'image',
                 'version1_value': img1,
-                'version2_value': img2
+                'version2_value': img2,
+                'priority': 'high'
             })
+        
+        # Check text fields with priority ordering
+        field_priorities = {
+            'title': 'high',
+            'medium': 'medium', 
+            'dimensions': 'medium',
+            'tags': 'low',
+            'description': 'low'
+        }
+        
+        for field, priority in field_priorities.items():
+            val1 = version1.get(field, '').strip()
+            val2 = version2.get(field, '').strip()
+            
+            # Skip trivial changes (empty to filled descriptions)
+            if field == 'description':
+                # Only show description changes if both have meaningful content
+                if not val1 and val2:
+                    continue  # Skip empty -> filled
+                if val1 and not val2:
+                    continue  # Skip filled -> empty
+            
+            if val1 != val2 and (val1 or val2):  # At least one must have content
+                differences.append({
+                    'field': field,
+                    'version1_value': val1 or 'Not set',
+                    'version2_value': val2 or 'Not set',
+                    'priority': priority
+                })
+        
+        # Sort by priority: high, medium, low
+        priority_order = {'high': 0, 'medium': 1, 'low': 2}
+        differences.sort(key=lambda x: priority_order.get(x['priority'], 3))
         
         return differences
 
