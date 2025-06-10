@@ -141,7 +141,7 @@
                                  data-version-number="{{ current_version_number }}"
                                  data-artwork-id="{{ artwork.id }}"
                                  data-archived="false">
-                                <div class="position-relative">
+                                <div class="position-relative cursor-pointer" onclick="switchToCurrentVersion({{ artwork.id }})">
                                     {% if current_version and current_version.image %}
                                         <img src="{{ current_version.image.url }}" class="img-thumbnail border-primary" style="width: 100%; height: 80px; object-fit: cover;" alt="Current">
                                     {% elif current_version and current_version.image_url %}
@@ -262,6 +262,8 @@
                                 Show archived versions
                             </label>
                         </div>
+                        
+
                         
                         <!-- Drag & Drop Comparison Interface -->
                         <div id="comparisonInterface" class="comparison-interface" style="display: none;">
@@ -1041,6 +1043,12 @@
         function showToast(title, message, type) {
             // Implementation depends on your toast system
             console.log(`${type.toUpperCase()}: ${title} - ${message}`);
+        }
+
+        // Function to switch back to current version
+        function switchToCurrentVersion(artworkId) {
+            // Simply reload the page to show the current version
+            window.location.href = `/artworks/${artworkId}/`;
         }
 
         // Function to switch to a different version
