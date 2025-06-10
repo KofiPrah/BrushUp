@@ -161,11 +161,9 @@ class ArtWorkDetailView(DetailView):
         context['total_versions'] = versions.count()
         context['current_version_number'] = self.object.get_current_version_number()
         
-        # Add current version for image display (highest version number)
-        if versions.exists():
-            context['current_version'] = versions.order_by('-version_number').first()
-        else:
-            context['current_version'] = None
+        # Current version represents the live artwork state, not the latest version
+        # This ensures "Current" shows the actual artwork, separate from saved versions
+        context['current_version'] = None  # Current version is the artwork itself
         
         return context
 
