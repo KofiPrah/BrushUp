@@ -1118,11 +1118,18 @@
                     })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.image_url) {
+                        console.log('Version switch response:', data); // Debug log
+                        
+                        // Check for image URL in the nested version object
+                        const imageUrl = data.version?.image_display_url || data.version?.image || data.image_url || data.image;
+                        const versionNumber = data.version?.version_number || data.version_number;
+                        
+                        if (imageUrl) {
                             // Update main artwork display
                             const mainImage = document.getElementById('main-artwork-image');
                             if (mainImage && mainImage.tagName === 'IMG') {
-                                mainImage.src = data.image_url;
+                                mainImage.src = imageUrl;
+                                console.log('Updated main image to:', imageUrl); // Debug log
                             }
 
                             // Update active thumbnail
@@ -1135,9 +1142,10 @@
                                 thumbnail.classList.add('active');
                             }
 
-                            showToast('Success', `Switched to Version ${data.version_number}`, 'success');
+                            showToast('Success', `Switched to Version ${versionNumber}`, 'success');
                         } else {
-                            showToast('Error', 'Failed to switch version', 'error');
+                            console.error('No image URL found in response:', data);
+                            showToast('Error', 'Failed to switch version - no image URL', 'error');
                         }
                     })
                     .catch(error => {
