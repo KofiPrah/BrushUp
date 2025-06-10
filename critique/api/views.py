@@ -1688,7 +1688,7 @@ def switch_artwork_version(request, artwork_id, version_id):
             'image_url': version.image.url if version.image else version.image_url,
             'title': version.title or artwork.title,
             'description': version.description or artwork.description,
-            'total_versions': artwork.versions.count(),
+            'total_versions': artwork.versions.count() + 1,  # Include current artwork state
             'message': f'Switched to version {version.version_number}'
         })
         
