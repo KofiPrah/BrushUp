@@ -1,0 +1,600 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}{{ artwork.title }} - Brush Up{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <div class="card mb-4 bg-dark text-white">
+                {% if current_version and current_version.image %}
+                    <img src="{{ current_version.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                {% elif current_version and current_version.image_url %}
+                    <img src="{{ current_version.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                {% elif artwork.image %}
+                    <img src="{{ artwork.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                {% elif artwork.image_url %}
+                    <img src="{{ artwork.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                {% else %}
+                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 400px;" id="main-artwork-image">
+                        <span>No Image Available</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <h1 class="card-title">{{ artwork.title }}</h1>
+
+                    <!-- Version Label -->
+                    {% if total_versions > 0 %}
+                    <div class="mb-2">
+                        <span class="badge bg-secondary me-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
+                                <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.942.313a7.023 7.023 0 0 0-.187-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-1.442 1.633c.263-.226.509-.467.740-.722l.724.69a8.026 8.026 0 0 1-.989.912l-.475-.88zm-2.266.97c.342-.14.677-.296.99-.49l.546.837a7.972 7.972 0 0 1-1.198.596l-.338-.943zm-2.137.339c.37-.042.741-.111 1.106-.207l.238.971a7.998 7.998 0 0 1-1.425.267l.081-.031z"/>
+                                <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                                <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                            </svg>
+                            Current ({{ current_version_number }} of {{ total_versions }})
+                        </span>
+                        {% if user.is_authenticated and user == artwork.author %}
+                        <button class="btn btn-sm btn-outline-info" onclick="openVersionManager({{ artwork.id }})">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                            Manage Versions
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    <p class="card-text">{{ artwork.description }}</p>
+                    <p class="card-text">
+                        {% if artwork.medium %}<span class="badge bg-info me-2">{{ artwork.medium }}</span>{% endif %}
+                        {% if artwork.dimensions %}<span class="badge bg-secondary me-2">{{ artwork.dimensions }}</span>{% endif %}
+                    </p>
+                    <p class="card-text"><small class="text-muted">Created: {{ artwork.created_at|date:"F d, Y" }}</small></p>
+                    {% if artwork.author %}
+                    <p class="card-text"><small class="text-muted">Artist: <a href="{% url 'critique:user_profile' artwork.author.username %}" class="text-info">{{ artwork.author.username }}</a></small></p>
+                    {% endif %}
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'critique:like_artwork' artwork.id %}" class="btn {% if user in artwork.likes.all %}btn-primary{% else %}btn-outline-light{% endif %} me-2" id="likeButton" data-artwork-id="{{ artwork.id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi {% if user in artwork.likes.all %}bi-heart-fill{% else %}bi-heart{% endif %}" viewBox="0 0 16 16">
+                                    {% if user in artwork.likes.all %}
+                                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
+                                    {% else %}
+                                    <path d="M8 2.748L7.775 2.454a.75.75 0 0 0-1.06-.02L8 1.314c4.438-4.562 15.534 2.421 0 13.686C-7.534 4.735 3.562-3.248 8 1.314l.225.296c.208.27.208.718 0 .988L8 2.748z"/>
+                                    {% endif %}
+                                </svg>
+                                <span class="like-count">{{ artwork.likes.count }}</span>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'critique:add_critique' artwork.id %}" class="btn btn-outline-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
+                                    <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                                    <path d="M2.165 15.803l.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a19.492 19.492 0 0 0 .398-2z"/>
+                                </svg>
+                                Add Critique
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar for Version History -->
+        <div class="col-lg-4">
+            {% if versions %}
+            <div class="card bg-dark text-white mb-3 sticky-top" style="top: 20px;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <h6 class="mb-0 me-3">Version History</h6>
+                        {% if user.is_authenticated and user == artwork.author %}
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="showArchivedVersions" onchange="toggleArchivedVersions()">
+                            <label class="form-check-label text-muted small" for="showArchivedVersions">
+                                Show Archived
+                            </label>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body" style="max-height: 70vh; overflow-y: auto;">
+                    <div class="row g-2">
+                        <!-- Current Version -->
+                        <div class="col-6">
+                            <div class="version-thumbnail text-center" 
+                                 data-version="current" 
+                                 data-version-id="current"
+                                 data-version-number="{{ current_version_number }}"
+                                 data-artwork-id="{{ artwork.id }}">
+                                <div class="position-relative">
+                                    {% if current_version and current_version.image %}
+                                        <img src="{{ current_version.image.url }}" class="img-thumbnail border-primary" style="width: 100%; height: 80px; object-fit: cover;" alt="Current">
+                                    {% elif current_version and current_version.image_url %}
+                                        <img src="{{ current_version.image_url }}" class="img-thumbnail border-primary" style="width: 100%; height: 80px; object-fit: cover;" alt="Current">
+                                    {% elif artwork.image %}
+                                        <img src="{{ artwork.image.url }}" class="img-thumbnail border-primary" style="width: 100%; height: 80px; object-fit: cover;" alt="Current">
+                                    {% elif artwork.image_url %}
+                                        <img src="{{ artwork.image_url }}" class="img-thumbnail border-primary" style="width: 100%; height: 80px; object-fit: cover;" alt="Current">
+                                    {% else %}
+                                        <div class="bg-dark d-flex align-items-center justify-content-center border border-primary" style="width: 100%; height: 80px;">
+                                            <span class="text-muted small">No Image</span>
+                                        </div>
+                                    {% endif %}
+                                    <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-primary">
+                                        Current
+                                    </span>
+                                </div>
+                                <small class="d-block mt-1 fw-bold text-primary">Current</small>
+                                <small class="d-block text-muted" style="font-size: 0.7rem;">v{{ current_version_number }}</small>
+                            </div>
+                        </div>
+
+                        <!-- Version History Thumbnails -->
+                        {% for version in versions reversed %}
+                        {% if not version.is_archived or user.is_authenticated and user == artwork.author %}
+                        <div class="col-6">
+                            <div class="version-thumbnail text-center {% if version.is_archived %}archived-version{% endif %}" 
+                                 data-version="{{ version.id }}" 
+                                 data-version-id="{{ version.id }}"
+                                 data-version-number="{{ version.version_number }}"
+                                 data-artwork-id="{{ artwork.id }}"
+                                 data-archived="{{ version.is_archived|yesno:'true,false' }}"
+                                 {% if version.is_archived %}style="display: none;"{% endif %}>
+                                <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
+                                    {% if version.image %}
+                                        <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 100%; height: 80px; object-fit: cover;" alt="Version {{ version.version_number }}">
+                                    {% elif version.image_url %}
+                                        <img src="{{ version.image_url }}" class="img-thumbnail" style="width: 100%; height: 80px; object-fit: cover;" alt="Version {{ version.version_number }}">
+                                    {% else %}
+                                        <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 100%; height: 80px;">
+                                            <span class="text-muted small">No Image</span>
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Version Actions Menu (only for artwork owner) -->
+                                    {% if user.is_authenticated and user == artwork.author %}
+                                    <div class="dropdown position-absolute" style="top: 2px; right: 2px;">
+                                        <button class="btn btn-sm btn-dark btn-outline-secondary dropdown-toggle p-1" type="button" 
+                                                data-bs-toggle="dropdown" aria-expanded="false" 
+                                                style="font-size: 0.6rem; line-height: 1;"
+                                                onclick="event.stopPropagation();">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+                                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                            </svg>
+                                        </button>
+                                        <ul class="dropdown-menu bg-dark border-secondary">
+                                            {% if version.is_archived %}
+                                            <li>
+                                                <button class="dropdown-item text-success" onclick="event.stopPropagation(); unarchiveVersion({{ version.id }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrow-up-circle me-1" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                                                    </svg>
+                                                    Unarchive
+                                                </button>
+                                            </li>
+                                            {% else %}
+                                            <li>
+                                                <button class="dropdown-item text-white" onclick="event.stopPropagation(); archiveVersion({{ version.id }}, {{ version.version_number }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-archive me-1" viewBox="0 0 16 16">
+                                                        <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                                                    </svg>
+                                                    Archive
+                                                </button>
+                                            </li>
+                                            {% endif %}
+                                            <li><hr class="dropdown-divider bg-secondary"></li>
+                                            <li>
+                                                <button class="dropdown-item text-danger" onclick="event.stopPropagation(); deleteVersion({{ version.id }}, {{ version.version_number }})">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-trash me-1" viewBox="0 0 16 16">
+                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                    </svg>
+                                                    Delete
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <small class="d-block mt-1">v{{ version.version_number }}</small>
+                                {% if version.created_at %}
+                                <small class="d-block text-muted" style="font-size: 0.7rem;">{{ version.created_at|date:"M d" }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Critiques Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card mb-4 bg-dark text-white">
+                <div class="card-header">
+                    <h4>Critiques ({{ critiques.count }})</h4>
+                    {% if user.is_authenticated %}
+                    <p class="mb-0"><small class="text-muted">Share your thoughts to help the artist improve</small></p>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if critiques %}
+                        {% for critique in critiques %}
+                            <div class="card mb-3 bg-secondary text-white critique-card" id="critique-{{ critique.id }}">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div class="d-flex align-items-center">
+                                            <strong>{{ critique.author.username }}</strong>
+                                            <span class="badge bg-primary ms-2">{{ critique.get_overall_score }}/10</span>
+                                        </div>
+                                        <small class="text-muted">{{ critique.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    
+                                    <div class="row mb-2">
+                                        <div class="col-4">
+                                            <small class="text-muted">Composition: {{ critique.composition_score }}/10</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">Technique: {{ critique.technique_score }}/10</small>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted">Originality: {{ critique.originality_score }}/10</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text">{{ critique.content }}</p>
+                                    
+                                    <!-- Reaction buttons and counts -->
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="reaction-buttons">
+                                            {% if user.is_authenticated %}
+                                            <button class="btn btn-sm btn-outline-success me-1 reaction-btn" 
+                                                    data-critique-id="{{ critique.id }}" 
+                                                    data-reaction-type="HELPFUL">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-hand-thumbs-up" viewBox="0 0 16 16">
+                                                    <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
+                                                </svg>
+                                                <span class="helpful-count">{{ critique.helpful_count }}</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-warning me-1 reaction-btn" 
+                                                    data-critique-id="{{ critique.id }}" 
+                                                    data-reaction-type="INSPIRING">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-lightbulb" viewBox="0 0 16 16">
+                                                    <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.46-.302l-.761-1.77a1.964 1.964 0 0 0-.453-.618A5.984 5.984 0 0 1 2 6zm6-5a5 5 0 0 0-3.479 8.592c.263.254.514.564.676.941L5.83 12h4.342l.632-1.467c.162-.377.413-.687.676-.941A5 5 0 0 0 8 1z"/>
+                                                </svg>
+                                                <span class="inspiring-count">{{ critique.inspiring_count }}</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-info reaction-btn" 
+                                                    data-critique-id="{{ critique.id }}" 
+                                                    data-reaction-type="DETAILED">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-card-text" viewBox="0 0 16 16">
+                                                    <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                                                    <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+                                                </svg>
+                                                <span class="detailed-count">{{ critique.detailed_count }}</span>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        {% if user.is_authenticated and user == artwork.author %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu bg-dark">
+                                                {% if critique.is_hidden %}
+                                                <li><button class="dropdown-item text-success" onclick="unhideCritique({{ critique.id }})">Unhide</button></li>
+                                                {% else %}
+                                                <li><button class="dropdown-item text-warning" onclick="hideCritique({{ critique.id }})">Hide</button></li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No critiques yet. Be the first to share your feedback!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle archived versions visibility (only for artwork authors)
+        function toggleArchivedVersions() {
+            const checkbox = document.getElementById('showArchivedVersions');
+            
+            // If toggle doesn't exist (non-author), do nothing
+            if (!checkbox) {
+                return;
+            }
+            
+            const archivedVersions = document.querySelectorAll('.version-thumbnail[data-archived="true"]');
+            
+            if (checkbox.checked) {
+                // Show archived versions
+                archivedVersions.forEach(function(thumbnail) {
+                    thumbnail.style.display = 'block';
+                    thumbnail.style.opacity = '0.7';
+                    // Add archived badge if not already present
+                    if (!thumbnail.querySelector('.archived-badge')) {
+                        const badge = document.createElement('div');
+                        badge.className = 'archived-badge position-absolute top-0 start-0 m-1';
+                        badge.innerHTML = '<span class="badge bg-secondary" style="font-size: 0.6rem;">Archived</span>';
+                        thumbnail.querySelector('.position-relative').appendChild(badge);
+                    }
+                });
+            } else {
+                // Hide archived versions
+                archivedVersions.forEach(function(thumbnail) {
+                    thumbnail.style.display = 'none';
+                });
+            }
+        }
+
+        // Initialize archived version visibility on page load
+        function initializeArchivedVersions() {
+            const archivedVersions = document.querySelectorAll('.version-thumbnail[data-archived="true"]');
+            archivedVersions.forEach(function(thumbnail) {
+                thumbnail.style.display = 'none';
+            });
+        }
+
+        // Call initialization when page loads
+        document.addEventListener('DOMContentLoaded', initializeArchivedVersions);
+
+        // Function to show delete version modal
+        function deleteVersion(versionId, versionNumber) {
+            const modalHtml = `
+                <div class="modal fade" id="deleteVersionModal" tabindex="-1" aria-labelledby="deleteVersionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark text-white">
+                            <div class="modal-header border-secondary">
+                                <h5 class="modal-title" id="deleteVersionModalLabel">Delete Version ${versionNumber}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to permanently delete version ${versionNumber}? This action cannot be undone.</p>
+                                <div class="alert alert-warning">
+                                    <strong>Warning:</strong> This will permanently remove the version and all associated data.
+                                </div>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" onclick="confirmDeleteVersion(${versionId})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash me-1" viewBox="0 0 16 16">
+                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                    </svg>
+                                    Delete Version
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('deleteVersionModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('deleteVersionModal'));
+            modal.show();
+        }
+
+        function confirmDeleteVersion(versionId) {
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Show loading state
+            const deleteBtn = document.querySelector('#deleteVersionModal .btn-danger');
+            const originalText = deleteBtn.innerHTML;
+            deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Deleting...';
+            deleteBtn.disabled = true;
+
+            // Send delete request
+            fetch(`/api/artworks/versions/${versionId}/delete/`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteVersionModal'));
+                modal.hide();
+
+                // Show success message
+                showToast('Success', 'Version deleted successfully.', 'success');
+
+                // Remove the version thumbnail from the page
+                const versionThumbnail = document.querySelector(`[data-version="${versionId}"]`);
+                if (versionThumbnail) {
+                    versionThumbnail.remove();
+                }
+
+                // Refresh page after a delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error deleting version:', error);
+
+                // Reset button
+                deleteBtn.innerHTML = originalText;
+                deleteBtn.disabled = false;
+
+                // Show error message
+                showToast('Error', 'Failed to delete version. Please try again.', 'danger');
+            });
+        }
+
+        // Function to unarchive a version
+        function unarchiveVersion(versionId) {
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Send unarchive request
+            fetch(`/api/versions/${versionId}/unarchive/`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Show success message
+                showToast('Success', 'Version unarchived successfully.', 'success');
+
+                // Refresh page after a delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error unarchiving version:', error);
+                // Show error message
+                showToast('Error', 'Failed to unarchive version. Please try again.', 'danger');
+            });
+        }
+
+        // Archive version function (existing)
+        function archiveVersion(versionId, versionNumber) {
+            const modalHtml = `
+                <div class="modal fade" id="archiveVersionModal" tabindex="-1" aria-labelledby="archiveVersionModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content bg-dark text-white">
+                            <div class="modal-header border-secondary">
+                                <h5 class="modal-title" id="archiveVersionModalLabel">Archive Version ${versionNumber}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to archive version ${versionNumber}? Archived versions are hidden from public view but can be restored later.</p>
+                                <div class="mb-3">
+                                    <label for="archiveReason" class="form-label">Reason for archiving (optional):</label>
+                                    <textarea id="archiveReason" class="form-control bg-dark text-white border-secondary" rows="3" placeholder="Why are you archiving this version?"></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-warning" onclick="confirmArchiveVersion(${versionId})">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-archive me-1" viewBox="0 0 16 16">
+                                        <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
+                                    </svg>
+                                    Archive Version
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('archiveVersionModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('archiveVersionModal'));
+            modal.show();
+        }
+
+        function confirmArchiveVersion(versionId) {
+            // Get CSRF token and reason
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            const reason = document.getElementById('archiveReason').value;
+
+            // Show loading state
+            const archiveBtn = document.querySelector('#archiveVersionModal .btn-warning');
+            const originalText = archiveBtn.innerHTML;
+            archiveBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Archiving...';
+            archiveBtn.disabled = true;
+
+            // Send archive request
+            fetch(`/api/versions/${versionId}/archive/`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    reason: reason
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Close modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('archiveVersionModal'));
+                modal.hide();
+
+                // Show success message
+                showToast('Success', 'Version archived successfully.', 'success');
+
+                // Refresh page after a delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error archiving version:', error);
+
+                // Reset button
+                archiveBtn.innerHTML = originalText;
+                archiveBtn.disabled = false;
+
+                // Show error message
+                showToast('Error', 'Failed to archive version. Please try again.', 'danger');
+            });
+        }
+
+        // Helper function to show toast notifications
+        function showToast(title, message, type) {
+            // Implementation depends on your toast system
+            console.log(`${type.toUpperCase()}: ${title} - ${message}`);
+        }
+    </script>
+{% endblock %}
