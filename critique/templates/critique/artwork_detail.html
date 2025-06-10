@@ -146,6 +146,7 @@
                                                      draggable="true"
                                                      style="display: none;">
                                                 {% endif %}
+                                                {% if not version.is_archived or user.is_authenticated and user == artwork.author %}
                                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                                         {% if version.image %}
                                                             <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Version {{ version.version_number }}">

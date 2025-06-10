@@ -1,0 +1,118 @@
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+Internal Server Error: /artworks/34/
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+Traceback (most recent call last):
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 510, in parse
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+compile_func = self.tags[command]
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+~~~~~~~~~^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+KeyError: 'endif'
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+During handling of the above exception, another exception occurred:
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+Traceback (most recent call last):
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/core/handlers/exception.py", line 55, in inner
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+response = get_response(request)
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/core/handlers/base.py", line 220, in _get_response
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+response = response.render()
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+^^^^^^^^^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/response.py", line 114, in render
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+self.content = self.rendered_content
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/response.py", line 90, in rendered_content
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+template = self.resolve_template(self.template_name)
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/response.py", line 72, in resolve_template
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+return select_template(template, using=self.using)
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/loader.py", line 42, in select_template
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+return engine.get_template(template_name)
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/backends/django.py", line 79, in get_template
+2025-06-09 21:00:00.29
+b4cc52ce
+User
+return Template(self.engine.get_template(template_name), self)
