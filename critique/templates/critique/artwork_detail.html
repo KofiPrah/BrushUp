@@ -37,6 +37,45 @@
     .form-check-input:checked::before {
         transform: translateX(1em);
     }
+    
+    /* Drop zone styling with fixed dimensions */
+    .drop-zone {
+        border: 2px dashed #6c757d;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        background-color: rgba(108, 117, 125, 0.1);
+        min-height: 120px;
+        max-height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    
+    .drop-zone.highlight {
+        border-color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+    
+    .drop-zone-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+    
+    .dropped-version {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        height: 100%;
+        padding: 10px;
+        gap: 10px;
+    }
 </style>
 {% endblock %}
 
@@ -652,12 +691,15 @@
             // Hide the placeholder content
             dropZoneContent.style.display = 'none';
             
-            // Show and populate the dropped version
+            // Show and populate the dropped version with thumbnail sizing
             droppedVersionDiv.style.display = 'flex';
             droppedVersionDiv.innerHTML = `
-                ${versionData.image ? `<img src="${versionData.image}" alt="${versionData.title}">` : '<div class="bg-secondary p-3 rounded"><span class="text-muted">No Image</span></div>'}
-                <small class="text-white fw-bold">${versionData.title}</small>
-                <button class="btn btn-sm btn-outline-light mt-2" onclick="removeVersionFromDropZone('${side}')">
+                ${versionData.image ? 
+                    `<img src="${versionData.image}" alt="${versionData.title}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">` : 
+                    '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 4px;"><span class="text-muted small">No Image</span></div>'
+                }
+                <small class="text-white fw-bold ms-2">${versionData.title}</small>
+                <button class="btn btn-sm btn-outline-light mt-2 ms-auto" onclick="removeVersionFromDropZone('${side}')">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                     </svg>
