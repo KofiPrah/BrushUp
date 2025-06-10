@@ -1254,49 +1254,26 @@
             // Pan and zoom with mouse wheel - zoom toward cursor
             const zoomContainer = document.getElementById('zoomContainer');
             if (zoomContainer) {
-                // Track mouse position for dynamic zoom origin
-                let mouseX = 0;
-                let mouseY = 0;
-                
-                zoomContainer.addEventListener('mousemove', (e) => {
+                zoomContainer.addEventListener('wheel', (e) => {
+                    e.preventDefault();
                     const rect = zoomContainer.getBoundingClientRect();
-                    mouseX = e.clientX - rect.left;
-                    mouseY = e.clientY - rect.top;
                     
-                    // Update transform origin to follow mouse
+                    // Capture mouse position only during zoom event
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    // Set transform origin to current mouse position for this zoom
                     const imageWrapper = document.getElementById('imageWrapper');
                     if (imageWrapper) {
                         const originX = (mouseX / rect.width) * 100;
                         const originY = (mouseY / rect.height) * 100;
                         imageWrapper.style.transformOrigin = `${originX}% ${originY}%`;
                     }
-                });
-                
-                zoomContainer.addEventListener('wheel', (e) => {
-                    e.preventDefault();
-                    const rect = zoomContainer.getBoundingClientRect();
-                    
-                    // Get current mouse position
-                    const currentMouseX = e.clientX - rect.left;
-                    const currentMouseY = e.clientY - rect.top;
                     
                     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
                     const newZoom = Math.min(Math.max(overlayState.zoom * zoomFactor, 0.1), 5);
                     
-                    // Calculate zoom toward mouse cursor
-                    const zoomChange = newZoom / overlayState.zoom;
-                    
-                    // Adjust pan to keep mouse position stable during zoom
-                    const containerCenterX = rect.width / 2;
-                    const containerCenterY = rect.height / 2;
-                    
-                    const offsetX = currentMouseX - containerCenterX;
-                    const offsetY = currentMouseY - containerCenterY;
-                    
-                    overlayState.panX = overlayState.panX + offsetX * (1 - zoomChange);
-                    overlayState.panY = overlayState.panY + offsetY * (1 - zoomChange);
                     overlayState.zoom = newZoom;
-                    
                     updateZoom();
                 });
                 
