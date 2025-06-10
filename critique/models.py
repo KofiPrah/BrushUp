@@ -520,6 +520,34 @@ class Critique(models.Model):
         self.is_flagged = True
         self.moderation_status = 'REJECTED'
         self.save()
+    
+    def has_engagement(self):
+        """
+        Check if this critique has any engagement (replies or reactions).
+        Returns True if the critique has replies or reactions, False otherwise.
+        """
+        # Check for replies
+        has_replies = self.replies.exists()
+        
+        # Check for reactions
+        has_reactions = self.reactions.exists()
+        
+        return has_replies or has_reactions
+    
+    def get_engagement_summary(self):
+        """
+        Get a summary of engagement for this critique.
+        Returns a dictionary with reply and reaction counts.
+        """
+        return {
+            'reply_count': self.replies.count(),
+            'reaction_count': self.reactions.count(),
+            'total_engagement': self.replies.count() + self.reactions.count()
+        }
+    
+    def get_overall_score(self):
+        """Return the overall average score as a single number for display purposes."""
+        return self.get_average_score() or 0
 
 
 class Reaction(models.Model):
