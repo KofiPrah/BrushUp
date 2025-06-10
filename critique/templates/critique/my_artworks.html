@@ -1309,8 +1309,9 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                 '<div class="card-body p-2">' +
                     '<div class="mb-2">' +
                         '<img src="' + (version.image_display_url || '/static/images/placeholder.png') + '" ' +
-                             'class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover;" ' +
-                             'alt="Version ' + version.version_number + '">' +
+                             'class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;" ' +
+                             'alt="Version ' + version.version_number + '" ' +
+                             'onclick="showFullImage(\'' + (version.image_display_url || '/static/images/placeholder.png') + '\', \'Version ' + version.version_number + '\')">' +
                     '</div>' +
                     '<h6 class="card-title text-sm mb-1">' + version.title + '</h6>' +
                     '<p class="card-text text-xs text-muted mb-2">' + 
@@ -1318,13 +1319,13 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                     '</p>' +
                     (version.version_notes ? '<p class="text-warning text-xs mb-2"><strong>Notes:</strong> ' + version.version_notes.substring(0, 40) + (version.version_notes.length > 40 ? '...' : '') + '</p>' : '') +
                     (hasCritiques ? '<p class="text-info text-xs mb-2"><i class="bi bi-chat-dots"></i> ' + version.critique_count + ' critique' + (version.critique_count === 1 ? '' : 's') + '</p>' : '') +
-                    '<div class="d-flex gap-1 flex-wrap">' +
-                        '<button class="btn btn-sm btn-warning flex-fill" onclick="restoreVersion(' + artworkId + ', ' + version.id + ')" ' +
+                    '<div class="d-grid gap-1">' +
+                        '<button class="btn btn-sm btn-warning" onclick="restoreVersion(' + artworkId + ', ' + version.id + ')" ' +
                                 'title="Make this version your current artwork" ' +
                                 'data-bs-toggle="tooltip" data-bs-placement="top">' +
                             'Restore' +
                         '</button>' +
-                        '<button class="btn btn-sm ' + deleteButtonClass + ' flex-fill" onclick="' + deleteAction + '(' + version.id + ', ' + version.version_number + ', ' + artworkId + ')" ' +
+                        '<button class="btn btn-sm ' + deleteButtonClass + '" onclick="' + deleteAction + '(' + version.id + ', ' + version.version_number + ', ' + artworkId + ')" ' +
                                 'title="' + deleteButtonTitle + '" ' +
                                 'data-bs-toggle="tooltip" data-bs-placement="top">' +
                             deleteButtonText +
@@ -1520,8 +1521,9 @@ function showVersionManagerModal(artworkId, versions, artworkTitle) {
                                     '<div class="card-body p-2">' +
                                         '<div class="mb-2">' +
                                             '<img src="' + currentArtworkImage + '" ' +
-                                                 'class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover;" ' +
-                                                 'alt="Current Version">' +
+                                                 'class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover; cursor: pointer;" ' +
+                                                 'alt="Current Version" ' +
+                                                 'onclick="showFullImage(\'' + currentArtworkImage + '\', \'Current Version\')">' +
                                         '</div>' +
                                         '<p class="text-xs text-muted mb-2">This is the current published state of your artwork</p>' +
                                     '</div>' +
@@ -3498,4 +3500,44 @@ function saveVersionOrder(artworkId) {
     box-shadow: 0 0 10px rgba(13, 110, 253, 0.5);
 }
 </style>
+
+<script>
+// Full-size image viewing function
+function showFullImage(imageUrl, title) {
+    // Remove existing full image modal if present
+    const existingModal = document.getElementById('fullImageModal');
+    if (existingModal) existingModal.remove();
+    
+    const modalHtml = 
+        '<div class="modal fade" id="fullImageModal" tabindex="-1" aria-labelledby="fullImageModalLabel" aria-hidden="true">' +
+            '<div class="modal-dialog modal-xl modal-dialog-centered">' +
+                '<div class="modal-content bg-dark text-light">' +
+                    '<div class="modal-header border-secondary">' +
+                        '<h5 class="modal-title" id="fullImageModalLabel">' + title + '</h5>' +
+                        '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                    '</div>' +
+                    '<div class="modal-body text-center p-4">' +
+                        '<img src="' + imageUrl + '" class="img-fluid rounded" style="max-height: 80vh; max-width: 100%;" alt="' + title + '">' +
+                    '</div>' +
+                    '<div class="modal-footer border-secondary">' +
+                        '<a href="' + imageUrl + '" target="_blank" class="btn btn-outline-light">' +
+                            '<i class="bi bi-download"></i> Open in New Tab' +
+                        '</a>' +
+                        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+    
+    // Add modal to body and show it
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('fullImageModal'));
+    modal.show();
+    
+    // Clean up when modal is hidden
+    document.getElementById('fullImageModal').addEventListener('hidden.bs.modal', function() {
+        this.remove();
+    });
+}
+</script>
 {% endblock %}
