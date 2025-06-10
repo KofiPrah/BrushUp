@@ -1032,7 +1032,7 @@
             }
         }
         
-        // Setup overlay view for image comparison
+        // Setup advanced overlay view for image comparison
         function setupOverlayView(version1, version2) {
             const overlayContainer = document.getElementById('overlayContainer');
             
@@ -1043,50 +1043,80 @@
             
             if (version1Image && version2Image) {
                 overlayContainer.innerHTML = `
-                    <!-- Image Overlay Container with Perfect Alignment -->
+                    <!-- Advanced Image Overlay Container -->
                     <div class="bg-dark" style="min-height: 75vh;">
-                        <div class="position-relative d-flex justify-content-center align-items-center" style="height: 75vh; overflow: hidden;">
-                            <div class="position-relative" style="max-width: 100%; max-height: 100%;" id="imageWrapper">
-                                <img id="overlayBaseImage" src="${version1Image}" class="img-fluid" alt="Version ${version1.version_number}" 
-                                     style="opacity: 1; display: block; max-height: 75vh; width: auto; object-fit: contain; cursor: pointer;"
-                                     onclick="openImageModal('${version1Image}', 'Version ${version1.version_number}')"
-                                     onload="alignOverlayImages()">
-                                <img id="overlayTopImage" src="${version2Image}" class="position-absolute top-0 start-0" alt="Version ${version2.version_number}" 
-                                     style="opacity: 0.5; max-height: 75vh; width: auto; object-fit: contain; cursor: pointer;"
-                                     onclick="openImageModal('${version2Image}', 'Version ${version2.version_number}')"
-                                     onload="alignOverlayImages()">
+                        <!-- Zoom and Blend Controls -->
+                        <div class="p-2 bg-secondary border-bottom d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center">
+                                <label class="form-label text-light me-2 mb-0">Blend Mode:</label>
+                                <select id="blendModeSelect" class="form-select form-select-sm" style="width: 140px;">
+                                    <option value="normal">Normal</option>
+                                    <option value="multiply">Multiply</option>
+                                    <option value="screen">Screen</option>
+                                    <option value="overlay">Overlay</option>
+                                    <option value="difference">Difference</option>
+                                    <option value="lighten">Lighten</option>
+                                    <option value="darken">Darken</option>
+                                    <option value="color-dodge">Color Dodge</option>
+                                    <option value="color-burn">Color Burn</option>
+                                    <option value="hard-light">Hard Light</option>
+                                    <option value="soft-light">Soft Light</option>
+                                    <option value="exclusion">Exclusion</option>
+                                </select>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <button id="zoomOut" class="btn btn-sm btn-outline-light me-2">-</button>
+                                <span id="zoomLevel" class="text-light me-2">100%</span>
+                                <button id="zoomIn" class="btn btn-sm btn-outline-light me-3">+</button>
+                                <button id="resetZoom" class="btn btn-sm btn-outline-light">Reset</button>
                             </div>
                         </div>
                         
-                        <!-- Single Opacity Control -->
+                        <!-- Zoomable Image Container -->
+                        <div id="zoomContainer" class="position-relative overflow-hidden" style="height: 70vh; cursor: grab;">
+                            <div id="imageWrapper" class="position-relative d-flex justify-content-center align-items-center h-100" 
+                                 style="transform-origin: center center; transition: transform 0.2s ease;">
+                                <img id="overlayBaseImage" src="${version1Image}" class="img-fluid" alt="Version ${version1.version_number}" 
+                                     style="opacity: 1; display: block; max-height: 70vh; width: auto; object-fit: contain; pointer-events: none;"
+                                     onload="initializeOverlayImages()">
+                                <img id="overlayTopImage" src="${version2Image}" class="position-absolute top-0 start-0" alt="Version ${version2.version_number}" 
+                                     style="opacity: 0.5; max-height: 70vh; width: auto; object-fit: contain; pointer-events: none; mix-blend-mode: normal;"
+                                     onload="initializeOverlayImages()">
+                            </div>
+                        </div>
+                        
+                        <!-- Opacity and Position Controls -->
                         <div class="p-3 bg-secondary border-top">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
                                     <span class="badge bg-primary me-2">Base: v${version1.version_number || 'Current'}</span>
                                     <span class="badge bg-success">Overlay: v${version2.version_number || 'Current'}</span>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <label for="overlaySlider" class="form-label text-light me-3 mb-0">Overlay Opacity:</label>
-                                    <input type="range" class="form-range" min="0" max="100" value="50" id="overlaySlider" style="width: 200px;">
-                                    <span id="opacityValue" class="text-light ms-3">50%</span>
+                                <div class="col-md-4 text-center">
+                                    <label for="overlaySlider" class="form-label text-light mb-1">Overlay Opacity:</label>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <input type="range" class="form-range" min="0" max="100" value="50" id="overlaySlider" style="width: 150px;">
+                                        <span id="opacityValue" class="text-light ms-2">50%</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <div class="d-flex justify-content-end align-items-center">
+                                        <button id="toggleDraggable" class="btn btn-sm btn-outline-light me-2">
+                                            <i class="bi bi-arrows-move"></i> Drag Mode
+                                        </button>
+                                        <button id="resetPosition" class="btn btn-sm btn-outline-light">
+                                            <i class="bi bi-arrow-clockwise"></i> Reset
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
                 
-                // Setup overlay slider functionality
-                const slider = document.getElementById('overlaySlider');
-                const opacityValue = document.getElementById('opacityValue');
-                if (slider && opacityValue) {
-                    slider.addEventListener('input', function() {
-                        const topImage = document.getElementById('overlayTopImage');
-                        if (topImage) {
-                            topImage.style.opacity = this.value / 100;
-                            opacityValue.textContent = this.value + '%';
-                        }
-                    });
-                }
+                // Initialize all overlay functionality
+                initializeOverlayControls();
+                
             } else {
                 overlayContainer.innerHTML = `
                     <div class="text-center text-muted p-5 bg-dark" style="min-height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
@@ -1100,8 +1130,21 @@
             }
         }
         
-        // Align overlay images for perfect comparison
-        function alignOverlayImages() {
+        // Global overlay state
+        let overlayState = {
+            zoom: 1,
+            panX: 0,
+            panY: 0,
+            isDraggableMode: false,
+            isDragging: false,
+            lastMouseX: 0,
+            lastMouseY: 0,
+            overlayOffsetX: 0,
+            overlayOffsetY: 0
+        };
+        
+        // Initialize overlay images with perfect synchronization
+        function initializeOverlayImages() {
             const baseImage = document.getElementById('overlayBaseImage');
             const topImage = document.getElementById('overlayTopImage');
             
@@ -1109,14 +1152,220 @@
                 // Get the actual displayed dimensions of the base image
                 const baseRect = baseImage.getBoundingClientRect();
                 
-                // Apply the same dimensions to the overlay image
+                // Apply exact same dimensions to overlay image
                 topImage.style.width = baseRect.width + 'px';
                 topImage.style.height = baseRect.height + 'px';
                 topImage.style.objectFit = 'contain';
                 
-                // Ensure perfect alignment
+                // Reset position
                 topImage.style.top = '0';
                 topImage.style.left = '0';
+                topImage.style.transform = 'translate(0px, 0px)';
+                
+                overlayState.overlayOffsetX = 0;
+                overlayState.overlayOffsetY = 0;
+            }
+        }
+        
+        // Initialize all overlay controls
+        function initializeOverlayControls() {
+            // Opacity slider
+            const slider = document.getElementById('overlaySlider');
+            const opacityValue = document.getElementById('opacityValue');
+            if (slider && opacityValue) {
+                slider.addEventListener('input', function() {
+                    const topImage = document.getElementById('overlayTopImage');
+                    if (topImage) {
+                        topImage.style.opacity = this.value / 100;
+                        opacityValue.textContent = this.value + '%';
+                    }
+                });
+            }
+            
+            // Blend mode selector
+            const blendSelect = document.getElementById('blendModeSelect');
+            if (blendSelect) {
+                blendSelect.addEventListener('change', function() {
+                    const topImage = document.getElementById('overlayTopImage');
+                    if (topImage) {
+                        topImage.style.mixBlendMode = this.value;
+                    }
+                });
+            }
+            
+            // Zoom controls
+            const zoomIn = document.getElementById('zoomIn');
+            const zoomOut = document.getElementById('zoomOut');
+            const resetZoom = document.getElementById('resetZoom');
+            const zoomLevel = document.getElementById('zoomLevel');
+            
+            if (zoomIn) {
+                zoomIn.addEventListener('click', () => {
+                    overlayState.zoom = Math.min(overlayState.zoom * 1.2, 5);
+                    updateZoom();
+                });
+            }
+            
+            if (zoomOut) {
+                zoomOut.addEventListener('click', () => {
+                    overlayState.zoom = Math.max(overlayState.zoom / 1.2, 0.1);
+                    updateZoom();
+                });
+            }
+            
+            if (resetZoom) {
+                resetZoom.addEventListener('click', () => {
+                    overlayState.zoom = 1;
+                    overlayState.panX = 0;
+                    overlayState.panY = 0;
+                    updateZoom();
+                });
+            }
+            
+            // Draggable toggle
+            const toggleDraggable = document.getElementById('toggleDraggable');
+            if (toggleDraggable) {
+                toggleDraggable.addEventListener('click', () => {
+                    overlayState.isDraggableMode = !overlayState.isDraggableMode;
+                    toggleDraggable.innerHTML = overlayState.isDraggableMode ? 
+                        '<i class="bi bi-arrows-move"></i> Exit Drag' : 
+                        '<i class="bi bi-arrows-move"></i> Drag Mode';
+                    toggleDraggable.classList.toggle('btn-outline-light');
+                    toggleDraggable.classList.toggle('btn-warning');
+                    
+                    const topImage = document.getElementById('overlayTopImage');
+                    if (topImage) {
+                        topImage.style.cursor = overlayState.isDraggableMode ? 'move' : 'pointer';
+                        topImage.style.pointerEvents = overlayState.isDraggableMode ? 'auto' : 'none';
+                    }
+                });
+            }
+            
+            // Reset position
+            const resetPosition = document.getElementById('resetPosition');
+            if (resetPosition) {
+                resetPosition.addEventListener('click', () => {
+                    overlayState.overlayOffsetX = 0;
+                    overlayState.overlayOffsetY = 0;
+                    updateOverlayPosition();
+                });
+            }
+            
+            // Pan and zoom with mouse wheel
+            const zoomContainer = document.getElementById('zoomContainer');
+            if (zoomContainer) {
+                zoomContainer.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const rect = zoomContainer.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                    const newZoom = Math.min(Math.max(overlayState.zoom * zoomFactor, 0.1), 5);
+                    
+                    // Zoom towards mouse position
+                    const zoomChange = newZoom / overlayState.zoom;
+                    overlayState.panX = mouseX - (mouseX - overlayState.panX) * zoomChange;
+                    overlayState.panY = mouseY - (mouseY - overlayState.panY) * zoomChange;
+                    overlayState.zoom = newZoom;
+                    
+                    updateZoom();
+                });
+                
+                // Pan with mouse drag
+                let isPanning = false;
+                let lastPanX = 0;
+                let lastPanY = 0;
+                
+                zoomContainer.addEventListener('mousedown', (e) => {
+                    if (!overlayState.isDraggableMode) {
+                        isPanning = true;
+                        lastPanX = e.clientX;
+                        lastPanY = e.clientY;
+                        zoomContainer.style.cursor = 'grabbing';
+                    }
+                });
+                
+                zoomContainer.addEventListener('mousemove', (e) => {
+                    if (isPanning && !overlayState.isDraggableMode) {
+                        const deltaX = e.clientX - lastPanX;
+                        const deltaY = e.clientY - lastPanY;
+                        overlayState.panX += deltaX;
+                        overlayState.panY += deltaY;
+                        lastPanX = e.clientX;
+                        lastPanY = e.clientY;
+                        updateZoom();
+                    }
+                });
+                
+                zoomContainer.addEventListener('mouseup', () => {
+                    isPanning = false;
+                    zoomContainer.style.cursor = 'grab';
+                });
+                
+                zoomContainer.addEventListener('mouseleave', () => {
+                    isPanning = false;
+                    zoomContainer.style.cursor = 'grab';
+                });
+            }
+            
+            // Overlay image dragging
+            setupOverlayDragging();
+        }
+        
+        // Update zoom transform
+        function updateZoom() {
+            const imageWrapper = document.getElementById('imageWrapper');
+            const zoomLevel = document.getElementById('zoomLevel');
+            
+            if (imageWrapper) {
+                imageWrapper.style.transform = `translate(${overlayState.panX}px, ${overlayState.panY}px) scale(${overlayState.zoom})`;
+            }
+            
+            if (zoomLevel) {
+                zoomLevel.textContent = Math.round(overlayState.zoom * 100) + '%';
+            }
+        }
+        
+        // Setup overlay image dragging
+        function setupOverlayDragging() {
+            const topImage = document.getElementById('overlayTopImage');
+            if (!topImage) return;
+            
+            topImage.addEventListener('mousedown', (e) => {
+                if (overlayState.isDraggableMode) {
+                    overlayState.isDragging = true;
+                    overlayState.lastMouseX = e.clientX;
+                    overlayState.lastMouseY = e.clientY;
+                    e.preventDefault();
+                }
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (overlayState.isDragging && overlayState.isDraggableMode) {
+                    const deltaX = e.clientX - overlayState.lastMouseX;
+                    const deltaY = e.clientY - overlayState.lastMouseY;
+                    
+                    overlayState.overlayOffsetX += deltaX / overlayState.zoom;
+                    overlayState.overlayOffsetY += deltaY / overlayState.zoom;
+                    
+                    overlayState.lastMouseX = e.clientX;
+                    overlayState.lastMouseY = e.clientY;
+                    
+                    updateOverlayPosition();
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                overlayState.isDragging = false;
+            });
+        }
+        
+        // Update overlay image position
+        function updateOverlayPosition() {
+            const topImage = document.getElementById('overlayTopImage');
+            if (topImage) {
+                topImage.style.transform = `translate(${overlayState.overlayOffsetX}px, ${overlayState.overlayOffsetY}px)`;
             }
         }
         
