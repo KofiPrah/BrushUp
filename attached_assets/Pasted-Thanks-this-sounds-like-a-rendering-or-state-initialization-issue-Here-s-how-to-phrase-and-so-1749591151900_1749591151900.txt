@@ -1,0 +1,74 @@
+Thanks — this sounds like a **rendering or state initialization issue**. Here's how to phrase and solve it:
+
+---
+
+### ✅ Problem Description (Dev-Friendly)
+
+> When the comparison modal first opens, only the **base layer image** is displayed. The **overlay image** is missing (not rendered or set to display: none), so the **opacity slider appears non-functional**. The overlay only appears **after clicking "Swap"**, which is unintuitive.
+>
+> **Expected Behavior:**
+> The **overlay image should be visible** immediately on entering the modal, regardless of whether “Swap” has been clicked. Opacity control should affect it right away.
+
+---
+
+### ✅ Implementation Fixes
+
+#### 1. **Ensure Both Images Are Mounted**
+
+In your React render logic, check that the overlay image isn't conditionally skipped:
+
+```jsx
+{baseImage && (
+  <img src={baseImage} className="base-layer" />
+)}
+
+{overlayImage && (
+  <img
+    src={overlayImage}
+    className="overlay-layer"
+    style={{ opacity: overlayOpacity }}
+  />
+)}
+```
+
+#### 2. **Avoid Premature Null State**
+
+Make sure your overlay image state is initialized properly before modal opens:
+
+```js
+useEffect(() => {
+  if (isModalOpen) {
+    setOverlayImage(preloadedOverlay); // ← Set this in modal entry logic
+  }
+}, [isModalOpen]);
+```
+
+If it’s undefined on first render, the image won’t mount — leading to the slider doing nothing.
+
+#### 3. **Debug Visibility with CSS**
+
+Check if the image is present but invisible (e.g., `display: none`, `opacity: 0`, or `z-index` issues).
+
+Temporarily apply:
+
+```css
+.overlay-layer {
+  border: 1px solid red;
+  z-index: 10;
+}
+```
+
+---
+
+### ✅ Summary of Fixes
+
+| Step | Action                                                            |
+| ---- | ----------------------------------------------------------------- |
+| 1.   | Ensure overlay image state is set **before or on modal open**     |
+| 2.   | Render overlay image by default, regardless of swap state         |
+| 3.   | Bind opacity slider to a real image layer, not a null placeholder |
+| 4.   | Use dev tools or temp borders to debug visibility                 |
+
+---
+
+Let me know if you want a React hook-based scaffolding for this component — I can show the full flow including base/overlay init, zoom, drag, and swap logic.

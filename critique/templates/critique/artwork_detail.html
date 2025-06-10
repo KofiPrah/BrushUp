@@ -1117,6 +1117,35 @@
                 // Initialize all overlay functionality
                 initializeOverlayControls();
                 
+                // Force immediate overlay setup - ensure both images are visible
+                setTimeout(() => {
+                    const baseImage = document.getElementById('overlayBaseImage');
+                    const topImage = document.getElementById('overlayTopImage');
+                    
+                    if (baseImage && topImage) {
+                        // Ensure base image is visible
+                        baseImage.style.display = 'block';
+                        baseImage.style.opacity = '1';
+                        
+                        // Ensure overlay image is visible with 50% opacity
+                        topImage.style.display = 'block';
+                        topImage.style.opacity = '0.5';
+                        topImage.style.position = 'absolute';
+                        topImage.style.top = '0';
+                        topImage.style.left = '0';
+                        
+                        // Force image synchronization
+                        initializeOverlayImages();
+                        syncImageDimensions();
+                        
+                        console.log('Overlay comparison initialized:', {
+                            baseVisible: baseImage.style.display !== 'none',
+                            overlayVisible: topImage.style.display !== 'none',
+                            overlayOpacity: topImage.style.opacity
+                        });
+                    }
+                }, 200);
+                
             } else {
                 overlayContainer.innerHTML = `
                     <div class="text-center text-muted p-5 bg-dark" style="min-height: 60vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
@@ -1148,6 +1177,41 @@
             const baseImage = document.getElementById('overlayBaseImage');
             const topImage = document.getElementById('overlayTopImage');
             
+            if (baseImage && topImage) {
+                // Force overlay image to be visible and properly positioned
+                topImage.style.display = 'block';
+                topImage.style.opacity = '0.5';
+                topImage.style.position = 'absolute';
+                topImage.style.top = '0';
+                topImage.style.left = '0';
+                topImage.style.transform = 'translate(0px, 0px)';
+                topImage.style.pointerEvents = 'none';
+                
+                // Reset overlay state
+                overlayState.overlayOffsetX = 0;
+                overlayState.overlayOffsetY = 0;
+                
+                // Wait for base image to load, then sync dimensions
+                if (baseImage.complete) {
+                    syncImageDimensions();
+                } else {
+                    baseImage.onload = syncImageDimensions;
+                }
+                
+                // Also sync when overlay image loads
+                if (topImage.complete) {
+                    syncImageDimensions();
+                } else {
+                    topImage.onload = syncImageDimensions;
+                }
+            }
+        }
+        
+        // Synchronize image dimensions for perfect overlay alignment
+        function syncImageDimensions() {
+            const baseImage = document.getElementById('overlayBaseImage');
+            const topImage = document.getElementById('overlayTopImage');
+            
             if (baseImage && topImage && baseImage.complete && topImage.complete) {
                 // Get the actual displayed dimensions of the base image
                 const baseRect = baseImage.getBoundingClientRect();
@@ -1157,29 +1221,45 @@
                 topImage.style.height = baseRect.height + 'px';
                 topImage.style.objectFit = 'contain';
                 
-                // Reset position
-                topImage.style.top = '0';
-                topImage.style.left = '0';
-                topImage.style.transform = 'translate(0px, 0px)';
-                
-                overlayState.overlayOffsetX = 0;
-                overlayState.overlayOffsetY = 0;
+                console.log('Overlay images synchronized:', {
+                    baseSize: { width: baseRect.width, height: baseRect.height },
+                    overlayOpacity: topImage.style.opacity
+                });
             }
         }
         
         // Initialize all overlay controls
         function initializeOverlayControls() {
-            // Opacity slider
+            // Opacity slider - ensure it works immediately
             const slider = document.getElementById('overlaySlider');
             const opacityValue = document.getElementById('opacityValue');
             if (slider && opacityValue) {
+                // Set initial opacity value
+                slider.value = 50;
+                opacityValue.textContent = '50%';
+                
                 slider.addEventListener('input', function() {
                     const topImage = document.getElementById('overlayTopImage');
                     if (topImage) {
-                        topImage.style.opacity = this.value / 100;
+                        const newOpacity = this.value / 100;
+                        topImage.style.opacity = newOpacity;
                         opacityValue.textContent = this.value + '%';
+                        
+                        // Ensure image is visible
+                        if (newOpacity > 0) {
+                            topImage.style.display = 'block';
+                        }
                     }
                 });
+                
+                // Force initial overlay visibility
+                setTimeout(() => {
+                    const topImage = document.getElementById('overlayTopImage');
+                    if (topImage) {
+                        topImage.style.opacity = '0.5';
+                        topImage.style.display = 'block';
+                    }
+                }, 100);
             }
             
             // Blend mode selector
