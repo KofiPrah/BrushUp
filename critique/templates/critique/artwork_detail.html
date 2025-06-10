@@ -1251,22 +1251,50 @@
                 });
             }
             
-            // Pan and zoom with mouse wheel
+            // Pan and zoom with mouse wheel - zoom toward cursor
             const zoomContainer = document.getElementById('zoomContainer');
             if (zoomContainer) {
+                // Track mouse position for dynamic zoom origin
+                let mouseX = 0;
+                let mouseY = 0;
+                
+                zoomContainer.addEventListener('mousemove', (e) => {
+                    const rect = zoomContainer.getBoundingClientRect();
+                    mouseX = e.clientX - rect.left;
+                    mouseY = e.clientY - rect.top;
+                    
+                    // Update transform origin to follow mouse
+                    const imageWrapper = document.getElementById('imageWrapper');
+                    if (imageWrapper) {
+                        const originX = (mouseX / rect.width) * 100;
+                        const originY = (mouseY / rect.height) * 100;
+                        imageWrapper.style.transformOrigin = `${originX}% ${originY}%`;
+                    }
+                });
+                
                 zoomContainer.addEventListener('wheel', (e) => {
                     e.preventDefault();
                     const rect = zoomContainer.getBoundingClientRect();
-                    const mouseX = e.clientX - rect.left;
-                    const mouseY = e.clientY - rect.top;
+                    
+                    // Get current mouse position
+                    const currentMouseX = e.clientX - rect.left;
+                    const currentMouseY = e.clientY - rect.top;
                     
                     const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
                     const newZoom = Math.min(Math.max(overlayState.zoom * zoomFactor, 0.1), 5);
                     
-                    // Zoom towards mouse position
+                    // Calculate zoom toward mouse cursor
                     const zoomChange = newZoom / overlayState.zoom;
-                    overlayState.panX = mouseX - (mouseX - overlayState.panX) * zoomChange;
-                    overlayState.panY = mouseY - (mouseY - overlayState.panY) * zoomChange;
+                    
+                    // Adjust pan to keep mouse position stable during zoom
+                    const containerCenterX = rect.width / 2;
+                    const containerCenterY = rect.height / 2;
+                    
+                    const offsetX = currentMouseX - containerCenterX;
+                    const offsetY = currentMouseY - containerCenterY;
+                    
+                    overlayState.panX = overlayState.panX + offsetX * (1 - zoomChange);
+                    overlayState.panY = overlayState.panY + offsetY * (1 - zoomChange);
                     overlayState.zoom = newZoom;
                     
                     updateZoom();
@@ -1313,13 +1341,19 @@
             setupOverlayDragging();
         }
         
-        // Update zoom transform
+        // Update zoom transform with proper transform origin
         function updateZoom() {
             const imageWrapper = document.getElementById('imageWrapper');
             const zoomLevel = document.getElementById('zoomLevel');
             
             if (imageWrapper) {
+                // Apply both pan and zoom transformations
                 imageWrapper.style.transform = `translate(${overlayState.panX}px, ${overlayState.panY}px) scale(${overlayState.zoom})`;
+                
+                // Ensure transform origin is maintained (set by mousemove event)
+                if (!imageWrapper.style.transformOrigin) {
+                    imageWrapper.style.transformOrigin = 'center center';
+                }
             }
             
             if (zoomLevel) {

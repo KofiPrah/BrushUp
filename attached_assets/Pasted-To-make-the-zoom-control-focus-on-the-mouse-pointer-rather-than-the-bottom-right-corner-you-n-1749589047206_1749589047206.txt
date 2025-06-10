@@ -1,0 +1,72 @@
+To make the **zoom control focus on the mouse pointer** (rather than the bottom-right corner), you need to update your zoom logic so that the **transform origin** dynamically tracks the mouse position. Here's how to describe and implement it:
+
+---
+
+### ✅ Problem
+
+> Currently, when zooming into an image (e.g., using a scroll wheel), the zoom focuses on a fixed point — typically the bottom-right corner — instead of zooming toward the **mouse cursor**, which is unintuitive for image comparison.
+
+---
+
+### ✅ Desired Behavior
+
+> When the user scrolls to zoom, the image should scale around the current **mouse position**, so that the region under the cursor stays under the cursor — similar to how image editors or Figma behave.
+
+---
+
+### ✅ Implementation Overview (React + CSS)
+
+1. **Track Mouse Position on Mouse Move**
+
+   ```js
+   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+   const handleMouseMove = (e) => {
+     const bounds = e.currentTarget.getBoundingClientRect();
+     setMousePos({
+       x: ((e.clientX - bounds.left) / bounds.width) * 100,
+       y: ((e.clientY - bounds.top) / bounds.height) * 100,
+     });
+   };
+   ```
+
+2. **Apply `transform-origin` Based on Cursor**
+
+   ```jsx
+   <div
+     className="zoom-container"
+     onWheel={handleZoom}
+     onMouseMove={handleMouseMove}
+     style={{
+       transform: `scale(${zoomLevel})`,
+       transformOrigin: `${mousePos.x}% ${mousePos.y}%`,
+     }}
+   >
+     <img src={overlayImageUrl} alt="Overlay" />
+   </div>
+   ```
+
+3. **Zoom Control Logic**
+
+   ```js
+   const [zoomLevel, setZoomLevel] = useState(1);
+
+   const handleZoom = (e) => {
+     e.preventDefault();
+     const zoomStep = 0.1;
+     const direction = e.deltaY > 0 ? -1 : 1;
+     setZoomLevel(prev => Math.max(0.1, prev + direction * zoomStep));
+   };
+   ```
+
+---
+
+### 🧪 Optional Enhancements
+
+* Add **drag-to-pan** support when zoomed in (e.g. using `react-pan-zoom` or manual pointer events).
+* Show zoom percentage in UI.
+* Limit zoom to a max/min scale.
+
+---
+
+Let me know if you'd like the full code scaffold or integration into your existing overlay comparison component.
