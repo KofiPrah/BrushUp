@@ -122,31 +122,18 @@
 
                                                 <!-- Version History Thumbnails -->
                                                 {% for version in versions reversed %}
-                                                {% if not version.is_archived %}
-                                                <div class="version-thumbnail me-3 mb-3" 
+                                                {% if not version.is_archived or user.is_authenticated and user == artwork.author %}
+                                                <div class="version-thumbnail me-3 mb-3 {% if version.is_archived %}archived-version{% endif %}" 
                                                      data-version="{{ version.id }}" 
                                                      data-version-id="{{ version.id }}"
                                                      data-version-number="{{ version.version_number }}"
                                                      data-version-title="{{ version.title }}"
                                                      data-version-description="{{ version.description }}"
                                                      data-artwork-id="{{ artwork.id }}"
-                                                     data-archived="false"
-                                                     data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}"
-                                                     draggable="true">
-                                                {% elif user.is_authenticated and user == artwork.author %}
-                                                <div class="version-thumbnail me-3 mb-3 archived-version" 
-                                                     data-version="{{ version.id }}" 
-                                                     data-version-id="{{ version.id }}"
-                                                     data-version-number="{{ version.version_number }}"
-                                                     data-version-title="{{ version.title }}"
-                                                     data-version-description="{{ version.description }}"
-                                                     data-artwork-id="{{ artwork.id }}"
-                                                     data-archived="true"
+                                                     data-archived="{{ version.is_archived|yesno:'true,false' }}"
                                                      data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}"
                                                      draggable="true"
-                                                     style="display: none;">
-                                                {% endif %}
-                                                {% if not version.is_archived or user.is_authenticated and user == artwork.author %}
+                                                     {% if version.is_archived %}style="display: none;"{% endif %}>
                                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                                         {% if version.image %}
                                                             <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Version {{ version.version_number }}">
@@ -179,6 +166,16 @@
                                                                 </svg>
                                                             </button>
                                                             <ul class="dropdown-menu bg-dark border-secondary">
+                                                                {% if version.is_archived %}
+                                                                <li>
+                                                                    <button class="dropdown-item text-success" onclick="event.stopPropagation(); unarchiveVersion({{ version.id }})">
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-arrow-up-circle me-1" viewBox="0 0 16 16">
+                                                                            <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
+                                                                        </svg>
+                                                                        Unarchive Version
+                                                                    </button>
+                                                                </li>
+                                                                {% else %}
                                                                 <li>
                                                                     <button class="dropdown-item text-white" onclick="event.stopPropagation(); archiveVersion({{ version.id }}, {{ version.version_number }})">
                                                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-archive me-1" viewBox="0 0 16 16">
@@ -187,6 +184,7 @@
                                                                         Archive Version
                                                                     </button>
                                                                 </li>
+                                                                {% endif %}
                                                                 <li><hr class="dropdown-divider bg-secondary"></li>
                                                                 <li>
                                                                     <button class="dropdown-item text-danger" onclick="event.stopPropagation(); deleteVersion({{ version.id }}, {{ version.version_number }})">
@@ -1798,7 +1796,7 @@
                         return;
                     }
                     
-                    const archivedVersions = document.querySelectorAll('.version-thumbnail.archived-version');
+                    const archivedVersions = document.querySelectorAll('.version-thumbnail[data-archived="true"]');
                     
                     if (checkbox.checked) {
                         // Show archived versions
@@ -1823,7 +1821,7 @@
 
                 // Initialize archived version visibility on page load
                 function initializeArchivedVersions() {
-                    const archivedVersions = document.querySelectorAll('.version-thumbnail.archived-version');
+                    const archivedVersions = document.querySelectorAll('.version-thumbnail[data-archived="true"]');
                     archivedVersions.forEach(function(thumbnail) {
                         thumbnail.style.display = 'none';
                     });
