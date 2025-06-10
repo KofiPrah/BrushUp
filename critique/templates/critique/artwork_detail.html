@@ -323,7 +323,7 @@
 
     <!-- Version Comparison Modal -->
     <div class="modal fade" id="versionComparisonModal" tabindex="-1" aria-labelledby="versionComparisonModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
+        <div class="modal-dialog modal-fullscreen-lg-down modal-xl modal-dialog-scrollable">
             <div class="modal-content bg-dark text-white">
                 <div class="modal-header border-secondary">
                     <h5 class="modal-title" id="versionComparisonModalLabel">
@@ -805,7 +805,7 @@
                             <!-- Image Section with Diff Highlighting -->
                             <div class="mb-3 position-relative">
                                 ${version1.image_url ? 
-                                    `<img src="${version1.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version1.version_number}" style="max-height: 300px; width: 100%; object-fit: cover;">
+                                    `<img src="${version1.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version1.version_number}" style="max-height: 600px; width: 100%; object-fit: contain; cursor: pointer;" onclick="openImageModal('${version1.image_url}', 'Version ${version1.version_number}')">
                                      ${differences.image ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Changed</span></div>' : ''}` : 
                                     '<div class="bg-dark p-5 rounded text-center"><span class="text-muted">No Image</span></div>'
                                 }
@@ -861,7 +861,7 @@
                             <!-- Image Section with Diff Highlighting -->
                             <div class="mb-3 position-relative">
                                 ${version2.image_url ? 
-                                    `<img src="${version2.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version2.version_number}" style="max-height: 300px; width: 100%; object-fit: cover;">
+                                    `<img src="${version2.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version2.version_number}" style="max-height: 600px; width: 100%; object-fit: contain; cursor: pointer;" onclick="openImageModal('${version2.image_url}', 'Version ${version2.version_number}')">
                                      ${differences.image ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Changed</span></div>' : ''}` : 
                                     '<div class="bg-dark p-5 rounded text-center"><span class="text-muted">No Image</span></div>'
                                 }
@@ -1515,6 +1515,44 @@
             .catch(error => {
                 console.error('Error unhiding critique:', error);
                 showToast('Error', 'Failed to unhide critique. Please try again.', 'danger');
+            });
+        }
+
+        // Function to open image in full-size modal
+        function openImageModal(imageSrc, title) {
+            // Create modal HTML
+            const modalHTML = `
+                <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
+                        <div class="modal-content bg-dark">
+                            <div class="modal-header border-secondary">
+                                <h5 class="modal-title text-white" id="imageModalLabel">${title}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center p-2">
+                                <img src="${imageSrc}" class="img-fluid" style="max-height: 80vh; max-width: 100%; object-fit: contain;" alt="${title}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if any
+            const existingModal = document.getElementById('imageModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to page
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+            modal.show();
+
+            // Clean up modal when hidden
+            document.getElementById('imageModal').addEventListener('hidden.bs.modal', function () {
+                this.remove();
             });
         }
 
