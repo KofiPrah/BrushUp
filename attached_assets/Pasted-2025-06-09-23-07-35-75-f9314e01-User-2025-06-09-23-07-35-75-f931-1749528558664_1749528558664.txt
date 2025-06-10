@@ -1,0 +1,164 @@
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+2025-06-09 23:07:35.75
+f9314e01
+User
+return self.render(context)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/loader_tags.py", line 159, in render
+2025-06-09 23:07:35.75
+f9314e01
+User
+return compiled_parent._render(context)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 163, in _render
+2025-06-09 23:07:35.75
+f9314e01
+User
+return self.nodelist.render(context)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 1016, in render
+2025-06-09 23:07:35.75
+f9314e01
+User
+return SafeString("".join([node.render_annotated(context) for node in self]))
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 1016, in
+2025-06-09 23:07:35.75
+f9314e01
+User
+return SafeString("".join([node.render_annotated(context) for node in self]))
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+2025-06-09 23:07:35.75
+f9314e01
+User
+return self.render(context)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/loader_tags.py", line 65, in render
+2025-06-09 23:07:35.75
+f9314e01
+User
+result = block.nodelist.render(context)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 1016, in render
+2025-06-09 23:07:35.75
+f9314e01
+User
+return SafeString("".join([node.render_annotated(context) for node in self]))
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 1016, in
+2025-06-09 23:07:35.75
+f9314e01
+User
+return SafeString("".join([node.render_annotated(context) for node in self]))
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/base.py", line 977, in render_annotated
+2025-06-09 23:07:35.75
+f9314e01
+User
+return self.render(context)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/template/defaulttags.py", line 480, in render
+2025-06-09 23:07:35.75
+f9314e01
+User
+url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/urls/base.py", line 98, in reverse
+2025-06-09 23:07:35.75
+f9314e01
+User
+resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+2025-06-09 23:07:35.75
+f9314e01
+User
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2025-06-09 23:07:35.75
+f9314e01
+User
+File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/django/urls/resolvers.py", line 831, in _reverse_with_prefix
+2025-06-09 23:07:35.75
+f9314e01
+User
+raise NoReverseMatch(msg)
+2025-06-09 23:07:35.75
+f9314e01
+User
+django.urls.exceptions.NoReverseMatch: Reverse for 'add_critique' not found. 'add_critique' is not a valid view function or pattern name.
+2025-06-09 23:07:35.75
+f9314e01
+User
+127.0.0.1 - - [10/Jun/2025:04:07:35 +0000] "GET /artworks/34/ HTTP/1.1" 500 179745 "https://brushup.replit.app/artworks/34/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36"
