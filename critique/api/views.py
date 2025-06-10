@@ -1633,8 +1633,8 @@ def switch_artwork_version(request, artwork_id, version_id):
         # Get the version
         version = ArtWorkVersion.objects.get(id=version_id, artwork=artwork)
         
-        # Check if version is archived and user is not the author
-        if version.is_archived and request.user != artwork.author:
+        # Check if version contains archived note and user is not the author
+        if version.version_notes and '[ARCHIVED:' in version.version_notes and request.user != artwork.author:
             return Response(
                 {'error': 'Version not found'}, 
                 status=status.HTTP_404_NOT_FOUND
