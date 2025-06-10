@@ -1130,6 +1130,41 @@
             }
         });
         
+        // Open image in fullscreen modal overlay
+        function openImageModal(imageUrl, title) {
+            if (!imageUrl) return;
+            
+            // Create modal if it doesn't exist
+            let imageModal = document.getElementById('imageModal');
+            if (!imageModal) {
+                const modalHtml = `
+                    <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-fullscreen">
+                            <div class="modal-content bg-dark">
+                                <div class="modal-header border-0">
+                                    <h5 class="modal-title text-white" id="imageModalTitle">${title || 'Image'}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body d-flex align-items-center justify-content-center p-0">
+                                    <img id="modalImage" src="${imageUrl}" class="img-fluid" style="max-height: 100vh; max-width: 100vw; object-fit: contain;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                imageModal = document.getElementById('imageModal');
+            } else {
+                // Update existing modal
+                document.getElementById('imageModalTitle').textContent = title || 'Image';
+                document.getElementById('modalImage').src = imageUrl;
+            }
+            
+            // Show the modal
+            const modal = new bootstrap.Modal(imageModal);
+            modal.show();
+        }
+
         // Setup view mode toggle functionality
         function setupViewModeToggle() {
             const sideBySideMode = document.getElementById('sideBySideMode');
