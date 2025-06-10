@@ -619,9 +619,11 @@ def create_critique(request, artwork_id):
             messages.error(request, f"Error saving critique: {str(e)}")
             return redirect('critique:artwork_detail', pk=artwork_id)
     
-    # For GET requests, render a template or redirect to artwork detail page
-    # We need to allow both GET and POST methods to fix the 405 Method Not Allowed error
-    return redirect('critique:artwork_detail', pk=artwork_id)
+    # For GET requests, render the critique creation form
+    context = {
+        'artwork': artwork,
+    }
+    return render(request, 'critique/create_critique.html', context)
 
 
 @login_required
