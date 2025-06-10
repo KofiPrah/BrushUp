@@ -5,7 +5,7 @@ from .views import (
     CritiqueViewSet, health_check,
     ReactionViewSet, NotificationViewSet, FolderViewSet,
     create_artwork_version, get_artwork_version, 
-    delete_artwork_version, archive_artwork_version, switch_artwork_version, ArtworkVersionViewSet,
+    delete_artwork_version, archive_artwork_version, unarchive_artwork_version, switch_artwork_version, ArtworkVersionViewSet,
     ArtworkVersionCompareView, ArtworkVersionRestoreView, ArtworkVersionReorderView,
     hide_critique, unhide_critique
 )
@@ -36,7 +36,7 @@ urlpatterns = [
     path('artworks/<int:artwork_id>/versions/reorder/', ArtworkVersionReorderView.as_view(), name='artwork-version-reorder'),
     path('artworks/versions/<int:version_id>/delete/', delete_artwork_version, name='artwork-version-delete'),
     path('versions/<int:version_id>/archive/', archive_artwork_version, name='version-archive'),
-    path('versions/<int:version_id>/unarchive/', archive_artwork_version, name='version-unarchive'),
+    path('versions/<int:version_id>/unarchive/', unarchive_artwork_version, name='version-unarchive'),
     path('critiques/<int:critique_id>/hide/', hide_critique, name='critique-hide'),
     path('critiques/<int:critique_id>/unhide/', unhide_critique, name='critique-unhide'),
 ]
