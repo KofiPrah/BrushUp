@@ -1617,7 +1617,7 @@ def delete_artwork_version(request, version_id):
                       status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
-@permission_classes([permissions.IsAuthenticatedOrReadOnly])
+@permission_classes([permissions.AllowAny])
 def switch_artwork_version(request, artwork_id, version_id):
     """Switch the main artwork display to a specific version."""
     try:
