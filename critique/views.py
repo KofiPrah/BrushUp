@@ -158,7 +158,8 @@ class ArtWorkDetailView(DetailView):
         # Add version information
         versions = ArtWorkVersion.objects.filter(artwork=self.object).order_by('version_number')
         context['versions'] = versions
-        context['total_versions'] = versions.count()
+        # Total versions includes the current artwork state plus all saved versions
+        context['total_versions'] = versions.count() + 1
         context['current_version_number'] = self.object.get_current_version_number()
         
         # Current version represents the live artwork state, not the latest version
