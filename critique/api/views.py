@@ -1526,11 +1526,52 @@ def create_artwork_version(request, artwork_id):
             })
         
         elif request.method == 'POST':
+            # Check if there are meaningful changes before creating a version
+            has_changes = False
+            changes_detected = []
+            
+            # Check for meaningful changes
+            if 'image' in request.FILES:
+                has_changes = True
+                changes_detected.append('image')
+            
+            if 'title' in request.data and request.data['title'] != artwork.title:
+                has_changes = True
+                changes_detected.append('title')
+                
+            if 'description' in request.data and request.data['description'] != artwork.description:
+                has_changes = True
+                changes_detected.append('description')
+                
+            if 'medium' in request.data and request.data['medium'] != getattr(artwork, 'medium', ''):
+                has_changes = True
+                changes_detected.append('medium')
+                
+            if 'dimensions' in request.data and request.data['dimensions'] != getattr(artwork, 'dimensions', ''):
+                has_changes = True
+                changes_detected.append('dimensions')
+                
+            if 'tags' in request.data and request.data['tags'] != getattr(artwork, 'tags', ''):
+                has_changes = True
+                changes_detected.append('tags')
+            
+            # Only create a new version if there are meaningful changes
+            if not has_changes:
+                return Response({
+                    'error': 'No changes detected',
+                    'message': 'A new version is only created when there are meaningful changes to the artwork.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
             # Get the highest version number and increment
             highest_version = artwork.versions.aggregate(
                 max_version=Max('version_number')
             )['max_version'] or 0
             new_version_number = highest_version + 1
+            
+            # Create version notes with detected changes
+            auto_notes = f"Changes: {', '.join(changes_detected)}"
+            manual_notes = request.data.get('version_notes', '')
+            version_notes = f"{auto_notes}. {manual_notes}".strip('. ')
             
             # Create the new version with current artwork data
             version = ArtWorkVersion.objects.create(
@@ -1542,7 +1583,7 @@ def create_artwork_version(request, artwork_id):
                 medium=request.data.get('medium', getattr(artwork, 'medium', '')),
                 dimensions=request.data.get('dimensions', getattr(artwork, 'dimensions', '')),
                 tags=request.data.get('tags', getattr(artwork, 'tags', '')),
-                version_notes=request.data.get('version_notes', '')
+                version_notes=version_notes
             )
             
             # Update artwork fields if provided
@@ -1559,7 +1600,7 @@ def create_artwork_version(request, artwork_id):
             if 'tags' in request.data:
                 artwork.tags = request.data['tags']
             
-            # Handle new image upload - this is the key fix
+            # Handle new image upload
             if 'image' in request.FILES:
                 new_image = request.FILES['image']
                 # Update artwork with new image
@@ -1573,7 +1614,7 @@ def create_artwork_version(request, artwork_id):
             serializer = ArtWorkVersionSerializer(version)
             return Response({
                 'version': serializer.data,
-                'message': f'Version {version.version_number} created successfully'
+                'message': f'Version {version.version_number} created successfully with changes: {", ".join(changes_detected)}'
             }, status=status.HTTP_201_CREATED)
         
     except ArtWork.DoesNotExist:
