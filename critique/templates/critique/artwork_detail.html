@@ -887,6 +887,159 @@
                 </div>
                 ` : ''}
             `;
+            
+            // Setup overlay view with actual version data
+            setupOverlayView(version1, version2);
+        }
+        
+        // Analyze differences between versions
+        function analyzeDifferences(version1, version2, differences) {
+            let diffCount = 0;
+            
+            // Count existing differences from backend
+            diffCount = Object.keys(differences).length;
+            
+            // Add client-side analysis for additional fields
+            if (version1.title !== version2.title) diffCount++;
+            if (version1.description !== version2.description) diffCount++;
+            if (version1.image_url !== version2.image_url) diffCount++;
+            
+            return diffCount;
+        }
+        
+        // Update comparison status display
+        function updateComparisonStatus(diffCount, differences) {
+            const statusElement = document.getElementById('comparisonStatus');
+            const diffCountElement = document.getElementById('diffCount');
+            
+            if (diffCountElement) {
+                diffCountElement.textContent = diffCount;
+            }
+            
+            if (statusElement) {
+                if (diffCount === 0) {
+                    statusElement.innerHTML = '<span class="badge bg-success me-2">Identical</span>These versions are identical';
+                } else {
+                    const severity = diffCount > 3 ? 'danger' : diffCount > 1 ? 'warning' : 'info';
+                    statusElement.innerHTML = `<span class="badge bg-${severity} me-2">${diffCount} Difference${diffCount > 1 ? 's' : ''}</span>Found changes between versions`;
+                }
+            }
+        }
+        
+        // Setup overlay view for image comparison
+        function setupOverlayView(version1, version2) {
+            const overlayContainer = document.getElementById('overlayContainer');
+            
+            if (!overlayContainer) return;
+            
+            if (version1.image_url && version2.image_url) {
+                overlayContainer.innerHTML = `
+                    <div class="position-relative" style="max-height: 500px; overflow: hidden;">
+                        <img id="overlayBaseImage" src="${version1.image_url}" class="img-fluid w-100" alt="Version ${version1.version_number}" style="opacity: 1;">
+                        <img id="overlayTopImage" src="${version2.image_url}" class="img-fluid w-100 position-absolute top-0 start-0" alt="Version ${version2.version_number}" style="opacity: 0.5;">
+                    </div>
+                    <div class="mt-3 small text-center">
+                        <span class="badge bg-primary me-2">Base: v${version1.version_number || 'Current'}</span>
+                        <span class="badge bg-success">Overlay: v${version2.version_number || 'Current'}</span>
+                    </div>
+                `;
+                
+                // Setup overlay slider functionality
+                const slider = document.getElementById('overlaySlider');
+                if (slider) {
+                    slider.addEventListener('input', function() {
+                        const topImage = document.getElementById('overlayTopImage');
+                        if (topImage) {
+                            topImage.style.opacity = this.value / 100;
+                        }
+                    });
+                }
+            } else {
+                overlayContainer.innerHTML = `
+                    <div class="text-center text-muted p-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-image mb-3" viewBox="0 0 16 16">
+                            <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                            <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-12zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093L6.5 10.5l-2.5-2.5a.5.5 0 0 0-.707 0L.002 10.5V3a1 1 0 0 1 1-1h12z"/>
+                        </svg>
+                        <p>Overlay view requires both versions to have images</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Swap versions in comparison
+        function swapVersions() {
+            if (!leftDroppedVersion || !rightDroppedVersion) return;
+            
+            // Swap the global variables
+            const temp = leftDroppedVersion;
+            leftDroppedVersion = rightDroppedVersion;
+            rightDroppedVersion = temp;
+            
+            // Re-fetch and display comparison
+            openVersionComparison();
+            
+            showToast('Success', 'Versions swapped successfully', 'success');
+        }
+        
+        // Helper function to format dates
+        function formatDate(dateString) {
+            if (!dateString) return 'Unknown';
+            try {
+                return new Date(dateString).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                return 'Invalid date';
+            }
+        }
+        
+        // Helper function to get status badge class
+        function getStatusBadgeClass(status) {
+            switch(status?.toLowerCase()) {
+                case 'published': return 'bg-success';
+                case 'draft': return 'bg-secondary';
+                case 'archived': return 'bg-warning';
+                case 'private': return 'bg-info';
+                default: return 'bg-secondary';
+            }
+        }
+        
+        // Initialize view mode switching for comparison modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup view mode toggle functionality
+            const versionModal = document.getElementById('versionComparisonModal');
+            if (versionModal) {
+                versionModal.addEventListener('shown.bs.modal', function() {
+                    setupViewModeToggle();
+                });
+            }
+        });
+        
+        // Setup view mode toggle functionality
+        function setupViewModeToggle() {
+            const sideBySideMode = document.getElementById('sideBySideMode');
+            const overlayMode = document.getElementById('overlayMode');
+            const sideBySideView = document.getElementById('sideBySideView');
+            const overlayView = document.getElementById('overlayView');
+            
+            if (sideBySideMode && overlayMode && sideBySideView && overlayView) {
+                sideBySideMode.addEventListener('change', function() {
+                    if (this.checked) {
+                        sideBySideView.style.display = 'block';
+                        overlayView.style.display = 'none';
+                    }
+                });
+                
+                overlayMode.addEventListener('change', function() {
+                    if (this.checked) {
+                        sideBySideView.style.display = 'none';
+                        overlayView.style.display = 'block';
+                    }
+                });
+            }
         }
 
         // Function to show delete version modal
