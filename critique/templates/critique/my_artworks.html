@@ -2697,29 +2697,61 @@ function showVersionComparisonModal(comparisonData, version1, version2) {
     
     let differencesHtml = '';
     if (differences.length > 0) {
-        differencesHtml = differences.map(diff => 
-            '<div class="mb-3">' +
-                '<h6 class="text-warning">' + diff.field.charAt(0).toUpperCase() + diff.field.slice(1) + ' Changed</h6>' +
-                '<div class="row">' +
-                    '<div class="col-md-6">' +
-                        '<div class="card bg-danger text-white">' +
-                            '<div class="card-header">Version ' + version1.versionNumber + '</div>' +
-                            '<div class="card-body">' +
-                                '<p class="mb-0">' + (diff.version1_value || '<em>Not set</em>') + '</p>' +
+        differencesHtml = differences.map(diff => {
+            const fieldTitle = diff.field.charAt(0).toUpperCase() + diff.field.slice(1);
+            
+            // Handle image differences specially
+            if (diff.field === 'image') {
+                return '<div class="mb-3">' +
+                    '<h6 class="text-warning">' + fieldTitle + ' Changed</h6>' +
+                    '<div class="row">' +
+                        '<div class="col-md-6">' +
+                            '<div class="card bg-danger text-white">' +
+                                '<div class="card-header">Version ' + version1.versionNumber + '</div>' +
+                                '<div class="card-body text-center">' +
+                                    (diff.version1_value ? 
+                                        '<img src="' + diff.version1_value + '" class="img-fluid rounded" style="max-height: 200px;" alt="Version ' + version1.versionNumber + '">' :
+                                        '<em>No image</em>') +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="col-md-6">' +
+                            '<div class="card bg-success text-white">' +
+                                '<div class="card-header">Version ' + version2.versionNumber + '</div>' +
+                                '<div class="card-body text-center">' +
+                                    (diff.version2_value ? 
+                                        '<img src="' + diff.version2_value + '" class="img-fluid rounded" style="max-height: 200px;" alt="Version ' + version2.versionNumber + '">' :
+                                        '<em>No image</em>') +
+                                '</div>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                    '<div class="col-md-6">' +
-                        '<div class="card bg-success text-white">' +
-                            '<div class="card-header">Version ' + version2.versionNumber + '</div>' +
-                            '<div class="card-body">' +
-                                '<p class="mb-0">' + (diff.version2_value || '<em>Not set</em>') + '</p>' +
+                '</div>';
+            } else {
+                // Handle text differences
+                return '<div class="mb-3">' +
+                    '<h6 class="text-warning">' + fieldTitle + ' Changed</h6>' +
+                    '<div class="row">' +
+                        '<div class="col-md-6">' +
+                            '<div class="card bg-danger text-white">' +
+                                '<div class="card-header">Version ' + version1.versionNumber + '</div>' +
+                                '<div class="card-body">' +
+                                    '<p class="mb-0">' + (diff.version1_value || '<em>Not set</em>') + '</p>' +
+                                '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="col-md-6">' +
+                            '<div class="card bg-success text-white">' +
+                                '<div class="card-header">Version ' + version2.versionNumber + '</div>' +
+                                '<div class="card-body">' +
+                                    '<p class="mb-0">' + (diff.version2_value || '<em>Not set</em>') + '</p>' +
+                                '</div>' +
                             '</div>' +
                         '</div>' +
                     '</div>' +
-                '</div>' +
-            '</div>'
-        ).join('');
+                '</div>';
+            }
+        }).join('');
     } else {
         differencesHtml = '<div class="alert alert-info">No differences found between these versions.</div>';
     }
