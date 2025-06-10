@@ -583,19 +583,27 @@
             if (!comparisonMode) return;
             
             e.target.classList.add('dragging');
+            
+            // Get the version data from the element's data attributes
+            const versionElement = e.target.closest('.version-thumbnail') || e.target;
+            const imgElement = versionElement.querySelector('img');
+            const titleElement = versionElement.querySelector('small');
+            
             const versionData = {
-                id: e.target.dataset.versionId,
-                artworkId: {{ artwork.id }}, // Ensure artwork ID is always available
-                version_number: e.target.dataset.versionNumber,
-                number: e.target.dataset.versionNumber,
-                title: e.target.querySelector('small')?.textContent || 'Version ' + e.target.dataset.versionNumber,
-                image: e.target.querySelector('img')?.src || null,
-                image_url: e.target.querySelector('img')?.src || null,
-                description: e.target.dataset.description || '',
-                tags: e.target.dataset.tags ? e.target.dataset.tags.split(',') : [],
-                created_at: e.target.dataset.createdAt || new Date().toISOString(),
-                status: e.target.dataset.status || 'draft'
+                id: versionElement.dataset.versionId || versionElement.dataset.version,
+                artworkId: {{ artwork.id }},
+                version_number: versionElement.dataset.versionNumber,
+                number: versionElement.dataset.versionNumber,
+                title: titleElement?.textContent?.trim() || `Version ${versionElement.dataset.versionNumber}`,
+                image: imgElement?.src || null,
+                image_url: imgElement?.src || null,
+                description: versionElement.dataset.description || `Version ${versionElement.dataset.versionNumber}`,
+                tags: versionElement.dataset.tags ? versionElement.dataset.tags.split(',') : [],
+                created_at: versionElement.dataset.createdAt || new Date().toISOString(),
+                status: versionElement.dataset.status || 'draft'
             };
+            
+            console.log('Dragging version data:', versionData); // Debug logging
             e.dataTransfer.setData('text/plain', JSON.stringify(versionData));
         }
 
@@ -715,10 +723,27 @@
             const version1Id = leftDroppedVersion.id === 'current' ? 'current' : leftDroppedVersion.id;
             const version2Id = rightDroppedVersion.id === 'current' ? 'current' : rightDroppedVersion.id;
             
-            // Validate we have the required IDs
-            if (!artworkId || (!version1Id && version1Id !== 'current') || (!version2Id && version2Id !== 'current')) {
+            // Debug logging
+            console.log('Comparison data:', { 
+                artworkId, 
+                version1Id, 
+                version2Id, 
+                leftDroppedVersion, 
+                rightDroppedVersion 
+            });
+            
+            // Validate we have the required IDs - allow 'current' and numeric IDs
+            if (!artworkId || 
+                (version1Id !== 'current' && (!version1Id || version1Id === 'undefined')) || 
+                (version2Id !== 'current' && (!version2Id || version2Id === 'undefined'))) {
                 showToast('Error', 'Missing artwork or version data. Please try again.', 'danger');
-                console.error('Missing data for comparison:', { artworkId, version1Id, version2Id, leftDroppedVersion, rightDroppedVersion });
+                console.error('Missing data for comparison:', { 
+                    artworkId, 
+                    version1Id, 
+                    version2Id, 
+                    leftDroppedVersion, 
+                    rightDroppedVersion 
+                });
                 return;
             }
             
