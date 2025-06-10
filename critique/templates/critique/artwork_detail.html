@@ -122,18 +122,30 @@
 
                                                 <!-- Version History Thumbnails -->
                                                 {% for version in versions reversed %}
-                                                {% if not version.is_archived or user.is_authenticated and user == artwork.author %}
-                                                <div class="version-thumbnail me-3 mb-3 {% if version.is_archived %}archived-version{% endif %}" 
+                                                {% if not version.is_archived %}
+                                                <div class="version-thumbnail me-3 mb-3" 
                                                      data-version="{{ version.id }}" 
                                                      data-version-id="{{ version.id }}"
                                                      data-version-number="{{ version.version_number }}"
                                                      data-version-title="{{ version.title }}"
                                                      data-version-description="{{ version.description }}"
                                                      data-artwork-id="{{ artwork.id }}"
-                                                     data-archived="{{ version.is_archived|yesno:'true,false' }}"
+                                                     data-archived="false"
+                                                     data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}"
+                                                     draggable="true">
+                                                {% elif user.is_authenticated and user == artwork.author %}
+                                                <div class="version-thumbnail me-3 mb-3 archived-version" 
+                                                     data-version="{{ version.id }}" 
+                                                     data-version-id="{{ version.id }}"
+                                                     data-version-number="{{ version.version_number }}"
+                                                     data-version-title="{{ version.title }}"
+                                                     data-version-description="{{ version.description }}"
+                                                     data-artwork-id="{{ artwork.id }}"
+                                                     data-archived="true"
                                                      data-image-url="{% if version.image %}{{ version.image.url }}{% elif version.image_url %}{{ version.image_url }}{% endif %}"
                                                      draggable="true"
-                                                     {% if version.is_archived and user.is_authenticated and user == artwork.author %}style="display: none;"{% endif %}>
+                                                     style="display: none;">
+                                                {% endif %}
                                                     <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
                                                         {% if version.image %}
                                                             <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 120px; height: 120px; object-fit: cover;" alt="Version {{ version.version_number }}">
@@ -1785,7 +1797,7 @@
                         return;
                     }
                     
-                    const archivedVersions = document.querySelectorAll('.version-thumbnail[data-archived="true"]');
+                    const archivedVersions = document.querySelectorAll('.version-thumbnail.archived-version');
                     
                     if (checkbox.checked) {
                         // Show archived versions
@@ -1795,10 +1807,9 @@
                             // Add archived badge if not already present
                             if (!thumbnail.querySelector('.archived-badge')) {
                                 const badge = document.createElement('div');
-                                badge.className = 'archived-badge position-absolute top-0 end-0 m-1';
-                                badge.innerHTML = '<span class="badge bg-secondary">Archived</span>';
-                                thumbnail.style.position = 'relative';
-                                thumbnail.appendChild(badge);
+                                badge.className = 'archived-badge position-absolute top-0 start-0 m-1';
+                                badge.innerHTML = '<span class="badge bg-secondary" style="font-size: 0.6rem;">Archived</span>';
+                                thumbnail.querySelector('.position-relative').appendChild(badge);
                             }
                         });
                     } else {
@@ -1808,6 +1819,17 @@
                         });
                     }
                 }
+
+                // Initialize archived version visibility on page load
+                function initializeArchivedVersions() {
+                    const archivedVersions = document.querySelectorAll('.version-thumbnail.archived-version');
+                    archivedVersions.forEach(function(thumbnail) {
+                        thumbnail.style.display = 'none';
+                    });
+                }
+
+                // Call initialization when page loads
+                document.addEventListener('DOMContentLoaded', initializeArchivedVersions);
 
                 // Function to unarchive a version
                 function unarchiveVersion(versionId) {
