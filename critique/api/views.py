@@ -1000,6 +1000,111 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(critiques, many=True)
         return Response(serializer.data)
 
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete a critique only if it has no engagement (replies or reactions).
+        Users can only delete their own critiques.
+        
+        Deletion is blocked if the critique has:
+        - Any replies from other users
+        - Any reactions (HELPFUL, INSPIRING, DETAILED)
+        
+        If engagement is found, returns 403 Forbidden with helpful message.
+        On successful deletion, recalculates artwork aggregated scores and deducts karma.
+        """
+        critique = self.get_object()
+        
+        # Check if user owns this critique
+        if critique.author != request.user:
+            return Response(
+                {'error': 'You can only delete your own critiques'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Check for engagement using the model method
+        if critique.has_engagement():
+            engagement_summary = critique.get_engagement_summary()
+            
+            # Build detailed error message
+            engagement_details = []
+            if engagement_summary['reply_count'] > 0:
+                engagement_details.append(f"{engagement_summary['reply_count']} reply(s)")
+            if engagement_summary['reaction_count'] > 0:
+                engagement_details.append(f"{engagement_summary['reaction_count']} reaction(s)")
+            
+            engagement_text = " and ".join(engagement_details)
+            
+            return Response(
+                {
+                    'error': 'This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.',
+                    'details': f'Critique has {engagement_text}',
+                    'engagement_summary': engagement_summary,
+                    'suggestion': 'Consider editing your critique or asking the artwork owner to hide it if inappropriate.'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        # Store artwork for score recalculation
+        artwork = critique.artwork
+        
+        # Deduct karma points for critique deletion
+        try:
+            from ..karma import deduct_critique_karma
+            deduct_critique_karma(request.user, critique)
+        except ImportError:
+            # If karma system is not available, continue with deletion
+            pass
+        
+        # Delete the critique
+        critique_id = critique.id
+        critique.delete()
+        
+        # Recalculate artwork aggregated scores
+        self._recalculate_artwork_scores(artwork)
+        
+        return Response(
+            {
+                'message': 'Critique deleted successfully',
+                'critique_id': critique_id,
+                'artwork_scores_updated': True
+            },
+            status=status.HTTP_204_NO_CONTENT
+        )
+    
+    def _recalculate_artwork_scores(self, artwork):
+        """
+        Recalculate aggregated scores for an artwork after critique deletion.
+        Updates average composition, technique, and originality scores.
+        """
+        from django.db.models import Avg
+        
+        # Get remaining critiques for this artwork
+        remaining_critiques = artwork.critiques.filter(
+            moderation_status='APPROVED',
+            is_hidden=False
+        )
+        
+        # Calculate new averages
+        averages = remaining_critiques.aggregate(
+            avg_composition=Avg('composition_score'),
+            avg_technique=Avg('technique_score'),
+            avg_originality=Avg('originality_score')
+        )
+        
+        # Update artwork fields if they exist
+        if hasattr(artwork, 'avg_composition_score'):
+            artwork.avg_composition_score = averages['avg_composition'] or 0
+        if hasattr(artwork, 'avg_technique_score'):
+            artwork.avg_technique_score = averages['avg_technique'] or 0
+        if hasattr(artwork, 'avg_originality_score'):
+            artwork.avg_originality_score = averages['avg_originality'] or 0
+        
+        try:
+            artwork.save()
+        except Exception:
+            # If artwork doesn't have these fields, that's fine
+            pass
+
 class ReactionViewSet(viewsets.ModelViewSet):
     """API endpoint for managing reactions to critiques.
 

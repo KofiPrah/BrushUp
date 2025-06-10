@@ -148,3 +148,36 @@ def get_user_karma_history(user, limit=20):
     """Get recent karma events for a user"""
     from .models import KarmaEvent
     return KarmaEvent.objects.filter(user=user).order_by('-created_at')[:limit]
+
+def deduct_critique_karma(user, critique):
+    """
+    Deduct karma points when a critique is deleted.
+    This reverses the karma awarded for posting the critique.
+    
+    Args:
+        user: User who is deleting the critique
+        critique: Critique object being deleted
+        
+    Returns:
+        Boolean indicating success
+    """
+    points_to_deduct = -KARMA_VALUES['critique_posted']  # Negative to deduct
+    
+    with transaction.atomic():
+        # Create a negative KarmaEvent record
+        from .models import KarmaEvent
+        
+        event = KarmaEvent.objects.create(
+            user=user,
+            action='critique_deleted',
+            points=points_to_deduct,
+            reason=f"Deleted critique on artwork: {critique.artwork.title}",
+            created_at=timezone.now()
+        )
+        
+        # Update user's total karma
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.karma += points_to_deduct
+        profile.save()
+        
+        return True
