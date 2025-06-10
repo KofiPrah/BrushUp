@@ -42,16 +42,16 @@
     .drop-zone {
         border: 2px dashed #6c757d;
         border-radius: 8px;
-        padding: 20px;
+        padding: 15px;
         text-align: center;
         transition: all 0.3s ease;
         background-color: rgba(108, 117, 125, 0.1);
-        min-height: 120px;
-        max-height: 120px;
+        height: 140px;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        position: relative;
     }
     
     .drop-zone.highlight {
@@ -69,12 +69,41 @@
     
     .dropped-version {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: center;
         width: 100%;
         height: 100%;
-        padding: 10px;
-        gap: 10px;
+        padding: 8px;
+        gap: 8px;
+        text-align: center;
+    }
+    
+    .dropped-version img {
+        flex-shrink: 0;
+    }
+    
+    .dropped-version .version-title {
+        font-size: 0.75rem;
+        line-height: 1.2;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .dropped-version .remove-btn {
+        margin-top: auto;
+        font-size: 0.7rem;
+        padding: 2px 6px;
+    }
+    
+    /* Extra small button class for Bootstrap 5 */
+    .btn-xs {
+        padding: 0.125rem 0.25rem;
+        font-size: 0.625rem;
+        line-height: 1.2;
+        border-radius: 0.2rem;
     }
 </style>
 {% endblock %}
@@ -695,12 +724,12 @@
             droppedVersionDiv.style.display = 'flex';
             droppedVersionDiv.innerHTML = `
                 ${versionData.image ? 
-                    `<img src="${versionData.image}" alt="${versionData.title}" class="img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">` : 
-                    '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; border-radius: 4px;"><span class="text-muted small">No Image</span></div>'
+                    `<img src="${versionData.image}" alt="${versionData.title}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : 
+                    '<div class="bg-secondary d-flex align-items-center justify-content-center" style="width: 50px; height: 50px; border-radius: 4px;"><span class="text-muted small">No Image</span></div>'
                 }
-                <small class="text-white fw-bold ms-2">${versionData.title}</small>
-                <button class="btn btn-sm btn-outline-light mt-2 ms-auto" onclick="removeVersionFromDropZone('${side}')">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                <small class="text-white fw-bold version-title">${versionData.title}</small>
+                <button class="btn btn-xs btn-outline-light remove-btn" onclick="removeVersionFromDropZone('${side}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
                         <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
                     </svg>
                     Remove
@@ -810,8 +839,11 @@
                     differences: {}
                 };
                 
-                // Calculate differences
-                if (leftDroppedVersion.image_url !== rightDroppedVersion.image_url) {
+                // Calculate differences using proper property names
+                const leftImage = leftDroppedVersion.image_url || leftDroppedVersion.image;
+                const rightImage = rightDroppedVersion.image_url || rightDroppedVersion.image;
+                
+                if (leftImage !== rightImage) {
                     mockData.differences.image = true;
                 }
                 if (leftDroppedVersion.title !== rightDroppedVersion.title) {
@@ -846,8 +878,8 @@
                         <div class="card-body">
                             <!-- Image Section with Diff Highlighting -->
                             <div class="mb-3 position-relative">
-                                ${version1.image_url ? 
-                                    `<img src="${version1.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version1.version_number}" style="max-height: 600px; width: 100%; object-fit: contain; cursor: pointer;" onclick="openImageModal('${version1.image_url}', 'Version ${version1.version_number}')">
+                                ${(version1.image_url || version1.image) ? 
+                                    `<img src="${version1.image_url || version1.image}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version1.version_number}" style="max-height: 600px; width: 100%; object-fit: contain; cursor: pointer;" onclick="openImageModal('${version1.image_url || version1.image}', 'Version ${version1.version_number}')">
                                      ${differences.image ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Changed</span></div>' : ''}` : 
                                     '<div class="bg-dark p-5 rounded text-center"><span class="text-muted">No Image</span></div>'
                                 }
@@ -902,8 +934,8 @@
                         <div class="card-body">
                             <!-- Image Section with Diff Highlighting -->
                             <div class="mb-3 position-relative">
-                                ${version2.image_url ? 
-                                    `<img src="${version2.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version2.version_number}" style="max-height: 600px; width: 100%; object-fit: contain; cursor: pointer;" onclick="openImageModal('${version2.image_url}', 'Version ${version2.version_number}')">
+                                ${(version2.image_url || version2.image) ? 
+                                    `<img src="${version2.image_url || version2.image}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version2.version_number}" style="max-height: 600px; width: 100%; object-fit: contain; cursor: pointer;" onclick="openImageModal('${version2.image_url || version2.image}', 'Version ${version2.version_number}')">
                                      ${differences.image ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Changed</span></div>' : ''}` : 
                                     '<div class="bg-dark p-5 rounded text-center"><span class="text-muted">No Image</span></div>'
                                 }
