@@ -813,8 +813,28 @@
             }
             
             // Show loading animation
-            const modal = new bootstrap.Modal(document.getElementById('versionComparisonModal'));
+            const modalElement = document.getElementById('versionComparisonModal');
+            const modal = new bootstrap.Modal(modalElement);
             const comparisonContent = document.getElementById('comparisonContent');
+            
+            // Add proper cleanup event handlers to prevent backdrop issues
+            modalElement.addEventListener('hidden.bs.modal', function (event) {
+                // Force removal of any lingering backdrop elements
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(backdrop => backdrop.remove());
+                
+                // Reset body classes that might block interaction
+                document.body.classList.remove('modal-open');
+                document.body.style.removeProperty('padding-right');
+                document.body.style.removeProperty('overflow');
+                
+                // Reset modal state
+                modalElement.style.display = 'none';
+                modalElement.setAttribute('aria-hidden', 'true');
+                modalElement.removeAttribute('aria-modal');
+                
+                console.log('Modal cleanup completed - page interaction restored');
+            });
             
             comparisonContent.innerHTML = `
                 <div class="col-12 text-center py-5">
