@@ -139,7 +139,8 @@
                                  data-version="current" 
                                  data-version-id="current"
                                  data-version-number="{{ current_version_number }}"
-                                 data-artwork-id="{{ artwork.id }}">
+                                 data-artwork-id="{{ artwork.id }}"
+                                 data-archived="false">
                                 <div class="position-relative">
                                     {% if current_version and current_version.image %}
                                         <img src="{{ current_version.image.url }}" class="img-thumbnail border-primary" style="width: 100%; height: 80px; object-fit: cover;" alt="Current">
@@ -442,7 +443,7 @@
     <script>
         // Toggle archived versions visibility (only for artwork authors)
         function toggleArchivedVersions() {
-            const checkbox = document.getElementById('showArchivedVersions');
+            const checkbox = document.getElementById('showArchivedToggle');
             
             // If toggle doesn't exist (non-author), do nothing
             if (!checkbox) {
@@ -481,7 +482,284 @@
         }
 
         // Call initialization when page loads
-        document.addEventListener('DOMContentLoaded', initializeArchivedVersions);
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeArchivedVersions();
+            initializeDragAndDrop();
+        });
+
+        // Global variables for comparison
+        let comparisonMode = false;
+        let leftDroppedVersion = null;
+        let rightDroppedVersion = null;
+
+        // Toggle comparison mode
+        function toggleComparisonMode() {
+            const checkbox = document.getElementById('comparisonModeToggle');
+            const comparisonInterface = document.getElementById('comparisonInterface');
+            const versionThumbnails = document.querySelectorAll('.version-thumbnail');
+            
+            comparisonMode = checkbox.checked;
+            
+            if (comparisonMode) {
+                comparisonInterface.style.display = 'block';
+                // Enable drag functionality on version thumbnails
+                versionThumbnails.forEach(thumbnail => {
+                    thumbnail.classList.add('comparison-mode');
+                    thumbnail.draggable = true;
+                });
+            } else {
+                comparisonInterface.style.display = 'none';
+                clearComparison();
+                // Disable drag functionality
+                versionThumbnails.forEach(thumbnail => {
+                    thumbnail.classList.remove('comparison-mode');
+                    thumbnail.draggable = false;
+                });
+            }
+        }
+
+        // Initialize drag and drop functionality
+        function initializeDragAndDrop() {
+            const versionThumbnails = document.querySelectorAll('.version-thumbnail');
+            
+            versionThumbnails.forEach(thumbnail => {
+                thumbnail.addEventListener('dragstart', handleDragStart);
+                thumbnail.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        // Handle drag start
+        function handleDragStart(e) {
+            if (!comparisonMode) return;
+            
+            e.target.classList.add('dragging');
+            const versionData = {
+                id: e.target.dataset.versionId,
+                number: e.target.dataset.versionNumber,
+                artworkId: e.target.dataset.artworkId,
+                image: e.target.querySelector('img')?.src || null,
+                title: e.target.querySelector('small')?.textContent || 'Unknown Version'
+            };
+            e.dataTransfer.setData('text/plain', JSON.stringify(versionData));
+        }
+
+        // Handle drag end
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        // Allow drop
+        function allowDrop(e) {
+            e.preventDefault();
+        }
+
+        // Highlight drop zone
+        function highlightDropZone(e) {
+            e.preventDefault();
+            e.target.closest('.drop-zone').classList.add('highlight');
+        }
+
+        // Unhighlight drop zone
+        function unhighlightDropZone(e) {
+            e.target.closest('.drop-zone').classList.remove('highlight');
+        }
+
+        // Handle drop
+        function handleDrop(e, side) {
+            e.preventDefault();
+            const dropZone = e.target.closest('.drop-zone');
+            dropZone.classList.remove('highlight');
+            
+            try {
+                const versionData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                addVersionToDropZone(versionData, side);
+                updateCompareButton();
+            } catch (error) {
+                console.error('Error handling drop:', error);
+                showToast('Error', 'Failed to add version to comparison', 'danger');
+            }
+        }
+
+        // Add version to drop zone
+        function addVersionToDropZone(versionData, side) {
+            const dropZoneContent = document.querySelector(`#${side}DropZone .drop-zone-content`);
+            const droppedVersionDiv = document.querySelector(`#${side}DroppedVersion`);
+            
+            // Hide the placeholder content
+            dropZoneContent.style.display = 'none';
+            
+            // Show and populate the dropped version
+            droppedVersionDiv.style.display = 'flex';
+            droppedVersionDiv.innerHTML = `
+                ${versionData.image ? `<img src="${versionData.image}" alt="${versionData.title}">` : '<div class="bg-secondary p-3 rounded"><span class="text-muted">No Image</span></div>'}
+                <small class="text-white fw-bold">${versionData.title}</small>
+                <button class="btn btn-sm btn-outline-light mt-2" onclick="removeVersionFromDropZone('${side}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                    </svg>
+                    Remove
+                </button>
+            `;
+            
+            // Store the version data
+            if (side === 'left') {
+                leftDroppedVersion = versionData;
+            } else {
+                rightDroppedVersion = versionData;
+            }
+        }
+
+        // Remove version from drop zone
+        function removeVersionFromDropZone(side) {
+            const dropZoneContent = document.querySelector(`#${side}DropZone .drop-zone-content`);
+            const droppedVersionDiv = document.querySelector(`#${side}DroppedVersion`);
+            
+            // Show the placeholder content
+            dropZoneContent.style.display = 'block';
+            
+            // Hide the dropped version
+            droppedVersionDiv.style.display = 'none';
+            droppedVersionDiv.innerHTML = '';
+            
+            // Clear the stored data
+            if (side === 'left') {
+                leftDroppedVersion = null;
+            } else {
+                rightDroppedVersion = null;
+            }
+            
+            updateCompareButton();
+        }
+
+        // Clear comparison
+        function clearComparison() {
+            removeVersionFromDropZone('left');
+            removeVersionFromDropZone('right');
+        }
+
+        // Update compare button state
+        function updateCompareButton() {
+            const compareButton = document.getElementById('compareButton');
+            const canCompare = leftDroppedVersion && rightDroppedVersion;
+            
+            compareButton.disabled = !canCompare;
+            compareButton.classList.toggle('btn-primary', canCompare);
+            compareButton.classList.toggle('btn-secondary', !canCompare);
+        }
+
+        // Open version comparison modal
+        function openVersionComparison() {
+            if (!leftDroppedVersion || !rightDroppedVersion) {
+                showToast('Error', 'Please select two versions to compare', 'warning');
+                return;
+            }
+            
+            const artworkId = leftDroppedVersion.artworkId;
+            const version1Id = leftDroppedVersion.id === 'current' ? 'current' : leftDroppedVersion.id;
+            const version2Id = rightDroppedVersion.id === 'current' ? 'current' : rightDroppedVersion.id;
+            
+            // Show loading animation
+            const modal = new bootstrap.Modal(document.getElementById('versionComparisonModal'));
+            const comparisonContent = document.getElementById('comparisonContent');
+            
+            comparisonContent.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <div class="paintbrush-loader mx-auto mb-3"></div>
+                    <p class="text-muted">Loading comparison...</p>
+                </div>
+            `;
+            
+            modal.show();
+            
+            // Fetch comparison data
+            fetch(`/api/artworks/${artworkId}/compare/?version1=${version1Id}&version2=${version2Id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load comparison data');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayComparisonResults(data);
+                })
+                .catch(error => {
+                    console.error('Error loading comparison:', error);
+                    comparisonContent.innerHTML = `
+                        <div class="col-12 text-center py-5">
+                            <div class="alert alert-danger">
+                                <h5>Comparison Failed</h5>
+                                <p>Unable to load version comparison. Please try again.</p>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
+
+        // Display comparison results
+        function displayComparisonResults(data) {
+            const comparisonContent = document.getElementById('comparisonContent');
+            const version1 = data.version1;
+            const version2 = data.version2;
+            const differences = data.differences || {};
+            
+            comparisonContent.innerHTML = `
+                <div class="col-6">
+                    <div class="card bg-secondary h-100">
+                        <div class="card-header bg-primary">
+                            <h6 class="mb-0">${version1.version_number}</h6>
+                        </div>
+                        <div class="card-body">
+                            ${version1.image_display_url ? 
+                                `<img src="${version1.image_display_url}" class="img-fluid mb-3 rounded" alt="${version1.title}">` :
+                                '<div class="bg-dark p-4 text-center mb-3 rounded"><span class="text-muted">No Image</span></div>'
+                            }
+                            <h6>${version1.title}</h6>
+                            <p class="small text-muted">${version1.description}</p>
+                            ${version1.medium ? `<p><strong>Medium:</strong> ${version1.medium}</p>` : ''}
+                            ${version1.dimensions ? `<p><strong>Dimensions:</strong> ${version1.dimensions}</p>` : ''}
+                            ${version1.tags ? `<p><strong>Tags:</strong> ${version1.tags}</p>` : ''}
+                            <p class="small text-muted">Created: ${new Date(version1.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="card bg-secondary h-100">
+                        <div class="card-header bg-success">
+                            <h6 class="mb-0">${version2.version_number}</h6>
+                        </div>
+                        <div class="card-body">
+                            ${version2.image_display_url ? 
+                                `<img src="${version2.image_display_url}" class="img-fluid mb-3 rounded" alt="${version2.title}">` :
+                                '<div class="bg-dark p-4 text-center mb-3 rounded"><span class="text-muted">No Image</span></div>'
+                            }
+                            <h6>${version2.title}</h6>
+                            <p class="small text-muted">${version2.description}</p>
+                            ${version2.medium ? `<p><strong>Medium:</strong> ${version2.medium}</p>` : ''}
+                            ${version2.dimensions ? `<p><strong>Dimensions:</strong> ${version2.dimensions}</p>` : ''}
+                            ${version2.tags ? `<p><strong>Tags:</strong> ${version2.tags}</p>` : ''}
+                            <p class="small text-muted">Created: ${new Date(version2.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                </div>
+                ${Object.keys(differences).length > 0 ? `
+                <div class="col-12 mt-3">
+                    <div class="card bg-dark">
+                        <div class="card-header">
+                            <h6 class="mb-0">Detected Differences</h6>
+                        </div>
+                        <div class="card-body">
+                            ${Object.entries(differences).map(([field, diff]) => `
+                                <div class="mb-2">
+                                    <strong>${field.charAt(0).toUpperCase() + field.slice(1)}:</strong>
+                                    <span class="text-warning">${diff}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                ` : ''}
+            `;
+        }
 
         // Function to show delete version modal
         function deleteVersion(versionId, versionNumber) {
