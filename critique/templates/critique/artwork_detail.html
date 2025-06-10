@@ -255,13 +255,7 @@
                             </label>
                         </div>
                         
-                        <!-- Archived Versions Toggle -->
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="showArchivedToggle" onchange="toggleArchivedVersions()">
-                            <label class="form-check-label text-muted small" for="showArchivedToggle">
-                                Show archived versions
-                            </label>
-                        </div>
+
                         
 
                         
@@ -332,16 +326,70 @@
         <div class="modal-dialog modal-xl">
             <div class="modal-content bg-dark text-white">
                 <div class="modal-header border-secondary">
-                    <h5 class="modal-title" id="versionComparisonModalLabel">Version Comparison</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="versionComparisonModalLabel">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrows-expand me-2" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13A.5.5 0 0 1 1 8zM7.646.146a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 1.707V5.5a.5.5 0 0 1-1 0V1.707L6.354 2.854a.5.5 0 1 1-.708-.708l2-2zM8 10a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 14.293V10.5A.5.5 0 0 1 8 10z"/>
+                        </svg>
+                        Version Comparison
+                    </h5>
+                    <div class="d-flex align-items-center">
+                        <!-- View Mode Toggle -->
+                        <div class="btn-group me-3" role="group" aria-label="View mode">
+                            <input type="radio" class="btn-check" name="viewMode" id="sideBySideMode" checked>
+                            <label class="btn btn-outline-light btn-sm" for="sideBySideMode">Side-by-Side</label>
+                            
+                            <input type="radio" class="btn-check" name="viewMode" id="overlayMode">
+                            <label class="btn btn-outline-light btn-sm" for="overlayMode">Overlay</label>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <div class="row" id="comparisonContent">
-                        <!-- Comparison content will be loaded here -->
+                <div class="modal-body p-0">
+                    <!-- Comparison Status Bar -->
+                    <div class="bg-secondary p-3 border-bottom border-dark">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div id="comparisonStatus" class="text-light">
+                                <span class="badge bg-info me-2">Analyzing</span>
+                                Comparing selected versions...
+                            </div>
+                            <button class="btn btn-sm btn-outline-light" onclick="swapVersions()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-arrow-left-right me-1" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5zm14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5z"/>
+                                </svg>
+                                Swap
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Side-by-Side View -->
+                    <div id="sideBySideView" class="p-3">
+                        <div class="row g-4" id="comparisonContent">
+                            <!-- Comparison content will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Overlay View -->
+                    <div id="overlayView" class="p-3" style="display: none;">
+                        <div class="position-relative" id="overlayContainer">
+                            <!-- Overlay comparison content -->
+                        </div>
+                        <div class="mt-3">
+                            <label for="overlaySlider" class="form-label small">Opacity Control</label>
+                            <input type="range" class="form-range" min="0" max="100" value="50" id="overlaySlider">
+                            <div class="d-flex justify-content-between small text-muted">
+                                <span>Left Version</span>
+                                <span>Right Version</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-secondary">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <div class="d-flex justify-content-between w-100">
+                        <div>
+                            <span class="text-muted small">Differences found: <span id="diffCount">0</span></span>
+                        </div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -445,7 +493,7 @@
     <script>
         // Toggle archived versions visibility (only for artwork authors)
         function toggleArchivedVersions() {
-            const checkbox = document.getElementById('showArchivedToggle');
+            const checkbox = document.getElementById('showArchivedVersions');
             
             // If toggle doesn't exist (non-author), do nothing
             if (!checkbox) {
@@ -697,49 +745,127 @@
                 });
         }
 
-        // Display comparison results
+        // Display comparison results with comprehensive analysis
         function displayComparisonResults(data) {
             const comparisonContent = document.getElementById('comparisonContent');
             const version1 = data.version1;
             const version2 = data.version2;
             const differences = data.differences || {};
             
+            // Analyze and count differences
+            const diffCount = analyzeDifferences(version1, version2, differences);
+            updateComparisonStatus(diffCount, differences);
+            
             comparisonContent.innerHTML = `
                 <div class="col-6">
                     <div class="card bg-secondary h-100">
-                        <div class="card-header bg-primary">
-                            <h6 class="mb-0">${version1.version_number}</h6>
+                        <div class="card-header bg-primary d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Version ${version1.version_number || 'Current'}</h6>
+                            <span class="badge bg-light text-dark">${formatDate(version1.created_at)}</span>
                         </div>
                         <div class="card-body">
-                            ${version1.image_display_url ? 
-                                `<img src="${version1.image_display_url}" class="img-fluid mb-3 rounded" alt="${version1.title}">` :
-                                '<div class="bg-dark p-4 text-center mb-3 rounded"><span class="text-muted">No Image</span></div>'
-                            }
-                            <h6>${version1.title}</h6>
-                            <p class="small text-muted">${version1.description}</p>
-                            ${version1.medium ? `<p><strong>Medium:</strong> ${version1.medium}</p>` : ''}
-                            ${version1.dimensions ? `<p><strong>Dimensions:</strong> ${version1.dimensions}</p>` : ''}
-                            ${version1.tags ? `<p><strong>Tags:</strong> ${version1.tags}</p>` : ''}
-                            <p class="small text-muted">Created: ${new Date(version1.created_at).toLocaleDateString()}</p>
+                            <!-- Image Section with Diff Highlighting -->
+                            <div class="mb-3 position-relative">
+                                ${version1.image_url ? 
+                                    `<img src="${version1.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version1.version_number}" style="max-height: 300px; width: 100%; object-fit: cover;">
+                                     ${differences.image ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Changed</span></div>' : ''}` : 
+                                    '<div class="bg-dark p-5 rounded text-center"><span class="text-muted">No Image</span></div>'
+                                }
+                            </div>
+                            
+                            <!-- Metadata with Diff Highlighting -->
+                            <div class="small">
+                                <div class="mb-3">
+                                    <strong>Title:</strong>
+                                    <div class="p-2 rounded ${differences.title ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        <span class="${differences.title ? 'text-warning fw-bold' : 'text-light'}">${version1.title || 'Untitled'}</span>
+                                        ${differences.title ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Description:</strong>
+                                    <div class="p-2 rounded ${differences.description ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        <span class="${differences.description ? 'text-warning' : 'text-muted'}">${version1.description || 'No description'}</span>
+                                        ${differences.description ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Tags:</strong>
+                                    <div class="p-2 rounded ${differences.tags ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        ${version1.tags && version1.tags.length > 0 ? 
+                                            version1.tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('') : 
+                                            '<span class="text-muted">No tags</span>'
+                                        }
+                                        ${differences.tags ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <strong>Status:</strong>
+                                    <div class="p-2 rounded ${differences.status ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        <span class="badge ${getStatusBadgeClass(version1.status)}">${version1.status || 'Draft'}</span>
+                                        ${differences.status ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="card bg-secondary h-100">
-                        <div class="card-header bg-success">
-                            <h6 class="mb-0">${version2.version_number}</h6>
+                        <div class="card-header bg-success d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0">Version ${version2.version_number || 'Current'}</h6>
+                            <span class="badge bg-light text-dark">${formatDate(version2.created_at)}</span>
                         </div>
                         <div class="card-body">
-                            ${version2.image_display_url ? 
-                                `<img src="${version2.image_display_url}" class="img-fluid mb-3 rounded" alt="${version2.title}">` :
-                                '<div class="bg-dark p-4 text-center mb-3 rounded"><span class="text-muted">No Image</span></div>'
-                            }
-                            <h6>${version2.title}</h6>
-                            <p class="small text-muted">${version2.description}</p>
-                            ${version2.medium ? `<p><strong>Medium:</strong> ${version2.medium}</p>` : ''}
-                            ${version2.dimensions ? `<p><strong>Dimensions:</strong> ${version2.dimensions}</p>` : ''}
-                            ${version2.tags ? `<p><strong>Tags:</strong> ${version2.tags}</p>` : ''}
-                            <p class="small text-muted">Created: ${new Date(version2.created_at).toLocaleDateString()}</p>
+                            <!-- Image Section with Diff Highlighting -->
+                            <div class="mb-3 position-relative">
+                                ${version2.image_url ? 
+                                    `<img src="${version2.image_url}" class="img-fluid rounded ${differences.image ? 'border border-warning border-3' : ''}" alt="Version ${version2.version_number}" style="max-height: 300px; width: 100%; object-fit: cover;">
+                                     ${differences.image ? '<div class="position-absolute top-0 end-0 m-2"><span class="badge bg-warning"><i class="bi bi-exclamation-triangle"></i> Changed</span></div>' : ''}` : 
+                                    '<div class="bg-dark p-5 rounded text-center"><span class="text-muted">No Image</span></div>'
+                                }
+                            </div>
+                            
+                            <!-- Metadata with Diff Highlighting -->
+                            <div class="small">
+                                <div class="mb-3">
+                                    <strong>Title:</strong>
+                                    <div class="p-2 rounded ${differences.title ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        <span class="${differences.title ? 'text-warning fw-bold' : 'text-light'}">${version2.title || 'Untitled'}</span>
+                                        ${differences.title ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Description:</strong>
+                                    <div class="p-2 rounded ${differences.description ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        <span class="${differences.description ? 'text-warning' : 'text-muted'}">${version2.description || 'No description'}</span>
+                                        ${differences.description ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <strong>Tags:</strong>
+                                    <div class="p-2 rounded ${differences.tags ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        ${version2.tags && version2.tags.length > 0 ? 
+                                            version2.tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('') : 
+                                            '<span class="text-muted">No tags</span>'
+                                        }
+                                        ${differences.tags ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-2">
+                                    <strong>Status:</strong>
+                                    <div class="p-2 rounded ${differences.status ? 'bg-warning bg-opacity-25 border border-warning' : 'bg-dark'}">
+                                        <span class="badge ${getStatusBadgeClass(version2.status)}">${version2.status || 'Draft'}</span>
+                                        ${differences.status ? '<span class="badge bg-warning ms-2">Changed</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
