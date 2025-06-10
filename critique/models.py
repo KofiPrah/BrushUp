@@ -191,6 +191,11 @@ class ArtWorkVersion(models.Model):
         unique_together = ['artwork', 'version_number']
         ordering = ['-version_number']
     
+    @property
+    def is_archived(self):
+        """Check if this version is archived based on version_notes"""
+        return self.version_notes and '[ARCHIVED:' in self.version_notes
+    
     def __str__(self):
         return f"{self.artwork.title} - Version {self.version_number}"
 

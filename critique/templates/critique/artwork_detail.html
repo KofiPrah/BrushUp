@@ -592,6 +592,43 @@
             });
         }
 
+        // Function to unarchive a version
+        function unarchiveVersion(versionId) {
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Send unarchive request
+            fetch(`/api/versions/${versionId}/unarchive/`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Show success message
+                showToast('Success', 'Version unarchived successfully.', 'success');
+
+                // Refresh page after a delay
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error unarchiving version:', error);
+                showToast('Error', 'Failed to unarchive version. Please try again.', 'danger');
+            });
+        }
+
         // Helper function to show toast notifications
         function showToast(title, message, type) {
             // Implementation depends on your toast system

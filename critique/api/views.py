@@ -2048,3 +2048,29 @@ class ArtworkVersionReorderView(APIView):
         except ArtWork.DoesNotExist:
             return Response({'error': 'Artwork not found or not owned by user'}, 
                           status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unarchive_artwork_version(request, version_id):
+    """Unarchive a specific version"""
+    try:
+        version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+        
+        # Remove archive note from version notes
+        if version.version_notes and '[ARCHIVED:' in version.version_notes:
+            # Remove all archive notes
+            lines = version.version_notes.split('\n')
+            filtered_lines = [line for line in lines if not line.strip().startswith('[ARCHIVED:')]
+            version.version_notes = '\n'.join(filtered_lines).strip()
+            version.save()
+        
+        return Response({
+            'message': f'Version {version.version_number} unarchived successfully',
+            'success': True,
+            'status': 'active',
+            'version_id': version.id,
+            'version_number': version.version_number
+        })
+    except ArtWorkVersion.DoesNotExist:
+        return Response({'error': 'Version not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)
