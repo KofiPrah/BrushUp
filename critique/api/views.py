@@ -1617,6 +1617,52 @@ def delete_artwork_version(request, version_id):
                       status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
+@permission_classes([permissions.IsAuthenticatedOrReadOnly])
+def switch_artwork_version(request, artwork_id, version_id):
+    """Switch the main artwork display to a specific version."""
+    try:
+        artwork = ArtWork.objects.get(id=artwork_id)
+        
+        # Check if user has permission to view this artwork
+        if artwork.folder and not artwork.folder.is_viewable_by(request.user):
+            return Response(
+                {'error': 'Not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Get the version
+        version = ArtWorkVersion.objects.get(id=version_id, artwork=artwork)
+        
+        # Check if version is archived and user is not the author
+        if version.is_archived and request.user != artwork.author:
+            return Response(
+                {'error': 'Version not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Return version data for frontend to update the display
+        return Response({
+            'success': True,
+            'version_number': version.version_number,
+            'image_url': version.image.url if version.image else version.image_url,
+            'title': version.title or artwork.title,
+            'description': version.description or artwork.description,
+            'total_versions': artwork.versions.count(),
+            'message': f'Switched to version {version.version_number}'
+        })
+        
+    except ArtWork.DoesNotExist:
+        return Response(
+            {'error': 'Artwork not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    except ArtWorkVersion.DoesNotExist:
+        return Response(
+            {'error': 'Version not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+@api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def archive_artwork_version(request, version_id):
     """Archive a specific version"""
@@ -1642,6 +1688,64 @@ def archive_artwork_version(request, version_id):
     except ArtWorkVersion.DoesNotExist:
         return Response({'error': 'Version not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def hide_critique(request, critique_id):
+    """Hide a critique (only artwork author can hide)"""
+    try:
+        critique = Critique.objects.get(id=critique_id)
+        
+        # Check if user is the artwork author
+        if request.user != critique.artwork.author:
+            return Response(
+                {'error': 'Only artwork author can hide critiques'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        critique.is_hidden = True
+        critique.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Critique hidden successfully',
+            'critique_id': critique.id
+        })
+        
+    except Critique.DoesNotExist:
+        return Response(
+            {'error': 'Critique not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def unhide_critique(request, critique_id):
+    """Unhide a critique (only artwork author can unhide)"""
+    try:
+        critique = Critique.objects.get(id=critique_id)
+        
+        # Check if user is the artwork author
+        if request.user != critique.artwork.author:
+            return Response(
+                {'error': 'Only artwork author can unhide critiques'}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        critique.is_hidden = False
+        critique.save()
+        
+        return Response({
+            'success': True,
+            'message': 'Critique unhidden successfully',
+            'critique_id': critique.id
+        })
+        
+    except Critique.DoesNotExist:
+        return Response(
+            {'error': 'Critique not found'}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
 
 class ArtworkVersionViewSet(viewsets.ModelViewSet):
     """ViewSet for artwork version management"""

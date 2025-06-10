@@ -5,8 +5,9 @@ from .views import (
     CritiqueViewSet, health_check,
     ReactionViewSet, NotificationViewSet, FolderViewSet,
     create_artwork_version, get_artwork_version, 
-    delete_artwork_version, archive_artwork_version, ArtworkVersionViewSet,
-    ArtworkVersionCompareView, ArtworkVersionRestoreView, ArtworkVersionReorderView
+    delete_artwork_version, archive_artwork_version, switch_artwork_version, ArtworkVersionViewSet,
+    ArtworkVersionCompareView, ArtworkVersionRestoreView, ArtworkVersionReorderView,
+    hide_critique, unhide_critique
 )
 
 # Create a router and register our viewsets with it
@@ -29,9 +30,13 @@ urlpatterns = [
     # Artwork versioning endpoints
     path('artworks/<int:artwork_id>/versions/', create_artwork_version, name='artwork-versions'),
     path('artworks/<int:artwork_id>/versions/<int:version_id>/', get_artwork_version, name='artwork-version-detail'),
+    path('artworks/<int:artwork_id>/switch-version/<int:version_id>/', switch_artwork_version, name='artwork-switch-version'),
     path('artworks/<int:artwork_id>/versions/compare/', ArtworkVersionCompareView.as_view(), name='artwork-versions-compare'),
     path('artworks/<int:artwork_id>/versions/<int:version_id>/restore/', ArtworkVersionRestoreView.as_view(), name='artwork-version-restore'),
     path('artworks/<int:artwork_id>/versions/reorder/', ArtworkVersionReorderView.as_view(), name='artwork-version-reorder'),
     path('artworks/versions/<int:version_id>/delete/', delete_artwork_version, name='artwork-version-delete'),
-    path('artworks/versions/<int:version_id>/archive/', archive_artwork_version, name='artwork-version-archive'),
+    path('versions/<int:version_id>/archive/', archive_artwork_version, name='version-archive'),
+    path('versions/<int:version_id>/unarchive/', archive_artwork_version, name='version-unarchive'),
+    path('critiques/<int:critique_id>/hide/', hide_critique, name='critique-hide'),
+    path('critiques/<int:critique_id>/unhide/', unhide_critique, name='critique-unhide'),
 ]
