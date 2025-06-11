@@ -37,6 +37,7 @@ urlpatterns = [
     
     # Folder URLs
     path('folders/<int:folder_id>/', views.folder_detail_view, name='folder_detail'),
+    path('portfolio-builder/', views.portfolio_builder, name='portfolio_builder'),
     
     # Authentication test
     path('auth-test/', views.auth_test, name='auth_test'),

@@ -848,3 +848,26 @@ def artwork_progress_view(request, pk):
     }
     
     return render(request, 'critique/artwork_progress.html', context)
+
+@login_required
+def portfolio_builder(request):
+    """
+    Drag-and-drop portfolio builder interface for organizing artworks into folders.
+    """
+    # Get user's folders
+    folders = Folder.objects.filter(owner=request.user).order_by('-updated_at')
+    
+    # Get unorganized artworks (not in any folder)
+    unorganized_artworks = ArtWork.objects.filter(
+        author=request.user,
+        folder__isnull=True
+    ).order_by('-created_at')
+    
+    context = {
+        'folders': folders,
+        'unorganized_artworks': unorganized_artworks,
+        'total_artworks': ArtWork.objects.filter(author=request.user).count(),
+        'organized_count': ArtWork.objects.filter(author=request.user, folder__isnull=False).count(),
+    }
+    
+    return render(request, 'critique/portfolio_builder.html', context)
