@@ -270,6 +270,39 @@
     }
 }
 
+/* Emergency fix for rogue full-size images */
+.portfolio-builder img:not(.artwork-thumbnail) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    max-height: 300px;
+    object-fit: contain;
+    box-shadow: 0 0 0 2px #ffc107;
+}
+
+/* Additional constraints for unorganized artwork zone */
+.unorganized-artworks .artwork-item {
+    align-items: flex-start !important;
+}
+
+.unorganized-artworks .portfolio-image-container {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    min-width: 80px;
+    min-height: 80px;
+}
+
+/* Ensure all artwork containers follow the same rules */
+.artwork-drop-zone .artwork-item {
+    align-items: flex-start !important;
+}
+
+.artwork-drop-zone .portfolio-image-container {
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .artwork-item {

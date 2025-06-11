@@ -1,0 +1,74 @@
+Thanks for the screenshot — it confirms the issue clearly. Your **full-size artwork image** is being injected without restriction into the unorganized artworks zone, likely because:
+
+* The image is rendered **outside** of a `.portfolio-image-container`
+* The markup does **not use the `.artwork-item` layout** intended for portfolio builder thumbnails
+* Possibly missing fallback image handling when no folder exists (so the art floats unstyled)
+
+---
+
+### ✅ Fix: Wrap the Artwork in a Thumbnail Container
+
+If this image is rendering **without being in a folder or drop zone**, ensure the template wraps it with the correct layout. In your `portfolio_builder.html`, confirm this section:
+
+```django
+{% for artwork in unorganized_artworks %}
+<div class="artwork-item d-flex align-items-center" data-artwork-id="{{ artwork.id }}">
+    <div class="me-3">
+        <div class="portfolio-image-container">
+            {% if artwork.image %}
+                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
+            {% else %}
+                <div class="d-flex align-items-center justify-content-center h-100">
+                    <i class="bi bi-image text-muted"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    ...
+</div>
+{% endfor %}
+```
+
+But if your image is rendering like a **full-size preview** instead, that likely means you have:
+
+```django
+<img src="{{ artwork.image.url }}">
+```
+
+…rendering directly somewhere outside that loop or inside a misidentified zone.
+
+---
+
+### 🔧 Emergency CSS Patch (for rogue full images)
+
+Until you fix the template logic, use this CSS band-aid to suppress unstyled images:
+
+```css
+.portfolio-builder img:not(.artwork-thumbnail) {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    max-height: 300px;
+    object-fit: contain;
+    box-shadow: 0 0 0 2px #ffc107;
+}
+```
+
+This limits large unwrapped `<img>` elements visually while helping you spot them.
+
+---
+
+### ✅ Final Fix Suggestion
+
+Look in your view or template and check whether you're accidentally rendering something like:
+
+```django
+{% for artwork in artworks %}
+    <img src="{{ artwork.image.url }}">
+{% endfor %}
+```
+
+…instead of using the thumbnail layout with `.artwork-item` + `.portfolio-image-container`.
+
+Let me know if you want me to extract and rewrite the correct snippet from the file.
