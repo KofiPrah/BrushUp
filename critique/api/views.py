@@ -836,14 +836,9 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         """
         critique = self.get_object()
 
-        # Validate reaction type
-        reaction_type = request.data.get('type')
+        # Validate reaction type - try both 'type' and 'reaction_type' fields
+        reaction_type = request.data.get('type') or request.data.get('reaction_type')
         valid_types = [choice[0] for choice in Reaction.ReactionType.choices]
-        
-        # Debug logging
-        print(f"DEBUG: Received reaction_type: {reaction_type}")
-        print(f"DEBUG: Valid types: {valid_types}")
-        print(f"DEBUG: Request data: {request.data}")
         
         if not reaction_type:
             return Response(

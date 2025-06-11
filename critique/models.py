@@ -523,26 +523,30 @@ class Critique(models.Model):
     
     def has_engagement(self):
         """
-        Check if this critique has any engagement (replies or reactions).
-        Returns True if the critique has replies or reactions, False otherwise.
+        Check if this critique has any engagement (replies or reactions from others).
+        Returns True if the critique has replies or reactions from other users, False otherwise.
+        Author's own reactions don't count as engagement for deletion purposes.
         """
         # Check for replies
         has_replies = self.replies.exists()
         
-        # Check for reactions
-        has_reactions = self.reactions.exists()
+        # Check for reactions from other users (exclude author's own reactions)
+        has_reactions_from_others = self.reactions.exclude(user=self.author).exists()
         
-        return has_replies or has_reactions
+        return has_replies or has_reactions_from_others
     
     def get_engagement_summary(self):
         """
-        Get a summary of engagement for this critique.
-        Returns a dictionary with reply and reaction counts.
+        Get a summary of engagement for this critique from other users.
+        Returns a dictionary with reply and reaction counts (excluding author's own reactions).
         """
+        reply_count = self.replies.count()
+        reaction_count_from_others = self.reactions.exclude(user=self.author).count()
+        
         return {
-            'reply_count': self.replies.count(),
-            'reaction_count': self.reactions.count(),
-            'total_engagement': self.replies.count() + self.reactions.count()
+            'reply_count': reply_count,
+            'reaction_count': reaction_count_from_others,
+            'total_engagement': reply_count + reaction_count_from_others
         }
     
     def get_overall_score(self):
