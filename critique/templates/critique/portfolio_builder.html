@@ -489,14 +489,7 @@ div.portfolio-builder img {
                                             <p class="text-muted small mb-1">{{ artwork.description|truncatewords:10 }}</p>
                                             <small class="text-muted">{{ artwork.created_at|date:"M d, Y" }}</small>
                                         </div>
-                                        <div class="quick-actions">
-                                            <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-primary me-2">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <button class="btn btn-sm btn-outline-secondary" onclick="removeFromFolder({{ artwork.id }})">
-                                                <i class="bi bi-folder-x"></i>
-                                            </button>
-                                        </div>
+
                                     </div>
                                     {% endfor %}
                                 {% else %}
