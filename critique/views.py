@@ -308,6 +308,9 @@ class MyArtworksListView(LoginRequiredMixin, ListView):
         # Add current search query to context
         context['search_query'] = self.request.GET.get('search', '')
         
+        # Add user's folders for portfolio viewer
+        context['folders'] = Folder.objects.filter(owner=self.request.user).order_by('-updated_at')
+        
         return context
 
 

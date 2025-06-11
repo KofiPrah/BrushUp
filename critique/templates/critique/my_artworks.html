@@ -294,6 +294,32 @@
     cursor: not-allowed;
 }
 
+/* Portfolio Folder Cards */
+.folder-preview-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.125);
+}
+
+.folder-preview-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.folder-thumbnail {
+    transition: transform 0.2s ease;
+}
+
+.folder-thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.portfolio-folders-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    padding: 2rem;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
 /* Comparison modal styling */
 #versionComparisonModal .card {
     border: none;
@@ -502,6 +528,93 @@
                     </button>
                 </div>
             </div>
+            
+            <!-- Portfolio Folders Overview -->
+            {% if folders %}
+            <div class="portfolio-folders-section mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">
+                        <i class="bi bi-folder2 me-2"></i>
+                        Portfolio Folders
+                    </h4>
+                    <a href="{% url 'critique:portfolio_builder' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-tools me-1"></i>
+                        Organize Portfolio
+                    </a>
+                </div>
+                
+                <div class="row g-3">
+                    {% for folder in folders %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card folder-preview-card h-100">
+                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">
+                                    <i class="bi bi-folder me-2"></i>
+                                    {{ folder.name }}
+                                </h6>
+                                <span class="badge bg-light text-dark">{{ folder.artworks.count }}</span>
+                            </div>
+                            <div class="card-body p-2">
+                                {% if folder.artworks.exists %}
+                                <div class="folder-artworks-preview">
+                                    <div class="row g-1">
+                                        {% for artwork in folder.artworks.all|slice:":4" %}
+                                        <div class="col-6">
+                                            <div class="position-relative">
+                                                <a href="{% url 'critique:artwork_detail' artwork.id %}" class="d-block">
+                                                    {% if artwork.image %}
+                                                        <img src="{{ artwork.image.url }}" 
+                                                             class="img-fluid rounded folder-thumbnail" 
+                                                             alt="{{ artwork.title }}"
+                                                             style="width: 100%; height: 60px; object-fit: cover;">
+                                                    {% elif artwork.image_url %}
+                                                        <img src="{{ artwork.image_url }}" 
+                                                             class="img-fluid rounded folder-thumbnail" 
+                                                             alt="{{ artwork.title }}"
+                                                             style="width: 100%; height: 60px; object-fit: cover;">
+                                                    {% else %}
+                                                        <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                                                             style="height: 60px;">
+                                                            <i class="bi bi-image text-muted"></i>
+                                                        </div>
+                                                    {% endif %}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                        {% if folder.artworks.count > 4 %}
+                                        <div class="col-12 mt-2">
+                                            <small class="text-muted">+{{ folder.artworks.count|add:"-4" }} more artworks</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="text-center text-muted py-3">
+                                    <i class="bi bi-folder-plus display-6 mb-2"></i>
+                                    <p class="mb-0 small">Empty folder</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-light">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        Updated {{ folder.updated_at|timesince }} ago
+                                    </small>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'critique:portfolio_builder' %}#folder-{{ folder.id }}" 
+                                           class="btn btn-outline-secondary btn-sm" title="Edit Folder">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
             
             {% if artworks %}
                 <!-- Bulk Actions Bar (Hidden by default) -->
