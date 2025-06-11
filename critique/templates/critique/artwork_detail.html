@@ -2643,5 +2643,187 @@
         }
 
 
+        // Function to toggle reactions
+        function toggleReaction(button, critiqueId, reactionType) {
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Optimistic UI update
+            const isActive = button.classList.contains('active');
+            button.classList.toggle('active');
+            
+            const countSpan = button.querySelector(`.${reactionType.toLowerCase()}-count`);
+            let currentCount = parseInt(countSpan.textContent) || 0;
+            countSpan.textContent = isActive ? Math.max(0, currentCount - 1) : currentCount + 1;
+            
+            // Send API request
+            fetch(`/api/critiques/${critiqueId}/react/`, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ type: reactionType })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    // Revert optimistic update on failure
+                    button.classList.toggle('active');
+                    countSpan.textContent = currentCount;
+                    throw new Error('Failed to toggle reaction');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Update counts with server response
+                updateReactionCounts(critiqueId, data);
+            })
+            .catch(error => {
+                console.error('Error toggling reaction:', error);
+                showToast('Error', 'Failed to update reaction. Please try again.', 'danger');
+            });
+        }
+
+        // Update reaction counts from server response
+        function updateReactionCounts(critiqueId, data) {
+            const helpfulCount = document.querySelector(`[data-critique-id="${critiqueId}"][data-reaction-type="HELPFUL"] .helpful-count`);
+            const inspiringCount = document.querySelector(`[data-critique-id="${critiqueId}"][data-reaction-type="INSPIRING"] .inspiring-count`);
+            const detailedCount = document.querySelector(`[data-critique-id="${critiqueId}"][data-reaction-type="DETAILED"] .detailed-count`);
+            
+            if (helpfulCount) helpfulCount.textContent = data.helpful_count || 0;
+            if (inspiringCount) inspiringCount.textContent = data.inspiring_count || 0;
+            if (detailedCount) detailedCount.textContent = data.detailed_count || 0;
+        }
+
+        // Add reply to DOM
+        function addReplyToDOM(critiqueId, replyData) {
+            const repliesContainer = document.querySelector(`#replies-${critiqueId}`);
+            if (!repliesContainer) return;
+            
+            const replyHtml = `
+                <div class="border-start border-2 border-secondary ps-3 mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex align-items-center">
+                            <span class="fw-semibold text-info me-2">${replyData.author.username || 'Anonymous'}</span>
+                            <small class="text-muted">${new Date(replyData.created_at).toLocaleDateString()}</small>
+                        </div>
+                    </div>
+                    <p class="mb-0 text-light">${replyData.text}</p>
+                </div>
+            `;
+            
+            repliesContainer.insertAdjacentHTML('beforeend', replyHtml);
+        }
+
+        // Handle critique deletion
+        function deleteCritique(critiqueId) {
+            if (!confirm('Are you sure you want to delete this critique? This action cannot be undone.')) {
+                return;
+            }
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            // Send delete request
+            fetch(`/api/critiques/${critiqueId}/`, {
+                method: 'DELETE',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to delete critique');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Remove critique from DOM
+                const critiqueCard = document.querySelector(`[data-critique-id="${critiqueId}"]`).closest('.critique-card');
+                if (critiqueCard) {
+                    critiqueCard.remove();
+                }
+                
+                showToast('Success', 'Critique deleted successfully!', 'success');
+            })
+            .catch(error => {
+                console.error('Error deleting critique:', error);
+                showToast('Error', 'Failed to delete critique. Please try again.', 'danger');
+            });
+        }
+
+        // Handle reply form submission
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('submit-reply-btn')) {
+                const form = e.target.closest('form');
+                const critiqueId = form.querySelector('input[name="critique_id"]').value;
+                const replyText = form.querySelector('textarea[name="reply_text"]').value.trim();
+                
+                if (!replyText) {
+                    showToast('Error', 'Please enter a reply message.', 'danger');
+                    return;
+                }
+                
+                // Get CSRF token
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                
+                // Send reply request to corrected endpoint
+                fetch(`/api/critiques/${critiqueId}/replies/`, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-CSRFToken': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ text: replyText })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to submit reply');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Clear the form
+                    form.querySelector('textarea[name="reply_text"]').value = '';
+                    
+                    // Add new reply to the DOM
+                    addReplyToDOM(critiqueId, data);
+                    
+                    // Show success message
+                    showToast('Success', 'Reply posted successfully!', 'success');
+                })
+                .catch(error => {
+                    console.error('Error submitting reply:', error);
+                    showToast('Error', 'Failed to submit reply. Please try again.', 'danger');
+                });
+            }
+        });
+
+        // Fix float precision for all score displays on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fix scores with proper precision formatting
+            document.querySelectorAll('.score-display').forEach(element => {
+                const score = parseFloat(element.textContent);
+                if (!isNaN(score)) {
+                    element.textContent = score.toFixed(1);
+                }
+            });
+            
+            // Fix rating display elements
+            document.querySelectorAll('[data-score]').forEach(element => {
+                const score = parseFloat(element.dataset.score);
+                if (!isNaN(score)) {
+                    const textElement = element.querySelector('.score-text') || element;
+                    textElement.textContent = score.toFixed(1);
+                }
+            });
+        });
+
     </script>
 {% endblock %}
