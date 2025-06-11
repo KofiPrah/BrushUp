@@ -1005,6 +1005,19 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         
         # Check for engagement using the model method
         if critique.has_engagement():
+            print("------ CRITIQUE DELETION DEBUG ------")
+            print("Critique ID:", critique.id)
+            print("Author:", critique.author.username)
+            print("Requesting user:", request.user.username)
+            print("Replies count:", critique.replies.count())
+            print("Replies:", list(critique.replies.all().values('id', 'author__username', 'text')))
+            print("All reactions count:", critique.reactions.count())
+            print("All reactions:", list(critique.reactions.all().values('id', 'user__username', 'reaction_type')))
+            print("Reactions (excluding author):", list(critique.reactions.exclude(user=critique.author).values('id', 'user__username', 'reaction_type')))
+            print("Engagement summary:", critique.get_engagement_summary())
+            print("Has engagement?:", critique.has_engagement())
+            print("-------------------------------------")
+            
             engagement_summary = critique.get_engagement_summary()
             
             # Build detailed error message

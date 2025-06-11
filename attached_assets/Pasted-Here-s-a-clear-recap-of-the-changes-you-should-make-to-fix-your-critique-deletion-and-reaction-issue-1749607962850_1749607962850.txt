@@ -1,0 +1,88 @@
+Here’s a clear recap of the changes you should make to fix your critique deletion and reaction issues:
+
+---
+
+## ✅ 1. **Add Debug Logging to the `destroy()` Method**
+
+This will confirm whether there are replies or reactions (especially from other users) even if the frontend doesn't show them.
+
+### 🔧 In `CritiqueViewSet.destroy()` (likely in your `views.py`):
+
+```python
+if critique.has_engagement():
+    print("------ CRITIQUE DELETION DEBUG ------")
+    print("Critique ID:", critique.id)
+    print("Replies count:", critique.replies.count())
+    print("Replies:", list(critique.replies.all().values('id', 'author__username', 'text')))
+    print("Reactions (excluding author):", list(critique.reactions.exclude(user=critique.author).values('id', 'user__username', 'reaction_type')))
+    print("Engagement summary:", critique.get_engagement_summary())
+    print("Has engagement?:", critique.has_engagement())
+    print("-------------------------------------")
+    
+    return Response(
+        {"detail": "You can only delete critiques with no replies or reactions"},
+        status=status.HTTP_403_FORBIDDEN
+    )
+```
+
+---
+
+## ✅ 2. **Confirm Your `has_engagement()` Method Is Working as Intended**
+
+You're already using this in `Critique`:
+
+```python
+def has_engagement(self):
+    return self.replies.exists() or self.reactions.exclude(user=self.author).exists()
+```
+
+Keep it as-is **if you're not doing soft deletes**.
+
+> If you ever add soft-delete flags (like `is_active`, `deleted`), you'll need to filter those too.
+
+---
+
+## ✅ 3. **Add Temporary Debug to the Template (Optional but Helpful)**
+
+In `critique_card.html` or `artwork_detail.html`, add this near the bottom of the critique card:
+
+```html
+<small class="text-muted">
+    Debug: Replies = {{ critique.replies.count }}, 
+    Helpful = {{ critique.get_helpful_count }}, 
+    Inspiring = {{ critique.get_inspiring_count }}, 
+    Detailed = {{ critique.get_detailed_count }}
+</small>
+```
+
+This will show you what the backend sees for each critique and help you visually confirm why deletion might be blocked.
+
+---
+
+## ✅ 4. **(Optional) Improve User Feedback When Deletion Fails**
+
+In your JS where you handle deletion, catch the 403 and show a helpful message:
+
+```js
+if (error.response.status === 403) {
+  showToast("This critique has replies or reactions from others and cannot be deleted.");
+}
+```
+
+---
+
+## ✅ 5. **Frontend Form Fix for Reactions (Already Looks Correct)**
+
+Make sure your AJAX `POST` request for reactions **includes** `reaction_type`, like:
+
+```js
+await axios.post(`/api/critiques/${critiqueId}/react/`, {
+  reaction_type: "HELPFUL"
+});
+```
+
+> You're already doing this in the Django form—just ensure your JS does the same if using async toggles.
+
+---
+
+Let me know if you want me to help apply these directly or prepare a version of the modified `destroy()` method.

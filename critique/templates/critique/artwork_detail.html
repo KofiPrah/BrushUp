@@ -2838,7 +2838,20 @@
                         }
                         
                         if (response.status === 403) {
-                            throw new Error(errorData.error || 'This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.');
+                            // Extract detailed error message from API response
+                            const errorMessage = errorData.error || 'This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.';
+                            const details = errorData.details || '';
+                            const suggestion = errorData.suggestion || '';
+                            
+                            let fullMessage = errorMessage;
+                            if (details) {
+                                fullMessage += ` (${details})`;
+                            }
+                            if (suggestion) {
+                                fullMessage += ` ${suggestion}`;
+                            }
+                            
+                            throw new Error(fullMessage);
                         } else if (response.status === 404) {
                             throw new Error('Critique not found');
                         } else {

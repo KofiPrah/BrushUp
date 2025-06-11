@@ -115,5 +115,16 @@
             {% endif %}
         </div>
         {% endif %}
+        
+        <!-- Debug information (remove in production) -->
+        <div class="mt-2">
+            <small class="text-muted">
+                Debug: Replies = {{ critique.replies.count }}, 
+                Helpful = {{ critique.get_helpful_count }}, 
+                Inspiring = {{ critique.get_inspiring_count }}, 
+                Detailed = {{ critique.get_detailed_count }},
+                Has engagement = {{ critique.has_engagement }}
+            </small>
+        </div>
     </div>
 </div>
