@@ -24,6 +24,9 @@ router.register(r'versions', ArtworkVersionViewSet, basename='version')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [
+    # Custom endpoints that need to be before the router
+    path('artworks/move-to-folder/', move_artwork_to_folder, name='artwork-move-to-folder'),
+    
     path('', include(router.urls)),
     path('auth/', include('critique.api.auth_urls')),  # Authentication endpoints
     path('health/', health_check, name='api-health-check'),
@@ -40,5 +43,4 @@ urlpatterns = [
     path('versions/<int:version_id>/unarchive/', unarchive_artwork_version, name='version-unarchive'),
     path('critiques/<int:critique_id>/hide/', hide_critique, name='critique-hide'),
     path('critiques/<int:critique_id>/unhide/', unhide_critique, name='critique-unhide'),
-    path('artworks/move-to-folder/', move_artwork_to_folder, name='artwork-move-to-folder'),
 ]
