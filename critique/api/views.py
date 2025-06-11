@@ -844,40 +844,15 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         This will create the reaction if it doesn't exist or remove it if it does,
         effectively toggling the reaction status.
         """
-        try:
-            critique = self.get_object()
-
-            # Debug logging
-            print(f"DEBUG: React endpoint called for critique {pk}")
-            print(f"DEBUG: Request method: {request.method}")
-            print(f"DEBUG: Request data: {request.data}")
-            print(f"DEBUG: Request content type: {request.content_type}")
-            print(f"DEBUG: User: {request.user}")
-
-            # Validate reaction type - try both 'type' and 'reaction_type' fields
-            reaction_type = request.data.get('type') or request.data.get('reaction_type')
-            valid_types = [choice[0] for choice in Reaction.ReactionType.choices]
-            
-            print(f"DEBUG: Extracted reaction_type: {reaction_type}")
-            print(f"DEBUG: Valid types: {valid_types}")
-            
-            if not reaction_type:
-                return Response(
-                    {"error": "Reaction type is required", "valid_types": valid_types, "received_data": dict(request.data)},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-                
-            if reaction_type not in valid_types:
-                return Response(
-                    {"error": f"Invalid reaction type '{reaction_type}'. Allowed values: {valid_types}"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-        except Exception as e:
-            print(f"DEBUG: Exception in react endpoint: {e}")
-            return Response(
-                {"error": f"Server error: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        # Early return with debug info to test if endpoint is reachable
+        return Response({
+            "debug": "Reaction endpoint reached",
+            "method": request.method,
+            "pk": pk,
+            "user": str(request.user),
+            "data": request.data,
+            "valid_types": [choice[0] for choice in Reaction.ReactionType.choices]
+        })
 
         # Check if user already gave this reaction type to this critique
         existing_reaction = Reaction.objects.filter(

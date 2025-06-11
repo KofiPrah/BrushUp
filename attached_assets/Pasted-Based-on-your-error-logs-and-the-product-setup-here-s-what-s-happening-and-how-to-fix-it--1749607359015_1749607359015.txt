@@ -1,0 +1,70 @@
+Based on your error logs and the product setup, here’s what’s happening and how to fix it:
+
+---
+
+### 🔴 **Issue 1: Reaction Failing (400 Bad Request)**
+
+**Errors:**
+
+```
+POST /api/critiques/16/react/ 400 (Bad Request)
+Error toggling reaction: Error: Failed to toggle reaction
+```
+
+**Likely Causes:**
+
+1. The request payload might be missing or incorrectly formatted.
+2. The backend expects a `reaction_type` (e.g., `"HELPFUL"`, `"INSPIRING"`, `"DETAILED"`) in the body of the POST request.
+
+**Fix:**
+Make sure your JavaScript function that sends the request includes the correct payload and headers:
+
+```js
+await axios.post(`/api/critiques/${critiqueId}/react/`, {
+  reaction_type: "HELPFUL" // or "INSPIRING", "DETAILED"
+}, {
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+```
+
+---
+
+### 🔴 **Issue 2: Deletion Failing (403 Forbidden)**
+
+**Errors:**
+
+```
+DELETE /api/critiques/16/ 403 (Forbidden)
+Error deleting critique: Error: You can only delete critiques with no replies or reactions
+```
+
+**Behavior is expected if:**
+
+* The critique has **at least one reaction or reply**, based on your logic: *“Users can delete their own critique only if it has no reactions or replies”*.
+
+**Fix or UX Suggestion:**
+
+* You should **catch this error in the frontend** and show a user-friendly message:
+
+```js
+if (error.response.status === 403) {
+  showToast("This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.");
+}
+```
+
+---
+
+### ✅ **Checklist for Debugging and Fixes**
+
+| Area       | What to Check                                                                                     |
+| ---------- | ------------------------------------------------------------------------------------------------- |
+| ✅ Reaction | `POST` request body must include `reaction_type`.                                                 |
+| ✅ Delete   | Server-side permission is working correctly. Don't change unless logic needs to be updated.       |
+| 🔄 UX      | Add frontend error handling + messages for these common failures.                                 |
+| 🧪 Backend | Confirm `@action` in Django ViewSet for `react` correctly handles input and enforces constraints. |
+
+---
+
+Let me know if you want help rewriting the frontend functions or the backend view handling `/react/`.

@@ -1,0 +1,101 @@
+Thanks for the clarification — if you're seeing critiques with **0 visible reactions or replies** still failing to delete with a `403`, then **either:**
+
+1. 🧩 **The frontend is failing to display correct reaction/reply counts**, misleading you.
+2. 🐞 **The backend is miscalculating the presence of reactions or replies**, incorrectly blocking deletion.
+
+Let’s break this down:
+
+---
+
+### ✅ 1. **Check if the Critique *actually* has reactions/replies in the database**
+
+In your Django `CritiqueViewSet` or delete method, you likely have logic like:
+
+```python
+if critique.reactions.exists() or critique.replies.exists():
+    return Response({"detail": "You can only delete critiques with no replies or reactions"}, status=403)
+```
+
+🔍 **Problem**: `.reactions.exists()` or `.replies.exists()` will always return `True` if:
+
+* You didn’t set up the related name correctly
+* Or you have ghost (or soft-deleted) data still in the table
+
+✅ **Solution**: Add debugging print/logs in your `destroy()` method to check actual counts:
+
+```python
+print("Reactions count:", critique.reactions.count())
+print("Replies count:", critique.replies.count())
+```
+
+Then reattempt the delete and check your server logs.
+
+---
+
+### ✅ 2. **Confirm `related_name` is used correctly in your models**
+
+Check your `Reaction` and `Reply` models:
+
+```python
+class Reaction(models.Model):
+    critique = models.ForeignKey(Critique, related_name='reactions', ...)
+    ...
+
+class Critique(models.Model):
+    parent = models.ForeignKey('self', related_name='replies', null=True, blank=True, ...)
+```
+
+❗If you forgot `related_name`, then `critique.reactions` or `critique.replies` may not be valid.
+
+---
+
+### ✅ 3. **Check for soft-deleted reactions or replies**
+
+If you implemented **soft deletion** (e.g. marking deleted rows with `is_deleted=True` instead of removing them), then:
+
+* `.exists()` will still return `True` unless you filter them out:
+
+```python
+critique.reactions.filter(is_deleted=False).exists()
+```
+
+---
+
+### ✅ 4. **Frontend Check: Make sure you're displaying the counts**
+
+In your React or Django Template:
+
+```js
+<div>{critique.reactions.length} Reactions</div>
+<div>{critique.replies.length} Replies</div>
+```
+
+If the counts are `undefined` or always zero:
+
+* You might not be fetching reactions/replies in your API response.
+* You need to update your serializer to include `.count()` fields.
+
+---
+
+### Want a Hotfix Right Now?
+
+If you're stuck and want to temporarily **bypass deletion constraints**, you can:
+
+```python
+# TEMPORARY PATCH for debugging
+def destroy(self, request, *args, **kwargs):
+    critique = self.get_object()
+    print("Reactions:", critique.reactions.count())
+    print("Replies:", critique.replies.count())
+    return super().destroy(request, *args, **kwargs)
+```
+
+Then confirm if it deletes properly and what those counts show.
+
+---
+
+Let me know if you want me to help:
+
+* Review your `Critique` and `Reaction` models
+* Patch your `destroy()` method safely
+* Or check how your serializer is handling reaction/reply counts in the API response.
