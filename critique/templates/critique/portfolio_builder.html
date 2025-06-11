@@ -89,6 +89,7 @@
     transition: all 0.3s ease;
     border: 2px solid transparent;
     user-select: none;
+    align-items: flex-start !important; /* prevent vertical centering from stretching */
 }
 
 .artwork-item:hover {
@@ -105,16 +106,17 @@
 
 /* Portfolio image container with consistent aspect ratio */
 .portfolio-image-container {
+    flex-shrink: 0;
+    flex-grow: 0;
     width: 80px;
     height: 80px;
-    aspect-ratio: 1 / 1;
     overflow: hidden;
-    border-radius: 6px;
-    background: #f8f9fa;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     display: flex;
     align-items: center;
     justify-content: center;
+    background: #f8f9fa;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .artwork-thumbnail {
@@ -122,6 +124,8 @@
     height: 100%;
     object-fit: cover;
     display: block;
+    max-width: 100%;
+    max-height: 100%;
     border-radius: 0;
 }
 
