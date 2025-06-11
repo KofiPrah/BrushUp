@@ -550,6 +550,18 @@ div.portfolio-builder img {
                                   placeholder="Optional description of this folder's theme or contents"></textarea>
                     </div>
                     <div class="mb-3">
+                        <label for="folderCoverImage" class="form-label">Cover Image</label>
+                        <input type="file" class="form-control" id="folderCoverImage" name="cover_image" 
+                               accept="image/*" onchange="previewCoverImage(this)">
+                        <div class="form-text">Upload a cover image for this folder (JPEG, PNG, GIF, WebP, SVG - max 20MB)</div>
+                        <div id="coverImagePreview" class="mt-2" style="display: none;">
+                            <img id="previewImg" src="" alt="Cover preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px; object-fit: cover;">
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeCoverPreview()">
+                                <i class="bi bi-x"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label for="folderVisibility" class="form-label">Visibility</label>
                         <select class="form-select" id="folderVisibility" name="is_public">
                             <option value="public">Public - Visible to everyone</option>
@@ -829,7 +841,32 @@ function setupModals() {
     // Clear form when modal is hidden
     document.getElementById('createFolderModal').addEventListener('hidden.bs.modal', function() {
         document.getElementById('createFolderForm').reset();
+        removeCoverPreview();
     });
+}
+
+function previewCoverImage(input) {
+    const preview = document.getElementById('coverImagePreview');
+    const previewImg = document.getElementById('previewImg');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeCoverPreview() {
+    const preview = document.getElementById('coverImagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const fileInput = document.getElementById('folderCoverImage');
+    
+    preview.style.display = 'none';
+    previewImg.src = '';
+    fileInput.value = '';
 }
 </script>
 {% endblock %}
