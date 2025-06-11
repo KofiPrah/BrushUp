@@ -569,7 +569,7 @@
                 <div class="row g-3">
                     {% for folder in folders %}
                     <div class="col-md-6 col-lg-4">
-                        <div class="card folder-preview-card h-100">
+                        <div class="card folder-preview-card h-100" data-folder-id="{{ folder.id }}">
                             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                                 <h6 class="mb-0">
                                     <i class="bi bi-folder me-2"></i>
@@ -3784,6 +3784,35 @@ let currentFolderId = null;
 
 function openCoverImageUpload(folderId) {
     currentFolderId = folderId;
+    
+    // Find the current cover image for this folder
+    const folderCard = document.querySelector(`[data-folder-id="${folderId}"]`);
+    const currentCoverSection = document.getElementById('currentCoverImageSection');
+    const currentCoverImg = document.getElementById('currentCoverImg');
+    const fileInput = document.getElementById('coverImageFile');
+    
+    // Reset form
+    fileInput.value = '';
+    fileInput.required = true;
+    removeUploadCoverPreview();
+    
+    if (folderCard) {
+        const coverImg = folderCard.querySelector('.folder-cover-image');
+        if (coverImg && coverImg.src) {
+            // Show current cover image section
+            currentCoverImg.src = coverImg.src;
+            currentCoverSection.style.display = 'block';
+            fileInput.required = false; // Not required if there's already a cover image
+        } else {
+            // Hide current cover image section
+            currentCoverSection.style.display = 'none';
+            fileInput.required = true; // Required if no cover image exists
+        }
+    } else {
+        currentCoverSection.style.display = 'none';
+        fileInput.required = true;
+    }
+    
     const modal = new bootstrap.Modal(document.getElementById('coverImageUploadModal'));
     modal.show();
 }
@@ -3810,6 +3839,41 @@ function removeUploadCoverPreview() {
     preview.style.display = 'none';
     previewImg.src = '';
     fileInput.value = '';
+}
+
+function removeCoverImage() {
+    if (!currentFolderId) {
+        alert('No folder selected');
+        return;
+    }
+    
+    if (confirm('Are you sure you want to remove the cover image for this folder?')) {
+        // Send request to remove cover image
+        fetch(`/api/folders/${currentFolderId}/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                cover_image: null
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id || data.name) {
+                // Close modal and refresh page
+                bootstrap.Modal.getInstance(document.getElementById('coverImageUploadModal')).hide();
+                location.reload();
+            } else {
+                alert('Failed to remove cover image. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing cover image:', error);
+            alert('Failed to remove cover image. Please check your connection.');
+        });
+    }
 }
 
 // Handle cover image upload form submission
