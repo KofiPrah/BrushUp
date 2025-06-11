@@ -9,6 +9,7 @@ from .views import (
     ArtworkVersionCompareView, ArtworkVersionRestoreView, ArtworkVersionReorderView,
     hide_critique, unhide_critique
 )
+from .move_artwork import move_artwork_to_folder
 
 # Create a router and register our viewsets with it
 router = DefaultRouter()
