@@ -3880,10 +3880,23 @@ document.addEventListener('DOMContentLoaded', function() {
             <form id="coverImageUploadForm" enctype="multipart/form-data">
                 <div class="modal-body">
                     {% csrf_token %}
+                    
+                    <!-- Current Cover Image Display -->
+                    <div id="currentCoverImageSection" class="mb-3" style="display: none;">
+                        <label class="form-label">Current Cover Image</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <img id="currentCoverImg" src="" alt="Current cover" class="img-thumbnail" style="max-width: 150px; max-height: 100px; object-fit: cover;">
+                            <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeCoverImage()">
+                                <i class="bi bi-trash me-1"></i> Remove Cover Image
+                            </button>
+                        </div>
+                        <hr class="my-3">
+                    </div>
+                    
                     <div class="mb-3">
-                        <label for="coverImageFile" class="form-label">Choose Cover Image</label>
+                        <label for="coverImageFile" class="form-label">Choose New Cover Image</label>
                         <input type="file" class="form-control" id="coverImageFile" name="cover_image" 
-                               accept="image/*" onchange="previewUploadCoverImage(this)" required>
+                               accept="image/*" onchange="previewUploadCoverImage(this)">
                         <div class="form-text">Upload a cover image for this folder (JPEG, PNG, GIF, WebP, SVG - max 20MB)</div>
                         <div id="uploadCoverImagePreview" class="mt-2" style="display: none;">
                             <img id="uploadPreviewImg" src="" alt="Cover preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px; object-fit: cover;">
