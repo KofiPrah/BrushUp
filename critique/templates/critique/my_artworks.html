@@ -333,6 +333,15 @@
     transform: scale(1.02);
 }
 
+.btn-cover-edit {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.folder-cover-preview:hover .btn-cover-edit {
+    opacity: 1;
+}
+
 /* Comparison modal styling */
 #versionComparisonModal .card {
     border: none;
@@ -3758,5 +3767,123 @@ function showFullImage(imageUrl, title) {
         this.remove();
     });
 }
+
+// Cover Image Upload Functions
+let currentFolderId = null;
+
+function openCoverImageUpload(folderId) {
+    currentFolderId = folderId;
+    const modal = new bootstrap.Modal(document.getElementById('coverImageUploadModal'));
+    modal.show();
+}
+
+function previewUploadCoverImage(input) {
+    const preview = document.getElementById('uploadCoverImagePreview');
+    const previewImg = document.getElementById('uploadPreviewImg');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeUploadCoverPreview() {
+    const preview = document.getElementById('uploadCoverImagePreview');
+    const previewImg = document.getElementById('uploadPreviewImg');
+    const fileInput = document.getElementById('coverImageFile');
+    
+    preview.style.display = 'none';
+    previewImg.src = '';
+    fileInput.value = '';
+}
+
+// Handle cover image upload form submission
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('coverImageUploadForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (!currentFolderId) {
+                alert('No folder selected');
+                return;
+            }
+            
+            const formData = new FormData(form);
+            
+            fetch(`/api/folders/${currentFolderId}/`, {
+                method: 'PATCH',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    // Close modal and refresh page
+                    bootstrap.Modal.getInstance(document.getElementById('coverImageUploadModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Failed to upload cover image. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading cover image:', error);
+                alert('Failed to upload cover image. Please check your connection.');
+            });
+        });
+    }
+    
+    // Clear form when modal is hidden
+    const modal = document.getElementById('coverImageUploadModal');
+    if (modal) {
+        modal.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('coverImageUploadForm').reset();
+            removeUploadCoverPreview();
+            currentFolderId = null;
+        });
+    }
+});
 </script>
+
+<!-- Cover Image Upload Modal -->
+<div class="modal fade" id="coverImageUploadModal" tabindex="-1" aria-labelledby="coverImageUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="coverImageUploadModalLabel">Upload Cover Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="coverImageUploadForm" enctype="multipart/form-data">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="coverImageFile" class="form-label">Choose Cover Image</label>
+                        <input type="file" class="form-control" id="coverImageFile" name="cover_image" 
+                               accept="image/*" onchange="previewUploadCoverImage(this)" required>
+                        <div class="form-text">Upload a cover image for this folder (JPEG, PNG, GIF, WebP, SVG - max 20MB)</div>
+                        <div id="uploadCoverImagePreview" class="mt-2" style="display: none;">
+                            <img id="uploadPreviewImg" src="" alt="Cover preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px; object-fit: cover;">
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="removeUploadCoverPreview()">
+                                <i class="bi bi-x"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-upload me-2"></i>
+                        Upload Cover Image
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
