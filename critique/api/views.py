@@ -838,9 +838,22 @@ class CritiqueViewSet(viewsets.ModelViewSet):
 
         # Validate reaction type
         reaction_type = request.data.get('type')
-        if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+        valid_types = [choice[0] for choice in Reaction.ReactionType.choices]
+        
+        # Debug logging
+        print(f"DEBUG: Received reaction_type: {reaction_type}")
+        print(f"DEBUG: Valid types: {valid_types}")
+        print(f"DEBUG: Request data: {request.data}")
+        
+        if not reaction_type:
             return Response(
-                {"error": f"Invalid reaction type. Allowed values: {[choice[0] for choice in Reaction.ReactionType.choices]}"},
+                {"error": "Reaction type is required", "valid_types": valid_types},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+        if reaction_type not in valid_types:
+            return Response(
+                {"error": f"Invalid reaction type '{reaction_type}'. Allowed values: {valid_types}"},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
