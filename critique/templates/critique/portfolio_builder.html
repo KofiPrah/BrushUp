@@ -272,13 +272,36 @@
 
 /* Emergency fix for rogue full-size images */
 .portfolio-builder img:not(.artwork-thumbnail) {
-    max-width: 100%;
-    height: auto;
+    max-width: 80px !important;
+    max-height: 80px !important;
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
     display: block;
-    margin: 0 auto;
-    max-height: 300px;
-    object-fit: contain;
     box-shadow: 0 0 0 2px #ffc107;
+}
+
+/* Force all images in portfolio builder to be thumbnails - maximum specificity */
+div.portfolio-builder div.unorganized-artworks div.artwork-drop-zone div.artwork-item div.portfolio-image-container img,
+div.portfolio-builder div.folder-container div.artwork-drop-zone div.artwork-item div.portfolio-image-container img,
+div.portfolio-builder img {
+    max-width: 80px !important;
+    max-height: 80px !important;
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 6px !important;
+}
+
+/* Specific override for any remaining large images */
+.unorganized-artworks img,
+.artwork-drop-zone img {
+    max-width: 80px !important;
+    max-height: 80px !important;
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
 }
 
 /* Additional constraints for unorganized artwork zone */
@@ -289,8 +312,12 @@
 .unorganized-artworks .portfolio-image-container {
     flex-shrink: 0 !important;
     flex-grow: 0 !important;
+    width: 80px !important;
+    height: 80px !important;
     min-width: 80px;
     min-height: 80px;
+    max-width: 80px;
+    max-height: 80px;
 }
 
 /* Ensure all artwork containers follow the same rules */
@@ -301,6 +328,10 @@
 .artwork-drop-zone .portfolio-image-container {
     flex-shrink: 0 !important;
     flex-grow: 0 !important;
+    width: 80px !important;
+    height: 80px !important;
+    max-width: 80px;
+    max-height: 80px;
 }
 
 /* Responsive design */
@@ -378,7 +409,7 @@
                                 <div class="me-3">
                                     <div class="portfolio-image-container">
                                         {% if artwork.image %}
-                                            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
+                                            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail" style="width: 80px !important; height: 80px !important; max-width: 80px !important; max-height: 80px !important; object-fit: cover !important; display: block !important;">
                                         {% else %}
                                             <div class="d-flex align-items-center justify-content-center h-100">
                                                 <i class="bi bi-image text-muted"></i>
@@ -444,7 +475,7 @@
                                         <div class="me-3">
                                             <div class="portfolio-image-container">
                                                 {% if artwork.image %}
-                                                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
+                                                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail" style="width: 80px !important; height: 80px !important; max-width: 80px !important; max-height: 80px !important; object-fit: cover !important; display: block !important;">
                                                 {% else %}
                                                     <div class="d-flex align-items-center justify-content-center h-100">
                                                         <i class="bi bi-image text-muted"></i>
