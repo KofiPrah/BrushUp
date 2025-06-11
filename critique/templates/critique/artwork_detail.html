@@ -600,7 +600,24 @@
                         </div>
 
                         {% for critique in critiques %}
-                            <div class="card mb-4 bg-dark text-white critique-card border-secondary rounded-3 shadow-sm" id="critique-{{ critique.id }}" data-critique-id="{{ critique.id }}" data-helpful-count="{{ critique.helpful_count|default:0 }}" data-created="{{ critique.created_at|date:'c' }}" data-rating="{{ critique.get_overall_score|default:0 }}">
+                            <div class="card mb-4 bg-dark text-white critique-card border-secondary rounded-3 shadow-sm {% if critique.is_hidden %}border-warning{% endif %}" id="critique-{{ critique.id }}" data-critique-id="{{ critique.id }}" data-helpful-count="{{ critique.helpful_count|default:0 }}" data-created="{{ critique.created_at|date:'c' }}" data-rating="{{ critique.get_overall_score|default:0 }}">
+                                
+                                <!-- Hidden Critique Alert (only shown to artwork author) -->
+                                {% if critique.is_hidden and user.is_authenticated and user == artwork.author %}
+                                <div class="alert alert-warning border-0 mb-0 rounded-0 rounded-top" style="background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);">
+                                    <div class="d-flex align-items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye-slash text-warning me-2" viewBox="0 0 16 16">
+                                            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
+                                            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
+                                            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
+                                        </svg>
+                                        <span class="text-dark fw-bold small">This critique is hidden from public view</span>
+                                        {% if critique.hidden_reason %}
+                                            <span class="text-muted small ms-2">• {{ critique.hidden_reason }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endif %}
                                 <!-- Critique Header -->
                                 <div class="card-header bg-secondary bg-opacity-25 border-0 pb-2">
                                     <div class="d-flex justify-content-between align-items-start">
@@ -634,7 +651,7 @@
                                         </div>
                                         <div class="d-flex align-items-center">
                                             {% if critique.get_overall_score %}
-                                                <span class="badge bg-primary me-2">{{ critique.get_overall_score }}/10</span>
+                                                <span class="badge bg-primary me-2">{{ critique.get_overall_score|floatformat:1 }}/10</span>
                                             {% endif %}
                                             
                                             <!-- Delete button for critique author -->
@@ -854,44 +871,7 @@
                                                 </a>
                                             {% endif %}
                                         </div>
-                                        
-                                        {% if user.is_authenticated and user == artwork.author %}
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                Actions
-                                            </button>
-                                            <ul class="dropdown-menu bg-dark border-secondary">
-                                                {% if critique.is_hidden %}
-                                                <li><button class="dropdown-item text-success" onclick="unhideCritique({{ critique.id }})">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-eye me-1" viewBox="0 0 16 16">
-                                                        <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                                                        <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                                                    </svg>
-                                                    Unhide
-                                                </button></li>
-                                                {% else %}
-                                                <li><button class="dropdown-item text-warning" onclick="hideCritique({{ critique.id }})">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-eye-slash me-1" viewBox="0 0 16 16">
-                                                        <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
-                                                        <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
-                                                        <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
-                                                    </svg>
-                                                    Hide
-                                                </button></li>
-                                                {% endif %}
-                                                {% if user == critique.author %}
-                                                <li><hr class="dropdown-divider border-secondary"></li>
-                                                <li><button class="dropdown-item text-danger" onclick="deleteCritique({{ critique.id }})">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash me-1" viewBox="0 0 16 16">
-                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                                    </svg>
-                                                    Delete
-                                                </button></li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
-                                        {% endif %}
+
 
                                         <!-- Action Controls -->
                                         <div class="action-controls d-flex gap-2">
