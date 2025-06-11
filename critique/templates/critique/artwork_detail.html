@@ -2762,6 +2762,10 @@
                     }
                     throw new Error('Failed to delete critique');
                 }
+                // Handle 204 No Content response (successful deletion)
+                if (response.status === 204) {
+                    return {}; // Return empty object for 204 responses
+                }
                 return response.json();
             })
             .then(data => {
