@@ -786,23 +786,23 @@ class CritiqueViewSet(viewsets.ModelViewSet):
             "message": "The critique has been flagged as inappropriate by a moderator"
         })
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def reply(self, request, pk=None):
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='replies')
+    def replies(self, request, pk=None):
         """
         Add a reply to a critique.
-        Only the artwork owner can reply to critiques.
+        Any authenticated user can reply to critiques.
 
-        Example: POST /api/critiques/5/reply/
+        Example: POST /api/critiques/5/replies/
         Payload: { "text": "Thank you for your feedback!" }
         """
         critique = self.get_object()
 
-        # Check if user is the artwork owner
-        if request.user != critique.artwork.author:
-            return Response(
-                {"error": "Only the artwork owner can reply to critiques"},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # Allow any authenticated user to reply (not just artwork owner)
+        # if request.user != critique.artwork.author:
+        #     return Response(
+        #         {"error": "Only the artwork owner can reply to critiques"},
+        #         status=status.HTTP_403_FORBIDDEN
+        #     )
 
         # Check if text is provided
         text = request.data.get('text', None)
@@ -823,8 +823,8 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         serializer = CritiqueReplySerializer(reply)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def toggle_reaction(self, request, pk=None):
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='react')
+    def react(self, request, pk=None):
         """
         Toggle a reaction on this critique.
 
