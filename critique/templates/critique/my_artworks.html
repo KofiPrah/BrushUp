@@ -338,7 +338,8 @@
     transition: opacity 0.3s ease;
 }
 
-.folder-cover-preview:hover .btn-cover-edit {
+.folder-cover-preview:hover .btn-cover-edit,
+.folder-artworks-preview:hover .btn-cover-edit {
     opacity: 1;
 }
 
@@ -603,12 +604,22 @@
                                 </div>
                                 {% elif folder.artworks.exists %}
                                 <!-- Show artwork thumbnails if no cover image -->
-                                <div class="folder-artworks-preview p-2">
+                                <div class="folder-artworks-preview p-2 position-relative">
+                                    <!-- Edit cover overlay for thumbnail folders -->
+                                    <div class="position-absolute top-0 end-0 p-2 z-1">
+                                        <button type="button" 
+                                                class="btn btn-sm btn-light btn-cover-edit" 
+                                                onclick="openCoverImageUpload({{ folder.id }})"
+                                                title="Add cover image">
+                                            <i class="bi bi-camera"></i>
+                                        </button>
+                                    </div>
+                                    
                                     <div class="row g-2">
                                         {% for artwork in folder.artworks.all|slice:":4" %}
                                         <div class="col-6">
                                             <div class="position-relative">
-                                                <a href="{% url 'critique:artwork_detail' artwork.id %}" class="d-block">
+                                                <a href="{% url 'critique:portfolio_builder' %}#folder-{{ folder.id }}" class="d-block">
                                                     {% if artwork.image %}
                                                         <img src="{{ artwork.image.url }}" 
                                                              class="img-fluid rounded folder-thumbnail" 
