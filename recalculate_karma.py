@@ -58,9 +58,9 @@ def recalculate_all_karma():
                 # Award 10 points per artwork upload
                 KarmaEvent.objects.create(
                     user=user,
-                    event_type='artwork_upload',
+                    action='artwork_upload',
                     points=10,
-                    description=f'Uploaded artwork: {artwork.title}',
+                    reason=f'Uploaded artwork: {artwork.title}',
                     created_at=artwork.created_at
                 )
                 profile.karma += 10
@@ -74,9 +74,9 @@ def recalculate_all_karma():
                 # Award 15 points per critique given
                 KarmaEvent.objects.create(
                     user=user,
-                    event_type='critique_given',
+                    action='critique_given',
                     points=15,
-                    description=f'Gave critique on: {critique.artwork.title}',
+                    reason=f'Gave critique on: {critique.artwork.title}',
                     created_at=critique.created_at
                 )
                 profile.karma += 15
@@ -89,9 +89,9 @@ def recalculate_all_karma():
             for critique in critiques_received:
                 KarmaEvent.objects.create(
                     user=user,
-                    event_type='critique_received',
+                    action='critique_received',
                     points=5,
-                    description=f'Received critique on: {critique.artwork.title}',
+                    reason=f'Received critique on: {critique.artwork.title}',
                     created_at=critique.created_at
                 )
                 profile.karma += 5
@@ -103,9 +103,9 @@ def recalculate_all_karma():
             # Award 2 points per like received
             KarmaEvent.objects.create(
                 user=user,
-                event_type='likes_received',
+                action='likes_received',
                 points=total_likes * 2,
-                description=f'Received {total_likes} likes on artworks'
+                reason=f'Received {total_likes} likes on artworks'
             )
             profile.karma += (total_likes * 2)
         
@@ -118,9 +118,9 @@ def recalculate_all_karma():
                 visit_days = min(days_since_joined, 30)
                 KarmaEvent.objects.create(
                     user=user,
-                    event_type='daily_visit',
+                    action='daily_visit',
                     points=visit_days,
-                    description=f'Active member for {visit_days} days'
+                    reason=f'Active member for {visit_days} days'
                 )
                 profile.karma += visit_days
         
