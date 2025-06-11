@@ -2658,16 +2658,26 @@
 
         // Function to toggle reactions
         function toggleReaction(button, critiqueId, reactionType) {
+            console.log(`Toggling reaction: ${reactionType} for critique ${critiqueId}`);
+            
             // Get CSRF token
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            if (!csrfToken) {
+                console.error('CSRF token not found');
+                showToast('Error', 'Security token missing. Please refresh the page.', 'danger');
+                return;
+            }
+            
+            // Store original state for rollback
+            const originalActive = button.classList.contains('active');
+            const countSpan = button.querySelector(`.${reactionType.toLowerCase()}-count`);
+            const originalCount = parseInt(countSpan?.textContent) || 0;
             
             // Optimistic UI update
-            const isActive = button.classList.contains('active');
             button.classList.toggle('active');
-            
-            const countSpan = button.querySelector(`.${reactionType.toLowerCase()}-count`);
-            let currentCount = parseInt(countSpan.textContent) || 0;
-            countSpan.textContent = isActive ? Math.max(0, currentCount - 1) : currentCount + 1;
+            if (countSpan) {
+                countSpan.textContent = originalActive ? Math.max(0, originalCount - 1) : originalCount + 1;
+            }
             
             // Send API request
             fetch(`/api/critiques/${critiqueId}/react/`, {
@@ -2681,20 +2691,70 @@
                 body: JSON.stringify({ type: reactionType })
             })
             .then(response => {
+                console.log(`Reaction API response status: ${response.status}`);
+                
                 if (!response.ok) {
-                    // Revert optimistic update on failure
-                    button.classList.toggle('active');
-                    countSpan.textContent = currentCount;
-                    throw new Error('Failed to toggle reaction');
+                    return response.text().then(text => {
+                        console.error('Reaction API error response:', text);
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
                 }
+                
                 return response.json();
             })
             .then(data => {
-                // Update counts with server response
-                updateReactionCounts(critiqueId, data);
+                console.log('Reaction API success:', data);
+                
+                // Update all reaction counts for this critique
+                const critiqueContainer = document.querySelector(`[data-critique-id="${critiqueId}"]`)?.closest('.critique-container');
+                if (critiqueContainer) {
+                    // Update helpful count
+                    const helpfulSpan = critiqueContainer.querySelector('.helpful-count');
+                    if (helpfulSpan && typeof data.helpful_count !== 'undefined') {
+                        helpfulSpan.textContent = data.helpful_count;
+                    }
+                    
+                    // Update inspiring count
+                    const inspiringSpan = critiqueContainer.querySelector('.inspiring-count');
+                    if (inspiringSpan && typeof data.inspiring_count !== 'undefined') {
+                        inspiringSpan.textContent = data.inspiring_count;
+                    }
+                    
+                    // Update detailed count
+                    const detailedSpan = critiqueContainer.querySelector('.detailed-count');
+                    if (detailedSpan && typeof data.detailed_count !== 'undefined') {
+                        detailedSpan.textContent = data.detailed_count;
+                    }
+                    
+                    // Update button states based on user reactions
+                    if (data.user_reactions) {
+                        const reactionButtons = critiqueContainer.querySelectorAll('.reaction-btn');
+                        reactionButtons.forEach(btn => {
+                            const btnType = btn.getAttribute('onclick')?.match(/'(\w+)'/)?.[1];
+                            if (btnType && data.user_reactions.includes(btnType)) {
+                                btn.classList.add('active');
+                            } else if (btnType) {
+                                btn.classList.remove('active');
+                            }
+                        });
+                    }
+                }
+                
+                showToast('Success', `Reaction ${data.created ? 'added' : 'removed'} successfully`, 'success');
             })
             .catch(error => {
                 console.error('Error toggling reaction:', error);
+                
+                // Revert optimistic update
+                if (originalActive) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+                if (countSpan) {
+                    countSpan.textContent = originalCount;
+                }
+                
                 showToast('Error', 'Failed to update reaction. Please try again.', 'danger');
             });
         }
@@ -2736,14 +2796,22 @@
                 return;
             }
             
+            console.log(`Deleting critique: ${critiqueId}`);
+            
             // Get CSRF token
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            if (!csrfToken) {
+                console.error('CSRF token not found');
+                showToast('Error', 'Security token missing. Please refresh the page.', 'danger');
+                return;
+            }
             
             // Show loading state on button
             const deleteBtn = document.querySelector(`[onclick="deleteCritique(${critiqueId})"]`);
+            const originalButtonHtml = deleteBtn?.innerHTML;
             if (deleteBtn) {
                 deleteBtn.disabled = true;
-                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Deleting...';
             }
             
             // Send delete request
@@ -2752,42 +2820,62 @@
                 credentials: 'same-origin',
                 headers: {
                     'X-CSRFToken': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest'
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json'
                 }
             })
             .then(response => {
+                console.log(`Delete API response status: ${response.status}`);
+                
                 if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error('You can only delete critiques with no replies or reactions');
-                    }
-                    throw new Error('Failed to delete critique');
+                    return response.text().then(text => {
+                        console.error('Delete API error response:', text);
+                        let errorData;
+                        try {
+                            errorData = JSON.parse(text);
+                        } catch (e) {
+                            errorData = { error: text };
+                        }
+                        
+                        if (response.status === 403) {
+                            throw new Error(errorData.error || 'This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.');
+                        } else if (response.status === 404) {
+                            throw new Error('Critique not found');
+                        } else {
+                            throw new Error(errorData.error || 'Failed to delete critique');
+                        }
+                    });
                 }
-                // Handle 204 No Content response (successful deletion)
+                
+                // Handle successful deletion (204 No Content)
                 if (response.status === 204) {
-                    return {}; // Return empty object for 204 responses
+                    return { success: true };
                 }
+                
                 return response.json();
             })
             .then(data => {
-                // Remove critique from DOM with animation
-                const critiqueCard = document.querySelector(`#critique-${critiqueId}`);
+                console.log('Delete API success:', data);
+                
+                // Remove the critique card from the page
+                const critiqueCard = document.getElementById(`critique-${critiqueId}`);
                 if (critiqueCard) {
-                    critiqueCard.style.transition = 'opacity 0.3s ease-out';
+                    critiqueCard.style.transition = 'opacity 0.3s ease';
                     critiqueCard.style.opacity = '0';
                     setTimeout(() => {
                         critiqueCard.remove();
                     }, 300);
                 }
                 
-                showToast('Success', 'Critique deleted successfully!', 'success');
+                showToast('Success', 'Critique deleted successfully', 'success');
             })
             .catch(error => {
                 console.error('Error deleting critique:', error);
                 
-                // Reset button state
-                if (deleteBtn) {
+                // Restore button state
+                if (deleteBtn && originalButtonHtml) {
                     deleteBtn.disabled = false;
-                    deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>';
+                    deleteBtn.innerHTML = originalButtonHtml;
                 }
                 
                 showToast('Error', error.message, 'danger');
