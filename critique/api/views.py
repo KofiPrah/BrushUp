@@ -828,28 +828,45 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         """
         Toggle a reaction on this critique.
 
-        Example: POST /api/critiques/5/toggle_reaction/
+        Example: POST /api/critiques/5/react/
         Payload: {"type": "HELPFUL"}
 
         This will create the reaction if it doesn't exist or remove it if it does,
         effectively toggling the reaction status.
         """
-        critique = self.get_object()
+        try:
+            critique = self.get_object()
 
-        # Validate reaction type - try both 'type' and 'reaction_type' fields
-        reaction_type = request.data.get('type') or request.data.get('reaction_type')
-        valid_types = [choice[0] for choice in Reaction.ReactionType.choices]
-        
-        if not reaction_type:
-            return Response(
-                {"error": "Reaction type is required", "valid_types": valid_types},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            # Debug logging
+            print(f"DEBUG: React endpoint called for critique {pk}")
+            print(f"DEBUG: Request method: {request.method}")
+            print(f"DEBUG: Request data: {request.data}")
+            print(f"DEBUG: Request content type: {request.content_type}")
+            print(f"DEBUG: User: {request.user}")
+
+            # Validate reaction type - try both 'type' and 'reaction_type' fields
+            reaction_type = request.data.get('type') or request.data.get('reaction_type')
+            valid_types = [choice[0] for choice in Reaction.ReactionType.choices]
             
-        if reaction_type not in valid_types:
+            print(f"DEBUG: Extracted reaction_type: {reaction_type}")
+            print(f"DEBUG: Valid types: {valid_types}")
+            
+            if not reaction_type:
+                return Response(
+                    {"error": "Reaction type is required", "valid_types": valid_types, "received_data": dict(request.data)},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            if reaction_type not in valid_types:
+                return Response(
+                    {"error": f"Invalid reaction type '{reaction_type}'. Allowed values: {valid_types}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except Exception as e:
+            print(f"DEBUG: Exception in react endpoint: {e}")
             return Response(
-                {"error": f"Invalid reaction type '{reaction_type}'. Allowed values: {valid_types}"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": f"Server error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
         # Check if user already gave this reaction type to this critique
