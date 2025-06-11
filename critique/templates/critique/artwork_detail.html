@@ -4,6 +4,112 @@
 
 {% block extra_head %}
 <style>
+    /* Enhanced Critique System Styles */
+    .critique-card {
+        transition: all 0.3s ease;
+        border: 1px solid rgba(108, 117, 125, 0.3) !important;
+    }
+    
+    .critique-card:hover {
+        border-color: rgba(13, 110, 253, 0.5) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .rating-bar-container {
+        margin-bottom: 8px;
+    }
+    
+    .progress {
+        background-color: rgba(108, 117, 125, 0.2) !important;
+    }
+    
+    .critique-collapse-btn svg {
+        transition: transform 0.3s ease;
+    }
+    
+    .reaction-btn {
+        transition: all 0.2s ease;
+        border-radius: 20px !important;
+        padding: 4px 12px !important;
+    }
+    
+    .reaction-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .reaction-btn.active {
+        background-color: var(--bs-primary) !important;
+        border-color: var(--bs-primary) !important;
+        color: white !important;
+    }
+    
+    .reply-form-container {
+        animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .replies-container {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .reply-item {
+        transition: background-color 0.2s ease;
+    }
+    
+    .reply-item:hover {
+        background-color: rgba(108, 117, 125, 0.2) !important;
+    }
+    
+    .critique-text {
+        line-height: 1.6;
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(108, 117, 125, 0.2) !important;
+    }
+    
+    .card-footer {
+        border-top: 1px solid rgba(108, 117, 125, 0.2) !important;
+    }
+    
+    .dropdown-menu {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(108, 117, 125, 0.3);
+    }
+    
+    .badge {
+        font-size: 0.75em;
+        font-weight: 500;
+    }
+    
+    .toast {
+        animation: slideInRight 0.3s ease;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
     /* Fix for toggle switch visibility */
     .form-check-input {
         width: 2em !important;
