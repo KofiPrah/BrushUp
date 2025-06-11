@@ -596,19 +596,6 @@
                                 </div>
                                 {% endif %}
                             </div>
-                            <div class="card-footer bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <small class="text-muted">
-                                        Updated {{ folder.updated_at|timesince }} ago
-                                    </small>
-                                    <div class="btn-group btn-group-sm">
-                                        <a href="{% url 'critique:portfolio_builder' %}#folder-{{ folder.id }}" 
-                                           class="btn btn-outline-secondary btn-sm" title="Edit Folder">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     {% endfor %}
