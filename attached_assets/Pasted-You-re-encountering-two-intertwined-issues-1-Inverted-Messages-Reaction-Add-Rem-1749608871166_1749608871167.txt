@@ -1,0 +1,100 @@
+You're encountering two intertwined issues:
+
+---
+
+## 🔁 **1. Inverted Messages: Reaction Add/Remove Notifications Are Swapped**
+
+### ✅ Problem
+
+You're displaying:
+
+* **“Successfully removed”** when `created: true` (meaning the reaction was just added)
+* **“Successfully added”** when `created: false` (meaning the reaction was just removed)
+
+### ✅ Fix in Your JS
+
+Wherever you're handling the reaction toggle response (like in `toggleReaction()`):
+
+```js
+if (response.data.created) {
+  showToast("Reaction added!");
+} else {
+  showToast("Reaction removed!");
+}
+```
+
+> 🔁 Your logic is reversed right now — just swap the success message to match the `created` flag.
+
+---
+
+## 🧩 **2. Critique Reactions Are Not Accurately Cleared**
+
+### ✅ Problem
+
+Even after toggling off all visible reactions, the backend still blocks deletion because:
+
+* `reaction_count` in `get_engagement_summary()` shows leftover counts (`1`, `2`, etc.)
+* You're receiving:
+
+  ```json
+  "details": "Critique has 2 reaction(s)"
+  ```
+
+### ✅ Diagnosis
+
+This suggests **there are still reactions in the database**, even after unclicking them.
+
+### 🔎 Confirm This on Backend:
+
+Inside `destroy()` or a debug API view, log:
+
+```python
+print("All reactions for critique:", critique.reactions.all().values('user__username', 'reaction_type'))
+print("Filtered (excluding self):", critique.reactions.exclude(user=critique.author).values('user__username', 'reaction_type'))
+```
+
+---
+
+## ✅ Fix: Ensure Reactions Are Actually Deleted on Toggle-Off
+
+In your **reaction toggle view (likely a `@action` on your `CritiqueViewSet`)**, you probably have logic like:
+
+```python
+reaction, created = Reaction.objects.get_or_create(...)
+if not created:
+    reaction.delete()
+```
+
+Make sure:
+
+* That `reaction.delete()` actually runs on toggle-off
+* You’re calling `exclude(user=self.author)` in your `has_engagement()` logic (you are — this is good!)
+
+If this logic is **silent-failing**, then reactions remain in the DB, falsely blocking deletion.
+
+---
+
+## 🧼 Optional DB Cleanup for Dev/Test
+
+If you’ve been testing a lot and now have ghost reactions stuck, you can manually clear them:
+
+```python
+# From shell
+from critique.models import Reaction
+Reaction.objects.all().delete()
+```
+
+(Only do this in a **dev** or **testing** environment!)
+
+---
+
+## ✅ Final Checklist for You
+
+| Area                    | Action                                                        |
+| ----------------------- | ------------------------------------------------------------- |
+| ✅ Reaction messages     | Swap add/remove based on `created` flag                       |
+| ✅ Backend deletion      | Log actual reaction users/types at delete time                |
+| ✅ Reaction toggle logic | Confirm `reaction.delete()` is running on second click        |
+| ✅ Debug cleanup         | Optionally remove stuck reactions if testing artifacts remain |
+
+Let me know if you'd like help writing a debug endpoint or inspecting the toggle logic!

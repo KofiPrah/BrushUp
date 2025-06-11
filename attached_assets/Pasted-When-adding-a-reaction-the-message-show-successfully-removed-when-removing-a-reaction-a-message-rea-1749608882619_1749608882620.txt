@@ -1,0 +1,88 @@
+When adding a reaction the message show successfully removed, when removing a reaction a message readss successfully added. Based on these logs the critiq count is not accurate possible due to old data in the DB or logiv
+30/:4443 Toggling reaction: HELPFUL for critique 16
+30/:4476 Reaction API response status: 200
+30/:4488 Reaction API success: {created: true, reaction_type: 'HELPFUL', critique_id: 16, helpful_count: 2, inspiring_count: 0, …}
+30/:4443 Toggling reaction: INSPIRING for critique 16
+30/:4476 Reaction API response status: 200
+30/:4488 Reaction API success: {created: true, reaction_type: 'INSPIRING', critique_id: 16, helpful_count: 2, inspiring_count: 1, …}
+30/:4443 Toggling reaction: INSPIRING for critique 16
+30/:4443 Toggling reaction: HELPFUL for critique 16
+30/:4476 Reaction API response status: 200
+30/:4488 Reaction API success: {created: false, reaction_type: 'INSPIRING', critique_id: 16, helpful_count: 2, inspiring_count: 0, …}
+30/:4476 Reaction API response status: 200
+30/:4488 Reaction API success: {created: false, reaction_type: 'HELPFUL', critique_id: 16, helpful_count: 1, inspiring_count: 0, …}
+30/:4581 Deleting critique: 16
+30/:4600 
+            
+            
+           DELETE https://brushup.replit.app/api/critiques/16/ 403 (Forbidden)
+deleteCritique @ 30/:4600
+onclick @ 30/:484
+30/:4610 Delete API response status: 403
+30/:4614 Delete API error response: {"error": "This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.", "details": "Critique has 2 reaction(s)", "engagement_summary": {"reply_count": 0, "reaction_count": 2, "total_engagement": 2}, "suggestion": "Consider editing your critique or asking the artwork owner to hide it if inappropriate."}
+overrideMethod @ hook.js:608
+(anonymous) @ 30/:4614
+Promise.then
+(anonymous) @ 30/:4613
+Promise.then
+deleteCritique @ 30/:4609
+onclick @ 30/:484
+30/:4668 Error deleting critique: Error: This critique has feedback from others and cannot be deleted. You can edit it or request to hide it. (Critique has 2 reaction(s)) Consider editing your critique or asking the artwork owner to hide it if inappropriate.
+    at 30/:4636:35
+overrideMethod @ hook.js:608
+(anonymous) @ 30/:4668
+Promise.catch
+deleteCritique @ 30/:4667
+onclick @ 30/:484
+30/:4581 Deleting critique: 16
+30/:4600 
+            
+            
+           DELETE https://brushup.replit.app/api/critiques/16/ 403 (Forbidden)
+deleteCritique @ 30/:4600
+onclick @ 30/:484
+30/:4610 Delete API response status: 403
+30/:4614 Delete API error response: {"error": "This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.", "details": "Critique has 2 reaction(s)", "engagement_summary": {"reply_count": 0, "reaction_count": 2, "total_engagement": 2}, "suggestion": "Consider editing your critique or asking the artwork owner to hide it if inappropriate."}
+overrideMethod @ hook.js:608
+(anonymous) @ 30/:4614
+Promise.then
+(anonymous) @ 30/:4613
+Promise.then
+deleteCritique @ 30/:4609
+onclick @ 30/:484
+30/:4668 Error deleting critique: Error: This critique has feedback from others and cannot be deleted. You can edit it or request to hide it. (Critique has 2 reaction(s)) Consider editing your critique or asking the artwork owner to hide it if inappropriate.
+    at 30/:4636:35
+overrideMethod @ hook.js:608
+(anonymous) @ 30/:4668
+Promise.catch
+deleteCritique @ 30/:4667
+onclick @ 30/:484
+30/:4443 Toggling reaction: INSPIRING for critique 15
+30/:4476 Reaction API response status: 200
+30/:4488 Reaction API success: {created: false, reaction_type: 'INSPIRING', critique_id: 15, helpful_count: 1, inspiring_count: 0, …}
+30/:4443 Toggling reaction: HELPFUL for critique 15
+30/:4476 Reaction API response status: 200
+30/:4488 Reaction API success: {created: false, reaction_type: 'HELPFUL', critique_id: 15, helpful_count: 0, inspiring_count: 0, …}
+30/:4581 Deleting critique: 13
+30/:4600 
+            
+            
+           DELETE https://brushup.replit.app/api/critiques/13/ 403 (Forbidden)
+deleteCritique @ 30/:4600
+onclick @ 30/:881
+30/:4610 Delete API response status: 403
+30/:4614 Delete API error response: {"error": "This critique has feedback from others and cannot be deleted. You can edit it or request to hide it.", "details": "Critique has 1 reaction(s)", "engagement_summary": {"reply_count": 0, "reaction_count": 1, "total_engagement": 1}, "suggestion": "Consider editing your critique or asking the artwork owner to hide it if inappropriate."}
+overrideMethod @ hook.js:608
+(anonymous) @ 30/:4614
+Promise.then
+(anonymous) @ 30/:4613
+Promise.then
+deleteCritique @ 30/:4609
+onclick @ 30/:881
+30/:4668 Error deleting critique: Error: This critique has feedback from others and cannot be deleted. You can edit it or request to hide it. (Critique has 1 reaction(s)) Consider editing your critique or asking the artwork owner to hide it if inappropriate.
+    at 30/:4636:35
+overrideMethod @ hook.js:608
+(anonymous) @ 30/:4668
+Promise.catch
+deleteCritique @ 30/:4667
+onclick @ 30/:881

@@ -853,6 +853,13 @@ class CritiqueViewSet(viewsets.ModelViewSet):
                     {"error": "Authentication required"},
                     status=status.HTTP_401_UNAUTHORIZED
                 )
+            
+            # Prevent users from reacting to their own critiques
+            if critique.author == request.user:
+                return Response(
+                    {"error": "You cannot react to your own critique"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             # Validate reaction type - try both 'type' and 'reaction_type' fields
             reaction_type = request.data.get('type') or request.data.get('reaction_type')
@@ -877,19 +884,32 @@ class CritiqueViewSet(viewsets.ModelViewSet):
                 reaction_type=reaction_type
             ).first()
 
+            print(f"------ REACTION TOGGLE DEBUG ------")
+            print(f"User: {request.user.username}")
+            print(f"Critique ID: {critique.id}")
+            print(f"Reaction Type: {reaction_type}")
+            print(f"Existing reaction: {existing_reaction}")
+            print(f"All reactions for this critique: {list(critique.reactions.all().values('user__username', 'reaction_type'))}")
+
             # Toggle reaction: remove if exists, add if doesn't
             created = False
             if existing_reaction:
                 # Remove the reaction (toggle off)
+                print(f"Removing existing reaction: {existing_reaction.id}")
                 existing_reaction.delete()
+                print(f"Reaction deleted successfully")
             else:
                 # Create the reaction (toggle on)
-                Reaction.objects.create(
+                new_reaction = Reaction.objects.create(
                     user=request.user,
                     critique=critique,
                     reaction_type=reaction_type
                 )
+                print(f"Created new reaction: {new_reaction.id}")
                 created = True
+
+            print(f"After toggle - All reactions: {list(critique.reactions.all().values('user__username', 'reaction_type'))}")
+            print(f"----------------------------------")
 
             # Get updated reaction counts
             critique_serializer = CritiqueSerializer(critique, context={'request': request})
