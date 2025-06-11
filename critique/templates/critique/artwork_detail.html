@@ -3208,5 +3208,76 @@
             });
         });
 
+        // Handle nested reply form submission
+        function createNestedReplyElement(reply) {
+            const div = document.createElement('div');
+            div.className = 'nested-reply bg-dark bg-opacity-25 p-2 rounded mb-2';
+            div.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded-circle bg-info d-flex align-items-center justify-content-center me-2" style="width: 20px; height: 20px; font-size: 10px; font-weight: bold;">
+                            ${reply.author.username.charAt(0).toUpperCase()}
+                        </div>
+                        <a href="/profile/${reply.author.username}/" class="text-decoration-none text-info fw-bold small">
+                            ${reply.author.username}
+                        </a>
+                    </div>
+                    <small class="text-muted">Just now</small>
+                </div>
+                <p class="mb-0 small">${reply.text}</p>
+            `;
+            return div;
+        }
+
+        // Initialize nested reply form handling
+        document.addEventListener('submit', function(e) {
+            if (e.target.classList.contains('nested-reply-form')) {
+                e.preventDefault();
+                
+                const form = e.target;
+                const replyId = form.dataset.replyId;
+                const textarea = form.querySelector('textarea');
+                const text = textarea.value.trim();
+                
+                if (!text) return;
+                
+                // Submit nested reply via API
+                fetch(`/api/replies/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        parent_reply: replyId,
+                        text: text
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Add new nested reply to the DOM
+                        const nestedContainer = document.getElementById(`nested-replies-${replyId}`);
+                        if (nestedContainer) {
+                            const newReply = createNestedReplyElement(data.reply);
+                            nestedContainer.appendChild(newReply);
+                        }
+                        
+                        // Clear and hide form
+                        textarea.value = '';
+                        hideReplyToReply(replyId);
+                        
+                        showToast('Reply posted successfully', 'success');
+                    } else {
+                        throw new Error(data.error || 'Failed to post reply');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error posting nested reply:', error);
+                    showToast('Failed to post reply', 'error');
+                });
+            }
+        });
+
     </script>
 {% endblock %}
