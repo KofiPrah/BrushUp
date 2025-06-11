@@ -1577,13 +1577,61 @@ class FolderViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        folders = Folder.objects.filter(owner=request.user).order_by('-updated_at')
+        folders = Folder.objects.filter(owner=request.user).order_by('display_order', '-updated_at')
         serializer = FolderListSerializer(folders, many=True, context={'request': request})
 
         return Response({
             'folders': serializer.data,
             'count': folders.count()
         })
+
+    @action(detail=False, methods=['post'])
+    def reorder(self, request):
+        """Reorder folders for the current user."""
+        if not request.user.is_authenticated:
+            return Response(
+                {"error": "Authentication required"},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        folder_order = request.data.get('folder_order', [])
+        
+        if not folder_order or not isinstance(folder_order, list):
+            return Response(
+                {"error": "folder_order must be a non-empty list"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Validate that all folders belong to the user
+            folder_ids = [int(folder_id) for folder_id in folder_order]
+            user_folders = Folder.objects.filter(
+                id__in=folder_ids, 
+                owner=request.user
+            )
+            
+            if user_folders.count() != len(folder_ids):
+                return Response(
+                    {"error": "Some folders not found or not owned by user"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Update the display order for each folder
+            for index, folder_id in enumerate(folder_ids):
+                Folder.objects.filter(id=folder_id, owner=request.user).update(
+                    display_order=index
+                )
+
+            return Response({
+                "status": "success",
+                "message": "Folder order updated successfully"
+            })
+
+        except (ValueError, TypeError) as e:
+            return Response(
+                {"error": "Invalid folder ID format"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class ArtworkVersionViewSet(APIView):

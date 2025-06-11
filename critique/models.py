@@ -123,9 +123,13 @@ class Folder(models.Model):
         blank=True,
         help_text="URL-friendly version of the folder name"
     )
+    display_order = models.IntegerField(
+        default=0,
+        help_text="Order for displaying folders in portfolio (lower values appear first)"
+    )
     
     class Meta:
-        ordering = ['-updated_at', '-created_at']
+        ordering = ['display_order', '-updated_at', '-created_at']
         unique_together = ['owner', 'slug']  # Ensure unique slugs per user
         verbose_name = 'Portfolio Folder'
         verbose_name_plural = 'Portfolio Folders'
