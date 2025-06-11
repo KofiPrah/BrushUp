@@ -1,0 +1,64 @@
+Here’s a tailored Replit prompt to refine your **Critique Page**, based on the screenshot and your platform’s goals:
+
+---
+
+### 🛠️ Replit Prompt: Refine Critique Page UI & Functionality
+
+**Goal**: Polish the critique display for clarity, visual hierarchy, and engagement using structured data and community signals.
+
+---
+
+**🔧 Tasks:**
+
+1. **UI Enhancements**
+
+   * Style critiques in **cards** with proper spacing, border radius, and background (respecting light/dark mode).
+   * Visually separate:
+
+     * Author name + timestamp (top, small font)
+     * Slider ratings (horizontal bars with category labels: Technique, Originality, Composition)
+     * Written feedback (body text)
+     * Reactions (bottom row with badge icons: Helpful, Inspiring, Detailed)
+
+2. **Structured Critique Display**
+
+   * Convert numerical ratings (1–10) into **labeled bars** or **stars** with consistent style.
+   * If any rating is 9–10 or 1–2, append a tooltip or tag like:
+
+     * ✅ "Outstanding" (for high)
+     * ⚠️ "Needs improvement" (for low)
+
+3. **Engagement & Reactions**
+
+   * Add buttons for "Helpful", "Inspiring", "Detailed" (one selectable per user)
+   * Show counts and highlight if current user reacted
+   * Reaction state should be togglable with AJAX for snappy UI
+
+4. **Threaded Replies**
+
+   * Display threaded replies indented under each critique
+   * Include "Reply" link → opens a textarea inline
+   * Submit reply via AJAX (no page reload)
+
+5. **Optional Badges**
+
+   * If the critique author has badges (e.g. "Expert Eye"), show beside their name
+
+---
+
+**✨ Extras (Optional Stretch)**
+
+* Show a mini **karma score** next to critic name
+* Add “Sort by” dropdown (e.g., Most Helpful, Newest)
+* Make critiques collapsible (expand/hide body)
+
+---
+
+**🎯 Replit Context**
+
+* Django backend
+* Bootstrap 5
+* AJAX interactivity via vanilla JS
+* Theme support (light/dark)
+
+Let me know if you want this scaffolded into HTML + JS + Django template snippets.
