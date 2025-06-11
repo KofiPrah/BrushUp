@@ -844,103 +844,75 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         This will create the reaction if it doesn't exist or remove it if it does,
         effectively toggling the reaction status.
         """
-        # Early return with debug info to test if endpoint is reachable
-        return Response({
-            "debug": "Reaction endpoint reached",
-            "method": request.method,
-            "pk": pk,
-            "user": str(request.user),
-            "data": request.data,
-            "valid_types": [choice[0] for choice in Reaction.ReactionType.choices]
-        })
+        try:
+            critique = self.get_object()
+            
+            # Ensure user is authenticated for reactions
+            if not request.user.is_authenticated:
+                return Response(
+                    {"error": "Authentication required"},
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
 
-        # Check if user already gave this reaction type to this critique
-        existing_reaction = Reaction.objects.filter(
-            user=request.user,
-            critique=critique,
-            reaction_type=reaction_type
-        ).first()
+            # Validate reaction type - try both 'type' and 'reaction_type' fields
+            reaction_type = request.data.get('type') or request.data.get('reaction_type')
+            valid_types = [choice[0] for choice in Reaction.ReactionType.choices]
+            
+            if not reaction_type:
+                return Response(
+                    {"error": "Reaction type is required", "valid_types": valid_types},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            if reaction_type not in valid_types:
+                return Response(
+                    {"error": f"Invalid reaction type '{reaction_type}'. Allowed values: {valid_types}"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        # Toggle reaction: remove if exists, add if doesn't
-        created = False
-        if existing_reaction:
-            # Remove the reaction (toggle off)
-            existing_reaction.delete()
-        else:
-            # Create the reaction (toggle on)
-            Reaction.objects.create(
+            # Check if user already gave this reaction type to this critique
+            existing_reaction = Reaction.objects.filter(
                 user=request.user,
                 critique=critique,
                 reaction_type=reaction_type
-            )
-            created = True
+            ).first()
 
-        # Get updated reaction counts
-        critique_serializer = CritiqueSerializer(critique, context={'request': request})
+            # Toggle reaction: remove if exists, add if doesn't
+            created = False
+            if existing_reaction:
+                # Remove the reaction (toggle off)
+                existing_reaction.delete()
+            else:
+                # Create the reaction (toggle on)
+                Reaction.objects.create(
+                    user=request.user,
+                    critique=critique,
+                    reaction_type=reaction_type
+                )
+                created = True
 
-        response_data = {
-            'created': created,
-            'reaction_type': reaction_type,
-            'critique_id': critique.id,
-            'helpful_count': critique_serializer.get_helpful_count(critique),
-            'inspiring_count': critique_serializer.get_inspiring_count(critique),
-            'detailed_count': critique_serializer.get_detailed_count(critique),
-            'user_reactions': critique_serializer.get_user_reactions(critique)
-        }
+            # Get updated reaction counts
+            critique_serializer = CritiqueSerializer(critique, context={'request': request})
 
-        return Response(response_data, status=status.HTTP_200_OK)
+            response_data = {
+                'created': created,
+                'reaction_type': reaction_type,
+                'critique_id': critique.id,
+                'helpful_count': critique.get_helpful_count(),
+                'inspiring_count': critique.get_inspiring_count(),
+                'detailed_count': critique.get_detailed_count(),
+                'user_reactions': list(critique.reactions.filter(user=request.user).values_list('reaction_type', flat=True))
+            }
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
-    def react(self, request, pk=None):
-        """
-        Add a reaction to this critique.
-
-        Example: POST /api/critiques/5/react/
-        Payload: {"reaction_type": "HELPFUL"}
-
-        Note: This endpoint is deprecated. Use toggle_reaction instead.
-        """
-        critique = self.get_object()
-
-        # Validate reaction type
-        reaction_type = request.data.get('reaction_type')
-        if not reaction_type or reaction_type not in [choice[0] for choice in Reaction.ReactionType.choices]:
+            return Response(response_data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
             return Response(
-                {"error": f"Invalid reaction_type. Allowed values: {[choice[0] for choice in Reaction.ReactionType.choices]}"},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": f"Server error: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Check if user already gave this reaction type to this critique
-        existing = Reaction.objects.filter(
-            user=request.user,
-            critique=critique,
-            reaction_type=reaction_type
-        ).exists()
 
-        if existing:
-            return Response(
-                {"error": f"You have already given a {reaction_type} reaction to this critique."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # Create the reaction
-        reaction = Reaction.objects.create(
-            user=request.user,
-            critique=critique,
-            reaction_type=reaction_type
-        )
-
-        # Get updated reaction counts
-        critique_serializer = CritiqueSerializer(critique, context={'request': request})
-
-        response_data = {
-            'reaction': ReactionSerializer(reaction, context={'request': request}).data,
-            'helpful_count': critique_serializer.get_helpful_count(critique),
-            'inspiring_count': critique_serializer.get_inspiring_count(critique),
-            'detailed_count': critique_serializer.get_detailed_count(critique)
-        }
-
-        return Response(response_data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['delete'], permission_classes=[permissions.IsAuthenticated])
     def unreact(self, request, pk=None):
