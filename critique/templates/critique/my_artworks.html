@@ -3833,9 +3833,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Upload failed with status: ' + response.status);
+                }
+            })
             .then(data => {
-                if (data.id) {
+                // Check if response has cover_image field (indicates successful upload)
+                if (data && (data.cover_image || data.name)) {
                     // Close modal and refresh page
                     bootstrap.Modal.getInstance(document.getElementById('coverImageUploadModal')).hide();
                     location.reload();
