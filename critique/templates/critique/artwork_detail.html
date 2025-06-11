@@ -636,6 +636,19 @@
                                             {% if critique.get_overall_score %}
                                                 <span class="badge bg-primary me-2">{{ critique.get_overall_score }}/10</span>
                                             {% endif %}
+                                            
+                                            <!-- Delete button for critique author -->
+                                            {% if user.is_authenticated and user == critique.author %}
+                                            <button class="btn btn-sm btn-outline-danger me-2" 
+                                                    onclick="deleteCritique({{ critique.id }})"
+                                                    title="Delete this critique">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                                                </svg>
+                                            </button>
+                                            {% endif %}
+                                            
                                             <button class="btn btn-sm btn-outline-secondary critique-collapse-btn" data-bs-toggle="collapse" data-bs-target="#critique-body-{{ critique.id }}" aria-expanded="true">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
                                                     <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
@@ -2726,6 +2739,13 @@
             // Get CSRF token
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
+            // Show loading state on button
+            const deleteBtn = document.querySelector(`[onclick="deleteCritique(${critiqueId})"]`);
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span>';
+            }
+            
             // Send delete request
             fetch(`/api/critiques/${critiqueId}/`, {
                 method: 'DELETE',
@@ -2737,22 +2757,36 @@
             })
             .then(response => {
                 if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error('You can only delete critiques with no replies or reactions');
+                    }
                     throw new Error('Failed to delete critique');
                 }
                 return response.json();
             })
             .then(data => {
-                // Remove critique from DOM
-                const critiqueCard = document.querySelector(`[data-critique-id="${critiqueId}"]`).closest('.critique-card');
+                // Remove critique from DOM with animation
+                const critiqueCard = document.querySelector(`#critique-${critiqueId}`);
                 if (critiqueCard) {
-                    critiqueCard.remove();
+                    critiqueCard.style.transition = 'opacity 0.3s ease-out';
+                    critiqueCard.style.opacity = '0';
+                    setTimeout(() => {
+                        critiqueCard.remove();
+                    }, 300);
                 }
                 
                 showToast('Success', 'Critique deleted successfully!', 'success');
             })
             .catch(error => {
                 console.error('Error deleting critique:', error);
-                showToast('Error', 'Failed to delete critique. Please try again.', 'danger');
+                
+                // Reset button state
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>';
+                }
+                
+                showToast('Error', error.message, 'danger');
             });
         }
 
