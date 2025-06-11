@@ -823,7 +823,17 @@ class CritiqueViewSet(viewsets.ModelViewSet):
         serializer = CritiqueReplySerializer(reply)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated], url_path='react')
+    @action(detail=True, methods=['get'], permission_classes=[permissions.IsAuthenticated], url_path='test-react')
+    def test_react(self, request, pk=None):
+        """Test endpoint to verify routing works."""
+        return Response({
+            "message": "Test endpoint working",
+            "critique_id": pk,
+            "user": str(request.user),
+            "method": request.method
+        })
+
+    @action(detail=True, methods=['post'], permission_classes=[], url_path='react')
     def react(self, request, pk=None):
         """
         Toggle a reaction on this critique.
