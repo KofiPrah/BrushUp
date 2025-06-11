@@ -103,12 +103,26 @@
     border-color: #007bff;
 }
 
-.artwork-thumbnail {
+/* Portfolio image container with consistent aspect ratio */
+.portfolio-image-container {
     width: 80px;
     height: 80px;
-    object-fit: cover;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
     border-radius: 6px;
+    background: #f8f9fa;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.artwork-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 6px;
 }
 
 .unorganized-artworks {
@@ -203,6 +217,55 @@
     transform: translateY(0);
 }
 
+/* Responsive gallery grid layout */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+/* Enhanced responsive image handling */
+@media (max-width: 768px) {
+    .portfolio-image-container {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .artwork-item {
+        padding: 0.75rem;
+    }
+    
+    .artwork-item h6 {
+        font-size: 0.9rem;
+    }
+    
+    .artwork-item .text-muted {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .portfolio-image-container {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .artwork-item {
+        padding: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .quick-actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .quick-actions .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .artwork-item {
@@ -276,13 +339,15 @@
                             {% for artwork in unorganized_artworks %}
                             <div class="artwork-item d-flex align-items-center" data-artwork-id="{{ artwork.id }}">
                                 <div class="me-3">
-                                    {% if artwork.image %}
-                                        <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
-                                    {% else %}
-                                        <div class="artwork-thumbnail bg-light d-flex align-items-center justify-content-center">
-                                            <i class="bi bi-image text-muted"></i>
-                                        </div>
-                                    {% endif %}
+                                    <div class="portfolio-image-container">
+                                        {% if artwork.image %}
+                                            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
+                                        {% else %}
+                                            <div class="d-flex align-items-center justify-content-center h-100">
+                                                <i class="bi bi-image text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
                                 </div>
                                 <div class="flex-grow-1">
                                     <h6 class="mb-1">{{ artwork.title }}</h6>
@@ -340,13 +405,15 @@
                                     {% for artwork in folder.artworks.all %}
                                     <div class="artwork-item d-flex align-items-center" data-artwork-id="{{ artwork.id }}">
                                         <div class="me-3">
-                                            {% if artwork.image %}
-                                                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
-                                            {% else %}
-                                                <div class="artwork-thumbnail bg-light d-flex align-items-center justify-content-center">
-                                                    <i class="bi bi-image text-muted"></i>
-                                                </div>
-                                            {% endif %}
+                                            <div class="portfolio-image-container">
+                                                {% if artwork.image %}
+                                                    <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail">
+                                                {% else %}
+                                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                                        <i class="bi bi-image text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
                                         </div>
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1">{{ artwork.title }}</h6>

@@ -1,0 +1,72 @@
+The issue you're seeing with inconsistent image sizing on the portfolio building page likely stems from not constraining image dimensions or aspect ratios consistently across various uploads. Here’s how you can fix that and make it work well for mixed resolutions:
+
+---
+
+### ✅ **Solution: CSS + Optional Processing Layer**
+
+#### 1. **Set CSS Constraints**
+
+Use `object-fit` with a fixed container size to preserve image integrity.
+
+```css
+.portfolio-image-container {
+  width: 100%;              /* or fixed width like 300px */
+  aspect-ratio: 4 / 3;      /* or 1 / 1 for square thumbnails */
+  overflow: hidden;
+  border-radius: 8px;
+  background: #111;         /* fallback for empty space */
+}
+
+.portfolio-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;        /* or 'contain' if you want full image without cropping */
+  display: block;
+}
+```
+
+* `object-fit: cover` fills the container, cropping excess parts.
+* `object-fit: contain` ensures no cropping, but will introduce letterboxing (empty borders).
+* Use `aspect-ratio` to maintain consistency in layout.
+
+---
+
+#### 2. **(Optional) Preprocess with Thumbnails**
+
+If you're uploading images to AWS S3 (or using Pillow on upload via Django), consider generating resized versions:
+
+* Use Pillow to resize images server-side on upload:
+
+```python
+from PIL import Image
+from io import BytesIO
+from django.core.files.base import ContentFile
+
+def resize_image(image_field, size=(800, 600)):
+    image = Image.open(image_field)
+    image.thumbnail(size, Image.ANTIALIAS)
+
+    buffer = BytesIO()
+    image.save(fp=buffer, format='JPEG')
+    return ContentFile(buffer.getvalue())
+```
+
+* Save the resized version separately for display in gallery views.
+
+---
+
+#### 3. **Responsive Grid Layout**
+
+Make sure the gallery layout supports responsive scaling. For example:
+
+```css
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+```
+
+---
+
+Would you like help implementing a thumbnail generation feature on upload using Pillow and S3, or just sticking to the frontend fix?
