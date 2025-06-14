@@ -2224,13 +2224,17 @@ class ArtworkVersionRestoreView(APIView):
             artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
             version = artwork.versions.get(id=version_id)
             
-            # Store the old values for the response
-            old_title = artwork.title
+            # STEP 1: Create a version with the current artwork state before restoration
+            # This preserves the current state so we don't lose any version data
+            current_version = artwork.create_version(
+                version_notes=f"Auto-saved before restoring to version {version.version_number}"
+            )
             
-            # Restore artwork to the selected version
+            # STEP 2: Restore artwork to the selected version WITHOUT affecting other versions
+            # We only update the main artwork, never touch existing version records
             artwork.title = version.title
             artwork.description = version.description
-            artwork.image = version.image
+            artwork.image = version.image  # This is safe - we're copying FROM version TO artwork
             if hasattr(version, 'medium') and version.medium:
                 artwork.medium = version.medium
             if hasattr(version, 'dimensions') and version.dimensions:
@@ -2240,8 +2244,9 @@ class ArtworkVersionRestoreView(APIView):
             artwork.save()
             
             return Response({
-                'message': f'Artwork restored to version {version.version_number}',
+                'message': f'Artwork restored to version {version.version_number} (previous state saved as version {current_version.version_number})',
                 'restored_version': version.version_number,
+                'auto_saved_version': current_version.version_number,
                 'success': True,
                 'artwork': {
                     'id': artwork.id,
