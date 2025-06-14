@@ -1,0 +1,81 @@
+Based on your description, the **new version upload behavior is breaking two core expectations**:
+
+1. **For artworks with version history:** Instead of preserving the previous image as an old version and setting the new image as current, the system is overwriting the previous image and duplicating the new image.
+2. **For artworks without version history:** The original artwork image is being overwritten instead of creating a new version and archiving the old one.
+
+---
+
+### ✅ Expected Behavior
+
+Uploading a new version should:
+
+* Create a **new Version object** linked to the parent Artwork.
+* Mark the new version as `current=True`.
+* Retain the previous image in an older Version object (`current=False`).
+* Ensure that **only one version per artwork has `current=True`**.
+
+---
+
+### 🔍 Likely Issues
+
+Here’s what might be going wrong:
+
+* The **existing Version record** is being updated instead of a new one being created.
+* Or the artwork’s main `image_url` field is being directly updated, possibly linked to the current version’s image in a one-to-one field.
+
+---
+
+### 🛠 Fix Strategy
+
+You’ll need to check and correct the version creation logic—probably in your `views.py` or wherever version uploads are handled. Here's a high-level plan:
+
+#### 1. **Ensure proper version model design**
+
+Make sure your model resembles something like:
+
+```python
+class Artwork(models.Model):
+    title = models.CharField(...)
+    description = models.TextField(...)
+    # Do not keep a single image_url here if using versioning
+    ...
+
+class Version(models.Model):
+    artwork = models.ForeignKey(Artwork, related_name='versions', on_delete=models.CASCADE)
+    image_url = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    current = models.BooleanField(default=False)
+```
+
+#### 2. **Fix the version creation logic**
+
+Here’s the expected upload logic:
+
+```python
+def upload_new_version(artwork_id, new_image_url):
+    # Step 1: Mark all existing versions as not current
+    Version.objects.filter(artwork_id=artwork_id).update(current=False)
+
+    # Step 2: Create a new version and mark it as current
+    Version.objects.create(
+        artwork_id=artwork_id,
+        image_url=new_image_url,
+        current=True
+    )
+```
+
+**Important:** Don’t update the Artwork model’s image field directly—render the current version image dynamically.
+
+---
+
+### ✅ To Validate
+
+Make sure:
+
+* Uploading a new version creates a new `Version` row with a unique `image_url`.
+* The old image is not overwritten.
+* The new image appears in the UI as the active/current version.
+
+---
+
+Would you like help writing this Django view or serializer logic? I can also help you migrate the image handling from `Artwork.image_url` to `Version.image_url` if needed.

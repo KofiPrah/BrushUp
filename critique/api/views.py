@@ -1800,20 +1800,20 @@ def create_artwork_version(request, artwork_id):
             manual_notes = request.data.get('version_notes', '')
             version_notes = f"{auto_notes}. {manual_notes}".strip('. ')
             
-            # Create the new version with current artwork data
+            # STEP 1: Create version with CURRENT artwork state (preserves old image)
             version = ArtWorkVersion.objects.create(
                 artwork=artwork,
                 version_number=new_version_number,
-                title=request.data.get('title', artwork.title),
-                description=request.data.get('description', artwork.description),
-                image=artwork.image,  # Start with current image
-                medium=request.data.get('medium', getattr(artwork, 'medium', '')),
-                dimensions=request.data.get('dimensions', getattr(artwork, 'dimensions', '')),
-                tags=request.data.get('tags', getattr(artwork, 'tags', '')),
+                title=artwork.title,  # Use current artwork values for the version
+                description=artwork.description,
+                image=artwork.image,  # Preserve the OLD image in the version
+                medium=getattr(artwork, 'medium', ''),
+                dimensions=getattr(artwork, 'dimensions', ''),
+                tags=getattr(artwork, 'tags', ''),
                 version_notes=version_notes
             )
             
-            # Update artwork fields if provided
+            # STEP 2: Update artwork with NEW data (including new image if provided)
             if 'title' in request.data:
                 artwork.title = request.data['title']
             if 'description' in request.data:
@@ -1827,14 +1827,10 @@ def create_artwork_version(request, artwork_id):
             if 'tags' in request.data:
                 artwork.tags = request.data['tags']
             
-            # Handle new image upload
+            # STEP 3: Only update artwork with new image (version keeps old image)
             if 'image' in request.FILES:
                 new_image = request.FILES['image']
-                # Update artwork with new image
-                artwork.image = new_image
-                # Also update the version with new image
-                version.image = new_image
-                version.save()
+                artwork.image = new_image  # Only update artwork, NOT the version
             
             artwork.save()
             
