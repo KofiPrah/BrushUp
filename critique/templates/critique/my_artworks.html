@@ -1782,7 +1782,7 @@ function createNewVersion(artworkId) {
 }
 
 function restoreVersion(artworkId, versionId) {
-    if (!confirm('Are you sure you want to restore to this version? This will update the main artwork image and details.')) {
+    if (!confirm('Are you sure you want to set this version as current? This will update the main artwork image and details.')) {
         return;
     }
     
@@ -2221,7 +2221,7 @@ function showVersionPreviewModal(version, artworkId) {
                                             '<path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>' +
                                             '<path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>' +
                                         '</svg>' +
-                                        'Restore This Version' +
+                                        'Set as Current' +
                                     '</button>' +
                                     '<button class="btn btn-outline-info" onclick="openVersionComparison(' + artworkId + '); bootstrap.Modal.getInstance(document.getElementById(\'versionPreviewModal\')).hide();">' +
                                         'Compare Versions' +

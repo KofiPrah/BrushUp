@@ -2215,26 +2215,20 @@ class ArtworkVersionCompareView(APIView):
         return differences
 
 class ArtworkVersionRestoreView(APIView):
-    """API endpoint for restoring an artwork to a previous version"""
+    """API endpoint for setting an artwork to display a specific version"""
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request, artwork_id, version_id):
-        """Restore artwork to a specific version"""
+        """Set artwork to display a specific version (without creating new versions)"""
         try:
             artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
             version = artwork.versions.get(id=version_id)
             
-            # STEP 1: Create a version with the current artwork state before restoration
-            # This preserves the current state so we don't lose any version data
-            current_version = artwork.create_version(
-                version_notes=f"Auto-saved before restoring to version {version.version_number}"
-            )
-            
-            # STEP 2: Restore artwork to the selected version WITHOUT affecting other versions
-            # We only update the main artwork, never touch existing version records
+            # Simply update the artwork to match the selected version
+            # No version creation - just set the selected version as current
             artwork.title = version.title
             artwork.description = version.description
-            artwork.image = version.image  # This is safe - we're copying FROM version TO artwork
+            artwork.image = version.image  # Copy FROM version TO artwork
             if hasattr(version, 'medium') and version.medium:
                 artwork.medium = version.medium
             if hasattr(version, 'dimensions') and version.dimensions:
@@ -2244,9 +2238,8 @@ class ArtworkVersionRestoreView(APIView):
             artwork.save()
             
             return Response({
-                'message': f'Artwork restored to version {version.version_number} (previous state saved as version {current_version.version_number})',
-                'restored_version': version.version_number,
-                'auto_saved_version': current_version.version_number,
+                'message': f'Artwork set to version {version.version_number}',
+                'current_version': version.version_number,
                 'success': True,
                 'artwork': {
                     'id': artwork.id,

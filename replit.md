@@ -137,15 +137,15 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ### June 14, 2025 - Version Management System Fixes
 - **Fixed critical version creation bug**: Versions now properly preserve old images instead of overwriting them
-- **Fixed version restoration bug**: Restoring a version no longer corrupts other version records
-- **Enhanced version preservation**: Current artwork state is automatically saved before restoration
-- **Improved version integrity**: All version operations now maintain proper image history
+- **Improved version switching**: Changed "restore" to "set as current" - no unnecessary version creation
+- **Enhanced version integrity**: All version operations now maintain proper image history
+- **Cleaner user experience**: Version switching is now intuitive and doesn't create version clutter
 
 ### Technical Details
 - Updated `create_artwork_version` API to preserve old images in versions while updating artwork with new images
-- Modified `ArtworkVersionRestoreView` to create backup version before restoration
+- Modified `ArtworkVersionRestoreView` to simply set selected version as current without creating new versions
 - Ensured version records are never modified after creation, maintaining data integrity
-- Added comprehensive version notes for automatic backups during restoration
+- Updated UI terminology from "Restore" to "Set as Current" for clarity
 
 ## Changelog
 
