@@ -35,10 +35,14 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 - Session management and security features
 
 ### Artwork Management
-- File upload handling with support for multiple formats
+- File upload handling with support for multiple formats (JPEG, PNG, GIF, WebP, SVG, BMP, TIFF)
 - S3 integration for scalable media storage
 - Image processing and display optimization
-- Artwork versioning and revision tracking
+- **Advanced Version Management System**:
+  - Preserves image history during version creation
+  - Safe version restoration with auto-backup of current state
+  - Drag-and-drop version comparison interface
+  - Version archiving and management tools
 
 ### Critique System
 - Multi-type reactions (Helpful, Inspiring, Detailed)
@@ -129,11 +133,25 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 - Migration management for schema updates
 - Karma system database tables and relationships
 
+## Recent Changes
+
+### June 14, 2025 - Version Management System Fixes
+- **Fixed critical version creation bug**: Versions now properly preserve old images instead of overwriting them
+- **Fixed version restoration bug**: Restoring a version no longer corrupts other version records
+- **Enhanced version preservation**: Current artwork state is automatically saved before restoration
+- **Improved version integrity**: All version operations now maintain proper image history
+
+### Technical Details
+- Updated `create_artwork_version` API to preserve old images in versions while updating artwork with new images
+- Modified `ArtworkVersionRestoreView` to create backup version before restoration
+- Ensured version records are never modified after creation, maintaining data integrity
+- Added comprehensive version notes for automatic backups during restoration
+
 ## Changelog
 
 ```
 Changelog:
-- June 14, 2025. Initial setup
+- June 14, 2025. Initial setup and version management system fixes
 ```
 
 ## User Preferences
