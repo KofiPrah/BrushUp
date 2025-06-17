@@ -1892,11 +1892,19 @@ def delete_artwork_version(request, version_id):
     """Delete a specific version"""
     try:
         version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+        artwork = version.artwork
+        
+        # Prevent deletion if this is the only version
+        if artwork.versions.count() <= 1:
+            return Response({'error': 'Cannot delete the only version of an artwork'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+        
         version_number = version.version_number
         version.delete()
         
         return Response({
-            'message': f'Version {version_number} deleted successfully'
+            'message': f'Version {version_number} deleted successfully',
+            'success': True
         })
     except ArtWorkVersion.DoesNotExist:
         return Response({'error': 'Version not found or not owned by user'}, 
