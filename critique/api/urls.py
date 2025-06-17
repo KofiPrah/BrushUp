@@ -43,4 +43,5 @@ urlpatterns = [
     path('versions/<int:version_id>/unarchive/', unarchive_artwork_version, name='version-unarchive'),
     path('critiques/<int:critique_id>/hide/', hide_critique, name='critique-hide'),
     path('critiques/<int:critique_id>/unhide/', unhide_critique, name='critique-unhide'),
+    path('replies/<int:reply_id>/', delete_critique_reply, name='critique-reply-delete'),
 ]

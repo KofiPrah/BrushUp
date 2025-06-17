@@ -142,6 +142,8 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 - **Added restoration snapshots**: Version restoration now creates automatic snapshots of current state before switching
 - **Critique-version associations**: Critiques are now linked to specific artwork versions, eliminating shared critique counts
 - **Fixed z-index overlap**: Version history card no longer interferes with main navigation dropdown
+- **Fixed deletion endpoints**: Resolved 405 error for version deletion and 404 error for critique reply deletion
+- **Enhanced user feedback control**: Users can now delete their own replies regardless of engagement levels
 
 ### June 14, 2025 - Version Management System Fixes
 - **Fixed critical version creation bug**: Versions now properly preserve old images instead of overwriting them
