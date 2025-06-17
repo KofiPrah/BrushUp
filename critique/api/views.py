@@ -2370,3 +2370,23 @@ def unarchive_artwork_version(request, version_id):
     except ArtWorkVersion.DoesNotExist:
         return Response({'error': 'Version not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['DELETE'])
+@permission_classes([permissions.IsAuthenticated])
+def delete_critique_reply(request, reply_id):
+    """Delete a critique reply - allows users to delete their own replies regardless of engagement"""
+    try:
+        from critique.models import CritiqueReply
+        reply = CritiqueReply.objects.get(id=reply_id, author=request.user)
+        
+        reply_text_preview = reply.text[:50] + "..." if len(reply.text) > 50 else reply.text
+        reply.delete()
+        
+        return Response({
+            'message': 'Reply deleted successfully',
+            'success': True,
+            'deleted_reply_preview': reply_text_preview
+        })
+    except CritiqueReply.DoesNotExist:
+        return Response({'error': 'Reply not found or not owned by user'}, 
+                      status=status.HTTP_404_NOT_FOUND)

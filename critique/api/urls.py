@@ -7,7 +7,7 @@ from .views import (
     create_artwork_version, get_artwork_version, 
     delete_artwork_version, archive_artwork_version, unarchive_artwork_version, switch_artwork_version, ArtworkVersionViewSet,
     ArtworkVersionCompareView, ArtworkVersionRestoreView, ArtworkVersionReorderView,
-    hide_critique, unhide_critique
+    hide_critique, unhide_critique, delete_critique_reply
 )
 from .move_artwork import move_artwork_to_folder
 
