@@ -1766,6 +1766,9 @@ def create_artwork_version(request, artwork_id):
             })
         
         elif request.method == 'POST':
+            # Check if force_create is enabled (for saving current state)
+            force_create = request.data.get('force_create', False)
+            
             # Check if there are meaningful changes before creating a version
             has_changes = False
             changes_detected = []
@@ -1795,8 +1798,8 @@ def create_artwork_version(request, artwork_id):
                 has_changes = True
                 changes_detected.append('tags')
             
-            # Only create a new version if there are meaningful changes
-            if not has_changes:
+            # Only create a new version if there are meaningful changes OR force_create is true
+            if not has_changes and not force_create:
                 return Response({
                     'error': 'No changes detected',
                     'message': 'A new version is only created when there are meaningful changes to the artwork.'
@@ -1809,7 +1812,13 @@ def create_artwork_version(request, artwork_id):
             new_version_number = highest_version + 1
             
             # Create version notes with detected changes
-            auto_notes = f"Changes: {', '.join(changes_detected)}"
+            if changes_detected:
+                auto_notes = f"Changes: {', '.join(changes_detected)}"
+            elif force_create:
+                auto_notes = "Snapshot: Current state saved"
+            else:
+                auto_notes = "Version created"
+                
             manual_notes = request.data.get('version_notes', '')
             version_notes = f"{auto_notes}. {manual_notes}".strip('. ')
             

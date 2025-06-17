@@ -135,8 +135,8 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
-### June 17, 2025 - Comprehensive Version History System Enhancement
-- **Fixed save current state API**: Resolved 400 error by adding `force_create` parameter to always create versions
+### June 17, 2025 - Comprehensive Version History System Enhancement ✓
+- **Fixed save current state API**: Resolved 400 error by adding `force_create` parameter to bypass change detection
 - **Implemented version deletion**: Users can now delete versions with safety checks to prevent deleting the only version
 - **Enhanced thumbnail refresh**: New version uploads immediately update thumbnails without requiring page refresh
 - **Added restoration snapshots**: Version restoration now creates automatic snapshots of current state before switching
