@@ -1659,25 +1659,27 @@ class ArtworkVersionViewSet(APIView):
         try:
             artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
             version_notes = request.data.get('version_notes', '')
+            force_create = request.data.get('force_create', False)
             
             # Create version with current artwork state
             version = artwork.create_version(version_notes=version_notes)
             
-            # Update artwork with new data if provided
-            if 'title' in request.data:
-                artwork.title = request.data['title']
-            if 'description' in request.data:
-                artwork.description = request.data['description']
-            if 'image' in request.data:
-                artwork.image = request.data['image']
-            if 'medium' in request.data:
-                artwork.medium = request.data['medium']
-            if 'dimensions' in request.data:
-                artwork.dimensions = request.data['dimensions']
-            if 'tags' in request.data:
-                artwork.tags = request.data['tags']
-            
-            artwork.save()
+            # Update artwork with new data if provided (skip if just saving current state)
+            if not force_create:
+                if 'title' in request.data:
+                    artwork.title = request.data['title']
+                if 'description' in request.data:
+                    artwork.description = request.data['description']
+                if 'image' in request.data:
+                    artwork.image = request.data['image']
+                if 'medium' in request.data:
+                    artwork.medium = request.data['medium']
+                if 'dimensions' in request.data:
+                    artwork.dimensions = request.data['dimensions']
+                if 'tags' in request.data:
+                    artwork.tags = request.data['tags']
+                
+                artwork.save()
             
             serializer = ArtWorkVersionSerializer(version)
             return Response({
@@ -1707,18 +1709,29 @@ class ArtworkVersionViewSet(APIView):
             return Response({'error': 'Version not found'}, 
                           status=status.HTTP_404_NOT_FOUND)
     
-    def destroy(self, request, version_id):
+    def delete(self, request, artwork_id, version_id):
         """Delete a specific version"""
         try:
-            version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
+            artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
+            version = artwork.versions.get(id=version_id)
+            
+            # Prevent deletion if this is the only version
+            if artwork.versions.count() <= 1:
+                return Response({'error': 'Cannot delete the only version of an artwork'}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
             version_number = version.version_number
             version.delete()
             
             return Response({
-                'message': f'Version {version_number} deleted successfully'
+                'message': f'Version {version_number} deleted successfully',
+                'success': True
             })
+        except ArtWork.DoesNotExist:
+            return Response({'error': 'Artwork not found or not owned by user'}, 
+                          status=status.HTTP_404_NOT_FOUND)
         except ArtWorkVersion.DoesNotExist:
-            return Response({'error': 'Version not found or not owned by user'}, 
+            return Response({'error': 'Version not found'}, 
                           status=status.HTTP_404_NOT_FOUND)
     
     def archive(self, request, version_id):
@@ -2219,13 +2232,17 @@ class ArtworkVersionRestoreView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request, artwork_id, version_id):
-        """Set artwork to display a specific version (without creating new versions)"""
+        """Set artwork to display a specific version (creates snapshot of current state first)"""
         try:
             artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
             version = artwork.versions.get(id=version_id)
             
-            # Simply update the artwork to match the selected version
-            # No version creation - just set the selected version as current
+            # Create a snapshot of the current state before restoration
+            snapshot = artwork.create_version(
+                version_notes=f"Auto-snapshot before restoring to version {version.version_number}"
+            )
+            
+            # Update the artwork to match the selected version
             artwork.title = version.title
             artwork.description = version.description
             artwork.image = version.image  # Copy FROM version TO artwork

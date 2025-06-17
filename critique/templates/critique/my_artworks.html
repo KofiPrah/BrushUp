@@ -1754,7 +1754,8 @@ function createNewVersion(artworkId) {
             'X-CSRFToken': getCookie('csrftoken')
         },
         body: JSON.stringify({
-            version_notes: notes || ''
+            version_notes: notes || '',
+            force_create: true
         })
     })
     .then(response => {
@@ -2618,7 +2619,7 @@ function showToast(message, type = 'info') {
 // Version Delete/Archive Functions
 function deleteVersion(versionId, versionNumber, artworkId) {
     if (confirm(`Are you sure you want to permanently delete Version ${versionNumber}? This action cannot be undone.`)) {
-        fetch(`/api/artworks/versions/${versionId}/delete/`, {
+        fetch(`/api/artworks/${artworkId}/versions/${versionId}/`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -2627,12 +2628,16 @@ function deleteVersion(versionId, versionNumber, artworkId) {
         })
         .then(response => response.json())
         .then(data => {
-            showToast(`Version ${versionNumber} deleted successfully`, 'success');
-            // Close modal and refresh version manager
-            const modal = bootstrap.Modal.getInstance(document.getElementById('versionManagerModal'));
-            if (modal) modal.hide();
-            // Optionally reload version manager
-            setTimeout(() => openVersionManager(artworkId), 500);
+            if (data.success) {
+                showToast(data.message, 'success');
+                // Close modal and refresh version manager
+                const modal = bootstrap.Modal.getInstance(document.getElementById('versionManagerModal'));
+                if (modal) modal.hide();
+                // Reload version manager to show updated list
+                setTimeout(() => openVersionManager(artworkId), 500);
+            } else {
+                showToast(data.error || `Failed to delete Version ${versionNumber}`, 'error');
+            }
         })
         .catch(error => {
             console.error('Error deleting version:', error);
