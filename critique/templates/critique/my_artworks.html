@@ -1768,6 +1768,19 @@ function createNewVersion(artworkId) {
     .then(data => {
         if (data.version) {
             showToast(`Version ${data.version.version_number} created successfully`, 'success');
+            
+            // Update the artwork thumbnail immediately in the studio workspace
+            const artworkCard = document.querySelector(`[data-artwork-id="${artworkId}"]`);
+            if (artworkCard) {
+                const thumbnailImg = artworkCard.querySelector('.artwork-thumbnail');
+                if (thumbnailImg && data.version.image_display_url) {
+                    thumbnailImg.src = data.version.image_display_url + '?t=' + Date.now();
+                    thumbnailImg.onload = function() {
+                        thumbnailImg.style.opacity = '1';
+                    };
+                }
+            }
+            
             // Refresh the version manager
             const modal = bootstrap.Modal.getInstance(document.getElementById('versionManagerModal'));
             modal.hide();

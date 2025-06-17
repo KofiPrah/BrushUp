@@ -353,6 +353,9 @@ class Critique(models.Model):
     with focus on constructive feedback and analysis.
     """
     artwork = models.ForeignKey(ArtWork, on_delete=models.CASCADE, related_name='critiques')
+    artwork_version = models.ForeignKey('ArtWorkVersion', on_delete=models.SET_NULL, 
+                                      null=True, blank=True, related_name='critiques',
+                                      help_text="The specific version of the artwork this critique was written for")
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='critiques')
     text = models.TextField(help_text="Critique content - analysis of the artwork")
     created_at = models.DateTimeField(auto_now_add=True)

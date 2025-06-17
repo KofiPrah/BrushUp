@@ -135,6 +135,14 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
+### June 17, 2025 - Comprehensive Version History System Enhancement
+- **Fixed save current state API**: Resolved 400 error by adding `force_create` parameter to always create versions
+- **Implemented version deletion**: Users can now delete versions with safety checks to prevent deleting the only version
+- **Enhanced thumbnail refresh**: New version uploads immediately update thumbnails without requiring page refresh
+- **Added restoration snapshots**: Version restoration now creates automatic snapshots of current state before switching
+- **Critique-version associations**: Critiques are now linked to specific artwork versions, eliminating shared critique counts
+- **Fixed z-index overlap**: Version history card no longer interferes with main navigation dropdown
+
 ### June 14, 2025 - Version Management System Fixes
 - **Fixed critical version creation bug**: Versions now properly preserve old images instead of overwriting them
 - **Improved version switching**: Changed "restore" to "set as current" - no unnecessary version creation
@@ -142,6 +150,16 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 - **Cleaner user experience**: Version switching is now intuitive and doesn't create version clutter
 
 ### Technical Details
+#### June 17, 2025 Updates
+- Added `artwork_version` foreign key to Critique model with proper migration
+- Enhanced version creation API with `force_create` parameter for saving current state
+- Implemented comprehensive version deletion with artwork ownership and safety validations
+- Added real-time thumbnail updates using cache-busting timestamps
+- Modified restoration to create automatic snapshots before version switching
+- Fixed frontend delete functionality with proper API endpoint routing
+- Set version history card z-index to 1 to resolve navigation overlap
+
+#### June 14, 2025 Updates
 - Updated `create_artwork_version` API to preserve old images in versions while updating artwork with new images
 - Modified `ArtworkVersionRestoreView` to simply set selected version as current without creating new versions
 - Ensured version records are never modified after creation, maintaining data integrity
@@ -151,6 +169,7 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ```
 Changelog:
+- June 17, 2025. Comprehensive version history system enhancements with deletion, snapshots, and critique associations
 - June 14, 2025. Initial setup and version management system fixes
 ```
 
