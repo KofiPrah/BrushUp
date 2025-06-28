@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from allauth.socialaccount.models import SocialAccount
 from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction, Folder, ArtWorkVersion
-from .forms import CommentForm, ReplyForm
+from .forms import CommentForm, ReplyForm, SetPasswordForOAuthUserForm, ProfileUpdateForm, RemovePasswordForm
 from .karma import award_like_karma, award_critique_karma
 import json
 
@@ -894,76 +894,59 @@ def profile_password_management(request):
     Allows setting, changing, or removing local passwords.
     """
     # Check if user authenticated via OAuth (Google)
-    has_social_account = SocialAccount.objects.filter(user=request.user).exists()
+    has_google_account = SocialAccount.objects.filter(user=request.user).exists()
     
     # Check if user has a password set
     has_password = request.user.has_usable_password()
     
+    # Initialize forms
+    profile_form = ProfileUpdateForm(instance=request.user)
+    password_form = SetPasswordForOAuthUserForm(request.user)
+    remove_password_form = RemovePasswordForm()
+    
     if request.method == 'POST':
         action = request.POST.get('action')
         
-        if action == 'set_password':
-            password1 = request.POST.get('password1')
-            password2 = request.POST.get('password2')
-            
-            if password1 and password2:
-                if password1 == password2:
-                    if len(password1) >= 8:
-                        request.user.set_password(password1)
-                        request.user.save()
-                        
-                        # Log the user back in after password change
-                        login(request, request.user)
-                        
-                        messages.success(request, 'Password has been set successfully! You can now log in with email and password.')
-                        return redirect('critique:profile')
-                    else:
-                        messages.error(request, 'Password must be at least 8 characters long.')
-                else:
-                    messages.error(request, 'Passwords do not match.')
-            else:
-                messages.error(request, 'Both password fields are required.')
+        if action == 'update_profile':
+            profile_form = ProfileUpdateForm(request.POST, instance=request.user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, 'Profile updated successfully!')
+                return redirect('critique:profile_password_management')
+        
+        elif action == 'set_password':
+            password_form = SetPasswordForOAuthUserForm(request.user, request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                # Log the user back in after password change
+                login(request, request.user)
+                messages.success(request, 'Password has been set successfully! You can now log in with email and password.')
+                return redirect('critique:profile_password_management')
         
         elif action == 'change_password' and has_password:
-            current_password = request.POST.get('current_password')
-            new_password1 = request.POST.get('new_password1')
-            new_password2 = request.POST.get('new_password2')
-            
-            if request.user.check_password(current_password):
-                if new_password1 and new_password2:
-                    if new_password1 == new_password2:
-                        if len(new_password1) >= 8:
-                            request.user.set_password(new_password1)
-                            request.user.save()
-                            
-                            # Log the user back in after password change
-                            login(request, request.user)
-                            
-                            messages.success(request, 'Password has been changed successfully!')
-                            return redirect('critique:profile')
-                        else:
-                            messages.error(request, 'New password must be at least 8 characters long.')
-                    else:
-                        messages.error(request, 'New passwords do not match.')
-                else:
-                    messages.error(request, 'Both new password fields are required.')
-            else:
-                messages.error(request, 'Current password is incorrect.')
+            from django.contrib.auth.forms import PasswordChangeForm
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                # Log the user back in after password change
+                login(request, request.user)
+                messages.success(request, 'Password has been changed successfully!')
+                return redirect('critique:profile_password_management')
         
         elif action == 'remove_password' and has_password:
-            current_password = request.POST.get('current_password_remove')
-            
-            if request.user.check_password(current_password):
+            remove_password_form = RemovePasswordForm(request.POST)
+            if remove_password_form.is_valid():
                 request.user.set_unusable_password()
                 request.user.save()
                 messages.success(request, 'Password has been removed. You can now only log in with Google.')
-                return redirect('critique:profile')
-            else:
-                messages.error(request, 'Current password is incorrect.')
+                return redirect('critique:profile_password_management')
     
     context = {
-        'has_social_account': has_social_account,
+        'has_google_account': has_google_account,
         'has_password': has_password,
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'remove_password_form': remove_password_form,
     }
     
     return render(request, 'critique/profile_password_management.html', context)
