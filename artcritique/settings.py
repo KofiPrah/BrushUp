@@ -103,8 +103,10 @@ INSTALLED_APPS = [
 # django-allauth configuration
 SITE_ID = 1
 
-# Email configuration for allauth
+# Email configuration for allauth and password reset
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
+DEFAULT_FROM_EMAIL = 'Brush Up <noreply@brushup.replit.app>'
+EMAIL_SUBJECT_PREFIX = '[Brush Up] '
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

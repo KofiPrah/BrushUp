@@ -7,6 +7,16 @@ from django.urls import reverse_lazy, reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q, Sum
+from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth import login
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from allauth.socialaccount.models import SocialAccount
 from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction, Folder, ArtWorkVersion
 from .forms import CommentForm
 from .karma import award_like_karma, award_critique_karma
