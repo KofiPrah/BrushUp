@@ -143,6 +143,7 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 - **Applied dark theme styling**: Ensured all password management forms follow consistent dark background theme
 - **Integrated security features**: Users can now set, change, or remove passwords while maintaining OAuth functionality
 - **Fixed version deletion 405 error**: Updated API endpoint to handle DELETE requests for artwork version removal
+- **Implemented dynamic version renumbering**: Versions are now automatically renumbered sequentially after deletion to maintain v1, v2, v3 ordering
 
 ### June 17, 2025 - Comprehensive Version History System Enhancement ✓
 - **Fixed save current state API**: Resolved 400 error by adding `force_create` parameter to bypass change detection

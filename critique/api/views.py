@@ -1890,6 +1890,13 @@ def get_artwork_version(request, artwork_id, version_id):
             version_number = version.version_number
             version.delete()
             
+            # Renumber remaining versions sequentially
+            remaining_versions = artwork.versions.order_by('version_number')
+            for index, remaining_version in enumerate(remaining_versions, 1):
+                if remaining_version.version_number != index:
+                    remaining_version.version_number = index
+                    remaining_version.save()
+            
             return Response({
                 'message': f'Version {version_number} deleted successfully',
                 'success': True
@@ -1917,6 +1924,13 @@ def delete_artwork_version(request, version_id):
         
         version_number = version.version_number
         version.delete()
+        
+        # Renumber remaining versions sequentially
+        remaining_versions = artwork.versions.order_by('version_number')
+        for index, remaining_version in enumerate(remaining_versions, 1):
+            if remaining_version.version_number != index:
+                remaining_version.version_number = index
+                remaining_version.save()
         
         return Response({
             'message': f'Version {version_number} deleted successfully',
