@@ -362,32 +362,7 @@
     </div>
 </div>
 
-<!-- Bulk Folder Assignment Modal -->
-<div class="modal fade" id="bulkFolderModal" tabindex="-1" aria-labelledby="bulkFolderModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content bg-dark text-light">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bulkFolderModalLabel">Add Artworks to Folder</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <p><span id="selected-count">0</span> artworks selected</p>
-                </div>
-                <div class="mb-3">
-                    <label for="bulkFolderSelect" class="form-label">Choose Folder</label>
-                    <select class="form-control" id="bulkFolderSelect">
-                        <option value="">Remove from all folders</option>
-                    </select>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="assignSelectedArtworksToFolder()">Assign to Folder</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <script>
 // Folder Management JavaScript
@@ -763,99 +738,14 @@ function displayArtworksForManagement(artworks) {
 
 
 
-function assignSelectedArtworksToFolder() {
-    const folderId = document.getElementById('bulkFolderSelect').value;
-    const artworkIds = Array.from(selectedArtworks);
-    
-    if (artworkIds.length === 0) {
-        showAlert('No artworks selected', 'warning');
-        return;
-    }
-    
-    console.log('Assigning artworks:', artworkIds, 'to folder:', folderId);
-    
-    const promises = artworkIds.map(artworkId => {
-        const folderValue = folderId ? parseInt(folderId) : null;
-        console.log(`Updating artwork ${artworkId} with folder:`, folderValue);
-        
-        return fetch(`/api/artworks/${artworkId}/`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify({
-                folder: folderValue
-            })
-        }).then(response => {
-            console.log(`Response for artwork ${artworkId}:`, response.status);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.error(`Error for artwork ${artworkId}:`, text);
-                    return { ok: false, error: text };
-                });
-            }
-            return response.json().then(data => {
-                console.log(`Success for artwork ${artworkId}:`, data);
-                return { ok: true, data };
-            });
-        });
-    });
-    
-    Promise.all(promises)
-        .then(results => {
-            const successCount = results.filter(r => r.ok).length;
-            const failedResults = results.filter(r => !r.ok);
-            
-            if (failedResults.length > 0) {
-                console.error('Failed results:', failedResults);
-                showAlert(`Updated ${successCount} of ' + artworkIds.length + ' artworks. Some failed.`, 'warning');
-            } else {
-                showAlert(`Successfully ' + folderId ? 'moved' : 'removed' + ' ${successCount} artwork' + successCount > 1 ? 's' : ' ' + folderId ? 'to folder' : 'from folders' + '`, 'success');
-                
-                bootstrap.Modal.getInstance(document.getElementById('bulkFolderModal')).hide();
-                selectedArtworks.clear();
-                loadUserArtworks();
-                toggleBulkSelection();
-            }
-        })
-        .catch(error => {
-            console.error('Error updating artworks:', error);
-            showAlert('Error updating artworks', 'danger');
-        });
-}
+
 
 function viewFolderContents(folderId) {
     // Navigate to the dedicated folder page
     window.location.href = `/folders/${folderId}/`;
 }
 
-// Fix the bulk selection button references
-function toggleBulkSelection() {
-    bulkSelectionMode = !bulkSelectionMode;
-    const checkboxes = document.querySelectorAll('.artwork-checkbox');
-    const button = document.getElementById('bulk-select-btn');
-    const bulkActionBtn = document.getElementById('bulk-action-btn');
-    
-    if (bulkSelectionMode) {
-        checkboxes.forEach(cb => cb.style.display = 'block');
-        button.innerHTML = 'Cancel Selection';
-        button.className = 'btn btn-sm btn-warning me-2';
-        bulkActionBtn.disabled = false;
-    } else {
-        checkboxes.forEach(cb => {
-            cb.style.display = 'none';
-            const checkbox = cb.querySelector('input');
-            if (checkbox) checkbox.checked = false;
-        });
-        selectedArtworks.clear();
-        button.innerHTML = 'Select Multiple';
-        button.className = 'btn btn-sm btn-light me-2';
-        bulkActionBtn.disabled = true;
-        updateBulkActionButton();
-    }
-}
+
 </script>
 {% endif %}
 {% endblock %}
