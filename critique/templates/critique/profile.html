@@ -160,42 +160,11 @@
                         <a href="{% url 'critique:my_artworks' %}" class="btn btn-sm btn-outline-light">
                             View All
                         </a>
-                        <button class="btn btn-sm btn-outline-light" onclick="toggleBulkSelection()" id="bulk-select-btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16">
-                                <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
-                                <path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/>
-                            </svg>
-                            Select Multiple
-                        </button>
                         {% endif %}
                     </div>
                 </div>
                 
-                {% if is_own_profile %}
-                <!-- Bulk action controls (hidden by default) -->
-                <div id="bulk-actions" class="alert alert-info m-3" style="display: none;">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span><span id="selected-artwork-count">0</span> artworks selected</span>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-success" onclick="openBulkFolderModal()" data-bs-toggle="modal" data-bs-target="#bulkFolderModal">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-plus" viewBox="0 0 16 16">
-                                    <path d="m.5 3 .04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8H16l.265-2.91A2 2 0 0 0 14.287 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2zm5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19c-.24 0-.47.042-.683.12L1.5 2.98a1 1 0 0 1 1-.98h3.672z"/>
-                                    <path d="M13.5 10a.5.5 0 0 1 .5.5V12h1.5a.5.5 0 1 1 0 1H14v1.5a.5.5 0 1 1-1 0V13h-1.5a.5.5 0 0 1 0-1H13v-1.5a.5.5 0 0 1 .5-.5z"/>
-                                </svg>
-                                Add to Folder
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="bulkDeleteArtworks()">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                    <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                    <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                </svg>
-                                Delete Selected
-                            </button>
-                            <button class="btn btn-sm btn-secondary" onclick="cancelBulkSelection()">Cancel</button>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+
                 
                 <div class="card-body">
                     {% if is_own_profile %}
@@ -781,48 +750,7 @@ function displayArtworksForManagement(artworks) {
     container.innerHTML = html;
 }
 
-function toggleBulkSelection() {
-    bulkSelectionMode = !bulkSelectionMode;
-    const checkboxes = document.querySelectorAll('.artwork-checkbox');
-    const button = document.querySelector('button[onclick="toggleBulkSelection()"]');
-    const bulkActions = document.getElementById('bulk-actions');
-    
-    if (bulkSelectionMode) {
-        checkboxes.forEach(cb => cb.style.display = 'block');
-        button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg> Cancel Selection';
-        button.classList.remove('btn-outline-light');
-        button.classList.add('btn-warning');
-        if (bulkActions) {
-            bulkActions.style.display = 'block';
-        }
-    } else {
-        cancelBulkSelection();
-    }
-}
 
-function cancelBulkSelection() {
-    bulkSelectionMode = false;
-    const checkboxes = document.querySelectorAll('.artwork-checkbox');
-    const button = document.querySelector('button[onclick="toggleBulkSelection()"]');
-    const bulkActions = document.getElementById('bulk-actions');
-    
-    checkboxes.forEach(cb => {
-        cb.style.display = 'none';
-        const input = cb.querySelector('input');
-        if (input) input.checked = false;
-    });
-    
-    selectedArtworks.clear();
-    button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-square" viewBox="0 0 16 16"><path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/><path d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.235.235 0 0 1 .02-.022z"/></svg> Select Multiple';
-    button.classList.remove('btn-warning');
-    button.classList.add('btn-outline-light');
-    
-    if (bulkActions) {
-        bulkActions.style.display = 'none';
-    }
-    
-    updateSelectedCount();
-}
 
 function toggleArtworkSelection(artworkId, checkbox) {
     if (checkbox.checked) {
@@ -840,79 +768,9 @@ function updateSelectedCount() {
     }
 }
 
-function bulkDeleteArtworks() {
-    if (selectedArtworks.size === 0) {
-        showAlert('Please select at least one artwork to delete', 'warning');
-        return;
-    }
-    
-    const count = selectedArtworks.size;
-    const artworkWord = count === 1 ? 'artwork' : 'artworks';
-    
-    if (!confirm(`Are you sure you want to delete ${count} ' + artworkWord + '? This action cannot be undone.`)) {
-        return;
-    }
-    
-    const deletePromises = Array.from(selectedArtworks).map(artworkId => {
-        return fetch(`/api/artworks/${artworkId}/`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken'),
-                'Content-Type': 'application/json'
-            },
-            credentials: 'same-origin'
-        });
-    });
-    
-    Promise.all(deletePromises)
-        .then(responses => {
-            const allSuccessful = responses.every(response => response.ok);
-            if (allSuccessful) {
-                showAlert(`Successfully deleted ${count} ' + artworkWord + '`, 'success');
-                cancelBulkSelection();
-                loadUserArtworks(); // Reload the artworks list
-            } else {
-                showAlert('Some artworks could not be deleted. Please try again.', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error deleting artworks:', error);
-            showAlert('Error deleting artworks. Please try again.', 'error');
-        });
-}
 
-function openBulkFolderModal() {
-    if (selectedArtworks.size === 0) {
-        showAlert('Please select at least one artwork', 'warning');
-        return;
-    }
-    
-    // Load folders into bulk select
-    fetch('/api/folders/my_folders/', {
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const folderSelect = document.getElementById('bulkFolderSelect');
-        if (folderSelect) {
-            folderSelect.innerHTML = '<option value="">Remove from all folders</option>';
-            
-            (data.folders || []).forEach(folder => {
-                const option = document.createElement('option');
-                option.value = folder.id;
-                option.textContent = folder.name;
-                folderSelect.appendChild(option);
-            });
-        }
-    })
-    .catch(error => {
-        console.error('Error loading folders:', error);
-        showAlert('Error loading folders', 'error');
-    });
-}
+
+
 
 function updateBulkActionButton() {
     const bulkActionBtn = document.getElementById('bulk-action-btn');
