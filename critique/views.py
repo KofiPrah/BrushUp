@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.conf import settings
 from allauth.socialaccount.models import SocialAccount
 from .models import ArtWork, Profile, Comment, KarmaEvent, Critique, Reaction, Folder, ArtWorkVersion
-from .forms import CommentForm
+from .forms import CommentForm, ReplyForm
 from .karma import award_like_karma, award_critique_karma
 import json
 
