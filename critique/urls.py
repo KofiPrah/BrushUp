@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views.password_management import profile_password_management, get_user_auth_status, send_password_reset_to_oauth_user
 
 app_name = 'critique'
 
@@ -31,15 +30,15 @@ urlpatterns = [
     # User profile URLs
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.ProfileUpdateView.as_view(), name='profile_edit'),
-    path('profile/password/', profile_password_management, name='profile_password_management'),
+    path('profile/password/', views.profile_password_management, name='profile_password_management'),
     path('user/<str:username>/', views.user_profile_view, name='user_profile'),
     path('my-artworks/', views.MyArtworksListView.as_view(), name='my_artworks'),
     path('my-karma/', views.karma_view, name='my_karma'),
     path('leaderboard/', views.karma_leaderboard, name='karma_leaderboard'),
     
     # Password management API endpoints
-    path('api/auth/status/', get_user_auth_status, name='user_auth_status'),
-    path('api/auth/send-password-reset/', send_password_reset_to_oauth_user, name='send_password_reset_oauth'),
+    path('api/auth/status/', views.get_user_auth_status, name='user_auth_status'),
+    path('api/auth/send-password-reset/', views.send_password_reset_to_oauth_user, name='send_password_reset_oauth'),
     
     # Folder URLs
     path('folders/<int:folder_id>/', views.folder_detail_view, name='folder_detail'),

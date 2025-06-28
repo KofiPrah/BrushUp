@@ -3,6 +3,7 @@ from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from .models import Comment
 
 
 class SetPasswordForOAuthUserForm(SetPasswordForm):
@@ -71,3 +72,41 @@ class RemovePasswordForm(forms.Form):
             'class': 'form-check-input'
         })
     )
+
+
+class CommentForm(forms.ModelForm):
+    """Form for adding comments to artworks."""
+    
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control bg-secondary text-white border-secondary',
+                'rows': 3,
+                'placeholder': 'Add your comment...'
+            })
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['content'].label = 'Comment'
+
+
+class ReplyForm(forms.ModelForm):
+    """Form for adding replies to comments."""
+    
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control bg-secondary text-white border-secondary',
+                'rows': 2,
+                'placeholder': 'Add your reply...'
+            })
+        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['content'].label = 'Reply'

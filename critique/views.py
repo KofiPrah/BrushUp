@@ -884,3 +884,158 @@ def portfolio_builder(request):
     }
     
     return render(request, 'critique/portfolio_builder.html', context)
+
+
+# Password Management for OAuth Users
+@login_required
+def profile_password_management(request):
+    """
+    Password management view for OAuth users.
+    Allows setting, changing, or removing local passwords.
+    """
+    # Check if user authenticated via OAuth (Google)
+    has_social_account = SocialAccount.objects.filter(user=request.user).exists()
+    
+    # Check if user has a password set
+    has_password = request.user.has_usable_password()
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'set_password':
+            password1 = request.POST.get('password1')
+            password2 = request.POST.get('password2')
+            
+            if password1 and password2:
+                if password1 == password2:
+                    if len(password1) >= 8:
+                        request.user.set_password(password1)
+                        request.user.save()
+                        
+                        # Log the user back in after password change
+                        login(request, request.user)
+                        
+                        messages.success(request, 'Password has been set successfully! You can now log in with email and password.')
+                        return redirect('critique:profile')
+                    else:
+                        messages.error(request, 'Password must be at least 8 characters long.')
+                else:
+                    messages.error(request, 'Passwords do not match.')
+            else:
+                messages.error(request, 'Both password fields are required.')
+        
+        elif action == 'change_password' and has_password:
+            current_password = request.POST.get('current_password')
+            new_password1 = request.POST.get('new_password1')
+            new_password2 = request.POST.get('new_password2')
+            
+            if request.user.check_password(current_password):
+                if new_password1 and new_password2:
+                    if new_password1 == new_password2:
+                        if len(new_password1) >= 8:
+                            request.user.set_password(new_password1)
+                            request.user.save()
+                            
+                            # Log the user back in after password change
+                            login(request, request.user)
+                            
+                            messages.success(request, 'Password has been changed successfully!')
+                            return redirect('critique:profile')
+                        else:
+                            messages.error(request, 'New password must be at least 8 characters long.')
+                    else:
+                        messages.error(request, 'New passwords do not match.')
+                else:
+                    messages.error(request, 'Both new password fields are required.')
+            else:
+                messages.error(request, 'Current password is incorrect.')
+        
+        elif action == 'remove_password' and has_password:
+            current_password = request.POST.get('current_password_remove')
+            
+            if request.user.check_password(current_password):
+                request.user.set_unusable_password()
+                request.user.save()
+                messages.success(request, 'Password has been removed. You can now only log in with Google.')
+                return redirect('critique:profile')
+            else:
+                messages.error(request, 'Current password is incorrect.')
+    
+    context = {
+        'has_social_account': has_social_account,
+        'has_password': has_password,
+    }
+    
+    return render(request, 'critique/profile_password_management.html', context)
+
+
+@require_POST
+@login_required
+def get_user_auth_status(request):
+    """
+    API endpoint to get user's authentication status.
+    Returns JSON with OAuth and password status.
+    """
+    has_social_account = SocialAccount.objects.filter(user=request.user).exists()
+    has_password = request.user.has_usable_password()
+    
+    return JsonResponse({
+        'has_social_account': has_social_account,
+        'has_password': has_password,
+        'email': request.user.email,
+    })
+
+
+@require_POST
+@csrf_protect
+def send_password_reset_to_oauth_user(request):
+    """
+    Send password reset email to OAuth users.
+    This allows OAuth users to set up local password authentication.
+    """
+    email = request.POST.get('email')
+    
+    if not email:
+        return JsonResponse({'error': 'Email is required'}, status=400)
+    
+    try:
+        user = User.objects.get(email=email)
+        
+        # Check if user has OAuth account
+        has_social_account = SocialAccount.objects.filter(user=user).exists()
+        
+        if not has_social_account:
+            return JsonResponse({'error': 'This feature is only for OAuth users'}, status=400)
+        
+        # Generate password reset token
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        
+        # Create password reset URL
+        reset_url = request.build_absolute_uri(
+            reverse('account_reset_password_from_key', kwargs={'uidb36': uid, 'key': token})
+        )
+        
+        # Send email
+        subject = 'Set Up Your Password - Brush Up'
+        message = render_to_string('critique/emails/oauth_password_setup.html', {
+            'user': user,
+            'reset_url': reset_url,
+            'site_name': 'Brush Up',
+        })
+        
+        send_mail(
+            subject,
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            html_message=message,
+            fail_silently=False,
+        )
+        
+        return JsonResponse({'success': True, 'message': 'Password setup email sent successfully!'})
+        
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User with this email does not exist'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': 'Failed to send email'}, status=500)
