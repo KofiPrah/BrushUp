@@ -918,8 +918,8 @@ def profile_password_management(request):
             password_form = SetPasswordForOAuthUserForm(request.user, request.POST)
             if password_form.is_valid():
                 password_form.save()
-                # Log the user back in after password change
-                login(request, request.user)
+                # Log the user back in after password change with explicit backend
+                login(request, request.user, backend='django.contrib.auth.backends.ModelBackend')
                 messages.success(request, 'Password has been set successfully! You can now log in with email and password.')
                 return redirect('critique:profile_password_management')
         
@@ -928,8 +928,8 @@ def profile_password_management(request):
             password_form = PasswordChangeForm(request.user, request.POST)
             if password_form.is_valid():
                 password_form.save()
-                # Log the user back in after password change
-                login(request, request.user)
+                # Log the user back in after password change with explicit backend
+                login(request, request.user, backend='django.contrib.auth.backends.ModelBackend')
                 messages.success(request, 'Password has been changed successfully!')
                 return redirect('critique:profile_password_management')
         

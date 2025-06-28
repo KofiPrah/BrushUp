@@ -135,6 +135,14 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
+### June 28, 2025 - OAuth Password Management System Implementation ✓
+- **Fixed import issues**: Added missing CommentForm and ReplyForm to forms.py to resolve 500 errors
+- **Implemented OAuth password management**: Created comprehensive password management system for Google OAuth users
+- **Fixed authentication backend error**: Resolved ValueError when setting passwords by specifying explicit backend
+- **Enhanced form visibility**: Fixed missing form fields in password management interface
+- **Applied dark theme styling**: Ensured all password management forms follow consistent dark background theme
+- **Integrated security features**: Users can now set, change, or remove passwords while maintaining OAuth functionality
+
 ### June 17, 2025 - Comprehensive Version History System Enhancement ✓
 - **Fixed save current state API**: Resolved 400 error by adding `force_create` parameter to bypass change detection
 - **Implemented version deletion**: Users can now delete versions with safety checks to prevent deleting the only version
