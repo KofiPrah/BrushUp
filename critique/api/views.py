@@ -1866,19 +1866,35 @@ def create_artwork_version(request, artwork_id):
         return Response({'error': 'Artwork not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 @permission_classes([permissions.IsAuthenticated])
 def get_artwork_version(request, artwork_id, version_id):
-    """Get a specific version of an artwork"""
+    """Get or delete a specific version of an artwork"""
     try:
         artwork = ArtWork.objects.get(id=artwork_id, author=request.user)
         version = artwork.versions.get(id=version_id)
-        serializer = ArtWorkVersionSerializer(version)
         
-        return Response({
-            'version': serializer.data,
-            'artwork_title': artwork.title
-        })
+        if request.method == 'GET':
+            serializer = ArtWorkVersionSerializer(version)
+            return Response({
+                'version': serializer.data,
+                'artwork_title': artwork.title
+            })
+        
+        elif request.method == 'DELETE':
+            # Prevent deletion if this is the only version
+            if artwork.versions.count() <= 1:
+                return Response({'error': 'Cannot delete the only version of an artwork'}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            version_number = version.version_number
+            version.delete()
+            
+            return Response({
+                'message': f'Version {version_number} deleted successfully',
+                'success': True
+            })
+            
     except ArtWork.DoesNotExist:
         return Response({'error': 'Artwork not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
