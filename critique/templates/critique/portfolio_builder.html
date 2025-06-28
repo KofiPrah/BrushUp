@@ -73,6 +73,62 @@
     border-style: solid;
 }
 
+.unorganized-artworks .artwork-drop-zone.drag-over {
+    border-color: #ffc107;
+    background: #fff3cd;
+    border-style: solid;
+}
+
+.unorganized-artworks .artwork-drop-zone.drag-over::before {
+    content: "Drop here to remove from folder";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 193, 7, 0.9);
+    color: #212529;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.unorganized-artworks.drop-target-active {
+    border-color: #ffc107 !important;
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3);
+    animation: pulse-yellow 1.5s infinite;
+}
+
+@keyframes pulse-yellow {
+    0% { box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3); }
+    50% { box-shadow: 0 0 0 6px rgba(255, 193, 7, 0.2); }
+    100% { box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.3); }
+}
+
+.artwork-drop-zone.removing-from-folder {
+    border-color: #dc3545 !important;
+    background: #f8d7da !important;
+}
+
+.artwork-drop-zone.removing-from-folder::before {
+    content: "Removing from folder...";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 10;
+    pointer-events: none;
+}
+
 .artwork-drop-zone.has-artworks {
     border-style: solid;
     border-color: #dee2e6;
@@ -393,48 +449,58 @@ div.portfolio-builder img {
         <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <!-- Unorganized Artworks Section -->
-                    {% if unorganized_artworks %}
+                    <!-- Unorganized Artworks Section - Always Visible as Drop Zone -->
                     <div class="unorganized-artworks" id="unorganized-container">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h3 class="text-warning mb-0">
                                 <i class="bi bi-archive me-2"></i>
                                 Unorganized Artworks ({{ unorganized_artworks|length }})
                             </h3>
-                            <span class="badge bg-warning text-dark">Drag to folders below</span>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-warning text-dark">Drag to folders below</span>
+                                <span class="badge bg-info text-dark">Drag from folders here to remove</span>
+                            </div>
                         </div>
-                        <div class="artwork-drop-zone has-artworks" id="unorganized-zone">
-                            {% for artwork in unorganized_artworks %}
-                            <div class="artwork-item d-flex align-items-center" data-artwork-id="{{ artwork.id }}">
-                                <div class="me-3">
-                                    <div class="portfolio-image-container">
-                                        {% if artwork.image %}
-                                            <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail" style="width: 80px !important; height: 80px !important; max-width: 80px !important; max-height: 80px !important; object-fit: cover !important; display: block !important;">
-                                        {% else %}
-                                            <div class="d-flex align-items-center justify-content-center h-100">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
-                                        {% endif %}
+                        <div class="artwork-drop-zone {% if unorganized_artworks %}has-artworks{% endif %}" id="unorganized-zone">
+                            {% if unorganized_artworks %}
+                                {% for artwork in unorganized_artworks %}
+                                <div class="artwork-item d-flex align-items-center" data-artwork-id="{{ artwork.id }}">
+                                    <div class="me-3">
+                                        <div class="portfolio-image-container">
+                                            {% if artwork.image %}
+                                                <img src="{{ artwork.image.url }}" alt="{{ artwork.title }}" class="artwork-thumbnail" style="width: 80px !important; height: 80px !important; max-width: 80px !important; max-height: 80px !important; object-fit: cover !important; display: block !important;">
+                                            {% else %}
+                                                <div class="d-flex align-items-center justify-content-center h-100">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ artwork.title }}</h6>
+                                        <p class="text-muted small mb-1">{{ artwork.description|truncatewords:10 }}</p>
+                                        <small class="text-muted">{{ artwork.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <div class="quick-actions">
+                                        <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="removeFromFolder({{ artwork.id }})">
+                                            <i class="bi bi-folder-x"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">{{ artwork.title }}</h6>
-                                    <p class="text-muted small mb-1">{{ artwork.description|truncatewords:10 }}</p>
-                                    <small class="text-muted">{{ artwork.created_at|date:"M d, Y" }}</small>
+                                {% endfor %}
+                            {% else %}
+                                <!-- Empty state encouraging drag-and-drop -->
+                                <div class="empty-state">
+                                    <i class="bi bi-folder-x text-warning"></i>
+                                    <h5 class="mt-2 text-muted">All artworks are organized!</h5>
+                                    <p class="text-muted">Drag artworks from folders above to this area to remove them from folders.</p>
                                 </div>
-                                <div class="quick-actions">
-                                    <a href="{% url 'critique:artwork_detail' artwork.id %}" class="btn btn-sm btn-outline-primary me-2">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <button class="btn btn-sm btn-outline-secondary" onclick="removeFromFolder({{ artwork.id }})">
-                                        <i class="bi bi-folder-x"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
-                    {% endif %}
 
                     <!-- Portfolio Folders -->
                     <div id="folders-container">
@@ -607,10 +673,24 @@ function initializeDragAndDrop() {
             chosenClass: 'sortable-chosen',
             onStart: function(evt) {
                 evt.item.classList.add('dragging');
+                // Add visual cue that items can be dropped here to remove from folders
+                document.querySelector('.unorganized-artworks').classList.add('drop-target-active');
             },
             onEnd: function(evt) {
                 evt.item.classList.remove('dragging');
+                document.querySelector('.unorganized-artworks').classList.remove('drop-target-active');
                 handleArtworkMove(evt);
+            },
+            onMove: function(evt) {
+                // Show special feedback when dragging from folder to unorganized
+                const fromFolder = evt.from.dataset.folderId;
+                const toUnorganized = evt.to.id === 'unorganized-zone';
+                
+                if (fromFolder && toUnorganized) {
+                    evt.to.classList.add('removing-from-folder');
+                } else {
+                    evt.to.classList.remove('removing-from-folder');
+                }
             }
         });
     }
