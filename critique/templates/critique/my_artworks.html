@@ -2526,7 +2526,7 @@ function bulkToggleCritique() {
         showToast(`Toggled critique requests for ${selectedArtworks.size} artworks`, 'success');
         // Update UI for selected artworks
         selectedArtworks.forEach(id => {
-            const item = document.querySelector(`[data-artwork-id="' + id + '"]`);
+            const item = document.querySelector(`[data-artwork-id="${id}"]`);
             if (item) {
                 const currentSeeking = item.dataset.seekingCritique === 'true';
                 item.dataset.seekingCritique = (!currentSeeking).toString();
@@ -2545,7 +2545,7 @@ function bulkToggleCritique() {
 function bulkDelete() {
     if (selectedArtworks.size === 0) return;
     
-    if (confirm(`Are you sure you want to delete ' + selectedArtworks.size + ' selected artworks? This action cannot be undone.`)) {
+    if (confirm(`Are you sure you want to delete ${selectedArtworks.size} selected artworks? This action cannot be undone.`)) {
         fetch('/api/artworks/bulk_actions/', {
             method: 'POST',
             headers: {
@@ -2559,10 +2559,10 @@ function bulkDelete() {
         })
         .then(response => response.json())
         .then(data => {
-            showToast(`Deleted ' + selectedArtworks.size + ' artworks`, 'success');
+            showToast(`Deleted ${selectedArtworks.size} artworks`, 'success');
             // Remove deleted artworks from UI
             selectedArtworks.forEach(id => {
-                const item = document.querySelector(`[data-artwork-id="' + id + '"]`);
+                const item = document.querySelector(`[data-artwork-id="${id}"]`);
                 if (item) {
                     item.remove();
                 }
