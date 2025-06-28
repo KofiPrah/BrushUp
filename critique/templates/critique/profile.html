@@ -645,8 +645,7 @@ function showAlert(message, type) {
 }
 
 // Bulk artwork management variables
-let bulkSelectionMode = false;
-let selectedArtworks = new Set();
+
 
 function loadUserArtworks() {
     const container = document.getElementById('artwork-management-container');
@@ -752,70 +751,17 @@ function displayArtworksForManagement(artworks) {
 
 
 
-function toggleArtworkSelection(artworkId, checkbox) {
-    if (checkbox.checked) {
-        selectedArtworks.add(artworkId);
-    } else {
-        selectedArtworks.delete(artworkId);
-    }
-    updateSelectedCount();
-}
-
-function updateSelectedCount() {
-    const countElement = document.getElementById('selected-artwork-count');
-    if (countElement) {
-        countElement.textContent = selectedArtworks.size;
-    }
-}
 
 
 
 
 
-function updateBulkActionButton() {
-    const bulkActionBtn = document.getElementById('bulk-action-btn');
-    const count = selectedArtworks.size;
-    
-    if (count > 0) {
-        bulkActionBtn.textContent = `Add ${count} artwork' + count > 1 ? 's' : ' to Folder`;
-        bulkActionBtn.disabled = false;
-    } else {
-        bulkActionBtn.textContent = 'Add to Folder';
-        bulkActionBtn.disabled = true;
-    }
-}
 
-function showBulkFolderModal() {
-    if (selectedArtworks.size === 0) {
-        showAlert('Please select at least one artwork', 'warning');
-        return;
-    }
-    
-    document.getElementById('selected-count').textContent = selectedArtworks.size;
-    
-    // Load folders into bulk select
-    fetch('/api/folders/my_folders/', {
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        credentials: 'same-origin'
-    })
-    .then(response => response.json())
-    .then(data => {
-        const folderSelect = document.getElementById('bulkFolderSelect');
-        folderSelect.innerHTML = '<option value="">Remove from all folders</option>';
-        
-        (data.folders || []).forEach(folder => {
-            const option = document.createElement('option');
-            option.value = folder.id;
-            option.textContent = folder.name;
-            folderSelect.appendChild(option);
-        });
-        
-        const modal = new bootstrap.Modal(document.getElementById('bulkFolderModal'));
-        modal.show();
-    });
-}
+
+
+
+
+
 
 function assignSelectedArtworksToFolder() {
     const folderId = document.getElementById('bulkFolderSelect').value;
