@@ -310,6 +310,16 @@
                     {% if artwork.author %}
                     <p class="card-text"><small class="text-muted">Artist: <a href="{% url 'critique:user_profile' artwork.author.username %}" class="text-info">{{ artwork.author.username }}</a></small></p>
                     {% endif %}
+                    {% if artwork.folder %}
+                    <p class="card-text">
+                        <small class="text-muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-folder me-1" viewBox="0 0 16 16">
+                                <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h4.672a2 2 0 0 1 2 2l-.54.87a1 1 0 0 1-.94.63H1.48a1 1 0 0 1-.94-.63zM2.5 4a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5H2.5z"/>
+                            </svg>
+                            Portfolio: <a href="/folders/{{ artwork.folder.id }}/" class="text-info">{{ artwork.folder.name }}</a>
+                        </small>
+                    </p>
+                    {% endif %}
 
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -353,6 +363,17 @@
                                         Edit Artwork
                                     </a>
                                 </li>
+                                {% if artwork.folder %}
+                                <li>
+                                    <a class="dropdown-item text-warning" href="#" onclick="removeArtworkFromFolder({{ artwork.id }})">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-x me-2" viewBox="0 0 16 16">
+                                            <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h4.672a2 2 0 0 1 2 2l-.54.87a1 1 0 0 1-.94.63H1.48a1 1 0 0 1-.94-.63zM2.5 4a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5H2.5z"/>
+                                            <path d="M6.146 6.146a.5.5 0 0 1 .708 0L8 7.293l1.146-1.147a.5.5 0 1 1 .708.708L8.707 8l1.147 1.146a.5.5 0 0 1-.708.708L8 8.707 6.854 9.854a.5.5 0 0 1-.708-.708L7.293 8 6.146 6.854a.5.5 0 0 1 0-.708z"/>
+                                        </svg>
+                                        Remove from Folder
+                                    </a>
+                                </li>
+                                {% endif %}
                                 <li><hr class="dropdown-divider border-secondary"></li>
                                 <li>
                                     <a class="dropdown-item text-danger" href="{% url 'critique:artwork_delete' artwork.id %}" onclick="return confirm('Are you sure you want to delete this artwork? This action cannot be undone and will also delete all associated critiques and reactions.')">
@@ -3326,6 +3347,47 @@
                 });
             }
         });
+
+        // Remove artwork from folder function
+        function removeArtworkFromFolder(artworkId) {
+            if (!confirm('Remove this artwork from its folder? It will still be visible in your main gallery.')) {
+                return;
+            }
+
+            fetch('/api/artworks/move-to-folder/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    artwork_id: artworkId,
+                    folder_id: null  // Remove from folder by setting to null
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to remove artwork from folder');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast('Artwork removed from folder successfully', 'success');
+                    // Refresh the page to show updated folder status
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    throw new Error(data.error || 'Failed to remove artwork from folder');
+                }
+            })
+            .catch(error => {
+                console.error('Error removing artwork from folder:', error);
+                showToast('Failed to remove artwork from folder', 'error');
+            });
+        }
 
     </script>
 {% endblock %}
