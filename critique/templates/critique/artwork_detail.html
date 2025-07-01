@@ -279,6 +279,117 @@
         margin-bottom: 0.75rem !important;
     }
     
+    /* Artwork Info Sidebar Enhancement */
+    .artwork-info-sidebar {
+        border-left: 2px solid rgba(255, 255, 255, 0.1);
+        padding-left: 1.5rem;
+    }
+    
+    .artwork-metadata .mb-3 {
+        margin-bottom: 0.25rem !important;
+    }
+    
+    /* Call-to-Action Area */
+    .cta-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 1rem;
+    }
+    
+    .cta-container .btn {
+        transition: all 0.3s ease;
+    }
+    
+    @media (max-width: 768px) {
+        .cta-container .btn {
+            width: 100% !important;
+        }
+    }
+    
+    /* Version History Sidebar Sticky */
+    @media (min-width: 992px) {
+        .version-history {
+            position: sticky;
+            top: 80px;
+        }
+    }
+    
+    /* Version Thumbnail Hover Enhancement */
+    .version-thumb:hover {
+        outline: 2px solid #6c63ff;
+        cursor: pointer;
+        transform: translateY(-2px);
+    }
+    
+    .version-thumb {
+        padding: 0.125rem;
+        transition: all 0.2s ease;
+    }
+    
+    /* Enhanced Critique Card Styling */
+    .critique-card {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+    
+    .critique-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Rating Labels with Icons */
+    .rating-section {
+        border-top: 1px solid rgba(255,255,255,0.1);
+        padding-top: 0.75rem;
+        margin-top: 0.75rem;
+    }
+    
+    .rating-section .fw-bold {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #adb5bd;
+    }
+    
+    /* Reaction Bar Enhancement */
+    .reaction-btn {
+        gap: 0.5rem;
+        justify-content: space-between;
+        padding: 0.5rem 0.75rem;
+        border-radius: 20px;
+        transition: all 0.3s ease;
+    }
+    
+    .reaction-btn:hover {
+        background: rgba(255,255,255,0.1) !important;
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    .reaction-btn.active {
+        background: rgba(13, 110, 253, 0.2) !important;
+        border-color: #0d6efd !important;
+    }
+    
+    /* Enhanced Dividers */
+    .critique-divider {
+        border-color: rgba(255,255,255,0.1) !important;
+        margin: 1.5rem 0 !important;
+    }
+    
+    /* Compact Mode Toggle Alignment */
+    .critique-controls {
+        align-items: center !important;
+        gap: 1rem;
+    }
+    
+    /* Visual Polish - Consistent Shadows */
+    .card, .version-history-card, .critique-card {
+        box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    
     /* Improved Version History Layout */
     .version-history-card {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
