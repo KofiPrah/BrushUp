@@ -1,0 +1,109 @@
+Perfect — here’s your **recap and build checklist** for implementing **Focus Mode as the default** on your BrushUp artwork detail page.
+
+---
+
+## ✅ Goal
+
+> Make the **artwork the centerpiece**, delaying UI elements and collapsing everything else until the user *intentionally engages* (scroll, hover, or wait).
+
+---
+
+## 🧱 Layout Architecture
+
+### 1. **Hero Section (Focus Mode Container)**
+
+* Full viewport height (`height: 100vh`)
+* Artwork centered (max height 90–100%)
+* Background: solid dark or gradient pulled from artwork
+* Hidden UI overlays (to be revealed after delay)
+
+### 2. **Delayed UI Elements**
+
+* Favorite button ❤️
+* Version info chip (e.g., “v2 (Current)”)
+* Scroll cue (down arrow or "See Critiques")
+* Optional: action dropdown / “Add Critique” button
+
+> ⏱ Use `setTimeout` (\~5 seconds) to fade these in
+
+### 3. **Scroll Anchor**
+
+* Scrolling down reveals:
+
+  * Critiques (collapsed by default)
+  * Comments (optional)
+  * Version History (minimized chip or off-canvas)
+
+---
+
+## 🧰 Components to Build
+
+| Component           | Description                                                    |
+| ------------------- | -------------------------------------------------------------- |
+| `#focus-mode`       | Fullscreen hero section with artwork                           |
+| `#delayed-ui`       | Bottom-floating UI (favorite, version chip) — hidden initially |
+| `#scroll-anchor`    | Wrapper for everything below artwork (critiques, etc.)         |
+| `#critique-section` | Starts collapsed; expands on scroll or user interaction        |
+| `#version-history`  | Optionally hidden/minimized until user clicks or scrolls       |
+| `scroll-indicator`  | Animates gently to suggest scroll interaction                  |
+
+---
+
+## 🎨 CSS/JS Needs
+
+### CSS
+
+* `vh-100` container
+* `opacity-0` → `opacity-100` transition for delayed UI
+* `overflow: hidden` on body initially (prevent scroll)
+* Animations:
+
+  * Fade-in
+  * Optional slight zoom or parallax on artwork
+
+### JS
+
+* `setTimeout` for delayed UI
+* `wheel` or `scroll` listener to reveal main content and unlock scroll
+* `IntersectionObserver` (optional) to fade in critique blocks on entry
+* Event toggles for collapsible UI
+
+---
+
+## 🔄 User Flow Summary
+
+1. **Page Loads**
+
+   * Artwork fills the screen
+   * No controls visible yet
+
+2. **After 5s**
+
+   * Buttons/icons fade in
+   * Scroll cue appears
+
+3. **On Scroll or Click**
+
+   * Page unlocks
+   * Critique section slides in
+   * Additional UI expands (version history, actions, etc.)
+
+4. **Below-the-fold**
+
+   * Structured critiques (collapsed initially)
+   * Comments
+   * Add Critique button
+   * Version history summary
+
+---
+
+## 🧪 Optional Enhancements
+
+* Ambient background blur
+* Fullscreen zoom on artwork click
+* Keyboard support (e.g., `Esc` to collapse critiques, `↓` to scroll to feedback)
+* Transitioned feedback when returning from full-view to focus mode
+
+---
+
+Would you like me to generate a **starter template** now (HTML + Bootstrap + JS) with all of this pre-wired and commented for integration into your Django template?

@@ -440,6 +440,162 @@
         margin-bottom: 0.5rem;
     }
     
+    /* Focus Mode Styles */
+    #focus-mode {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        overflow: hidden;
+    }
+    
+    #focus-artwork {
+        max-height: 90vh;
+        max-width: 90vw;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        transition: transform 0.3s ease;
+    }
+    
+    #focus-artwork:hover {
+        transform: scale(1.02);
+    }
+    
+    #delayed-ui {
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        opacity: 0;
+        transition: opacity 1s ease;
+        z-index: 10;
+    }
+    
+    #delayed-ui.visible {
+        opacity: 1;
+    }
+    
+    .focus-ui-element {
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 0.75rem 1rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .focus-ui-element:hover {
+        background: rgba(255,255,255,0.1);
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .scroll-indicator {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: opacity 1s ease;
+        animation: bounce 2s infinite;
+        cursor: pointer;
+    }
+    
+    .scroll-indicator.visible {
+        opacity: 0.7;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateX(-50%) translateY(0);
+        }
+        40% {
+            transform: translateX(-50%) translateY(-10px);
+        }
+        60% {
+            transform: translateX(-50%) translateY(-5px);
+        }
+    }
+    
+    #scroll-anchor {
+        min-height: 100vh;
+        padding-top: 2rem;
+        transform: translateY(50px);
+        opacity: 0;
+        transition: all 0.8s ease;
+    }
+    
+    #scroll-anchor.visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    
+    .focus-mode-active {
+        overflow: hidden;
+    }
+    
+    .version-chip {
+        background: rgba(108, 99, 255, 0.2);
+        border: 1px solid rgba(108, 99, 255, 0.3);
+        color: #6c63ff;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    
+    .favorite-btn {
+        background: rgba(220, 53, 69, 0.2);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        color: #dc3545;
+        width: 44px;
+        height: 44px;
+        border-radius: 22px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .favorite-btn:hover {
+        background: rgba(220, 53, 69, 0.3);
+        transform: scale(1.1);
+    }
+    
+    .favorite-btn.active {
+        background: #dc3545;
+        color: white;
+    }
+    
+    /* Responsive Focus Mode */
+    @media (max-width: 768px) {
+        #focus-artwork {
+            max-height: 80vh;
+            max-width: 95vw;
+        }
+        
+        #delayed-ui {
+            bottom: 1rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .focus-ui-element {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+        }
+    }
+    
     /* Improved Version History Layout */
     .version-history-card {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
