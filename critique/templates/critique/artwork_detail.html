@@ -929,10 +929,9 @@
 <!-- Main Content (Initially Hidden) -->
 <div id="main-content">
     <div id="scroll-anchor"></div>
-
-{% block content %}
-    {% csrf_token %}
-    <div class="row">
+    <div class="container-fluid py-4">
+        {% csrf_token %}
+        <div class="row">
         <!-- Main Content -->
         <div class="col-lg-8">
             <div class="card mb-4 bg-dark text-white">
@@ -4366,4 +4365,8 @@
         });
 
     </script>
+
+</div>
+</div>
+
 {% endblock %}
