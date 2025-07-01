@@ -434,7 +434,18 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         # Create and validate the serializer
         serializer = CritiqueSerializer(data=data, context={'request': request})
         if serializer.is_valid():
-            serializer.save(author=request.user, artwork=artwork)
+            critique = serializer.save(author=request.user, artwork=artwork)
+            
+            # Trigger badge checking after critique creation
+            try:
+                from critique.services import AchievementService
+                AchievementService.trigger_badge_check(request.user, 'critique_created')
+            except Exception as e:
+                # Don't let badge checking errors affect critique creation
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Failed to check badges after critique creation: {str(e)}")
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
