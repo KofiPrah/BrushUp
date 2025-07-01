@@ -981,6 +981,13 @@
             </svg>
             Add Critique
         </a>
+        
+        <button class="focus-button" onclick="enterFullscreen(document.getElementById('focus-artwork'))" title="Fullscreen View">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z"/>
+            </svg>
+            Fullscreen
+        </button>
     </div>
     
     <!-- Scroll Indicator -->
@@ -4417,8 +4424,33 @@
             showToast('Favorite', heart.classList.contains('bi-heart-fill') ? 'Added to favorites' : 'Removed from favorites', 'info');
         }
 
+        // Scroll detection for smooth reveals
+        window.addEventListener('scroll', () => {
+            const body = document.body;
+            if (window.scrollY > 50) {
+                body.classList.add('scrolled');
+            } else {
+                body.classList.remove('scrolled');
+            }
+        });
+
         // Focus Mode initialization
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize scroll anchor reveal
+            const scrollAnchor = document.getElementById('scroll-anchor');
+            if (scrollAnchor) {
+                // Set up intersection observer for smooth critique reveals
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, { threshold: 0.1 });
+                
+                observer.observe(scrollAnchor);
+            }
+
             // Auto-transition after delay if user doesn't interact
             setTimeout(() => {
                 const mainContent = document.getElementById('main-content');
