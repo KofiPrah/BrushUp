@@ -1,0 +1,108 @@
+Your artwork detail page is already clean and intuitive—great work! To elevate the **visual layout and clarity**, here are specific suggestions broken down by section:
+
+---
+
+## 🎨 1. **Main Artwork Area (Top Center)**
+
+### ✅ **Make the Artwork More Prominent**
+
+* Add a subtle shadow or light border to the image to separate it from the background:
+
+  ```css
+  .artwork-image {
+    box-shadow: 0 0 10px rgba(255,255,255,0.1);
+    border-radius: 4px;
+  }
+  ```
+
+### ✅ **Add Spacing Between Metadata**
+
+* Increase vertical spacing between the artwork title, creation date, artist, and portfolio link. Right now it's a bit tight.
+
+* Example with Bootstrap:
+
+  ```html
+  <div class="mb-2">Created: ...</div>
+  <div class="mb-2">Artist: ...</div>
+  ```
+
+---
+
+## 🧭 2. **Right Sidebar (Version History)**
+
+### ✅ **Tighten Version History Layout**
+
+* Add visual balance with more **consistent padding** and spacing between items.
+
+* Consider grouping elements like this:
+
+  * **Header:** "Version History" + toggle in a single line
+  * **Thumbnail Stack:** Use `.mb-2` between thumbnails
+  * **"Compare Versions"**: Align it to bottom or center to reduce floating look
+
+### ✅ **Visual Enhancements**
+
+* Use lighter hover effects or subtle outlines on version thumbnails.
+* Consider a label like “v2 (Current)” inside the thumbnail rather than outside, reducing width strain.
+
+---
+
+## 🗣 3. **Critique Section**
+
+### ✅ **Improve Visual Hierarchy**
+
+* Right now everything is in a dark rectangle — try:
+
+  * **Card-style layout** per critique with light borders or a subtle background
+  * Give `Ratings` a bold title bar or icon
+  * Separate the “...” comment from the rating block visually (e.g., a light divider or spacing)
+
+### ✅ **Color Coding for Ratings**
+
+* You're already using color! Nice. Make it **consistent and intuitive**:
+
+  * e.g., green for 7–10, yellow 4–6, red 1–3
+  * Consider small icons next to rating names (like a brush for “Technique” or spark for “Originality”)
+
+### ✅ **Improve Reaction Row**
+
+* Add tooltips on icons ("Helpful", "Inspiring", etc.)
+* Use color fills or hover animations to enhance interactivity
+* Spread the icons out with `gap-3` or `justify-content-around`
+
+---
+
+## 🧩 4. **Actions & Buttons**
+
+### ✅ **Clarify the 'Actions' Dropdown**
+
+* Add a dropdown caret (`▼`) if not already present
+* Use icons inside the dropdown to aid scanning
+
+### ✅ **Elevate “Add Critique” Button**
+
+* Give it more visual weight:
+
+  * Slight increase in padding or font-size
+  * Maybe place it right under the title or under the artwork with emphasis
+  * Optional: use a "+" icon on the button
+
+---
+
+## 🧼 5. **Minor UX Polish**
+
+* **Compact View Toggle:** Align left and closer to “Critiques (1)” label
+* **Sort Dropdown:** Add a label like “Sort by” next to the dropdown for clarity
+* **Profile Link:** Add hover underline on artist name or avatar to indicate it's clickable
+
+---
+
+## 🧠 Bonus: If You Want To Get Fancy
+
+* Consider **scroll sync** or a sticky sidebar for Version History when scrolling critiques
+* Add **tabs** for separating structured critique vs comments if the section grows long
+* Display **average rating summary** (like 6.3/10 overall) near the title or under the artwork as quick insight
+
+---
+
+Let me know if you want a quick Figma-style mockup or if you're building this with Bootstrap—happy to sketch HTML/CSS samples!
