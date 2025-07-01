@@ -3000,8 +3000,14 @@
             showToast('Sorted', `Critiques sorted by ${sortBy}`, 'success');
         }
 
-        // Compact View Toggle
+        // Enhanced initialization
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize enhanced critique controls
+            setupCompactView();
+            setupRatedFilter();
+            setupViewModeToggle();
+            
+            // Legacy compact view toggle (maintaining existing functionality)
             const compactToggle = document.getElementById('collapseMode');
             if (compactToggle) {
                 compactToggle.addEventListener('change', function() {
