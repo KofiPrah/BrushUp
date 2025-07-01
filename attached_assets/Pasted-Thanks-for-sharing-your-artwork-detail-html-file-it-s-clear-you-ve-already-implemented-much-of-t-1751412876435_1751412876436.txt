@@ -1,0 +1,162 @@
+Thanks for sharing your `artwork_detail.html` file — it's clear you’ve already implemented much of the Focus Mode structure! Here’s a **complete list of what to fix and improve**, based on the behaviors and layout issues you described.
+
+---
+
+## ✅ Summary of Issues
+
+1. **Artwork disappears after scroll**
+2. **Inconsistent button transparency**
+3. **No scroll-triggered transition**
+4. **Layout doesn’t preserve flow gracefully**
+5. **UI elements are not visually unified**
+
+---
+
+## 🛠️ Step-by-Step Fixes
+
+### 1. ✅ Fix the Disappearing Artwork
+
+**Problem:** The artwork is isolated in a section with limited height (`vh-100`) and doesn't remain part of the scrollable flow.
+
+**Fix:**
+
+* Remove `vh-100` from `#focus-mode` or ensure that the image remains in flow.
+* Add `position: sticky` or allow scroll continuity by embedding the image within a single scrollable flow instead of segmenting sections sharply.
+
+Replace:
+
+```html
+<section id="focus-mode" class="vh-100 position-relative overflow-hidden">
+```
+
+With:
+
+```html
+<section id="focus-mode" class="position-relative py-5">
+```
+
+And remove any `overflow-hidden` that could clip child content.
+
+---
+
+### 2. ✅ Standardize Button Appearance
+
+**Problem:** Like/favorite and version buttons are semi-transparent, while others are solid.
+
+**Fix:**
+Replace:
+
+```html
+<button class="btn btn-outline-light btn-sm">♥ Favorite</button>
+```
+
+With:
+
+```html
+<button class="btn btn-light btn-sm focus-button">♥ Favorite</button>
+```
+
+Then define in CSS:
+
+```css
+.focus-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  backdrop-filter: blur(6px);
+  transition: background-color 0.3s;
+}
+.focus-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+```
+
+Apply `.focus-button` to all UI controls in Focus Mode for consistency.
+
+---
+
+### 3. ✅ Implement Scroll Reveal Transition
+
+**Problem:** No visual cue or behavior when scrolling to critiques.
+
+**Fix:**
+Add this JS to detect scroll:
+
+```js
+window.addEventListener('scroll', () => {
+  const body = document.body;
+  if (window.scrollY > 50) {
+    body.classList.add('scrolled');
+  } else {
+    body.classList.remove('scrolled');
+  }
+});
+```
+
+Add CSS:
+
+```css
+#scroll-anchor {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.4s ease;
+}
+body.scrolled #scroll-anchor {
+  opacity: 1;
+  transform: translateY(0);
+}
+```
+
+Wrap critique section with `#scroll-anchor`.
+
+---
+
+### 4. ✅ Smooth Critique Reveal and Collapsible UI
+
+**Problem:** Critiques appear suddenly and clutter the page.
+
+**Fix:**
+
+* Add `.collapsed` class to critique section by default
+* On scroll or button click, expand the critique block
+* Use Bootstrap's collapse feature or a simple JS toggle
+
+Example:
+
+```html
+<div id="critique-section" class="collapse show">...</div>
+```
+
+---
+
+### 5. ✅ Layout Polish: Unified Flow
+
+**Suggestions:**
+
+* Remove hard visual breaks between focus section and rest of the page
+* Use `padding-top` and smooth visual fade-ins for new sections
+* Consider using `container-fluid` on `#focus-mode` and `container` on critiques to create visual layering
+
+---
+
+## 🧪 Optional Enhancements
+
+* Add a fullscreen toggle to the image (`<button class="btn btn-sm">⛶</button>`)
+* Fade in critiques individually using `IntersectionObserver`
+* Blur background subtly with dominant color from artwork
+
+---
+
+## ✅ Final Touch Summary
+
+| Fix                      | What to Do                                                   |
+| ------------------------ | ------------------------------------------------------------ |
+| 🎨 Artwork disappears    | Keep image in scroll flow, remove vh-100 or overflow-hidden  |
+| 🎛 Button consistency    | Use `.focus-button` class with backdrop blur                 |
+| ⬇ Scroll transition      | Animate `#scroll-anchor` into view on scroll                 |
+| 💬 Collapsible critiques | Use Bootstrap collapse or manual toggling                    |
+| 🧼 Layout polish         | Reduce padding jumps, add visual continuity between sections |
+
+---
+
+Would you like me to send over the cleaned-up version of your full HTML file with all these fixes implemented?
