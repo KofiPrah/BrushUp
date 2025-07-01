@@ -227,7 +227,19 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         """Set the author to the current user when creating an artwork."""
-        serializer.save(author=self.request.user)
+        artwork = serializer.save(author=self.request.user)
+        
+        # Trigger badge checking after artwork creation
+        try:
+            from critique.services import AchievementService
+            AchievementService.trigger_badge_check(self.request.user, 'artwork_upload')
+        except Exception as e:
+            # Don't let badge checking errors affect artwork creation
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.warning(f"Failed to check badges after artwork creation: {str(e)}")
+        
+        return artwork
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def toggle_publish_status(self, request, pk=None):

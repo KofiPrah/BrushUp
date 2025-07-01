@@ -30,6 +30,12 @@ urlpatterns = [
     # Custom endpoints that need to be before the router
     path('artworks/move-to-folder/', move_artwork_to_folder, name='artwork-move-to-folder'),
     
+    # Achievement system endpoints - must be before router to prevent conflicts
+    path('badges/overview/', user_badge_overview, name='user-badge-overview'),
+    path('badges/overview/<int:user_id>/', user_badge_overview, name='user-badge-overview-by-id'),
+    path('badges/trigger-check/', trigger_badge_check, name='trigger-badge-check'),
+    path('badges/leaderboard/', badge_leaderboard, name='badge-leaderboard'),
+    
     path('', include(router.urls)),
     path('auth/', include('critique.api.auth_urls')),  # Authentication endpoints
     path('health/', health_check, name='api-health-check'),
