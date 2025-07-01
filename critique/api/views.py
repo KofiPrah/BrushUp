@@ -7,12 +7,13 @@ from django.db import models
 from django.db.models import Max
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Reaction, Notification, CritiqueReply, Folder
+from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Reaction, Notification, CritiqueReply, Folder, AchievementBadge, UserAchievement
 from .serializers import (
     UserSerializer, ProfileSerializer, ProfileUpdateSerializer, ArtWorkSerializer, ArtWorkVersionSerializer,
     ArtWorkListSerializer, CritiqueSerializer, CritiqueListSerializer,
     ReactionSerializer, NotificationSerializer, CritiqueReplySerializer,
-    FolderSerializer, FolderListSerializer, FolderCreateUpdateSerializer
+    FolderSerializer, FolderListSerializer, FolderCreateUpdateSerializer,
+    AchievementBadgeSerializer, UserAchievementSerializer, UserBadgeOverviewSerializer
 )
 from .permissions import (
     IsAuthorOrReadOnly, IsOwnerOrReadOnly, IsModeratorOrOwner, 
@@ -2420,3 +2421,156 @@ def delete_critique_reply(request, reply_id):
     except CritiqueReply.DoesNotExist:
         return Response({'error': 'Reply not found or not owned by user'}, 
                       status=status.HTTP_404_NOT_FOUND)
+
+
+# ============================================================================
+# ACHIEVEMENT API ENDPOINTS FOR BADGE SYSTEM
+# ============================================================================
+
+class AchievementBadgeViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint for viewing achievement badges."""
+    queryset = AchievementBadge.objects.filter(is_active=True).order_by('category', 'tier', 'sort_order')
+    serializer_class = AchievementBadgeSerializer
+    permission_classes = [permissions.AllowAny]  # Public badges can be viewed by anyone
+    
+    def get_queryset(self):
+        """Filter badges by category if specified."""
+        queryset = super().get_queryset()
+        category = self.request.query_params.get('category', None)
+        if category:
+            queryset = queryset.filter(category=category)
+        return queryset
+
+
+class UserAchievementViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint for viewing user achievements."""
+    serializer_class = UserAchievementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """Return achievements for the current user or specified user."""
+        user_id = self.request.query_params.get('user_id', None)
+        if user_id and self.request.user.is_staff:
+            # Staff can view any user's achievements
+            return UserAchievement.objects.filter(user_id=user_id).select_related('badge').order_by('-earned_at')
+        else:
+            # Regular users can only view their own achievements
+            return UserAchievement.objects.filter(user=self.request.user).select_related('badge').order_by('-earned_at')
+
+
+@api_view(['GET'])
+@permission_classes([permissions.IsAuthenticated])
+def user_badge_overview(request, user_id=None):
+    """
+    Get comprehensive badge overview for a user including earned badges and progress.
+    If user_id is provided and user is staff, show that user's overview.
+    Otherwise, show current user's overview.
+    """
+    try:
+        # Determine which user to show badges for
+        if user_id and request.user.is_staff:
+            target_user = User.objects.get(id=user_id)
+        else:
+            target_user = request.user
+        
+        # Import the service here to avoid circular imports
+        from critique.services import AchievementService
+        
+        # Get badge progress data
+        badge_data = AchievementService.get_user_badge_progress(target_user)
+        
+        # Serialize the data
+        serializer = UserBadgeOverviewSerializer(badge_data)
+        
+        return Response({
+            'user_id': target_user.id,
+            'username': target_user.username,
+            'badge_overview': serializer.data
+        })
+        
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def trigger_badge_check(request):
+    """
+    Manually trigger a badge check for the current user.
+    This can be called after significant actions to update badge progress.
+    """
+    try:
+        # Import the service here to avoid circular imports
+        from critique.services import AchievementService
+        
+        # Check for new badges
+        newly_awarded = AchievementService.check_and_award_badges(request.user)
+        
+        return Response({
+            'message': f'Badge check completed. {len(newly_awarded)} new badges awarded.',
+            'new_badges': UserAchievementSerializer(newly_awarded, many=True).data,
+            'total_new_badges': len(newly_awarded)
+        })
+        
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def badge_leaderboard(request):
+    """
+    Get a leaderboard of users by badge count or specific badge achievements.
+    Public endpoint to showcase community achievements.
+    """
+    try:
+        # Get query parameters
+        badge_id = request.query_params.get('badge_id', None)
+        limit = int(request.query_params.get('limit', 10))
+        
+        if badge_id:
+            # Get users who have earned a specific badge
+            achievements = UserAchievement.objects.filter(
+                badge_id=badge_id
+            ).select_related('user', 'badge').order_by('earned_at')[:limit]
+            
+            leaderboard_data = [{
+                'user_id': achievement.user.id,
+                'username': achievement.user.username,
+                'badge_name': achievement.badge.name,
+                'earned_at': achievement.earned_at,
+                'time_since_earned': UserAchievementSerializer().get_time_since_earned(achievement)
+            } for achievement in achievements]
+            
+            return Response({
+                'type': 'specific_badge',
+                'badge_id': badge_id,
+                'leaderboard': leaderboard_data
+            })
+        else:
+            # Get users with the most badges overall
+            from django.db.models import Count
+            
+            users_with_badge_counts = User.objects.annotate(
+                badge_count=Count('achievements')
+            ).filter(badge_count__gt=0).order_by('-badge_count')[:limit]
+            
+            leaderboard_data = [{
+                'user_id': user.id,
+                'username': user.username,
+                'badge_count': user.badge_count,
+                'latest_badges': UserAchievementSerializer(
+                    user.achievements.select_related('badge').order_by('-earned_at')[:3], 
+                    many=True
+                ).data
+            } for user in users_with_badge_counts]
+            
+            return Response({
+                'type': 'overall_badges',
+                'leaderboard': leaderboard_data
+            })
+            
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

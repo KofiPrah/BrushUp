@@ -7,7 +7,8 @@ from .views import (
     create_artwork_version, get_artwork_version, 
     delete_artwork_version, archive_artwork_version, unarchive_artwork_version, switch_artwork_version, ArtworkVersionViewSet,
     ArtworkVersionCompareView, ArtworkVersionRestoreView, ArtworkVersionReorderView,
-    hide_critique, unhide_critique, delete_critique_reply
+    hide_critique, unhide_critique, delete_critique_reply,
+    AchievementBadgeViewSet, UserAchievementViewSet, user_badge_overview, trigger_badge_check, badge_leaderboard
 )
 from .move_artwork import move_artwork_to_folder
 
@@ -21,6 +22,8 @@ router.register(r'reactions', ReactionViewSet, basename='reaction')
 router.register(r'notifications', NotificationViewSet, basename='notification')
 router.register(r'folders', FolderViewSet, basename='folder')
 router.register(r'versions', ArtworkVersionViewSet, basename='version')
+router.register(r'badges', AchievementBadgeViewSet, basename='badge')
+router.register(r'achievements', UserAchievementViewSet, basename='achievement')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [

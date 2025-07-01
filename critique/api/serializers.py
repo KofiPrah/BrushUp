@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Notification, Reaction, CritiqueReply, Folder
+from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Notification, Reaction, CritiqueReply, Folder, AchievementBadge, UserAchievement
 from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -623,3 +623,67 @@ class FolderCreateUpdateSerializer(serializers.ModelSerializer):
         if len(value.strip()) > 200:
             raise serializers.ValidationError("Folder name cannot exceed 200 characters.")
         return value.strip()
+
+
+# ============================================================================
+# ACHIEVEMENT SERIALIZERS FOR BADGE SYSTEM
+# ============================================================================
+
+class AchievementBadgeSerializer(serializers.ModelSerializer):
+    """Serializer for achievement badges."""
+    
+    class Meta:
+        model = AchievementBadge
+        fields = [
+            'id', 'name', 'description', 'category', 'tier', 'icon', 'color',
+            'criteria_type', 'criteria_value', 'is_active', 'sort_order'
+        ]
+        read_only_fields = ['id']
+
+
+class UserAchievementSerializer(serializers.ModelSerializer):
+    """Serializer for user achievements with badge details."""
+    badge = AchievementBadgeSerializer(read_only=True)
+    user_display_name = serializers.CharField(source='user.username', read_only=True)
+    time_since_earned = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = UserAchievement
+        fields = [
+            'id', 'user', 'user_display_name', 'badge', 'earned_at', 
+            'time_since_earned', 'context_data'
+        ]
+        read_only_fields = ['id', 'user', 'user_display_name', 'earned_at', 'time_since_earned']
+    
+    def get_time_since_earned(self, obj):
+        """Return a human-readable time since the badge was earned."""
+        from django.utils import timezone
+        from django.utils.timesince import timesince
+        return timesince(obj.earned_at, timezone.now())
+
+
+class BadgeProgressSerializer(serializers.Serializer):
+    """Serializer for badge progress information."""
+    badge = AchievementBadgeSerializer()
+    current_value = serializers.IntegerField()
+    target_value = serializers.IntegerField()
+    progress_percentage = serializers.FloatField()
+    is_completed = serializers.BooleanField()
+
+
+class UserBadgeOverviewSerializer(serializers.Serializer):
+    """Serializer for user badge overview including earned and in-progress badges."""
+    earned_badges = UserAchievementSerializer(many=True)
+    badge_progress = BadgeProgressSerializer(many=True)
+    total_earned_count = serializers.SerializerMethodField()
+    total_available_count = serializers.SerializerMethodField()
+    
+    def get_total_earned_count(self, obj):
+        """Return the total number of badges earned."""
+        return len(obj.get('earned_badges', []))
+    
+    def get_total_available_count(self, obj):
+        """Return the total number of available badges."""
+        earned_count = len(obj.get('earned_badges', []))
+        progress_count = len(obj.get('badge_progress', []))
+        return earned_count + progress_count
