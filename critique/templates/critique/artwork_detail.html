@@ -4305,5 +4305,65 @@
             });
         }
 
+        // Focus Mode Functions
+        function enterFullscreen(img) {
+            if (img.requestFullscreen) {
+                img.requestFullscreen();
+            } else if (img.webkitRequestFullscreen) {
+                img.webkitRequestFullscreen();
+            } else if (img.msRequestFullscreen) {
+                img.msRequestFullscreen();
+            }
+        }
+        
+        function exitFocusMode() {
+            const mainContent = document.getElementById('main-content');
+            const focusMode = document.getElementById('focus-mode');
+            
+            // Hide focus mode
+            focusMode.style.display = 'none';
+            
+            // Show main content with animation
+            mainContent.classList.add('visible');
+            
+            // Smooth scroll to anchor
+            document.getElementById('scroll-anchor').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        function toggleFavorite(artworkId) {
+            const btn = event.target.closest('.favorite-btn');
+            const heart = btn.querySelector('svg');
+            
+            // Toggle visual state
+            if (heart.classList.contains('bi-heart')) {
+                heart.classList.remove('bi-heart');
+                heart.classList.add('bi-heart-fill');
+                btn.style.background = 'rgba(220,53,69,0.3)';
+                btn.style.color = '#dc3545';
+            } else {
+                heart.classList.remove('bi-heart-fill');
+                heart.classList.add('bi-heart');
+                btn.style.background = 'rgba(220,53,69,0.15)';
+            }
+            
+            // Show success message
+            showToast('Favorite', heart.classList.contains('bi-heart-fill') ? 'Added to favorites' : 'Removed from favorites', 'info');
+        }
+
+        // Focus Mode initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-transition after delay if user doesn't interact
+            setTimeout(() => {
+                const mainContent = document.getElementById('main-content');
+                if (!mainContent.classList.contains('visible')) {
+                    // Auto-transition after 8 seconds if user doesn't interact
+                    setTimeout(exitFocusMode, 8000);
+                }
+            }, 2000);
+        });
+
     </script>
 {% endblock %}
