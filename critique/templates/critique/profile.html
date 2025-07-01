@@ -111,6 +111,21 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Achievement Badges Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+                    <h2 class="mb-0">Achievement Badges</h2>
+                    <small class="text-muted" id="badge-summary">Loading...</small>
+                </div>
+                <div class="card-body" id="badges-container">
+                    <div class="d-flex justify-content-center py-4">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="visually-hidden">Loading badges...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <!-- Portfolio Folders -->
@@ -386,6 +401,7 @@ function getCookie(name) {
 
 document.addEventListener('DOMContentLoaded', function() {
     loadUserFolders();
+    loadUserBadges();
     // Automatically load artworks for own profile
     {% if is_own_profile %}
     loadUserArtworks();
@@ -739,6 +755,142 @@ function displayArtworksForManagement(artworks) {
 
 
 
+
+// Badge loading function
+function loadUserBadges() {
+    const container = document.getElementById('badges-container');
+    const summary = document.getElementById('badge-summary');
+    
+    {% if is_own_profile %}
+    const endpoint = '/api/badges/overview/';
+    {% else %}
+    const endpoint = '/api/badges/overview/{{ profile_user.id }}/';
+    {% endif %}
+    
+    fetch(endpoint, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            {% if is_own_profile %}
+            'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
+            {% endif %}
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to load badges');
+        }
+        return response.json();
+    })
+    .then(data => {
+        displayBadges(data);
+        updateBadgeSummary(data);
+    })
+    .catch(error => {
+        console.error('Error loading badges:', error);
+        container.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-exclamation-triangle fs-1"></i>
+                <p>Unable to load badges at this time.</p>
+            </div>
+        `;
+        summary.textContent = 'Error loading badges';
+    });
+}
+
+function displayBadges(badgeData) {
+    const container = document.getElementById('badges-container');
+    const earnedBadges = badgeData.earned_badges || [];
+    const progressBadges = badgeData.badge_progress || [];
+    
+    if (earnedBadges.length === 0 && progressBadges.length === 0) {
+        container.innerHTML = `
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-trophy fs-1"></i>
+                <p>No badges earned yet. Start creating artwork and giving critiques to earn your first badges!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    // Earned badges section
+    if (earnedBadges.length > 0) {
+        html += '<div class="mb-4">';
+        html += '<h5 class="mb-3"><i class="bi bi-trophy text-warning"></i> Earned Badges</h5>';
+        html += '<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">';
+        
+        earnedBadges.forEach(achievement => {
+            const badge = achievement.badge;
+            const tierColors = {
+                'bronze': 'text-warning',
+                'silver': 'text-secondary', 
+                'gold': 'text-warning',
+                'platinum': 'text-primary'
+            };
+            
+            html += `
+                <div class="col">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <i class="bi ${badge.icon} fs-1 ${badge.color || tierColors[badge.tier] || 'text-primary'}"></i>
+                            <h6 class="card-title mt-2 mb-1">${badge.name}</h6>
+                            <p class="card-text small text-muted">${badge.description}</p>
+                            <small class="text-muted">${achievement.time_since_earned} ago</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div></div>';
+    }
+    
+    // Progress badges section
+    if (progressBadges.length > 0) {
+        html += '<div class="mb-3">';
+        html += '<h5 class="mb-3"><i class="bi bi-graph-up text-info"></i> Progress Towards Next Badges</h5>';
+        html += '<div class="row row-cols-1 row-cols-md-2 g-3">';
+        
+        progressBadges.forEach(progress => {
+            const badge = progress.badge;
+            const percentage = Math.min(progress.progress_percentage, 100);
+            
+            html += `
+                <div class="col">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="bi ${badge.icon} fs-4 ${badge.color || 'text-secondary'} me-2"></i>
+                                <div>
+                                    <h6 class="mb-0">${badge.name}</h6>
+                                    <small class="text-muted">${badge.description}</small>
+                                </div>
+                            </div>
+                            <div class="progress mb-2" style="height: 6px;">
+                                <div class="progress-bar" role="progressbar" style="width: ${percentage}%"></div>
+                            </div>
+                            <small class="text-muted">${progress.current_value} / ${progress.target_value}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div></div>';
+    }
+    
+    container.innerHTML = html;
+}
+
+function updateBadgeSummary(badgeData) {
+    const summary = document.getElementById('badge-summary');
+    const earnedCount = badgeData.total_earned_count || 0;
+    const totalCount = badgeData.total_available_count || 0;
+    
+    summary.textContent = `${earnedCount} earned • ${totalCount - earnedCount} in progress`;
+}
 
 function viewFolderContents(folderId) {
     // Navigate to the dedicated folder page

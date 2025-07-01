@@ -2482,19 +2482,22 @@ class UserAchievementViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def user_badge_overview(request, user_id=None):
     """
     Get comprehensive badge overview for a user including earned badges and progress.
-    If user_id is provided and user is staff, show that user's overview.
-    Otherwise, show current user's overview.
+    If user_id is provided, show that user's overview.
+    If no user_id and user is authenticated, show current user's overview.
+    Public endpoint to allow viewing badges on public profiles.
     """
     try:
         # Determine which user to show badges for
-        if user_id and request.user.is_staff:
+        if user_id:
             target_user = User.objects.get(id=user_id)
-        else:
+        elif request.user.is_authenticated:
             target_user = request.user
+        else:
+            return Response({'error': 'User ID required for anonymous requests'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Import the service here to avoid circular imports
         from critique.services import AchievementService
