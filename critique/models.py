@@ -677,3 +677,87 @@ class Notification(models.Model):
     
     def __str__(self):
         return f"Notification for {self.recipient.username}: {self.message[:50]}"
+
+
+class AchievementBadge(models.Model):
+    """
+    Model representing different achievement badges that users can earn.
+    These are predefined achievements based on various activities and milestones.
+    """
+    CATEGORY_ARTWORK = 'artwork'
+    CATEGORY_CRITIQUE = 'critique'
+    CATEGORY_COMMUNITY = 'community'
+    CATEGORY_MILESTONE = 'milestone'
+    CATEGORY_SPECIAL = 'special'
+    
+    CATEGORY_CHOICES = [
+        (CATEGORY_ARTWORK, 'Artwork'),
+        (CATEGORY_CRITIQUE, 'Critique'),
+        (CATEGORY_COMMUNITY, 'Community'),
+        (CATEGORY_MILESTONE, 'Milestone'),
+        (CATEGORY_SPECIAL, 'Special'),
+    ]
+    
+    TIER_BRONZE = 'bronze'
+    TIER_SILVER = 'silver'
+    TIER_GOLD = 'gold'
+    TIER_PLATINUM = 'platinum'
+    
+    TIER_CHOICES = [
+        (TIER_BRONZE, 'Bronze'),
+        (TIER_SILVER, 'Silver'),
+        (TIER_GOLD, 'Gold'),
+        (TIER_PLATINUM, 'Platinum'),
+    ]
+    
+    name = models.CharField(max_length=100, unique=True, help_text="Name of the achievement badge")
+    description = models.TextField(help_text="Description of what this badge represents")
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, help_text="Category this badge belongs to")
+    tier = models.CharField(max_length=20, choices=TIER_CHOICES, help_text="Tier/rarity of this badge")
+    icon = models.CharField(max_length=50, help_text="Bootstrap icon class for this badge")
+    color = models.CharField(max_length=20, help_text="CSS color class for this badge")
+    
+    # Criteria for earning this badge
+    criteria_type = models.CharField(max_length=50, help_text="Type of criteria (e.g., 'artwork_count', 'karma_points')")
+    criteria_value = models.IntegerField(help_text="Threshold value for earning this badge")
+    
+    # Badge visibility and availability
+    is_active = models.BooleanField(default=True, help_text="Whether this badge can be earned")
+    is_hidden = models.BooleanField(default=False, help_text="Whether this badge is visible to users")
+    
+    # Ordering and metadata
+    sort_order = models.PositiveIntegerField(default=0, help_text="Display order for this badge")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['category', 'tier', 'sort_order']
+        verbose_name = 'Achievement Badge'
+        verbose_name_plural = 'Achievement Badges'
+    
+    def __str__(self):
+        return f"{self.name} ({self.tier.title()})"
+
+
+class UserAchievement(models.Model):
+    """
+    Model representing badges earned by users.
+    Links users to their earned achievement badges with timestamps.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='achievements')
+    badge = models.ForeignKey(AchievementBadge, on_delete=models.CASCADE, related_name='earned_by')
+    earned_at = models.DateTimeField(auto_now_add=True)
+    
+    # Optional context about when/why the badge was earned
+    context_data = models.JSONField(blank=True, null=True, help_text="Additional context about earning this badge")
+    
+    # Notification sent status
+    notification_sent = models.BooleanField(default=False, help_text="Whether user was notified about earning this badge")
+    
+    class Meta:
+        unique_together = ['user', 'badge']  # A user can only earn each badge once
+        ordering = ['-earned_at']
+        verbose_name = 'User Achievement'
+        verbose_name_plural = 'User Achievements'
+    
+    def __str__(self):
+        return f"{self.user.username} earned {self.badge.name}"
