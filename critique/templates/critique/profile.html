@@ -865,13 +865,13 @@ function displayBadges(badgeData) {
             const progressClass = percentage > 50 ? 'bg-success' : percentage > 25 ? 'bg-warning' : 'bg-info';
             
             html += `
-                <div class="p-3 border rounded shadow-sm" style="background-color: #f8f9fa;">
+                <div class="p-3 border rounded bg-dark text-white shadow-sm">
                     <div class="d-flex align-items-center mb-2">
                         <i class="bi ${badge.icon} fs-6 ${badge.color || 'text-secondary'} me-2"></i>
                         <div class="flex-grow-1">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fw-semibold text-dark" style="font-size: 0.9rem;">${badge.name}</span>
-                                <small class="text-muted">${progress.current_value}/${progress.target_value}</small>
+                                <span class="fw-semibold text-light" style="font-size: 0.9rem;">${badge.name}</span>
+                                <small class="text-secondary">${progress.current_value}/${progress.target_value}</small>
                             </div>
                         </div>
                     </div>
