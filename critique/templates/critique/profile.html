@@ -783,8 +783,10 @@ function loadUserBadges() {
         return response.json();
     })
     .then(data => {
-        displayBadges(data);
-        updateBadgeSummary(data);
+        // Handle the API response format
+        const badgeData = data.badge_overview || data;
+        displayBadges(badgeData);
+        updateBadgeSummary(badgeData);
     })
     .catch(error => {
         console.error('Error loading badges:', error);
