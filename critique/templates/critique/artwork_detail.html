@@ -261,6 +261,129 @@
         line-height: 1.2;
         border-radius: 0.2rem;
     }
+    
+    /* Enhanced Artwork Image Styling */
+    .artwork-image {
+        box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .artwork-image:hover {
+        box-shadow: 0 0 30px rgba(255,255,255,0.15);
+        transform: translateY(-2px);
+    }
+    
+    /* Enhanced metadata spacing */
+    .artwork-metadata .mb-2 {
+        margin-bottom: 0.75rem !important;
+    }
+    
+    /* Improved Version History Layout */
+    .version-history-card {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .version-thumbnail {
+        transition: all 0.2s ease;
+    }
+    
+    .version-thumbnail:hover {
+        transform: translateY(-2px);
+    }
+    
+    .version-thumbnail img {
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .version-thumbnail:hover img {
+        border-color: rgba(13, 110, 253, 0.5);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Enhanced Action Button */
+    .actions-dropdown .dropdown-toggle {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.2s ease;
+        position: relative;
+    }
+    
+    .actions-dropdown .dropdown-toggle:after {
+        margin-left: 0.5em;
+    }
+    
+    /* Add Critique Button Enhancement */
+    .add-critique-btn {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%);
+        border: none;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    
+    .add-critique-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(13, 110, 253, 0.4);
+        background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+    }
+    
+    /* Critique Cards Enhancement */
+    .critique-card {
+        background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(108, 117, 125, 0.2) !important;
+    }
+    
+    .critique-card:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        border-color: rgba(13, 110, 253, 0.3) !important;
+    }
+    
+    /* Rating Section Enhancement */
+    .rating-section {
+        background: rgba(108, 117, 125, 0.1);
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 4px solid #0d6efd;
+    }
+    
+    /* Progress bars with better colors */
+    .progress-bar {
+        background: linear-gradient(90deg, #dc3545 0%, #ffc107 50%, #28a745 100%);
+        transition: all 0.3s ease;
+    }
+    
+    /* Reaction buttons enhancement */
+    .reaction-btn {
+        background: rgba(108, 117, 125, 0.2);
+        border: 1px solid rgba(108, 117, 125, 0.3);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .reaction-btn:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s;
+    }
+    
+    .reaction-btn:hover:before {
+        left: 100%;
+    }
+    
+    .reaction-btn.active {
+        background: linear-gradient(135deg, #0d6efd 0%, #0056b3 100%) !important;
+        border-color: #0d6efd !important;
+        box-shadow: 0 0 15px rgba(13, 110, 253, 0.4);
+    }
 </style>
 {% endblock %}
 
@@ -271,25 +394,25 @@
         <div class="col-lg-8">
             <div class="card mb-4 bg-dark text-white">
                 {% if current_version and current_version.image %}
-                    <img src="{{ current_version.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                    <img src="{{ current_version.image.url }}" class="card-img-top img-fluid artwork-image" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
                 {% elif current_version and current_version.image_url %}
-                    <img src="{{ current_version.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                    <img src="{{ current_version.image_url }}" class="card-img-top img-fluid artwork-image" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
                 {% elif artwork.image %}
-                    <img src="{{ artwork.image.url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                    <img src="{{ artwork.image.url }}" class="card-img-top img-fluid artwork-image" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
                 {% elif artwork.image_url %}
-                    <img src="{{ artwork.image_url }}" class="card-img-top img-fluid" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
+                    <img src="{{ artwork.image_url }}" class="card-img-top img-fluid artwork-image" alt="{{ artwork.title }}" style="max-height: 500px; object-fit: contain;" id="main-artwork-image">
                 {% else %}
-                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 400px;" id="main-artwork-image">
+                    <div class="bg-secondary text-white d-flex justify-content-center align-items-center artwork-image" style="height: 400px;" id="main-artwork-image">
                         <span>No Image Available</span>
                     </div>
                 {% endif %}
-                <div class="card-body">
-                    <h1 class="card-title">{{ artwork.title }}</h1>
+                <div class="card-body artwork-metadata">
+                    <h1 class="card-title mb-3">{{ artwork.title }}</h1>
 
                     <!-- Version Label -->
                     {% if total_versions > 0 %}
-                    <div class="mb-2">
-                        <span class="badge bg-secondary me-2">
+                    <div class="mb-3">
+                        <span class="badge bg-secondary me-2 px-3 py-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-clock-history me-1" viewBox="0 0 16 16">
                                 <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.76.2 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.942.313a7.023 7.023 0 0 0-.187-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1.001.025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-1.442 1.633c.263-.226.509-.467.740-.722l.724.69a8.026 8.026 0 0 1-.989.912l-.475-.88zm-2.266.97c.342-.14.677-.296.99-.49l.546.837a7.972 7.972 0 0 1-1.198.596l-.338-.943zm-2.137.339c.37-.042.741-.111 1.106-.207l.238.971a7.998 7.998 0 0 1-1.425.267l.081-.031z"/>
                                 <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
@@ -301,24 +424,41 @@
                     </div>
                     {% endif %}
 
-                    <p class="card-text">{{ artwork.description }}</p>
-                    <p class="card-text">
-                        {% if artwork.medium %}<span class="badge bg-info me-2">{{ artwork.medium }}</span>{% endif %}
-                        {% if artwork.dimensions %}<span class="badge bg-secondary me-2">{{ artwork.dimensions }}</span>{% endif %}
-                    </p>
-                    <p class="card-text"><small class="text-muted">Created: {{ artwork.created_at|date:"F d, Y" }}</small></p>
-                    {% if artwork.author %}
-                    <p class="card-text"><small class="text-muted">Artist: <a href="{% url 'critique:user_profile' artwork.author.username %}" class="text-info">{{ artwork.author.username }}</a></small></p>
+                    {% if artwork.description %}
+                    <div class="mb-3">
+                        <p class="card-text text-white-50 lh-lg">{{ artwork.description }}</p>
+                    </div>
                     {% endif %}
+                    
+                    {% if artwork.medium or artwork.dimensions %}
+                    <div class="mb-3">
+                        {% if artwork.medium %}<span class="badge bg-info me-2 px-3 py-2">{{ artwork.medium }}</span>{% endif %}
+                        {% if artwork.dimensions %}<span class="badge bg-secondary me-2 px-3 py-2">{{ artwork.dimensions }}</span>{% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <strong class="text-muted">Created:</strong> 
+                        <span class="text-white">{{ artwork.created_at|date:"F d, Y" }}</span>
+                    </div>
+                    
+                    {% if artwork.author %}
+                    <div class="mb-3">
+                        <strong class="text-muted">Artist:</strong> 
+                        <a href="{% url 'critique:user_profile' artwork.author.username %}" class="text-decoration-none text-info fw-bold">{{ artwork.author.username }}</a>
+                    </div>
+                    {% endif %}
+                    
                     {% if artwork.folder %}
-                    <p class="card-text">
-                        <small class="text-muted">
+                    <div class="mb-3">
+                        <strong class="text-muted">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-folder me-1" viewBox="0 0 16 16">
                                 <path d="M.54 3.87.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3h4.672a2 2 0 0 1 2 2l-.54.87a1 1 0 0 1-.94.63H1.48a1 1 0 0 1-.94-.63zM2.5 4a.5.5 0 0 0-.5.5v8a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5H2.5z"/>
                             </svg>
-                            Portfolio: <a href="/folders/{{ artwork.folder.id }}/" class="text-info">{{ artwork.folder.name }}</a>
-                        </small>
-                    </p>
+                            Portfolio:
+                        </strong> 
+                        <a href="/folders/{{ artwork.folder.id }}/" class="text-decoration-none text-info">{{ artwork.folder.name }}</a>
+                    </div>
                     {% endif %}
 
                     <div class="d-flex justify-content-between align-items-center">
@@ -335,10 +475,10 @@
                                 <span class="like-count">{{ artwork.likes.count }}</span>
                             </a>
                             {% endif %}
-                            <a href="{% url 'critique:create_critique' artwork.id %}" class="btn btn-outline-success">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chat-dots" viewBox="0 0 16 16">
-                                    <path d="M5 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm4 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
-                                    <path d="M2.165 15.803l.02-.004c1.83-.363 2.948-.842 3.468-1.105A9.06 9.06 0 0 0 8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6a10.437 10.437 0 0 1-.524 2.318l-.003.011a10.722 10.722 0 0 1-.244.637c-.079.186.074.394.273.362a21.673 21.673 0 0 0 .693-.125zm.8-3.108a1 1 0 0 0-.287-.801C1.618 10.83 1 9.468 1 8c0-3.192 3.004-6 7-6s7 2.808 7 6c0 3.193-3.004 6-7 6a8.06 8.06 0 0 1-2.088-.272 1 1 0 0 0-.711.074c-.387.196-1.24.57-2.634.893a19.492 19.492 0 0 0 .398-2z"/>
+                            <a href="{% url 'critique:create_critique' artwork.id %}" class="btn add-critique-btn px-4 py-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-2" viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
                                 </svg>
                                 Add Critique
                             </a>
@@ -346,9 +486,9 @@
                         
                         <!-- Artwork Owner Actions -->
                         {% if user.is_authenticated and user == artwork.author %}
-                        <div class="dropdown">
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                        <div class="dropdown actions-dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle px-3 py-2" type="button" data-bs-toggle="dropdown">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear me-1" viewBox="0 0 16 16">
                                     <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
                                     <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
                                 </svg>
