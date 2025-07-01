@@ -390,6 +390,56 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.15);
     }
     
+    /* Filter Bar Enhancement */
+    .filter-bar {
+        background-color: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    /* Critique Card Left Border Accent */
+    .critique-card:hover {
+        border-left: 4px solid var(--bs-primary);
+        margin-left: -4px;
+    }
+    
+    /* Highly Rated Critique Accent */
+    .critique-card.highly-rated {
+        border-left: 4px solid #28a745;
+        background: linear-gradient(135deg, rgba(40, 167, 69, 0.05) 0%, transparent 50%);
+    }
+    
+    /* Refined Reaction Count Styling */
+    .reaction-count-badge {
+        background: rgba(255,255,255,0.08) !important;
+        color: #adb5bd !important;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* Enhanced Add Critique Button */
+    .btn-add-critique {
+        background: linear-gradient(135deg, var(--bs-primary) 0%, #4c6ef5 100%);
+        border: 2px solid transparent;
+        background-clip: padding-box;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-add-critique:hover {
+        background: transparent;
+        border: 2px solid var(--bs-primary);
+        color: var(--bs-primary);
+    }
+    
+    /* Artwork Info Section Enhancement */
+    .artwork-meta-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+    
     /* Improved Version History Layout */
     .version-history-card {
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -3148,6 +3198,35 @@
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         }
+        
+        // Mark highly rated critiques
+        function markHighlyRatedCritiques() {
+            document.querySelectorAll('.critique-card').forEach(card => {
+                const ratingElements = card.querySelectorAll('.progress-bar');
+                let totalScore = 0;
+                let ratingCount = 0;
+                
+                ratingElements.forEach(bar => {
+                    const value = parseFloat(bar.getAttribute('aria-valuenow'));
+                    if (!isNaN(value)) {
+                        totalScore += value;
+                        ratingCount++;
+                    }
+                });
+                
+                if (ratingCount > 0) {
+                    const averageRating = totalScore / ratingCount;
+                    if (averageRating >= 8) {
+                        card.classList.add('highly-rated');
+                    }
+                }
+            });
+        }
+        
+        // Enhanced initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            markHighlyRatedCritiques();
+        });
 
         // Toggle Reply Form
         function toggleReplyForm(critiqueId) {
