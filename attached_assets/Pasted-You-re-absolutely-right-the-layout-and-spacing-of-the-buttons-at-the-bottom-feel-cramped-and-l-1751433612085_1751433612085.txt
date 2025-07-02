@@ -1,0 +1,102 @@
+You're absolutely right — the **layout and spacing of the buttons** at the bottom feel cramped and lack visual polish. Let’s fix that by applying some **UX design and visual hierarchy principles** to make the buttons more appealing and intuitive.
+
+---
+
+## 🛠️ Problems You're Seeing
+
+1. **Uneven spacing** — buttons feel squashed and too close to the bottom edge
+2. **Lack of grouping** — buttons don't feel logically clustered (e.g., Favorite vs. Add Critique)
+3. **Flat layout** — they lack visual layering, hover feedback, or scale emphasis
+4. **Touch targets** are small (especially on mobile)
+
+---
+
+## ✅ Design Goals
+
+* Give buttons **breathing room**
+* Improve **grouping and visual hierarchy**
+* Make them **more tappable**
+* Ensure they **don't overlap** or feel tacked on
+
+---
+
+## 🎨 RECOMMENDED LAYOUT
+
+### ✅ CSS Styles (add this)
+
+```css
+#artwork-actions-bar {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: rgba(20, 20, 20, 0.75);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  z-index: 50;
+  transition: opacity 0.3s ease;
+}
+
+#artwork-actions-bar button {
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#artwork-actions-bar .btn-icon {
+  font-size: 1.1rem;
+}
+
+#artwork-actions-bar .btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+
+#artwork-actions-bar .btn-outline-light:hover {
+  background-color: rgba(255,255,255,0.15);
+}
+```
+
+---
+
+### ✅ HTML Update (example markup)
+
+```html
+<div id="artwork-actions-bar" class="d-flex align-items-center">
+  <button class="btn btn-outline-light">
+    <i class="bi bi-heart-fill btn-icon"></i> Favorite
+  </button>
+
+  <button class="btn btn-outline-light">
+    <i class="bi bi-chat-left-text btn-icon"></i> See Critiques
+  </button>
+
+  <button class="btn btn-primary">
+    <i class="bi bi-pencil btn-icon"></i> Add Critique
+  </button>
+</div>
+```
+
+* You can optionally use your custom heart icon (`♥`) in place of `bi-heart-fill`
+* Feel free to add a light bounce animation to the whole bar on load or when revealed after 5s
+
+---
+
+## ✅ Mobile Consideration
+
+On smaller screens:
+
+* Use `flex-wrap: wrap` or switch to a **stacked layout** (`flex-column`)
+* Add `padding-bottom: 6rem` to page body to prevent overlap
+
+---
+
+Would you like me to build a full minimal HTML + CSS file you can drop into your project as a working Focus Mode action bar?
