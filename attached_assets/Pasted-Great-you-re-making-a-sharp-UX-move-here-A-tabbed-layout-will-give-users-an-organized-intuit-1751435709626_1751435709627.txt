@@ -1,0 +1,112 @@
+Great — you're making a sharp UX move here. A **tabbed layout** will give users an organized, intuitive way to explore the **art**, **critiques**, **version history**, and **info** without overwhelming them or requiring long scrolls.
+
+---
+
+## ✅ Final Vision
+
+You want:
+
+| Section                    | Behavior                             |
+| -------------------------- | ------------------------------------ |
+| 🎨 Artwork                 | Fullscreen by default (Focus Mode)   |
+| 💬 Critiques               | Accessed via tab                     |
+| 🕓 Version History         | Via tab                              |
+| ℹ️ Artwork Info            | Via tab                              |
+| ⚙️ Add Critique / Favorite | In action bar (persistent or tabbed) |
+
+---
+
+## 📋 Master Fix List (Tabbed Layout Edition)
+
+### 🔧 STRUCTURE
+
+* [ ] ✅ **Remove duplicate artwork rendering** (keep only Focus Mode image)
+* [ ] ✅ Ensure `#focus-mode` has `position: relative` for UI overlays
+* [ ] ✅ Add a `tabbed-panel` section *after* the artwork for organized info
+* [ ] ✅ Use Bootstrap's tab component for navigation
+
+### 🎨 LAYOUT & DESIGN
+
+* [ ] ✅ Restyle the action bar (`Favorite`, `Add Critique`, etc.) into a consistent floating bar
+* [ ] ✅ Add backdrop blur and spacing to the action bar for polish
+* [ ] ✅ Add scroll padding if the action bar is fixed
+* [ ] ✅ Ensure responsiveness on small screens (`flex-wrap`, `padding-bottom`)
+
+### ⚙️ BEHAVIOR
+
+* [ ] ✅ **Remove all timers and auto scrolls**
+* [ ] ✅ Disable `exitFocusMode()` auto-triggers
+* [ ] ✅ Keep critiques/info hidden unless user clicks tab
+* [ ] ✅ Ensure tabs show/hide content dynamically (via `data-bs-toggle="tab"`)
+
+### 💡 VISUAL CLEANUP
+
+* [ ] ✅ Fix the floating version label (move inside `#focus-mode` with `.position-absolute`)
+* [ ] ✅ Remove unnecessary `min-height: 100vh` and layout wrappers
+* [ ] ✅ Consolidate all CSS classes for artwork detail into one clean layout
+
+---
+
+## ✨ Suggested Tab Structure (4 Tabs)
+
+```html
+<ul class="nav nav-tabs justify-content-center mt-5" id="artworkTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-info" type="button">Info</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-critiques" type="button">Critiques</button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-versions" type="button">Versions</button>
+  </li>
+</ul>
+
+<div class="tab-content bg-dark p-4" id="artworkTabContent">
+  <div class="tab-pane fade show active" id="tab-info">
+    <!-- Artwork title, date, medium, etc. -->
+  </div>
+  <div class="tab-pane fade" id="tab-critiques">
+    {% include "critique/partials/critique_list.html" %}
+  </div>
+  <div class="tab-pane fade" id="tab-versions">
+    {% include "critique/partials/version_history.html" %}
+  </div>
+</div>
+```
+
+---
+
+## ✅ Next Step
+
+I’ll now generate and send you a cleaned, fully updated `artwork_detail.html` file with:
+
+* Focus Mode
+* Fixed action bar
+* Proper version badge
+* Bootstrap tabbed layout for critiques/info/versions
+* Fully removed legacy/scrolling behavior
+
+Working on it now…
+
+
+Here’s your updated file:
+
+📄 **[Download `artwork_detail_tabbed_cleaned.html`](sandbox:/mnt/data/artwork_detail_tabbed_cleaned.html)**
+
+### ✅ What’s Included
+
+* ✅ Focus Mode image display only once
+* ✅ Floating version badge removed from awkward position
+* ✅ Removed `exitFocusMode()` auto-timer and scroll triggers
+* ✅ Added Bootstrap **tabbed layout** for:
+
+  * `Info`
+  * `Critiques`
+  * `Versions`
+* ✅ Layout cleaned to prevent broken zoomed-out views
+* ✅ Legacy image duplication removed from `.split-view-container`
+
+---
+
+You can now style and integrate the tabs however you like (e.g., minimal underline, fade transition, scroll-to-top on tab change). Let me know if you want me to wire that up too.
