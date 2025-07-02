@@ -55,12 +55,13 @@
         padding: 1rem 2rem;
         border: 1px solid rgba(255, 255, 255, 0.3);
         gap: 1rem;
-        z-index: 9999;
+        z-index: 1030;
         opacity: 1;
         transition: all 0.3s ease;
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
         display: flex;
         align-items: center;
+        margin-bottom: 2rem;
     }
 
     #artwork-actions-bar .btn {
@@ -197,7 +198,7 @@
     /* Scroll Indicator */
     .scroll-indicator {
         position: fixed;
-        bottom: 1rem;
+        bottom: 5rem;
         left: 50%;
         transform: translateX(-50%);
         background: rgba(255, 255, 255, 0.1);
@@ -209,6 +210,7 @@
         justify-content: center;
         cursor: pointer;
         animation: bounce 2s infinite;
+        z-index: 1000;
     }
 
     @keyframes bounce {
@@ -829,9 +831,14 @@ function switchToVersion(versionId) {
     // Update artwork image in focus mode
     const focusArtwork = document.getElementById('focus-artwork');
     
-    // Make API call to get version data
-    fetch(`/api/artworks/versions/${versionId}/`)
-        .then(response => response.json())
+    // Make API call to get version data using the correct endpoint
+    fetch(`/api/versions/${versionId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             const imageUrl = data.image || data.image_url;
             if (imageUrl && focusArtwork) {
@@ -840,7 +847,7 @@ function switchToVersion(versionId) {
                 // Update version badge
                 const versionBadge = document.querySelector('.version-badge');
                 if (versionBadge && data.version_number) {
-                    versionBadge.textContent = `v${data.version_number} (Current)`;
+                    versionBadge.textContent = `v${data.version_number} (Viewing)`;
                 }
                 
                 // Update version cards highlighting
@@ -858,6 +865,7 @@ function switchToVersion(versionId) {
         })
         .catch(error => {
             console.error('Error switching version:', error);
+            alert('Error loading version. Please try again.');
         });
 }
 

@@ -585,7 +585,23 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
         serializer = ArtWorkListSerializer(artworks, many=True)
         return Response(serializer.data)
 
-
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def favorite(self, request, pk=None):
+        """Toggle favorite status for an artwork."""
+        artwork = self.get_object()
+        user = request.user
+        
+        if user in artwork.likes.all():
+            artwork.likes.remove(user)
+            favorited = False
+        else:
+            artwork.likes.add(user)
+            favorited = True
+        
+        return Response({
+            'favorited': favorited,
+            'total_favorites': artwork.likes.count()
+        }, status=status.HTTP_200_OK)
 
 
 class CritiqueViewSet(viewsets.ModelViewSet):

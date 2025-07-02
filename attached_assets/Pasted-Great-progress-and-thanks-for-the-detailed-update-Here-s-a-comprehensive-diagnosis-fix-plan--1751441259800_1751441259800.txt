@@ -1,0 +1,143 @@
+Great progress — and thanks for the detailed update. Here’s a comprehensive **diagnosis + fix plan** for each issue you listed:
+
+---
+
+## ✅ Your Current Status Summary
+
+| Problem                                      | Cause                                                     | Fix                                                     |
+| -------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------- |
+| **`/api/artworks/36/favorite/` returns 404** | Endpoint likely doesn't exist or route mismatch           | Define `favorite` API view and add it to `urls.py`      |
+| **Switching version returns 404**            | Version switching AJAX not routed or method not allowed   | Add `artwork_version_switch` view and endpoint          |
+| **Action bar overlaps scroll arrow**         | `z-index` conflict and fixed positioning                  | Use flexbox with margin-bottom + `z-index: 1000`        |
+| **Artist name not clickable**                | Not wrapped in `<a href="/users/{{ artist.username }}/">` | Add profile link template logic                         |
+| **Critiques show no ratings/comments**       | Possibly empty data or block not rendering properly       | Fix `{{ critique.comment }}` and loop logic             |
+| **Top nav changes / login state disappears** | Session/cookie bug (possibly due to image/media loading)  | Ensure avatar/JS doesn't redirect unauthenticated users |
+
+---
+
+## 🔧 Actionable Fixes
+
+### 1. 🎯 Fix `/api/artworks/<id>/favorite/` – 404
+
+* You need to define a Django view (or DRF endpoint):
+
+```python
+# views.py
+@login_required
+@require_POST
+def toggle_favorite(request, artwork_id):
+    artwork = get_object_or_404(ArtWork, pk=artwork_id)
+    ...
+    return JsonResponse({'favorited': True})
+```
+
+* Add this to `urls.py`:
+
+```python
+path('api/artworks/<int:artwork_id>/favorite/', views.toggle_favorite, name='toggle_favorite'),
+```
+
+---
+
+### 2. 🔁 Fix Version Switch 404
+
+* In JS you likely hit something like `/api/artworks/36/switch-version/`.
+* Add this view:
+
+```python
+@login_required
+@require_POST
+def switch_version(request, artwork_id, version_id):
+    ...
+    return JsonResponse({'success': True, 'version': version_id})
+```
+
+* Route:
+
+```python
+path('api/artworks/<int:artwork_id>/switch-version/<int:version_id>/', views.switch_version, name='switch_version'),
+```
+
+---
+
+### 3. 🎨 Fix Scroll Arrow Overlap
+
+* Add this to CSS:
+
+```css
+#artwork-actions-bar {
+  z-index: 1030;
+  margin-bottom: 2rem;
+}
+#scroll-down-arrow {
+  z-index: 1000;
+  bottom: 5rem; /* move it above the pill bar */
+}
+```
+
+---
+
+### 4. 👤 Make Artist Name Clickable
+
+Update:
+
+```html
+Artist: <a href="{% url 'user_profile' artwork.artist.username %}">{{ artwork.artist.username }}</a>
+```
+
+Ensure you have this in `urls.py`:
+
+```python
+path('users/<str:username>/', views.profile_view, name='user_profile'),
+```
+
+---
+
+### 5. 💬 Fix Critiques Not Rendering
+
+Inside your loop:
+
+```html
+{% for critique in critiques %}
+  <div class="critique-card">
+    <p>{{ critique.comment }}</p>
+    <div>Technique: {{ critique.rating_technique }}</div>
+    <div>Originality: {{ critique.rating_originality }}</div>
+    <div>Composition: {{ critique.rating_composition }}</div>
+  </div>
+{% endfor %}
+```
+
+Check that the view passes `critiques = artwork.critiques.all()`.
+
+---
+
+### 6. 🔒 Fix Login State Toggle on Detail Page
+
+This is urgent. It likely results from:
+
+* A `GET` to a protected resource (like `/media/avatars/...`) causing a **redirect to `/accounts/login/`**
+* Some browsers **treat that as a logout trigger**, resetting session cookies
+
+**Fixes:**
+
+* Make sure `/media/` does **not require login**
+* Add fallback avatar:
+
+```html
+<img src="{{ user.profile.avatar.url|default:"/static/img/default-avatar.png" }}" onerror="this.src='/static/img/default-avatar.png'">
+```
+
+Check dev tools → Network tab → Look for **302 redirects**.
+
+---
+
+## ✅ Next Step
+
+Would you like me to:
+
+1. Generate the missing backend endpoints (`favorite`, `switch_version`)?
+2. Patch your `artwork_detail.html` with all the fixes above?
+3. Write a consistent test plan for all detail page interactions?
+
+Let me know and I’ll prep the full patch set.
