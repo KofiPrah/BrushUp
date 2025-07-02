@@ -747,18 +747,7 @@
     </div>
 </div>
 
-<!-- Floating Actions Bar -->
-<div id="artwork-actions-bar" class="d-flex align-items-center gap-3">
-    <button class="btn btn-outline-light btn-sm" onclick="toggleFavorite({{ artwork.id }})">
-        <i class="bi bi-heart me-2"></i>Favorite
-    </button>
-    <a href="{% url 'critique:create_critique' artwork.id %}" class="btn btn-primary btn-sm">
-        <i class="bi bi-plus-circle me-2"></i>Add Critique
-    </a>
-    <button class="btn btn-outline-light btn-sm" onclick="shareArtwork()">
-        <i class="bi bi-share me-2"></i>Share
-    </button>
-</div>
+
 
 {% endblock %}
 
@@ -778,6 +767,11 @@ function initializeFocusMode() {
     
     // Actions bar is already visible by default (no animation delays)
     actionsBar.style.opacity = '1';
+    
+    // Show actions bar with bounce animation after delay
+    setTimeout(() => {
+        actionsBar.classList.add('animate__animated', 'animate__bounceIn');
+    }, 2000);
 }
 
 function scrollToTabs() {
@@ -874,6 +868,13 @@ function switchToCurrentVersion(artworkId) {
 
 // Favorite functionality
 function toggleFavorite(artworkId) {
+    // Check if user is authenticated
+    {% if not user.is_authenticated %}
+    alert('Please login to add artworks to your favorites.');
+    window.location.href = '{% url "account_login" %}';
+    return;
+    {% endif %}
+    
     fetch(`/api/artworks/${artworkId}/favorite/`, {
         method: 'POST',
         headers: {
@@ -881,17 +882,30 @@ function toggleFavorite(artworkId) {
             'Content-Type': 'application/json',
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        if (response.status === 401 || response.status === 403) {
+            alert('Please login to add artworks to your favorites.');
+            window.location.href = '{% url "account_login" %}';
+            return;
+        }
+        return response.json();
+    })
     .then(data => {
+        if (!data) return;
+        
         // Update all favorite buttons
         const btns = document.querySelectorAll('[onclick*="toggleFavorite"]');
         btns.forEach(btn => {
             if (data.favorited) {
-                btn.innerHTML = btn.innerHTML.includes('♥') ? '♥ Favorited' : 'Favorited';
+                btn.innerHTML = btn.innerHTML.includes('♥') ? 
+                    '<span class="btn-icon">♥</span> Favorited' : 
+                    '<i class="bi bi-heart-fill me-2"></i>Favorited';
                 btn.classList.remove('btn-outline-light');
                 btn.classList.add('btn-danger');
             } else {
-                btn.innerHTML = btn.innerHTML.includes('♥') ? '♥ Favorite' : 'Favorite';
+                btn.innerHTML = btn.innerHTML.includes('♥') ? 
+                    '<span class="btn-icon">♥</span> Favorite' : 
+                    '<i class="bi bi-heart me-2"></i>Favorite';
                 btn.classList.remove('btn-danger');
                 btn.classList.add('btn-outline-light');
             }
@@ -899,7 +913,47 @@ function toggleFavorite(artworkId) {
     })
     .catch(error => {
         console.error('Error toggling favorite:', error);
+        alert('Error updating favorite status. Please try again.');
     });
+}
+
+// Share functionality
+function shareArtwork() {
+    const artworkTitle = '{{ artwork.title|escapejs }}';
+    const artworkUrl = window.location.href;
+    
+    if (navigator.share) {
+        // Use native sharing if available
+        navigator.share({
+            title: artworkTitle,
+            text: `Check out this amazing artwork: ${artworkTitle}`,
+            url: artworkUrl
+        }).catch(error => {
+            console.log('Error sharing:', error);
+            fallbackShare(artworkTitle, artworkUrl);
+        });
+    } else {
+        fallbackShare(artworkTitle, artworkUrl);
+    }
+}
+
+function fallbackShare(title, url) {
+    // Copy URL to clipboard as fallback
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Artwork link copied to clipboard!');
+        }).catch(() => {
+            showShareModal(title, url);
+        });
+    } else {
+        showShareModal(title, url);
+    }
+}
+
+function showShareModal(title, url) {
+    // Create a simple modal for sharing options
+    const shareText = `Check out this amazing artwork: ${title}\n${url}`;
+    prompt('Copy this link to share:', url);
 }
 
 // CSRF token helper
