@@ -1,0 +1,126 @@
+Thanks — your screenshots reveal layout and rendering problems that need quick, precise fixes. Let’s go through the issues and how to resolve them:
+
+---
+
+## 🧩 1. Artwork Not Centered
+
+**Problem:** The image is floating to the left in Focus Mode.
+
+### ✅ Fix
+
+Wrap the image in a flexbox container and center it:
+
+```html
+<section id="focus-mode" class="d-flex justify-content-center align-items-center flex-column">
+  <img id="focus-artwork" src="{{ current_version.image.url }}" class="img-fluid" style="max-height: 90vh; object-fit: contain;">
+</section>
+```
+
+### ✅ CSS Ensurement
+
+```css
+#focus-mode {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 2rem 1rem;
+}
+```
+
+---
+
+## 🖼️ 2. Version History Takes Up Too Much Space
+
+**Problem:** Version images are full-width.
+
+### ✅ Fix
+
+Limit size and make layout horizontal if possible:
+
+```css
+#tab-versions img {
+  max-height: 200px;
+  max-width: 100%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+}
+```
+
+If you're listing multiple versions:
+
+```html
+<div class="d-flex flex-wrap gap-3 justify-content-start">
+  {% for version in versions %}
+    <div class="card bg-dark text-white" style="width: 180px;">
+      <img src="{{ version.image.url }}" class="card-img-top">
+      <div class="card-body p-2">
+        <small class="text-muted">v{{ version.number }} — {{ version.created|date:"M d" }}</small>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+```
+
+---
+
+## 💬 3. Critiques Not Displaying
+
+Likely reasons:
+
+* Tab is missing `show active` class
+* Django block `{% include "critique/partials/critique_list.html" %}` isn’t loading properly
+
+### ✅ Fix
+
+Ensure:
+
+```html
+<div class="tab-pane fade show active" id="tab-critiques">
+  {% include "critique/partials/critique_list.html" %}
+</div>
+```
+
+Test the template directly. If nothing renders, insert test content:
+
+```html
+<p class="text-white">Loaded critique panel</p>
+```
+
+---
+
+## 🧑 4. Critic Avatar Returns 404
+
+**Problem:** Path to user avatars is broken or user has no image.
+
+### ✅ Fix
+
+In the template:
+
+```html
+<img src="{{ user.profile.avatar.url }}" onerror="this.src='/static/img/default-avatar.png'" class="rounded-circle" width="40">
+```
+
+Ensure:
+
+* Users have profile avatars assigned
+* `MEDIA_URL` is correctly served
+* Your dev server handles `/media/` paths
+* Add fallback image via `onerror` if missing
+
+---
+
+## ✅ Summary of Fixes
+
+| Issue                    | Fix                                                              |
+| ------------------------ | ---------------------------------------------------------------- |
+| Artwork not centered     | Use Bootstrap `d-flex justify-content-center align-items-center` |
+| Versions huge/full-width | Limit size with `max-height` and show in horizontal cards        |
+| Critiques not showing    | Ensure `{% include %}` is loading and the tab has `show active`  |
+| Critic avatar broken     | Use `onerror` fallback and ensure correct avatar path            |
+
+---
+
+Would you like me to send you a fully corrected version of `artwork_detail.html` now with all 4 fixes applied?
