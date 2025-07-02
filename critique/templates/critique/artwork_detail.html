@@ -63,6 +63,100 @@
         align-items: center;
     }
 
+    #artwork-actions-bar .btn {
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    #artwork-actions-bar .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Version Cards Enhanced */
+    .version-card {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 2px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        overflow: hidden !important;
+        transition: all 0.3s ease !important;
+        cursor: pointer !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+        width: 140px !important;
+    }
+
+    .version-card:hover {
+        border-color: #0d6efd !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 12px 30px rgba(13, 110, 253, 0.3) !important;
+    }
+
+    .version-card.current {
+        border-color: #28a745 !important;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3) !important;
+    }
+
+    .version-card img {
+        width: 100% !important;
+        height: 120px !important;
+        object-fit: cover !important;
+        transition: transform 0.3s ease !important;
+    }
+
+    .version-card:hover img {
+        transform: scale(1.05) !important;
+    }
+
+    .version-card .card-body {
+        padding: 0.75rem 0.5rem !important;
+        text-align: center !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .version-card .card-body small {
+        font-weight: 600 !important;
+        color: #fff !important;
+    }
+
+    /* Critique Cards Enhanced */
+    .critique-card {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        margin-bottom: 1.5rem !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .critique-card:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+        border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    .critique-card .card-body {
+        padding: 1.5rem !important;
+    }
+
+    /* Rating Badge Enhancement */
+    .rating-badge {
+        background: linear-gradient(135deg, #0d6efd, #6610f2) !important;
+        border: none !important;
+        padding: 0.5rem 1rem !important;
+        border-radius: 20px !important;
+        font-weight: 600 !important;
+        color: white !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+        box-shadow: 0 2px 10px rgba(13, 110, 253, 0.3) !important;
+    }
+
     .btn-like {
         background: linear-gradient(135deg, #e91e63, #f06292);
         border: none;
@@ -601,36 +695,34 @@
         <div class="tab-pane fade" id="tab-versions" role="tabpanel" aria-labelledby="versions-tab">
             <div class="p-4">
                 {% if versions %}
-                    <div class="version-grid">
+                    <div class="version-history-cards">
                         <!-- Current Version -->
-                        <div class="version-card current" onclick="switchToCurrentVersion({{ artwork.id }})">
+                        <div class="version-card current card bg-dark text-white" onclick="switchToCurrentVersion({{ artwork.id }})">
                             {% if current_version and current_version.image %}
-                                <img src="{{ current_version.image.url }}" class="version-image" alt="Current Version">
+                                <img src="{{ current_version.image.url }}" class="card-img-top" alt="Current Version">
                             {% elif current_version and current_version.image_url %}
-                                <img src="{{ current_version.image_url }}" class="version-image" alt="Current Version">
+                                <img src="{{ current_version.image_url }}" class="card-img-top" alt="Current Version">
                             {% elif artwork.image %}
-                                <img src="{{ artwork.image.url }}" class="version-image" alt="Current Version">
+                                <img src="{{ artwork.image.url }}" class="card-img-top" alt="Current Version">
                             {% elif artwork.image_url %}
-                                <img src="{{ artwork.image_url }}" class="version-image" alt="Current Version">
+                                <img src="{{ artwork.image_url }}" class="card-img-top" alt="Current Version">
                             {% endif %}
-                            <div class="version-info">
-                                <div class="version-number">v{{ current_version_number|default:"1" }} (Current)</div>
-                                <div class="version-date">{{ artwork.created_at|date:"M d, Y" }}</div>
+                            <div class="card-body">
+                                <small class="text-muted">v{{ current_version_number|default:"1" }} (Current)</small>
                             </div>
                         </div>
                         
                         <!-- Other Versions -->
                         {% for version in versions %}
                             {% if not version.is_archived %}
-                            <div class="version-card" onclick="switchToVersion({{ version.id }})">
+                            <div class="version-card card bg-dark text-white" onclick="switchToVersion({{ version.id }})">
                                 {% if version.image %}
-                                    <img src="{{ version.image.url }}" class="version-image" alt="Version {{ version.version_number }}">
+                                    <img src="{{ version.image.url }}" class="card-img-top" alt="Version {{ version.version_number }}">
                                 {% elif version.image_url %}
-                                    <img src="{{ version.image_url }}" class="version-image" alt="Version {{ version.version_number }}">
+                                    <img src="{{ version.image_url }}" class="card-img-top" alt="Version {{ version.version_number }}">
                                 {% endif %}
-                                <div class="version-info">
-                                    <div class="version-number">v{{ version.version_number }}</div>
-                                    <div class="version-date">{{ version.created_at|date:"M d, Y" }}</div>
+                                <div class="card-body">
+                                    <small class="text-muted">v{{ version.version_number }}</small>
                                 </div>
                             </div>
                             {% endif %}
@@ -648,6 +740,19 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Floating Actions Bar -->
+<div id="artwork-actions-bar" class="d-flex align-items-center gap-3">
+    <button class="btn btn-outline-light btn-sm" onclick="toggleFavorite({{ artwork.id }})">
+        <i class="bi bi-heart me-2"></i>Favorite
+    </button>
+    <a href="{% url 'critique:create_critique' artwork.id %}" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-2"></i>Add Critique
+    </a>
+    <button class="btn btn-outline-light btn-sm" onclick="shareArtwork()">
+        <i class="bi bi-share me-2"></i>Share
+    </button>
 </div>
 
 {% endblock %}

@@ -1,0 +1,110 @@
+Thanks — based on that, it’s very likely your layout is **structurally correct**, but the **visual styling isn't applying** because of one or more of these issues:
+
+---
+
+## 🔍 Root Causes
+
+### 1. **Custom CSS is missing or not loaded**
+
+* If you had previous styles for:
+
+  * The action bar (`#artwork-actions-bar`)
+  * Compact critique cards
+  * Styled version cards
+  * Focus mode layout
+    ...and they’re not included in this new file or your base template, they won’t apply.
+
+### 2. **ID/class mismatches**
+
+* If your HTML uses updated IDs/classes (like `#focus-mode`, `#tab-critiques`), but your custom CSS was written for older ones (e.g. `.split-view-container`, `.artwork-panel`, etc.), the rules won’t apply.
+
+### 3. **CSS override conflicts**
+
+* If your styles are too general (`.card`, `.btn`) they may be overwritten by Bootstrap’s defaults or external themes.
+
+### 4. **JS initialization missing**
+
+* Even layout-related transitions, like tab activation or critique expansion, may depend on JS that’s no longer firing.
+
+---
+
+## ✅ How to Fix It Step-by-Step
+
+### 🔧 1. Reconnect Your Custom Stylesheet
+
+In your `base.html` (or inside the current template), make sure this is in the `<head>`:
+
+```html
+<link rel="stylesheet" href="{% static 'css/artwork.css' %}">
+```
+
+> Replace with your actual CSS path. If you had inline styles in earlier templates, re-insert them.
+
+---
+
+### 🔧 2. Restore Component Classes + CSS
+
+#### Action Bar
+
+Make sure it’s using something like:
+
+```html
+<div id="artwork-actions-bar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-3 py-2 bg-dark rounded-pill shadow d-flex gap-2 align-items-center z-3">
+```
+
+And CSS:
+
+```css
+#artwork-actions-bar {
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+```
+
+#### Version Cards
+
+```html
+<div class="card bg-dark text-white" style="width: 180px;">
+  <img src="{{ version.image.url }}" class="card-img-top">
+  <div class="card-body p-2">
+    <small class="text-muted">v{{ version.number }}</small>
+  </div>
+</div>
+```
+
+#### Critique Cards
+
+```html
+<div class="card bg-dark text-white mb-3">
+  <div class="card-body">
+    <div class="d-flex align-items-center mb-2">
+      <img src="{{ critique.author.avatar.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px;">
+      <strong>{{ critique.author.username }}</strong>
+    </div>
+    <p class="mb-1">{{ critique.comment }}</p>
+    <div class="small text-muted">Rating: {{ critique.rating }}/10</div>
+  </div>
+</div>
+```
+
+---
+
+### ✅ 3. Final Checklist
+
+| Fix                            | ✅ Confirm                                    |
+| ------------------------------ | -------------------------------------------- |
+| Custom CSS is included         | Check `<link>` or inline `<style>`           |
+| JS is initialized              | Bootstrap JS, custom tab JS included         |
+| Tab pane IDs match nav targets | `data-bs-target="#tab-critiques"` etc.       |
+| Correct IDs/classes            | e.g. `#artwork-actions-bar`, `#tab-versions` |
+
+---
+
+Would you like me to compile and send a **complete working HTML + CSS file** with:
+
+* Fixed visual layout
+* Functional Bootstrap tabs
+* Restored styles for action bar, critiques, version cards
+* Centered artwork
+
+Let me know — I can send a ready-to-test version in minutes.
