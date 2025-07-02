@@ -1,0 +1,98 @@
+Whoa — that’s a critical bug. If **visiting an artwork detail page logs you out**, it likely involves one of these backend or session-level issues in Django.
+
+---
+
+## 🔍 Root Cause Possibilities
+
+### 1. **CSRF Token Mismatch or Missing**
+
+If the page includes a form (`{% csrf_token %}`), but the token isn’t properly rendered (e.g., inside a script or broken block), Django may invalidate the session.
+
+### 2. **Media or Static File URLs Require Auth**
+
+If something like:
+
+```html
+<img src="{{ user.profile.avatar.url }}">
+```
+
+resolves to a protected media route (e.g., `/media/avatars/...`), and the file storage is not configured to allow anonymous access, Django may:
+
+* redirect to login
+* or throw a `403` or `302` redirect that breaks the page load
+
+### 3. **Custom Middleware or View Logic Logs You Out**
+
+If the `ArtWorkDetailView` checks session state or user cookies and fails validation, it could forcibly redirect to login.
+
+### 4. **Browser Infinite Redirect Loop**
+
+If Django tries to load something via AJAX or `<img>` that causes a redirect to login — and it happens multiple times — some browsers automatically clear session cookies.
+
+---
+
+## ✅ What to Do Right Now
+
+### 🔎 1. Check for a broken avatar URL
+
+In your `artwork_detail.html`:
+
+```html
+<img src="{{ critique.author.avatar.url }}" onerror="this.src='/static/img/default-avatar.png'" ...>
+```
+
+If `avatar.url` points to something that requires login — it could break the page load.
+
+**Solution:**
+
+* Use `{% if critique.author.avatar %}` check
+* Or ensure `/media/` is properly served and public
+
+---
+
+### 🔎 2. View HTML source and network requests
+
+Open browser dev tools:
+
+* Go to the **Network** tab
+* Reload `/artworks/35/`
+* Look for any **302 redirects to `/accounts/login`**
+* Look at cookies — does the `sessionid` disappear?
+
+---
+
+### 🔎 3. Confirm Login Requirements on View
+
+In your `views.py`, check:
+
+```python
+class ArtWorkDetailView(LoginRequiredMixin, DetailView):
+    ...
+```
+
+If you're using `LoginRequiredMixin`, and `MEDIA_URL` or AJAX isn’t handled right, the view could silently redirect or fail.
+
+---
+
+## ✅ Fast Patch Options
+
+| Situation                  | Fix                                                                                       |
+| -------------------------- | ----------------------------------------------------------------------------------------- |
+| Avatar/media requires auth | Serve `/media/` via `django.views.static.serve` in `urls.py` during development           |
+| Avatar missing             | Add `onerror`, default image fallback                                                     |
+| CSRF/token issue           | Wrap every form with `{% csrf_token %}` and load with `{% csrf_token %}` block tag active |
+| Session resets on error    | Make sure no invalid cookies/headers are sent by the frontend                             |
+
+---
+
+## Want Help Diagnosing This?
+
+If you share:
+
+* `urls.py` handling of `/media/`
+* the view function (`ArtWorkDetailView`)
+* and the full `<img>` or `<form>` markup
+
+…I can help you isolate this fast.
+
+Would you like me to generate a new `artwork_detail.html` file with all previous fixes *and* this media/avatar protection handled?

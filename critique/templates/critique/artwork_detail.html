@@ -636,9 +636,14 @@
                     {% for critique in critiques %}
                         <div class="critique-card">
                             <div class="critique-header">
-                                <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.svg?v=1' }}" 
-                                     onerror="this.src='/static/img/default-avatar.svg?v=1'" 
-                                     class="critique-avatar" alt="{{ critique.author.username }}">
+                                {% if critique.author.profile.profile_picture %}
+                                    <img src="{{ critique.author.profile.profile_picture.url }}" 
+                                         onerror="this.src='/static/img/default-avatar.svg?v=1'" 
+                                         class="critique-avatar" alt="{{ critique.author.username }}">
+                                {% else %}
+                                    <img src="/static/img/default-avatar.svg?v=1" 
+                                         class="critique-avatar" alt="{{ critique.author.username }}">
+                                {% endif %}
                                 <div class="flex-grow-1">
                                     <div class="critique-author fw-bold">{{ critique.author.username }}</div>
                                     <div class="critique-date text-muted small">
