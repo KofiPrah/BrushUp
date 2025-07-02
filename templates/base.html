@@ -29,17 +29,15 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'critique:my_artworks' %}">My Artworks</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'critique:profile' %}">Profile</a>
+                            <a class="nav-link" href="{% url 'critique:artwork_upload' %}">Upload Art</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ user.username }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" href="{% url 'critique:artwork_upload' %}">Upload Artwork</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:profile' %}">My Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:my_artworks' %}">My Artworks</a></li>
                                 <li><a class="dropdown-item" href="{% url 'critique:my_karma' %}">My Karma</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
