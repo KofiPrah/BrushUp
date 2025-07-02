@@ -1,0 +1,79 @@
+Yes — great catch. Based on your screenshots and what's been implemented, here's **why the pill-style bottom nav (action bar) stopped working**, and what to do about it.
+
+---
+
+## ❌ What's Wrong with the Bottom Nav?
+
+### 1. **Positioning conflicts**
+
+* The nav bar is meant to float **at the bottom of the artwork** in Focus Mode.
+* But with the tab layout inserted after the artwork, the page now scrolls, so the action bar gets pushed up or left behind.
+
+### 2. **No fixed or sticky behavior**
+
+* Without `position: fixed` or `sticky`, it behaves like regular content and scrolls out of view.
+
+### 3. **Incorrect DOM nesting or missing Bootstrap styles**
+
+* If it’s not wrapped properly or missing padding/margin classes, it might shrink or get clipped.
+
+---
+
+## ✅ How to Fix It
+
+### 🔧 1. Use a Fixed Bottom Action Bar (for Focus Mode)
+
+Place this directly inside `#focus-mode`:
+
+```html
+<div id="action-bar" class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-3 py-2 bg-dark rounded-pill shadow d-flex gap-2 align-items-center z-3">
+  <button class="btn btn-outline-light btn-sm">❤️ Favorite</button>
+  <button class="btn btn-outline-light btn-sm" data-bs-toggle="tab" data-bs-target="#tab-info">See Details</button>
+  <button class="btn btn-primary btn-sm" data-bs-toggle="tab" data-bs-target="#tab-critiques">💬 Add Critique</button>
+  <button class="btn btn-outline-light btn-sm" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+</div>
+```
+
+### 🔧 2. Ensure Focus Mode Has Room
+
+Add bottom padding to avoid overlap:
+
+```css
+#focus-mode {
+  padding-bottom: 6rem;
+}
+```
+
+---
+
+## ⚠️ Gotcha: Tabs Require Visible Container
+
+If you're triggering a tab (e.g., `#tab-critiques`) from a button outside the `.tab-content`, it must still exist in the DOM and Bootstrap’s JavaScript must be loaded.
+
+### ✅ Ensure
+
+* You’ve included Bootstrap JS (`bootstrap.bundle.min.js`)
+* The tab content area exists and uses the correct IDs
+
+---
+
+## ✅ Recap of Fix
+
+| Problem                        | Fix                                                                  |
+| ------------------------------ | -------------------------------------------------------------------- |
+| Pill nav doesn't stay in place | Use `position-fixed bottom-0` and center with `translate-middle-x`   |
+| Overlapping UI                 | Add padding to bottom of `#focus-mode`                               |
+| Tabs not opening from button   | Add `data-bs-toggle="tab"` and `data-bs-target="#tab-id"`            |
+| Bootstrap tabs not working     | Include `bootstrap.bundle.min.js` script at the end of your template |
+
+---
+
+Would you like me to regenerate your full layout file (`artwork_detail.html`) now with:
+
+* ✅ Pill-style bottom nav fixed and polished
+* ✅ Tab layout fully working
+* ✅ Image centered
+* ✅ Critiques & avatars functional
+* ✅ Versions compacted
+
+Let me know and I’ll ship the complete update.
