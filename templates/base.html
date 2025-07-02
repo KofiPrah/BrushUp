@@ -13,17 +13,20 @@
 <body class="{% block body_class %}{% endblock %}">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/">Art Critique</a>
+            <a class="navbar-brand" href="{% url 'critique:index' %}">Brush Up</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
+                        <a class="nav-link" href="{% url 'critique:index' %}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/artworks/">Artworks</a>
+                        <a class="nav-link" href="{% url 'critique:artwork_list' %}">Artworks</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'critique:karma_leaderboard' %}">Leaderboard</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -38,9 +41,11 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                                 <li><a class="dropdown-item" href="{% url 'critique:profile' %}">My Profile</a></li>
                                 <li><a class="dropdown-item" href="{% url 'critique:my_artworks' %}">My Artworks</a></li>
-                                <li><a class="dropdown-item" href="{% url 'critique:my_karma' %}">My Karma</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:portfolio_builder' %}">Portfolio Builder</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:my_karma' %}">My Karma Points</a></li>
+                                <li><a class="dropdown-item" href="{% url 'critique:karma_leaderboard' %}">Karma Leaderboard</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'account_logout' %}">Logout</a></li>
+                                <li><a class="dropdown-item" href="{% url 'account_logout' %}">Log Out</a></li>
                             </ul>
                         </li>
                     {% else %}
