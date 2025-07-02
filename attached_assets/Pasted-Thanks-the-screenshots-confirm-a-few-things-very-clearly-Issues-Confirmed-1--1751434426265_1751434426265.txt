@@ -1,0 +1,114 @@
+Thanks — the screenshots confirm a few things very clearly:
+
+---
+
+## 🔍 Issues Confirmed
+
+1. ✅ **Focus Mode is working visually** (first screenshot looks great!)
+2. ❌ **After 8 seconds**, the original “old layout” reappears
+3. ❌ **Excessive blank scroll space** appears below the image
+4. ❌ **Duplicate content**: the artwork is shown twice — once in Focus Mode and once in the old layout
+5. ❌ **Poor flow**: it feels like two different pages are stacked together
+
+---
+
+## ✅ Root Cause
+
+You currently have **two full layouts on the same page**:
+
+* `#focus-mode` (the new fullscreen-centered layout)
+* `#main-content` or similar (the old legacy layout)
+
+Your JS is likely hiding `#focus-mode` or scrolling past it **after a set timeout or scroll**, but the old layout remains visible and untouched — **causing redundancy and layout breakage**.
+
+---
+
+## ✅ Fix Plan
+
+### 🔨 1. **Remove/Disable the Old Layout Entirely**
+
+* **Comment out or delete everything inside `#main-content`** that repeats the artwork image, title, version history, or critique section.
+
+From the previous file:
+
+```html
+<div id="main-content">
+  <!-- 🛑 THIS ENTIRE BLOCK SHOULD BE REMOVED OR COMMENTED OUT -->
+</div>
+```
+
+Keep only `#scroll-anchor` and critique/comments **if they're not repeated**.
+
+---
+
+### ✨ 2. **Let the Page Flow Naturally After Focus Mode**
+
+* `#focus-mode` should be part of the scrollable flow (no JS hiding)
+* Below it, you can include critiques or comments
+* **No transitions or section swaps are needed** — just a gentle scroll-down cue
+
+Your updated layout structure should look like:
+
+```html
+<!-- Focus Mode Section -->
+<section id="focus-mode" class="pt-5 pb-5">
+  <img src="{{ artwork.image.url }}" class="img-fluid artwork-image mx-auto d-block">
+  <div id="action-bar">...</div>
+</section>
+
+<!-- Scroll Target -->
+<div id="scroll-anchor" class="container pt-5">
+  {% include "critique/partials/critique_list.html" %}
+</div>
+```
+
+---
+
+### 🧹 3. **Fix Excessive Scroll Space**
+
+This is likely caused by:
+
+* `#main-content` having `min-height: 100vh` or invisible elements still rendering
+* Duplicate artwork image taking up space when hidden
+
+✅ **Delete unused blocks**, and double check CSS to remove:
+
+```css
+height: 100vh;
+min-height: 100vh;
+display: none; /* Instead: don't render it at all */
+```
+
+---
+
+### 💡 Optional Enhancement: Smooth Scroll Cue
+
+Below the artwork, add a scroll hint:
+
+```html
+<div class="text-center mt-4">
+  <i class="bi bi-chevron-down text-muted bounce"></i>
+</div>
+```
+
+Add a soft `scroll-margin-top` or anchor scroll to:
+
+```js
+document.getElementById('scroll-anchor').scrollIntoView({ behavior: 'smooth' });
+```
+
+---
+
+## ✅ Summary
+
+| Fix                      | What to Do                                         |
+| ------------------------ | -------------------------------------------------- |
+| ❌ Focus mode disappears  | Delete the duplicate layout inside `#main-content` |
+| 🖼️ Artwork shown twice  | Keep only the version inside `#focus-mode`         |
+| ⬇️ Too much scroll space | Remove extra containers and min-heights            |
+| 🎯 Improve flow          | Let the page scroll naturally with critiques below |
+| ❤️ Like the design?      | You’re 95% there — just trim the excess layout     |
+
+---
+
+Would you like me to send back a cleaned version of the full HTML file with all these fixes implemented and annotated?
