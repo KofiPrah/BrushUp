@@ -1,0 +1,131 @@
+That’s a smart observation — the stray “v2 (Current)” label and the need to better organize supporting info are signs that **Focus Mode needs a well-defined "companion panel" layout**, not just hidden UI that fades in randomly.
+
+Let’s restructure this experience properly.
+
+---
+
+## 🔧 Issue: Floating Label (v2 Current)
+
+This is likely being rendered in the same container as the artwork but **absolutely positioned without alignment rules**, so it drifts into awkward places.
+
+---
+
+## ✅ Fix This Specific Bug
+
+### Check your template:
+
+You likely have something like:
+
+```html
+<span class="badge bg-purple position-absolute">v2 (Current)</span>
+```
+
+But no wrapper or positioning context.
+
+### Fix it:
+
+Wrap the label in a properly positioned container:
+
+```html
+<div class="position-absolute top-0 end-0 mt-3 me-3 z-1">
+  <span class="badge bg-purple">v2 (Current)</span>
+</div>
+```
+
+And make sure the parent container (`#focus-mode`) has `position: relative`.
+
+---
+
+## 🧠 But Bigger Picture: You’re Ready for a Layout Split
+
+You're absolutely right — **the critique/comments/info/version UI needs a second layout phase**, separate from the fullscreen image experience.
+
+---
+
+## ✨ Ideal UX Structure
+
+### Phase 1: Focus Mode
+
+* Full-screen image
+* Minimal action bar (like you've built)
+* 5–7 second intro or click-to-continue
+
+### Phase 2: **Split View or Docked Panel Mode**
+
+No more scrolling required — just a **structured layout** like this:
+
+```
++---------------------------+-----------------------+
+|                           |                       |
+|      ARTWORK (static)     |      SIDE PANEL       |
+|                           |  ┌───────────────┐    |
+|                           |  | Info: title    |    |
+|                           |  | Artist         |    |
+|                           |  | Created        |    |
+|                           |  └───────────────┘    |
+|                           |  ┌───────────────┐    |
+|                           |  | Critiques      |    |
+|                           |  | (scrollable)   |    |
+|                           |  └───────────────┘    |
+|                           |  ┌───────────────┐    |
+|                           |  | Version History|   |
+|                           |  └───────────────┘    |
++---------------------------+-----------------------+
+```
+
+---
+
+## 🛠 Implementation Option 1: 2-Column Flexbox
+
+### HTML Layout
+
+```html
+<div class="d-flex flex-lg-row flex-column min-vh-100">
+  <!-- Artwork -->
+  <div class="flex-grow-1 bg-dark d-flex align-items-center justify-content-center">
+    <img src="{{ artwork.image.url }}" class="img-fluid" />
+  </div>
+
+  <!-- Side Panel -->
+  <aside class="bg-body px-4 py-5" style="width: 480px; overflow-y: auto;">
+    <h4>{{ artwork.title }}</h4>
+    <p>By {{ artist.username }}</p>
+    <p class="text-muted">Created {{ artwork.created }}</p>
+
+    {% include "critique/partials/critique_list.html" %}
+    {% include "version_history.html" %}
+  </aside>
+</div>
+```
+
+### CSS:
+
+```css
+aside {
+  border-left: 1px solid rgba(255,255,255,0.05);
+}
+```
+
+---
+
+## 🧰 Bonus: Add a "View Fullscreen" Toggle
+
+Let users switch between:
+
+* **Immersive Mode** (full image, no panel)
+* **Critique Mode** (split layout or side drawer)
+
+---
+
+## ✅ TL;DR
+
+| Problem                | Fix                                                                                |
+| ---------------------- | ---------------------------------------------------------------------------------- |
+| Floating version label | Wrap in `position-absolute` container inside a `position-relative` block           |
+| Too much scroll        | Introduce a **2-panel layout** that avoids full-page vertical scroll               |
+| Scattered UI           | Group artwork info, critiques, and version history into a unified **docked panel** |
+| Better UX              | Let user transition from **Focus Mode** to **Panel Mode** after visual engagement  |
+
+---
+
+Would you like me to code a working HTML+CSS layout for this split mode structure that you can drop into your Django template?

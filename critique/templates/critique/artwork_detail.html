@@ -1053,6 +1053,204 @@
     #artwork-actions-bar.animate-in {
         animation: bounceIn 0.6s ease-out;
     }
+
+    /* Focus Mode positioning */
+    #focus-mode {
+        position: relative;
+    }
+
+    /* Split-view layout styles */
+    .split-view-container {
+        min-height: 100vh;
+    }
+
+    .artwork-panel {
+        background: #1a1a1a;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .artwork-panel img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        cursor: pointer;
+    }
+
+    .companion-panel {
+        background: #121212;
+        border-left: 1px solid rgba(255,255,255,0.05);
+        height: 100vh;
+        overflow-y: auto;
+        padding: 2rem;
+    }
+
+    .artwork-info-section {
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .artwork-info-section h2 {
+        font-size: 1.75rem;
+        font-weight: 300;
+        margin-bottom: 0.5rem;
+    }
+
+    .artwork-info-section .artist-info {
+        color: #aaa;
+        margin-bottom: 0.75rem;
+    }
+
+    .artwork-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .meta-item {
+        text-align: center;
+        padding: 0.75rem;
+        background: rgba(255,255,255,0.02);
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .meta-item .label {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #888;
+        margin-bottom: 0.25rem;
+    }
+
+    .meta-item .value {
+        font-weight: 500;
+        color: #fff;
+    }
+
+    .panel-section {
+        margin-bottom: 2rem;
+    }
+
+    .panel-section h3 {
+        font-size: 1.1rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        color: #fff;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        padding-bottom: 0.5rem;
+    }
+
+    .version-thumbnails {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .version-thumb {
+        aspect-ratio: 1;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+
+    .version-thumb:hover {
+        border-color: #6f42c1;
+    }
+
+    .version-thumb.current {
+        border-color: #0d6efd;
+    }
+
+    .version-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .critique-compact {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .critique-compact .author-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .critique-compact .author-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 0.75rem;
+    }
+
+    .critique-compact .author-name {
+        font-weight: 500;
+        margin-bottom: 0.125rem;
+    }
+
+    .critique-compact .critique-date {
+        font-size: 0.75rem;
+        color: #888;
+    }
+
+    .critique-compact .critique-content {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        margin-bottom: 0.75rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .critique-compact .reactions-compact {
+        display: flex;
+        gap: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .view-mode-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        background: rgba(0,0,0,0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+
+    /* Mobile responsiveness for split view */
+    @media (max-width: 991px) {
+        .split-view-container {
+            flex-direction: column;
+        }
+        
+        .artwork-panel {
+            height: 50vh;
+            position: relative;
+        }
+        
+        .companion-panel {
+            height: auto;
+            border-left: none;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+    }
 </style>
 {% endblock %}
 
@@ -1095,9 +1293,9 @@
         </button>
     </div>
     
-    <!-- Version Info (separate from actions) -->
-    <div class="version-chip">
-        v{{ current_version_number|default:"1" }} (Current)
+    <!-- Version Info (properly positioned) -->
+    <div class="position-absolute top-0 end-0 mt-3 me-3 z-1">
+        <span class="badge bg-primary">v{{ current_version_number|default:"1" }} (Current)</span>
     </div>
     
     <!-- Scroll Indicator -->
@@ -1108,282 +1306,375 @@
     </div>
 </section>
 
-<!-- Scroll Target for Smooth Transition -->
-<div id="scroll-anchor" class="container pt-5">
-    <div class="text-center mb-4">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-chevron-down text-muted opacity-50" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+<!-- View Mode Toggle -->
+<div class="view-mode-toggle">
+    <button class="btn btn-sm btn-outline-light" onclick="toggleViewMode()" id="viewModeBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layout-split me-1" viewBox="0 0 16 16">
+            <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8.5zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5V2z"/>
         </svg>
-    </div>
+        Split View
+    </button>
 </div>
 
-    <!-- Critiques Section -->
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col-12">
-                <div class="card mb-4 bg-dark text-white">
-                    <div class="card-header">
-                        <h4>Critiques ({{ critiques.count }})</h4>
-                        {% if user.is_authenticated %}
-                        <p class="mb-0"><small class="text-muted">Share your thoughts to help the artist improve</small></p>
-                        {% endif %}
-                    </div>
-                    <div class="card-body">
-                        {% if critiques %}
-                            <!-- Enhanced Critique Sorting Controls -->
-                            <div class="critique-sorting-controls mb-4 p-3 rounded-3" style="background: linear-gradient(135deg, rgba(52, 58, 64, 0.8), rgba(33, 37, 41, 0.6)); border: 1px solid rgba(108, 117, 125, 0.3);">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="d-flex align-items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-funnel me-2 text-primary" viewBox="0 0 16 16">
-                                                <path d="M1.5 1.5A.5.5 0 0 1 2 1h12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.128.334L10 8.692V13.5a.5.5 0 0 1-.342.474l-3 1A.5.5 0 0 1 6 14.5V8.692L1.628 3.834A.5.5 0 0 1 1.5 3.5z"/>
-                                            </svg>
-                                            <label for="sortCritiques" class="form-label me-2 mb-0 fw-semibold text-uppercase small">Sort by:</label>
-                                            <select id="sortCritiques" class="form-select form-select-sm bg-secondary text-white border-0" style="width: auto;">
-                                                <option value="newest">Latest First</option>
-                                                <option value="oldest">Oldest First</option>
-                                                <option value="rating-high">Highest Rated</option>
-                                                <option value="rating-low">Lowest Rated</option>
-                                                <option value="helpful">Most Helpful</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" id="compactView">
-                                            <label class="form-check-label small text-muted" for="compactView">
-                                                Compact View
-                                            </label>
-                                        </div>
-                                        
-                                        <div class="dropdown">
-                                            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-stars me-1" viewBox="0 0 16 16">
-                                                    <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.73 1.73 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.73 1.73 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.73 1.73 0 0 0 3.407 2.31zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
-                                                </svg>
-                                                Filter by Rating
-                                            </button>
-                                            <ul class="dropdown-menu bg-dark border-secondary">
-                                                <li><a class="dropdown-item text-light" href="#" onclick="filterByRating('all')">All Ratings</a></li>
-                                                <li><a class="dropdown-item text-success" href="#" onclick="filterByRating('excellent')">Excellent (8-10)</a></li>
-                                                <li><a class="dropdown-item text-primary" href="#" onclick="filterByRating('good')">Good (6-7)</a></li>
-                                                <li><a class="dropdown-item text-warning" href="#" onclick="filterByRating('average')">Average (4-5)</a></li>
-                                                <li><a class="dropdown-item text-danger" href="#" onclick="filterByRating('poor')">Poor (1-3)</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<!-- Split View Layout -->
+<div id="scroll-anchor" class="d-flex flex-lg-row flex-column split-view-container">
+    <!-- Artwork Panel -->
+    <div class="artwork-panel flex-grow-1 d-flex align-items-center justify-content-center">
+        <img src="{% if current_version and current_version.image %}{{ current_version.image.url }}{% elif current_version and current_version.image_url %}{{ current_version.image_url }}{% elif artwork.image %}{{ artwork.image.url }}{% elif artwork.image_url %}{{ artwork.image_url }}{% endif %}" 
+             alt="{{ artwork.title }}" 
+             onclick="enterFullscreen(this)">
+    </div>
 
-                            <!-- Critiques List -->
-                            <div id="critiques-container">
-                                {% for critique in critiques %}
-                                    <div class="critique-card card bg-secondary text-white mb-3" data-rating="{{ critique.average_rating|floatformat:1 }}" data-date="{{ critique.created_at|date:'Y-m-d' }}">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                                <div class="d-flex align-items-center">
-                                                    <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.png' }}" 
-                                                         class="rounded-circle me-3" width="40" height="40" alt="{{ critique.author.username }}">
-                                                    <div>
-                                                        <h6 class="mb-0">{{ critique.author.username }}</h6>
-                                                        <small class="text-muted">{{ critique.created_at|timesince }} ago</small>
-                                                    </div>
-                                                </div>
-                                                <div class="text-end">
-                                                    {% if critique.average_rating %}
-                                                        <div class="rating-display">
-                                                            <span class="badge bg-primary">{{ critique.average_rating|floatformat:1 }}/10</span>
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="critique-content">
-                                                <p class="mb-3">{{ critique.content|linebreaks }}</p>
-                                                
-                                                <!-- Rating sections if they exist -->
-                                                {% if critique.composition_rating or critique.technique_rating or critique.creativity_rating %}
-                                                <div class="rating-breakdown mb-3">
-                                                    <div class="row g-2">
-                                                        {% if critique.composition_rating %}
-                                                        <div class="col-md-4">
-                                                            <div class="rating-item">
-                                                                <span class="text-uppercase small text-muted">Composition</span>
-                                                                <div class="progress" style="height: 6px;">
-                                                                    <div class="progress-bar bg-primary" style="width: {{ critique.composition_rating }}0%"></div>
-                                                                </div>
-                                                                <span class="small">{{ critique.composition_rating }}/10</span>
-                                                            </div>
-                                                        </div>
-                                                        {% endif %}
-                                                        {% if critique.technique_rating %}
-                                                        <div class="col-md-4">
-                                                            <div class="rating-item">
-                                                                <span class="text-uppercase small text-muted">Technique</span>
-                                                                <div class="progress" style="height: 6px;">
-                                                                    <div class="progress-bar bg-success" style="width: {{ critique.technique_rating }}0%"></div>
-                                                                </div>
-                                                                <span class="small">{{ critique.technique_rating }}/10</span>
-                                                            </div>
-                                                        </div>
-                                                        {% endif %}
-                                                        {% if critique.creativity_rating %}
-                                                        <div class="col-md-4">
-                                                            <div class="rating-item">
-                                                                <span class="text-uppercase small text-muted">Creativity</span>
-                                                                <div class="progress" style="height: 6px;">
-                                                                    <div class="progress-bar bg-warning" style="width: {{ critique.creativity_rating }}0%"></div>
-                                                                </div>
-                                                                <span class="small">{{ critique.creativity_rating }}/10</span>
-                                                            </div>
-                                                        </div>
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                                {% endif %}
-                                                
-                                                <!-- Reaction buttons -->
-                                                <div class="reaction-buttons d-flex align-items-center gap-3 mt-3">
-                                                    <button class="btn btn-outline-light btn-sm reaction-btn" data-critique-id="{{ critique.id }}" data-reaction="HELPFUL">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up me-1" viewBox="0 0 16 16">
-                                                            <path d="M8.864.046C7.908-.193 7.02.53 6.956 1.466c-.072 1.051-.23 2.016-.428 2.59-.125.36-.479 1.013-1.04 1.639-.557.623-1.282 1.178-2.131 1.41C2.685 7.288 2 7.87 2 8.72v4.001c0 .845.682 1.464 1.448 1.545 1.07.114 1.564.415 2.068.723l.048.03c.272.165.578.348.97.484.397.136.861.217 1.466.217h3.5c.937 0 1.599-.477 1.934-1.064a1.86 1.86 0 0 0 .254-.912c0-.152-.023-.312-.077-.464.201-.263.38-.578.488-.901.11-.33.172-.762.004-1.149.069-.13.12-.269.159-.403.077-.27.113-.568.113-.857 0-.288-.036-.585-.113-.856a2.144 2.144 0 0 0-.138-.362 1.9 1.9 0 0 0 .234-1.734c-.206-.592-.682-1.1-1.2-1.272-.847-.282-1.803-.276-2.516-.211a9.84 9.84 0 0 0-.443.05 9.365 9.365 0 0 0-.062-4.509A1.38 1.38 0 0 0 9.125.111L8.864.046zM11.5 14.721H8c-.51 0-.863-.069-1.14-.164-.281-.097-.506-.228-.776-.393l-.04-.024c-.555-.339-1.198-.731-2.49-.868-.333-.036-.554-.29-.554-.55V8.72c0-.254.226-.543.62-.65 1.095-.3 1.977-.996 2.614-1.708.635-.71 1.064-1.475 1.238-1.978.243-.7.407-1.768.482-2.85.025-.362.36-.594.667-.518l.262.066c.16.04.258.143.288.255a8.34 8.34 0 0 1-.145 4.725.5.5 0 0 0 .595.644l.003-.001.014-.003.058-.014a8.908 8.908 0 0 1 1.036-.157c.663-.06 1.457-.054 2.11.164.175.058.45.3.57.65.107.308.087.67-.266 1.022l-.353.353.353.354c.043.043.105.141.154.315.048.167.075.37.075.581 0 .212-.027.414-.075.582-.05.174-.111.272-.154.315l-.353.353.353.354c.047.047.109.177.005.488a2.224 2.224 0 0 1-.505.805l-.353.353.353.354c.006.005.041.05.041.17a.866.866 0 0 1-.121.416c-.165.288-.503.56-1.066.56z"/>
-                                                        </svg>
-                                                        Helpful
-                                                        <span class="badge bg-secondary ms-1">{{ critique.helpful_count }}</span>
-                                                    </button>
-                                                    
-                                                    <button class="btn btn-outline-light btn-sm reaction-btn" data-critique-id="{{ critique.id }}" data-reaction="INSPIRING">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightbulb me-1" viewBox="0 0 16 16">
-                                                            <path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13a.5.5 0 0 1 0 1 .5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1 0-1 .5.5 0 0 1 0-1 .5.5 0 0 1-.459-.31l-.762-1.77C3.69 11.2 3.534 10.996 3.331 10.8A5.99 5.99 0 0 1 2 6zm10.064 4.19a.5.5 0 0 0 .288-.648l-1.441-3.23A6.001 6.001 0 0 0 8 1a6 6 0 0 0-2.911 5.312l-1.441 3.23a.5.5 0 0 0 .288.648A5.99 5.99 0 0 0 8 12a5.99 5.99 0 0 0 4.064-1.81z"/>
-                                                        </svg>
-                                                        Inspiring
-                                                        <span class="badge bg-secondary ms-1">{{ critique.inspiring_count }}</span>
-                                                    </button>
-                                                    
-                                                    <button class="btn btn-outline-light btn-sm reaction-btn" data-critique-id="{{ critique.id }}" data-reaction="DETAILED">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search me-1" viewBox="0 0 16 16">
-                                                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                                                        </svg>
-                                                        Detailed
-                                                        <span class="badge bg-secondary ms-1">{{ critique.detailed_count }}</span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            <div class="text-center py-5">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-chat-text text-muted mb-3" viewBox="0 0 16 16">
-                                    <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
-                                    <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8zm0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>
-                                </svg>
-                                <h5 class="text-muted">No critiques yet</h5>
-                                <p class="text-muted">Be the first to share your thoughts on this artwork!</p>
-                                {% if user.is_authenticated %}
-                                <a href="{% url 'critique:critique_add' artwork.id %}" class="btn btn-primary">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-1" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                    </svg>
-                                    Add Critique
-                                </a>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-                        
-                        <!-- Add critique button for authenticated users -->
-                        {% if user.is_authenticated and critiques %}
-                        <div class="text-center mt-4">
-                            <a href="{% url 'critique:critique_add' artwork.id %}" class="btn btn-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-1" viewBox="0 0 16 16">
-                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                    <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
-                                </svg>
-                                Add Your Critique
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
+    <!-- Companion Panel -->
+    <aside class="companion-panel" style="width: 480px;">
+        <!-- Artwork Info Section -->
+        <div class="artwork-info-section">
+            <h2>{{ artwork.title }}</h2>
+            <div class="artist-info">
+                <strong>{{ artwork.author.username }}</strong>
+                {% if artwork.author.profile.profile_image %}
+                <img src="{{ artwork.author.profile.profile_image.url }}" class="rounded-circle ms-2" width="24" height="24" alt="{{ artwork.author.username }}">
+                {% endif %}
+            </div>
+            <p class="text-muted mb-3">Created {{ artwork.created_at|date:"M d, Y" }}</p>
+            
+            <!-- Artwork Meta Grid -->
+            <div class="artwork-meta">
+                <div class="meta-item">
+                    <span class="label">Version</span>
+                    <span class="value">v{{ current_version_number|default:"1" }}</span>
                 </div>
+                <div class="meta-item">
+                    <span class="label">Critiques</span>
+                    <span class="value">{{ critiques.count }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="label">Views</span>
+                    <span class="value">{{ artwork.view_count|default:"0" }}</span>
+                </div>
+                {% if artwork.category %}
+                <div class="meta-item">
+                    <span class="label">Category</span>
+                    <span class="value">{{ artwork.category }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if artwork.description %}
+            <p class="text-light">{{ artwork.description|linebreaks }}</p>
+            {% endif %}
+            
+            <!-- Quick Actions -->
+            <div class="d-flex gap-2 mt-3">
+                <a href="{% url 'critique:create_critique' artwork.id %}" class="btn btn-primary btn-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-circle me-1" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+                    </svg>
+                    Add Critique
+                </a>
+                <button class="btn btn-outline-light btn-sm" onclick="toggleFavorite({{ artwork.id }})">
+                    ♥ Favorite
+                </button>
             </div>
         </div>
-    </div>
+
+        <!-- Version History Section -->
+        {% if versions %}
+        <div class="panel-section">
+            <h3>Version History</h3>
+            <div class="version-thumbnails">
+                <!-- Current Version -->
+                <div class="version-thumb current" title="Current Version" onclick="switchToCurrentVersion({{ artwork.id }})">
+                    {% if current_version and current_version.image %}
+                        <img src="{{ current_version.image.url }}" alt="Current">
+                    {% elif current_version and current_version.image_url %}
+                        <img src="{{ current_version.image_url }}" alt="Current">
+                    {% elif artwork.image %}
+                        <img src="{{ artwork.image.url }}" alt="Current">
+                    {% elif artwork.image_url %}
+                        <img src="{{ artwork.image_url }}" alt="Current">
+                    {% endif %}
+                </div>
+                
+                <!-- Other Versions -->
+                {% for version in versions %}
+                    {% if not version.is_archived %}
+                    <div class="version-thumb" title="Version {{ version.version_number }}" onclick="switchToVersion({{ version.id }})">
+                        {% if version.image %}
+                            <img src="{{ version.image.url }}" alt="v{{ version.version_number }}">
+                        {% elif version.image_url %}
+                            <img src="{{ version.image_url }}" alt="v{{ version.version_number }}">
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Critiques Section -->
+        <div class="panel-section">
+            <h3>Critiques ({{ critiques.count }})</h3>
+            {% if critiques %}
+                <div class="critiques-compact">
+                    {% for critique in critiques %}
+                        <div class="critique-compact">
+                            <div class="author-info">
+                                <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.png' }}" 
+                                     class="author-avatar" alt="{{ critique.author.username }}">
+                                <div>
+                                    <div class="author-name">{{ critique.author.username }}</div>
+                                    <div class="critique-date">{{ critique.created_at|timesince }} ago</div>
+                                </div>
+                                {% if critique.average_rating %}
+                                <div class="ms-auto">
+                                    <span class="badge bg-primary">{{ critique.average_rating|floatformat:1 }}/10</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="critique-content">
+                                {{ critique.content|truncatechars:150 }}
+                            </div>
+                            <div class="reactions-compact">
+                                <span class="badge bg-secondary">{{ critique.helpful_count }} helpful</span>
+                                <span class="badge bg-secondary">{{ critique.inspiring_count }} inspiring</span>
+                                <span class="badge bg-secondary">{{ critique.detailed_count }} detailed</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-chat-text text-muted mb-2" viewBox="0 0 16 16">
+                        <path d="M2.678 11.894a1 1 0 0 1 .287.801 10.97 10.97 0 0 1-.398 2c1.395-.323 2.247-.697 2.634-.893a1 1 0 0 1 .71-.074A8.06 8.06 0 0 0 8 14c3.996 0 7-2.807 7-6 0-3.192-3.004-6-7-6S1 4.808 1 8c0 1.468.617 2.83 1.678 3.894zm-.493 3.905a21.682 21.682 0 0 1-.713.129c-.2.032-.352-.176-.273-.362a9.68 9.68 0 0 0 .244-.637l.003-.01c.248-.72.45-1.548.524-2.319C.743 11.37 0 9.76 0 8c0-3.866 3.582-7 8-7s8 3.134 8 7-3.582 7-8 7a9.06 9.06 0 0 1-2.347-.306c-.52.263-1.639.742-3.468 1.105z"/>
+                        <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zM4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8zm0 2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5z"/>
+                    </svg>
+                    <p class="text-muted small mb-0">No critiques yet</p>
+                </div>
+            {% endif %}
+        </div>
+    </aside>
 </div>
 
 {% endblock %}
-                            </div>
-                        </div>
 
-                        <!-- Version History Thumbnails -->
-                        {% for version in versions reversed %}
-                        {% if not version.is_archived or user.is_authenticated and user == artwork.author %}
-                        <div class="col-6">
-                            <div class="version-thumbnail text-center {% if version.is_archived %}archived-version{% endif %}" 
-                                 data-version="{{ version.id }}" 
-                                 data-version-id="{{ version.id }}"
-                                 data-version-number="{{ version.version_number }}"
-                                 data-artwork-id="{{ artwork.id }}"
-                                 data-archived="{{ version.is_archived|yesno:'true,false' }}"
-                                 {% if version.is_archived %}style="display: none;"{% endif %}>
-                                <div class="position-relative cursor-pointer" onclick="switchToVersion({{ artwork.id }}, {{ version.id }})">
-                                    {% if version.image %}
-                                        <img src="{{ version.image.url }}" class="img-thumbnail" style="width: 100%; height: 80px; object-fit: cover;" alt="Version {{ version.version_number }}">
-                                    {% elif version.image_url %}
-                                        <img src="{{ version.image_url }}" class="img-thumbnail" style="width: 100%; height: 80px; object-fit: cover;" alt="Version {{ version.version_number }}">
-                                    {% else %}
-                                        <div class="bg-dark d-flex align-items-center justify-content-center" style="width: 100%; height: 80px;">
-                                            <span class="text-muted small">No Image</span>
-                                        </div>
-                                    {% endif %}
+{% block extra_js %}
+<script>
+// Focus Mode and View Management
+let currentViewMode = 'focus'; // focus, split
+let focusModeTimer;
+let scrollDetectionTimer;
 
-                                    <!-- Version Actions Menu (only for artwork owner) -->
-                                    {% if user.is_authenticated and user == artwork.author %}
-                                    <div class="dropdown position-absolute" style="top: 2px; right: 2px;">
-                                        <button class="btn btn-sm btn-dark btn-outline-secondary dropdown-toggle p-1" type="button" 
-                                                data-bs-toggle="dropdown" aria-expanded="false" 
-                                                style="font-size: 0.6rem; line-height: 1;"
-                                                onclick="event.stopPropagation();">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
-                                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
-                                            </svg>
-                                        </button>
-                                        <ul class="dropdown-menu bg-dark border-secondary">
-                                            {% if version.is_archived %}
-                                            <li>
-                                                <button class="dropdown-item text-success" onclick="event.stopPropagation(); unarchiveVersion({{ version.id }})">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-arrow-up-circle me-1" viewBox="0 0 16 16">
-                                                        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-7.5 3.5a.5.5 0 0 1-1 0V5.707L5.354 7.854a.5.5 0 1 1-.708-.708l3-3a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 5.707V11.5z"/>
-                                                    </svg>
-                                                    Unarchive
-                                                </button>
-                                            </li>
-                                            {% else %}
-                                            <li>
-                                                <button class="dropdown-item text-white" onclick="event.stopPropagation(); archiveVersion({{ version.id }}, {{ version.version_number }})">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-archive me-1" viewBox="0 0 16 16">
-                                                        <path d="M0 2a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1v7.5a2.5 2.5 0 0 1-2.5 2.5h-9A2.5 2.5 0 0 1 1 12.5V5a1 1 0 0 1-1-1V2zm2 3v7.5A1.5 1.5 0 0 0 3.5 14h9a1.5 1.5 0 0 0 1.5-1.5V5H2zm13-3H1v2h14V2zM5 7.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5z"/>
-                                                    </svg>
-                                                    Archive
-                                                </button>
-                                            </li>
-                                            {% endif %}
-                                            <li><hr class="dropdown-divider bg-secondary"></li>
-                                            <li>
-                                                <button class="dropdown-item text-danger" onclick="event.stopPropagation(); deleteVersion({{ version.id }}, {{ version.version_number }})">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-trash me-1" viewBox="0 0 16 16">
-                                                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                                                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
-                                                    </svg>
-                                                    Delete
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    {% endif %}
-                                </div>
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFocusMode();
+    initializeViewModeToggle();
+    
+    // Initialize scroll detection
+    setupScrollDetection();
+});
+
+function initializeFocusMode() {
+    const focusMode = document.getElementById('focus-mode');
+    const actionsBar = document.getElementById('artwork-actions-bar');
+    
+    if (!focusMode || !actionsBar) return;
+    
+    // Start Focus Mode sequence
+    setTimeout(() => {
+        // Show actions bar with animation
+        actionsBar.style.opacity = '1';
+        actionsBar.classList.add('animate-in');
+        
+        // Start auto-transition timer (8 seconds)
+        focusModeTimer = setTimeout(() => {
+            exitFocusMode();
+        }, 8000);
+        
+    }, 2000); // 2-second delay before showing UI
+}
+
+function setupScrollDetection() {
+    let hasScrolled = false;
+    
+    window.addEventListener('scroll', function() {
+        if (window.scrollY > 100 && !hasScrolled) {
+            hasScrolled = true;
+            // Clear auto-transition if user scrolls
+            if (focusModeTimer) {
+                clearTimeout(focusModeTimer);
+            }
+            exitFocusMode();
+        }
+    });
+}
+
+function exitFocusMode() {
+    const scrollAnchor = document.getElementById('scroll-anchor');
+    if (scrollAnchor) {
+        scrollAnchor.scrollIntoView({ 
+            behavior: 'smooth',
+            block: 'start'
+        });
+    }
+    
+    // Clear any remaining timers
+    if (focusModeTimer) {
+        clearTimeout(focusModeTimer);
+    }
+    
+    // Update view mode
+    currentViewMode = 'split';
+    updateViewModeButton();
+}
+
+function initializeViewModeToggle() {
+    updateViewModeButton();
+}
+
+function toggleViewMode() {
+    if (currentViewMode === 'focus') {
+        exitFocusMode();
+    } else {
+        enterFocusMode();
+    }
+}
+
+function enterFocusMode() {
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    currentViewMode = 'focus';
+    updateViewModeButton();
+    
+    // Restart focus mode sequence
+    setTimeout(() => {
+        initializeFocusMode();
+    }, 500);
+}
+
+function updateViewModeButton() {
+    const btn = document.getElementById('viewModeBtn');
+    if (!btn) return;
+    
+    if (currentViewMode === 'focus') {
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-layout-split me-1" viewBox="0 0 16 16">
+                <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8.5zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5V2z"/>
+            </svg>
+            Split View
+        `;
+    } else {
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen me-1" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z"/>
+            </svg>
+            Focus Mode
+        `;
+    }
+}
+
+// Fullscreen functionality
+function enterFullscreen(element) {
+    if (element.requestFullscreen) {
+        element.requestFullscreen();
+    } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+    } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullscreen();
+    } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+    }
+}
+
+// Version switching functionality
+function switchToVersion(versionId) {
+    // Update artwork images in both focus mode and split view
+    const focusArtwork = document.getElementById('focus-artwork');
+    const splitArtwork = document.querySelector('.artwork-panel img');
+    
+    // Make API call to get version data
+    fetch(`/api/artworks/versions/${versionId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const imageUrl = data.image || data.image_url;
+            if (imageUrl) {
+                if (focusArtwork) {
+                    focusArtwork.src = imageUrl;
+                }
+                if (splitArtwork) {
+                    splitArtwork.src = imageUrl;
+                }
+                
+                // Update version badge
+                const versionBadge = document.querySelector('.position-absolute .badge');
+                if (versionBadge && data.version_number) {
+                    versionBadge.textContent = `v${data.version_number} (Current)`;
+                }
+                
+                // Update version thumbnails highlighting
+                document.querySelectorAll('.version-thumb').forEach(thumb => {
+                    thumb.classList.remove('current');
+                });
+                document.querySelector(`[onclick*="${versionId}"]`)?.classList.add('current');
+            }
+        })
+        .catch(error => {
+            console.error('Error switching version:', error);
+        });
+}
+
+function switchToCurrentVersion(artworkId) {
+    // Switch back to main artwork
+    location.reload(); // Simple approach - reload to show current state
+}
+
+// Favorite functionality
+function toggleFavorite(artworkId) {
+    fetch(`/api/artworks/${artworkId}/favorite/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update favorite button appearance
+        const btn = document.querySelector('[onclick*="toggleFavorite"]');
+        if (btn) {
+            if (data.favorited) {
+                btn.innerHTML = '♥ Favorited';
+                btn.classList.remove('btn-outline-light');
+                btn.classList.add('btn-danger');
+            } else {
+                btn.innerHTML = '♥ Favorite';
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-light');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error toggling favorite:', error);
+    });
+}
+
+// CSRF token helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
                                 <small class="d-block mt-1">v{{ version.version_number }}</small>
                                 {% if version.created_at %}
                                 <small class="d-block text-muted" style="font-size: 0.7rem;">{{ version.created_at|date:"M d" }}</small>
