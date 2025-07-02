@@ -1,0 +1,109 @@
+Thanks for the screenshot — you're seeing the **username and timestamp**, but not the **ratings or comments**. This means the critique object is rendering, but key fields aren’t showing up.
+
+---
+
+### ✅ Let's Diagnose the Problem
+
+From the look of this:
+
+```html
+No rating
+```
+
+Your template probably checks something like:
+
+```django
+{% if critique.rating_technique or ... %}
+```
+
+and nothing is evaluating truthy.
+
+---
+
+### 🔍 What to Check
+
+#### 1. **Backend View** — are the ratings being passed?
+
+Your Django view should pass:
+
+```python
+critiques = artwork.critiques.select_related("author").all()
+```
+
+In your template context:
+
+```python
+return render(request, "critique/artwork_detail.html", {
+    "artwork": artwork,
+    "critiques": critiques,
+    ...
+})
+```
+
+---
+
+#### 2. **Template Logic** — are you displaying the right fields?
+
+Check this section of your template:
+
+```django
+{% for critique in critiques %}
+  <div class="critique-box">
+    {{ critique.comment }}
+    {{ critique.rating_technique }}
+    {{ critique.rating_originality }}
+    {{ critique.rating_composition }}
+  </div>
+{% endfor %}
+```
+
+Make sure you're using:
+
+* `{{ critique.comment }}` (or `critique.text`, depending on your model)
+* `{{ critique.rating_technique }}` etc.
+
+---
+
+#### 3. **Model Field Names**
+
+Check your model. Your `Critique` model likely looks like:
+
+```python
+class Critique(models.Model):
+    rating_technique = models.IntegerField(...)
+    rating_originality = models.IntegerField(...)
+    rating_composition = models.IntegerField(...)
+    comment = models.TextField(...)
+```
+
+Make sure you're referencing the correct field names in the template.
+
+---
+
+### ✅ Suggested Template Fix
+
+Here’s a working snippet you can paste directly:
+
+```django
+<div class="critique-meta">
+  {% if critique.rating_technique or critique.rating_originality or critique.rating_composition %}
+    <div class="ratings">
+      <strong>Technique:</strong> {{ critique.rating_technique }}/10
+      <strong>Originality:</strong> {{ critique.rating_originality }}/10
+      <strong>Composition:</strong> {{ critique.rating_composition }}/10
+    </div>
+  {% else %}
+    <span class="badge bg-secondary">No rating</span>
+  {% endif %}
+
+  {% if critique.comment %}
+    <p class="comment">{{ critique.comment }}</p>
+  {% else %}
+    <p class="text-muted">No comment provided.</p>
+  {% endif %}
+</div>
+```
+
+---
+
+If it still doesn’t work, would you like to share your current `Critique` model and the view function for `ArtWorkDetailView`? I can debug the actual data pipeline.

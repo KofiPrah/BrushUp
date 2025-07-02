@@ -666,10 +666,10 @@
                                     </div>
                                 </div>
                                 <div class="critique-rating ms-auto">
-                                    {% if critique.average_rating %}
+                                    {% if critique.get_average_score %}
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="rating-score badge bg-primary px-3 py-2">
-                                                <i class="bi bi-star-fill me-1"></i>{{ critique.average_rating|floatformat:1 }}/10
+                                                <i class="bi bi-star-fill me-1"></i>{{ critique.get_average_score|floatformat:1 }}/10
                                             </span>
                                         </div>
                                     {% else %}
@@ -678,8 +678,55 @@
                                 </div>
                             </div>
                             <div class="critique-content">
-                                {{ critique.content|linebreaks }}
+                                {{ critique.text|linebreaks }}
                             </div>
+                            
+                            <!-- Individual Ratings -->
+                            {% if critique.composition_score or critique.technique_score or critique.originality_score %}
+                            <div class="rating-breakdown mt-3">
+                                <div class="row g-2">
+                                    {% if critique.composition_score %}
+                                    <div class="col-md-4">
+                                        <div class="rating-item">
+                                            <small class="text-muted">Composition</small>
+                                            <div class="rating-bar">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-info" style="width: {{ critique.composition_score }}0%"></div>
+                                                </div>
+                                                <span class="badge bg-info">{{ critique.composition_score }}/10</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if critique.technique_score %}
+                                    <div class="col-md-4">
+                                        <div class="rating-item">
+                                            <small class="text-muted">Technique</small>
+                                            <div class="rating-bar">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-success" style="width: {{ critique.technique_score }}0%"></div>
+                                                </div>
+                                                <span class="badge bg-success">{{ critique.technique_score }}/10</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if critique.originality_score %}
+                                    <div class="col-md-4">
+                                        <div class="rating-item">
+                                            <small class="text-muted">Originality</small>
+                                            <div class="rating-bar">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-warning" style="width: {{ critique.originality_score }}0%"></div>
+                                                </div>
+                                                <span class="badge bg-warning">{{ critique.originality_score }}/10</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
                             {% if critique.helpful_count or critique.inspiring_count or critique.detailed_count %}
                             <div class="critique-reactions">
                                 {% if critique.helpful_count %}
