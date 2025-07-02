@@ -21,7 +21,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0;
+        flex-direction: column;
+        padding: 2rem 1rem;
     }
 
     #focus-artwork {
@@ -256,9 +257,10 @@
 
     /* Version Tab Styles */
     .version-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: flex-start;
         margin-bottom: 2rem;
     }
 
@@ -269,6 +271,8 @@
         overflow: hidden;
         cursor: pointer;
         transition: all 0.3s ease;
+        width: 180px;
+        flex-shrink: 0;
     }
 
     .version-card:hover {
@@ -283,8 +287,9 @@
 
     .version-image {
         width: 100%;
-        aspect-ratio: 1;
+        height: 160px;
         object-fit: cover;
+        border-radius: 8px 8px 0 0;
     }
 
     .version-info {
@@ -498,6 +503,7 @@
                         <div class="critique-card">
                             <div class="critique-header">
                                 <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.png' }}" 
+                                     onerror="this.src='/static/img/default-avatar.png'" 
                                      class="critique-avatar" alt="{{ critique.author.username }}">
                                 <div>
                                     <div class="critique-author">{{ critique.author.username }}</div>
