@@ -137,8 +137,10 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ### July 01, 2025 - Enhanced Focus Mode Implementation ✓
 - **Fixed template syntax error**: Removed duplicate {% block content %} tags that were causing Django template errors
+- **Resolved artwork disappearing issue**: Removed duplicate image block in main-content section that caused visual conflicts
 - **Implemented seamless Focus Mode experience**: Updated layout to use min-height instead of fixed height for better flow preservation
 - **Standardized button styling**: Added `.focus-button` class with consistent glassmorphism effects and hover states across all Focus Mode controls
+- **Restored custom heart button**: Implemented custom ♥ button with glassmorphism styling and pink hover effects
 - **Added scroll-triggered reveals**: Implemented smooth transitions with Intersection Observer API for progressive content disclosure
 - **Enhanced user interactions**: Added fullscreen toggle button and improved favorite functionality with visual feedback
 - **Improved accessibility**: Added proper focus states, keyboard navigation support, and screen reader friendly elements

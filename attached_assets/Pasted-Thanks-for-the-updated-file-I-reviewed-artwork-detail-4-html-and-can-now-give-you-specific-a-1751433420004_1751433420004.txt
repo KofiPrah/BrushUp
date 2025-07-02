@@ -1,0 +1,101 @@
+Thanks for the updated file — I reviewed `artwork_detail (4).html` and can now give you **specific actions** to fix Focus Mode and restore your ❤️ **like button design**.
+
+---
+
+## 🔧 1. FIX: **Artwork Disappears on Scroll**
+
+The issue is that you're still using **two separate layout structures**:
+
+* `#focus-mode` (`vh-100`) for initial display
+* Then `#main-content` with a second `<img>` block inside
+
+📛 This causes the image to flash, disappear, or jump.
+
+### ✅ Fix Strategy: Use **only one layout**, not both
+
+### ✅ Do this:
+
+**Delete or comment out** the second image block inside `#main-content` (lines 938–942):
+
+```html
+<!-- REMOVE THIS DUPLICATE BLOCK -->
+{% if current_version and current_version.image %}
+    <img src="{{ current_version.image.url }}" class="card-img-top img-fluid artwork-image" ...>
+{% endif %}
+```
+
+You're already rendering the image correctly in `#focus-mode` (line 65). That’s the **only place it should be shown**.
+
+### 🧠 Why?
+
+The artwork shouldn't appear twice — it should be one continuous experience. Let `#scroll-anchor` just introduce critiques/comments *below* it without switching layouts.
+
+---
+
+## 💙 2. RESTORE: Heart Button (Like/Favorite)
+
+You're right to want to preserve your custom ❤️ button! The AI agent swapped it for Bootstrap defaults, but your original idea had charm.
+
+Here’s how to bring it back *with style*:
+
+### ✅ Option 1: Your Custom Heart (Restored Cleanly)
+
+```html
+<button class="btn btn-like" aria-label="Favorite">
+  ♥
+</button>
+```
+
+```css
+.btn-like {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  transition: color 0.3s ease;
+}
+.btn-like:hover,
+.btn-like.liked {
+  color: #ff5e78;
+}
+```
+
+* Add `.liked` class via JS or server-side logic to show filled/active state.
+
+### ✅ Option 2: Use Bootstrap Icon
+
+```html
+<button class="btn btn-dark btn-heart" aria-label="Favorite">
+  <i class="bi bi-heart-fill"></i>
+</button>
+```
+
+With style:
+
+```css
+.btn-heart {
+  font-size: 1.25rem;
+  color: white;
+  background-color: rgba(255,255,255,0.05);
+  border: none;
+}
+.btn-heart:hover,
+.btn-heart.active {
+  color: #ff4d6d;
+}
+```
+
+---
+
+## 📦 Summary of What to Change
+
+| Task                       | What to Do                                                      |
+| -------------------------- | --------------------------------------------------------------- |
+| 🖼 Artwork disappears      | **Delete duplicate `<img>` in `#main-content`** (lines 938–942) |
+| 🎯 Make Focus Mode default | Keep `#focus-mode` as the only hero layout                      |
+| 💬 Scroll to critiques     | Keep `#scroll-anchor` visible and natural below                 |
+| ❤️ Restore like button     | Use custom `btn-like` or styled Bootstrap icon                  |
+
+---
+
+Would you like me to send you a cleaned, corrected version of `artwork_detail.html` with all these fixes applied in place?
