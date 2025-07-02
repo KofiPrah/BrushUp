@@ -482,29 +482,29 @@
                         </div>
                         {% endif %}
                         <div class="info-item">
-                            <span class="info-label">Current Version</span>
+                            <span class="info-label"><i class="bi bi-layers"></i> Current Version</span>
                             <span class="info-value">v{{ current_version_number|default:"1" }}</span>
                         </div>
                     </div>
 
                     <!-- Statistics -->
                     <div class="info-section">
-                        <h3>Statistics</h3>
+                        <h3><i class="bi bi-graph-up"></i> Statistics</h3>
                         <div class="info-item">
-                            <span class="info-label">Views</span>
+                            <span class="info-label"><i class="bi bi-eye"></i> Views</span>
                             <span class="info-value">{{ artwork.view_count|default:"0" }}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Critiques</span>
+                            <span class="info-label"><i class="bi bi-chat-text"></i> Critiques</span>
                             <span class="info-value">{{ critiques.count }}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Versions</span>
+                            <span class="info-label"><i class="bi bi-collection"></i> Versions</span>
                             <span class="info-value">{{ versions.count|default:"1" }}</span>
                         </div>
                         {% if artwork.favorites_count %}
                         <div class="info-item">
-                            <span class="info-label">Favorites</span>
+                            <span class="info-label"><i class="bi bi-heart"></i> Favorites</span>
                             <span class="info-value">{{ artwork.favorites_count }}</span>
                         </div>
                         {% endif %}
@@ -513,7 +513,7 @@
 
                 {% if artwork.description %}
                 <div class="info-section">
-                    <h3>Description</h3>
+                    <h3><i class="bi bi-file-text"></i> Description</h3>
                     <p class="text-light">{{ artwork.description|linebreaks }}</p>
                 </div>
                 {% endif %}
