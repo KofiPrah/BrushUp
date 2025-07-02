@@ -1,0 +1,116 @@
+Thanks for your patience. Based on the code and screenshots, here’s a structured diagnosis and resolution plan for the key issues with your **artwork detail page**.
+
+---
+
+### ✅ Immediate Problems You’re Facing
+
+#### 1. **User Logs Out When Visiting the Page**
+
+* This usually means a view is rendering a template without properly injecting `request.user`, `csrf_token`, or causing a redirect.
+* **Possible causes:**
+
+  * CSRF mismatch due to broken session state.
+  * Unauthenticated API call (e.g., in `toggleFavorite()` or version API).
+* **Fix:**
+
+  * Make sure:
+
+    ```python
+    'django.contrib.auth.context_processors.auth'
+    'django.template.context_processors.csrf'
+    ```
+
+    are in your `TEMPLATES['OPTIONS']['context_processors']`.
+
+  * In views, confirm you're using `@login_required` **only where needed**. Don't block artwork detail for guests unless you intend to.
+
+---
+
+#### 2. **Tabbed UI, Critiques, and Styles Not Working**
+
+* **Diagnosis:**
+
+  * Your file contains **two `<div id="artwork-actions-bar">`** — which may break layout JS logic or style bindings.
+  * **Bootstrap tab JS** requires valid imports and tab `id`s must match exactly.
+
+* **Fixes:**
+
+  * Ensure only **one `#artwork-actions-bar`** exists.
+  * Make sure these files are loaded in `base.html` or this page:
+
+    ```html
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    ```
+
+---
+
+#### 3. **Focus Mode Disappears / Original Layout Overrides**
+
+* You’ve added a “Focus Mode” but:
+
+  * It’s **not isolated** in layout logic.
+  * The old layout content below still exists and can take over once scroll or delays happen.
+
+* **Fix:**
+
+  * Remove all previous layout logic (like critique lists, version rows, etc.) **outside of the tab structure**.
+  * Keep your view simple:
+
+    ```python
+    context = {
+        'artwork': artwork,
+        'critiques': artwork.critiques.all(),
+        'versions': artwork.versions.all(),
+        'current_version': current_version,
+        'current_version_number': current_version.version_number if current_version else 1
+    }
+    ```
+
+---
+
+#### 4. **Critique Avatars Not Displaying**
+
+* You’ve already fixed the `404`, so:
+
+  * Confirm that `{{ critique.author.profile.profile_picture.url }}` resolves correctly.
+  * Double-check that users have profile objects and fallback image is working.
+
+---
+
+#### 5. **Visual UI Not Styled Like Before**
+
+* The CSS is correctly included (`{% block extra_css %}`), but your layout includes **duplicate or floating elements** (`#artwork-actions-bar` x2), which breaks placement.
+
+* **Fixes:**
+
+  * Remove this redundant block near the bottom:
+
+    ```html
+    <!-- Floating Actions Bar -->
+    <div id="artwork-actions-bar" class="d-flex align-items-center gap-3">
+      ...
+    </div>
+    ```
+
+---
+
+### 🔧 Consolidated To-Do List
+
+| Issue                                   | Fix                                                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Logged out on page load**             | Ensure session, CSRF, and user context are preserved. Check `@login_required` decorators and session cookies. |
+| **Critiques and tabs not showing**      | Ensure Bootstrap 5 JS is loaded. Remove duplicated actions bar. Fix tab binding issues.                       |
+| **Two `#artwork-actions-bar`**          | Remove one. Keep the one under `#focus-mode` section.                                                         |
+| **Focus Mode disappears**               | Ensure old layout blocks are removed (no full-page fallback appearing after 8s).                              |
+| **Version Badge in wrong spot**         | Absolute position `.version-badge` inside the artwork container, not body-wide.                               |
+| **Page spacing/broken layout**          | Use a grid or flexbox layout for `focus-mode` and `.container`, don’t let orphaned elements float.            |
+| **Critique Avatar not visible**         | Confirm user has `profile_picture`. If not, fallback works via `onerror` (you already added this).            |
+| **Share / Like buttons non-functional** | Fix AJAX endpoints or auth checks in those handlers. Console errors might show missing CSRF or auth issues.   |
+
+---
+
+Would you like me to send a cleaned-up version of the template file with all these fixed?
