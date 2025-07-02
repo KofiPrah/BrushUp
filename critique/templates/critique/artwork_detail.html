@@ -578,7 +578,7 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label"><i class="bi bi-person"></i> Artist</span>
-                            <a href="{% url 'user_profile' artwork.author.username %}" class="info-value artist-link">{{ artwork.author.username }}</a>
+                            <a href="{% url 'critique:user_profile' artwork.author.username %}" class="info-value artist-link">{{ artwork.author.username }}</a>
                         </div>
                         <div class="info-item">
                             <span class="info-label"><i class="bi bi-calendar"></i> Created</span>
