@@ -324,7 +324,15 @@
         }
 
         .version-grid {
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .version-card {
+            width: 140px;
+        }
+        
+        .version-image {
+            height: 120px;
         }
     }
 </style>
@@ -502,8 +510,8 @@
                     {% for critique in critiques %}
                         <div class="critique-card">
                             <div class="critique-header">
-                                <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.png' }}" 
-                                     onerror="this.src='/static/img/default-avatar.png'" 
+                                <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.svg' }}" 
+                                     onerror="this.src='/static/img/default-avatar.svg'" 
                                      class="critique-avatar" alt="{{ critique.author.username }}">
                                 <div>
                                     <div class="critique-author">{{ critique.author.username }}</div>
