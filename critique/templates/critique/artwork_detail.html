@@ -26,13 +26,17 @@
     }
 
     #focus-artwork {
-        max-width: 95vw;
-        max-height: 95vh;
+        max-width: 90vw;
+        max-height: 80vh;
+        width: auto;
+        height: auto;
         object-fit: contain;
         cursor: pointer;
         border-radius: 12px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
         transition: transform 0.3s ease;
+        margin: auto;
+        display: block;
     }
 
     #focus-artwork:hover {
@@ -45,16 +49,18 @@
         bottom: 2rem;
         left: 50%;
         transform: translateX(-50%);
-        background: rgba(0, 0, 0, 0.9);
-        backdrop-filter: blur(15px);
+        background: rgba(0, 0, 0, 0.95);
+        backdrop-filter: blur(20px);
         border-radius: 25px;
-        padding: 0.75rem 1.5rem;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.3);
         gap: 1rem;
-        z-index: 1000;
+        z-index: 9999;
         opacity: 1;
         transition: all 0.3s ease;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+        display: flex;
+        align-items: center;
     }
 
     .btn-like {
@@ -167,20 +173,35 @@
     }
 
     .info-section h3 {
-        font-size: 1.1rem;
-        font-weight: 500;
-        margin-bottom: 1rem;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
         color: #0d6efd;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 0.5rem;
+        border-bottom: 2px solid rgba(13, 110, 253, 0.3);
+        padding-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-section h3 i {
+        font-size: 1.1rem;
     }
 
     .info-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.5rem 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        transition: all 0.2s ease;
+    }
+
+    .info-item:hover {
+        background: rgba(255, 255, 255, 0.02);
+        margin: 0 -1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
     }
 
     .info-item:last-child {
@@ -188,13 +209,23 @@
     }
 
     .info-label {
-        font-weight: 500;
-        color: #aaa;
+        font-weight: 600;
+        color: #bbb;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .info-label i {
+        color: #0d6efd;
+        font-size: 1rem;
     }
 
     .info-value {
         color: #fff;
-        font-weight: 500;
+        font-weight: 600;
+        font-size: 1rem;
     }
 
     /* Critique Tab Styles */
@@ -258,9 +289,9 @@
 
     /* Version Tab Styles */
     .version-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
         justify-content: flex-start;
         margin-bottom: 2rem;
     }
@@ -272,7 +303,6 @@
         overflow: hidden;
         cursor: pointer;
         transition: all 0.3s ease;
-        width: 180px;
         flex-shrink: 0;
     }
 
@@ -288,18 +318,19 @@
 
     .version-image {
         width: 100%;
-        height: 160px;
+        height: 120px;
         object-fit: cover;
         border-radius: 8px 8px 0 0;
     }
 
     .version-info {
-        padding: 1rem;
+        padding: 0.75rem;
     }
 
     .version-number {
         font-weight: 500;
         margin-bottom: 0.25rem;
+        font-size: 0.875rem;
     }
 
     .version-date {
@@ -431,22 +462,22 @@
                 <div class="artwork-info-grid">
                     <!-- Artwork Details -->
                     <div class="info-section">
-                        <h3>Artwork Details</h3>
+                        <h3><i class="bi bi-palette"></i> Artwork Details</h3>
                         <div class="info-item">
-                            <span class="info-label">Title</span>
+                            <span class="info-label"><i class="bi bi-bookmark"></i> Title</span>
                             <span class="info-value">{{ artwork.title }}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Artist</span>
+                            <span class="info-label"><i class="bi bi-person"></i> Artist</span>
                             <span class="info-value">{{ artwork.author.username }}</span>
                         </div>
                         <div class="info-item">
-                            <span class="info-label">Created</span>
+                            <span class="info-label"><i class="bi bi-calendar"></i> Created</span>
                             <span class="info-value">{{ artwork.created_at|date:"M d, Y" }}</span>
                         </div>
                         {% if artwork.category %}
                         <div class="info-item">
-                            <span class="info-label">Category</span>
+                            <span class="info-label"><i class="bi bi-tag"></i> Category</span>
                             <span class="info-value">{{ artwork.category }}</span>
                         </div>
                         {% endif %}
@@ -514,15 +545,23 @@
                                 <img src="{{ critique.author.profile.profile_image.url|default:'/static/img/default-avatar.svg?v=1' }}" 
                                      onerror="this.src='/static/img/default-avatar.svg?v=1'" 
                                      class="critique-avatar" alt="{{ critique.author.username }}">
-                                <div>
-                                    <div class="critique-author">{{ critique.author.username }}</div>
-                                    <div class="critique-date">{{ critique.created_at|timesince }} ago</div>
+                                <div class="flex-grow-1">
+                                    <div class="critique-author fw-bold">{{ critique.author.username }}</div>
+                                    <div class="critique-date text-muted small">
+                                        <i class="bi bi-clock me-1"></i>{{ critique.created_at|timesince }} ago
+                                    </div>
                                 </div>
-                                {% if critique.average_rating %}
-                                <div class="ms-auto">
-                                    <span class="badge bg-primary">{{ critique.average_rating|floatformat:1 }}/10</span>
+                                <div class="critique-rating ms-auto">
+                                    {% if critique.average_rating %}
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="rating-score badge bg-primary px-3 py-2">
+                                                <i class="bi bi-star-fill me-1"></i>{{ critique.average_rating|floatformat:1 }}/10
+                                            </span>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-secondary">No rating</span>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                             <div class="critique-content">
                                 {{ critique.content|linebreaks }}
