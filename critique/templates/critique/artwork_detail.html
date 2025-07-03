@@ -817,10 +817,8 @@
                                 <img src="{{ current_version.image.url }}" class="card-img-top" alt="Current Version">
                             {% elif current_version and current_version.image_url %}
                                 <img src="{{ current_version.image_url }}" class="card-img-top" alt="Current Version">
-                            {% elif artwork.image %}
-                                <img src="{{ artwork.image.url }}" class="card-img-top" alt="Current Version">
-                            {% elif artwork.image_url %}
-                                <img src="{{ artwork.image_url }}" class="card-img-top" alt="Current Version">
+                            {% elif artwork.get_display_image_url %}
+                                <img src="{{ artwork.get_display_image_url }}" class="card-img-top" alt="Current Version">
                             {% endif %}
                             <div class="card-body">
                                 <small class="text-muted">v{{ current_version_number|default:"1" }} (Current)</small>

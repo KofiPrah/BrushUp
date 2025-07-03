@@ -159,10 +159,8 @@ class ArtWorkSerializer(serializers.ModelSerializer):
                            'folder_name', 'folder_slug']
                            
     def get_image_display_url(self, obj):
-        """Return the URL to display the image, prioritizing S3 storage."""
-        if obj.image and hasattr(obj.image, 'url'):
-            return obj.image.url
-        return obj.image_url
+        """Return the URL to display the image, prioritizing current_version."""
+        return obj.get_display_image_url()
     
     def get_likes_count(self, obj):
         """Return the number of likes for this artwork."""
@@ -234,10 +232,8 @@ class ArtWorkListSerializer(serializers.ModelSerializer):
                  'medium', 'likes_count', 'tags_list', 'folder_name', 'folder_id']
                  
     def get_image_display_url(self, obj):
-        """Return the URL to display the image, prioritizing S3 storage."""
-        if obj.image and hasattr(obj.image, 'url'):
-            return obj.image.url
-        return obj.image_url
+        """Return the URL to display the image, prioritizing current_version."""
+        return obj.get_display_image_url()
         
     def get_likes_count(self, obj):
         """Return the number of likes for this artwork."""

@@ -270,6 +270,16 @@ class ArtWork(models.Model):
         blank=True,
     )
     
+    # Current version pointer - all image data should live in versions
+    current_version = models.ForeignKey(
+        'ArtWorkVersion',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='current_for',
+        help_text="Points to the current active version of this artwork"
+    )
+    
     def __str__(self):
         return self.title
         
@@ -304,6 +314,11 @@ class ArtWork(models.Model):
             dimensions=self.dimensions,
             tags=self.tags
         )
+        
+        # Automatically set this as the current version
+        self.current_version = version
+        self.save(update_fields=['current_version'])
+        
         return version
     
     def get_next_version_number(self):
@@ -328,6 +343,22 @@ class ArtWork(models.Model):
         """Get the current version number (latest version + 1, or 1 if no versions)"""
         latest_version = self.get_latest_version()
         return (latest_version.version_number + 1) if latest_version else 1
+    
+    def get_display_image_url(self):
+        """Get the image URL for display, prioritizing current_version over legacy fields"""
+        if self.current_version and self.current_version.image:
+            return self.current_version.image.url
+        elif self.image:
+            return self.image.url
+        elif self.image_url:
+            return self.image_url
+        return None
+    
+    def get_display_image(self):
+        """Get the image object for display, prioritizing current_version"""
+        if self.current_version and self.current_version.image:
+            return self.current_version.image
+        return self.image
 
 
 class Comment(models.Model):

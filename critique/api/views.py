@@ -1957,6 +1957,11 @@ def delete_artwork_version(request, version_id):
         version = ArtWorkVersion.objects.get(id=version_id, artwork__author=request.user)
         artwork = version.artwork
         
+        # Prevent deletion if this is the current version
+        if version == artwork.current_version:
+            return Response({'error': 'Cannot delete the current version'}, 
+                          status=status.HTTP_400_BAD_REQUEST)
+        
         # Prevent deletion if this is the only version
         if artwork.versions.count() <= 1:
             return Response({'error': 'Cannot delete the only version of an artwork'}, 

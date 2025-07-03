@@ -1,0 +1,150 @@
+Here’s a sequenced set of Replit-ready prompts to help you **fix the deletion bug** and **revamp the artwork version system** step-by-step. Each prompt corresponds to a specific edit you’ll make in your Django code on Replit.
+
+---
+
+## ✅ PHASE 1: Fix Version Deletion Bug
+
+### **Prompt 1: Update `create_artwork_version` API View**
+
+🔧 **File:** `views.py` (inside `ArtWorkVersionViewSet` or custom version upload view)
+
+```python
+@action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+def create_artwork_version(self, request, pk=None):
+    artwork = self.get_object()
+
+    # STEP 1: Save current image as a version BEFORE replacing it
+    artwork.create_version(version_notes="Auto-version before new upload")
+
+    # STEP 2: Replace the image with the new one
+    new_image = request.FILES.get('image')
+    if not new_image:
+        return Response({'error': 'Image file required.'}, status=400)
+
+    artwork.image = new_image
+    artwork.save()
+
+    return Response({'status': 'Version created and image updated.'})
+```
+
+🧪 **Test it on Replit:**
+
+* Upload v1
+* Upload a new image (should now save v1 as a version)
+* Confirm two versions now exist
+
+---
+
+## 🛠️ PHASE 2: Add `current_version` Pointer (Revamp Start)
+
+### **Prompt 2: Modify the ArtWork model**
+
+🔧 **File:** `models.py`
+
+```python
+# Add to ArtWork model
+current_version = models.ForeignKey(
+    'ArtWorkVersion',
+    null=True,
+    blank=True,
+    on_delete=models.SET_NULL,
+    related_name='current_for'
+)
+```
+
+📌 This sets up a clean separation: all image data lives in versions; the artwork just points to the current one.
+
+---
+
+### **Prompt 3: Update `create_version()` to auto-set latest**
+
+🔧 **File:** `models.py`
+
+Modify the `create_version()` method:
+
+```python
+def create_version(self, version_notes=""):
+    version = ArtWorkVersion.objects.create(
+        artwork=self,
+        version_number=self.get_next_version_number(),
+        title=self.title,
+        description=self.description,
+        image=self.image,
+        version_notes=version_notes,
+        medium=self.medium,
+        dimensions=self.dimensions,
+        tags=self.tags
+    )
+
+    self.current_version = version
+    self.save(update_fields=['current_version'])
+
+    return version
+```
+
+---
+
+## 🎯 PHASE 3: Update Views + Templates
+
+### **Prompt 4: Use `current_version.image` Instead of `artwork.image`**
+
+🔧 **File:** All templates and serializers
+
+Wherever you do:
+
+```django
+<img src="{{ artwork.image.url }}">
+```
+
+Replace with:
+
+```django
+<img src="{{ artwork.current_version.image.url }}">
+```
+
+For serializers:
+
+```python
+def get_image_display_url(self, obj):
+    if obj.current_version and obj.current_version.image:
+        return obj.current_version.image.url
+    return None
+```
+
+---
+
+### **Prompt 5: Update Delete Logic to Allow Deleting Non-current Versions**
+
+🔧 **File:** `views.py` or wherever `delete_artwork_version()` is
+
+Update the validation:
+
+```python
+if version == artwork.current_version:
+    return Response({'error': 'Cannot delete the current version.'}, status=400)
+
+if artwork.versions.count() <= 1:
+    return Response({'error': 'At least one version must remain.'}, status=400)
+```
+
+---
+
+## 🚀 Final Steps
+
+### ✅ Migrate your models
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+```
+
+### ✅ Update existing records
+
+Write a one-time script or management command to:
+
+* Loop over existing artworks
+* Set `current_version = artwork.get_latest_version()`
+
+---
+
+Let me know if you want the migration, test script, or drag-and-drop frontend logic refactored next.

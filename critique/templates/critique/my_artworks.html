@@ -620,13 +620,8 @@
                                         <div class="col-6">
                                             <div class="position-relative">
                                                 <a href="/folders/{{ folder.id }}/" class="d-block">
-                                                    {% if artwork.image %}
-                                                        <img src="{{ artwork.image.url }}" 
-                                                             class="img-fluid rounded folder-thumbnail" 
-                                                             alt="{{ artwork.title }}"
-                                                             style="width: 100%; height: 120px; object-fit: cover;">
-                                                    {% elif artwork.image_url %}
-                                                        <img src="{{ artwork.image_url }}" 
+                                                    {% if artwork.get_display_image_url %}
+                                                        <img src="{{ artwork.get_display_image_url }}" 
                                                              class="img-fluid rounded folder-thumbnail" 
                                                              alt="{{ artwork.title }}"
                                                              style="width: 100%; height: 120px; object-fit: cover;">
@@ -719,10 +714,8 @@
                                 <!-- Image Container -->
                                 <div class="position-relative" style="z-index: 1;">
                                     <a href="{% url 'critique:artwork_detail' artwork.id %}" style="z-index: 1;">
-                                        {% if artwork.image %}
-                                            <img src="{{ artwork.image.url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover; z-index: 1;">
-                                        {% elif artwork.image_url %}
-                                            <img src="{{ artwork.image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover; z-index: 1;">
+                                        {% if artwork.get_display_image_url %}
+                                            <img src="{{ artwork.get_display_image_url }}" class="card-img-top" alt="{{ artwork.title }}" style="height: 200px; object-fit: cover; z-index: 1;">
                                         {% else %}
                                             <div class="bg-secondary text-white d-flex justify-content-center align-items-center" style="height: 200px; z-index: 1;">
                                                 <span>No Image</span>
