@@ -179,6 +179,56 @@
     border-color: var(--bs-primary);
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
+
+/* Tooltip styling for better visibility */
+.tooltip .tooltip-inner {
+    background-color: #343a40 !important;
+    color: #ffffff !important;
+    font-size: 0.875rem;
+    padding: 8px 12px;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tooltip .tooltip-arrow::before {
+    border-top-color: #343a40 !important;
+    border-bottom-color: #343a40 !important;
+    border-left-color: #343a40 !important;
+    border-right-color: #343a40 !important;
+}
+
+/* Bootstrap tooltip variants */
+.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #343a40 !important;
+}
+
+.bs-tooltip-bottom .tooltip-arrow::before {
+    border-bottom-color: #343a40 !important;
+}
+
+.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: #343a40 !important;
+}
+
+.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: #343a40 !important;
+}
+
+/* Dark mode tooltip adjustments */
+@media (prefers-color-scheme: dark) {
+    .tooltip .tooltip-inner {
+        background-color: #1a1a1a !important;
+        color: #ffffff !important;
+        border: 1px solid #444;
+    }
+    
+    .tooltip .tooltip-arrow::before {
+        border-top-color: #1a1a1a !important;
+        border-bottom-color: #1a1a1a !important;
+        border-left-color: #1a1a1a !important;
+        border-right-color: #1a1a1a !important;
+    }
+}
 </style>
 
 <script>
