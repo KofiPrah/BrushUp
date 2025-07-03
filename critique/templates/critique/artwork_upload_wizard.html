@@ -1035,7 +1035,9 @@ class UploadWizard {
         try {
             const formData = new FormData();
             formData.append('title', this.formData.title);
-            if (this.formData.description.trim()) formData.append('description', this.formData.description);
+            if (this.formData.description && this.formData.description.trim()) {
+                formData.append('description', this.formData.description);
+            }
             if (this.formData.medium.trim()) formData.append('medium', this.formData.medium);
             if (this.formData.dimensions.trim()) formData.append('dimensions', this.formData.dimensions);
             if (this.formData.tags.trim()) formData.append('tags', this.formData.tags);

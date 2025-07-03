@@ -219,7 +219,7 @@ class ArtWork(models.Model):
     ]
     
     title = models.CharField(max_length=200)
-    description = models.TextField()
+    description = models.TextField(blank=True)
     image = models.ImageField(upload_to='artworks/', blank=True, null=True,
                            storage=s3_storage if settings.USE_S3 else None,
                            validators=[validate_image_file],

@@ -135,6 +135,12 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
+### July 03, 2025 - Upload System Fixes and Enhancements ✓
+- **Fixed description field requirement**: Made artwork description field optional in model and API
+- **Applied database migration**: Updated schema to allow empty descriptions (migration 0020)
+- **Enhanced upload debugging**: Added comprehensive error logging and field-specific error handling
+- **Fixed all tooltip styling**: Updated remaining tooltips in steps 3 and 5 to use dark backgrounds
+
 ### July 03, 2025 - Multi-Step Upload Wizard Implementation ✓
 - **Transformed upload experience**: Replaced single-form upload with sophisticated 6-step wizard using progressive disclosure
 - **Step 1 - Image Upload**: Drag-and-drop interface with instant preview, file validation, and visual feedback
