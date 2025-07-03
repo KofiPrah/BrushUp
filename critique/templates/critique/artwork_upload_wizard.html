@@ -96,7 +96,7 @@
 </div>
 
 <!-- Hidden form data -->
-<input type="hidden" id="folders-data" value="{{ folders|safe }}">
+<input type="hidden" id="folders-data" value="{{ folders_json|safe }}">
 
 <style>
 /* Upload Wizard Styles */
@@ -263,8 +263,15 @@ class UploadWizard {
         // Get folders from Django context
         try {
             const foldersData = document.getElementById('folders-data').value;
-            this.folders = foldersData ? JSON.parse(foldersData) : [];
+            if (foldersData && foldersData.trim() !== '') {
+                this.folders = JSON.parse(foldersData);
+                console.log('Loaded folders:', this.folders);
+            } else {
+                this.folders = [];
+                console.log('No folders data found');
+            }
         } catch (e) {
+            console.error('Error parsing folders data:', e);
             this.folders = [];
         }
     }

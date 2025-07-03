@@ -258,11 +258,25 @@ def artwork_upload_view(request):
     View for displaying the enhanced multi-step artwork upload wizard.
     Now includes progressive disclosure and better UX.
     """
+    import json
+    
     # Get user's folders for the folder selection step
     folders = request.user.folders.all().order_by('name')
     
+    # Serialize folders data for JavaScript
+    folders_data = [
+        {
+            'id': folder.id,
+            'name': folder.name,
+            'description': folder.description or '',
+            'slug': folder.slug,
+        }
+        for folder in folders
+    ]
+    
     context = {
         'folders': folders,
+        'folders_json': json.dumps(folders_data),
         'user': request.user,
     }
     
