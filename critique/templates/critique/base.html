@@ -17,7 +17,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'critique:index' %}">Home</a>
                     </li>
@@ -27,12 +27,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'critique:karma_leaderboard' %}">Leaderboard</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav">
                     {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'critique:artwork_upload' %}">Upload Art</a>
-                    </li>
-                    {% endif %}
-                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'critique:artwork_upload' %}">Upload Art</a>
+                        </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ user.username }}
