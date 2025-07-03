@@ -31,16 +31,25 @@
         width: auto;
         height: auto;
         object-fit: contain;
-        cursor: pointer;
+        cursor: zoom-in;
         border-radius: 12px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
         transition: transform 0.3s ease;
         margin: auto;
         display: block;
+        transform-origin: center center;
     }
 
     #focus-artwork:hover {
         transform: scale(1.02);
+    }
+
+    #focus-artwork.zoomed {
+        cursor: zoom-out;
+        max-width: none;
+        max-height: none;
+        width: auto;
+        height: auto;
     }
 
     /* Actions Bar */
@@ -193,6 +202,47 @@
         border-radius: 20px;
         font-weight: 500;
         z-index: 10;
+    }
+
+    /* Zoom Badge */
+    .zoom-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: rgba(40, 167, 69, 0.9) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-size: 0.875rem;
+    }
+
+    .zoom-badge.visible {
+        opacity: 1;
+    }
+
+    /* Zoom instructions */
+    .zoom-instructions {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        opacity: 0.7;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .zoom-instructions:hover {
+        opacity: 1;
     }
 
     /* Scroll Indicator */
@@ -485,8 +535,7 @@
 <section id="focus-mode">
     <img id="focus-artwork" 
          src="{% if current_version and current_version.image %}{{ current_version.image.url }}{% elif current_version and current_version.image_url %}{{ current_version.image_url }}{% elif artwork.image %}{{ artwork.image.url }}{% elif artwork.image_url %}{{ artwork.image_url }}{% endif %}" 
-         alt="{{ artwork.title }}" 
-         onclick="enterFullscreen(this)">
+         alt="{{ artwork.title }}">
     
     <!-- Enhanced Actions Bar -->
     <div id="artwork-actions-bar" class="d-flex align-items-center">
@@ -510,17 +559,29 @@
             Add Critique
         </a>
         
-        <button class="btn btn-outline-light" onclick="enterFullscreen(document.getElementById('focus-artwork'))" title="Fullscreen View">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrows-fullscreen btn-icon" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344 0a.5.5 0 0 1 .707 0l4.096 4.096V11.5a.5.5 0 1 1 1 0v3.975a.5.5 0 0 1-.5.5H11.5a.5.5 0 0 1 0-1h2.768l-4.096-4.096a.5.5 0 0 1 0-.707zm0-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707zm-4.344 0a.5.5 0 0 1-.707 0L1.025 1.732V4.5a.5.5 0 0 1-1 0V.525a.5.5 0 0 1 .5-.5H4.5a.5.5 0 0 1 0 1H1.732l4.096 4.096a.5.5 0 0 1 0 .707z"/>
+        <button class="btn btn-outline-light" onclick="resetZoom()" title="Reset Zoom">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-zoom-out btn-icon" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                <path fill-rule="evenodd" d="M3 6.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+                <path d="m13.5 13.5 3 3"/>
             </svg>
-            Fullscreen
+            Reset Zoom
         </button>
     </div>
     
     <!-- Version Badge -->
     <div class="version-badge">
         v{{ current_version_number|default:"1" }} (Current)
+    </div>
+    
+    <!-- Zoom Badge -->
+    <div class="zoom-badge" id="zoom-badge">
+        100%
+    </div>
+    
+    <!-- Zoom Instructions -->
+    <div class="zoom-instructions">
+        Scroll to zoom • Click Reset Zoom to return to normal
     </div>
     
     <!-- Scroll Indicator -->
@@ -803,9 +864,14 @@
 {% block extra_js %}
 <script>
 // Focus Mode and Tabbed Layout Management
+let currentZoom = 1;
+let maxZoom = 3;
+let minZoom = 0.5;
+
 document.addEventListener('DOMContentLoaded', function() {
     initializeFocusMode();
     initializeTabNavigation();
+    initializeImageZoom();
 });
 
 function initializeFocusMode() {
@@ -821,6 +887,109 @@ function initializeFocusMode() {
     setTimeout(() => {
         actionsBar.classList.add('animate__animated', 'animate__bounceIn');
     }, 2000);
+}
+
+function initializeImageZoom() {
+    const focusArtwork = document.getElementById('focus-artwork');
+    if (!focusArtwork) return;
+    
+    // Add wheel event listener for scroll-based zoom
+    focusArtwork.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        
+        const delta = e.deltaY > 0 ? -0.1 : 0.1;
+        const newZoom = Math.max(minZoom, Math.min(maxZoom, currentZoom + delta));
+        
+        if (newZoom !== currentZoom) {
+            currentZoom = newZoom;
+            updateImageZoom();
+            updateCursor();
+        }
+    });
+    
+    // Add touch support for mobile pinch-to-zoom
+    let initialDistance = 0;
+    let initialZoom = 1;
+    
+    focusArtwork.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+            initialDistance = getDistance(e.touches[0], e.touches[1]);
+            initialZoom = currentZoom;
+        }
+    });
+    
+    focusArtwork.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const distance = getDistance(e.touches[0], e.touches[1]);
+            const scale = distance / initialDistance;
+            const newZoom = Math.max(minZoom, Math.min(maxZoom, initialZoom * scale));
+            
+            if (newZoom !== currentZoom) {
+                currentZoom = newZoom;
+                updateImageZoom();
+                updateCursor();
+            }
+        }
+    });
+}
+
+function getDistance(touch1, touch2) {
+    const dx = touch1.clientX - touch2.clientX;
+    const dy = touch1.clientY - touch2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function updateImageZoom() {
+    const focusArtwork = document.getElementById('focus-artwork');
+    const zoomBadge = document.getElementById('zoom-badge');
+    if (!focusArtwork) return;
+    
+    focusArtwork.style.transform = `scale(${currentZoom})`;
+    
+    // Update zoom badge
+    if (zoomBadge) {
+        zoomBadge.textContent = `${Math.round(currentZoom * 100)}%`;
+        
+        // Show/hide zoom badge based on zoom level
+        if (currentZoom !== 1) {
+            zoomBadge.classList.add('visible');
+        } else {
+            zoomBadge.classList.remove('visible');
+        }
+    }
+}
+
+function updateCursor() {
+    const focusArtwork = document.getElementById('focus-artwork');
+    if (!focusArtwork) return;
+    
+    if (currentZoom >= maxZoom) {
+        focusArtwork.style.cursor = 'zoom-out';
+    } else if (currentZoom <= minZoom) {
+        focusArtwork.style.cursor = 'zoom-in';
+    } else {
+        focusArtwork.style.cursor = currentZoom > 1 ? 'zoom-out' : 'zoom-in';
+    }
+    
+    // Add or remove zoomed class
+    if (currentZoom > 1) {
+        focusArtwork.classList.add('zoomed');
+    } else {
+        focusArtwork.classList.remove('zoomed');
+    }
+}
+
+function resetZoom() {
+    currentZoom = 1;
+    updateImageZoom();
+    updateCursor();
+    
+    // Hide zoom badge when reset to 100%
+    const zoomBadge = document.getElementById('zoom-badge');
+    if (zoomBadge) {
+        zoomBadge.classList.remove('visible');
+    }
 }
 
 function scrollToTabs() {
@@ -860,18 +1029,7 @@ function initializeTabNavigation() {
     });
 }
 
-// Fullscreen functionality
-function enterFullscreen(element) {
-    if (element.requestFullscreen) {
-        element.requestFullscreen();
-    } else if (element.mozRequestFullScreen) {
-        element.mozRequestFullScreen();
-    } else if (element.webkitRequestFullscreen) {
-        element.webkitRequestFullscreen();
-    } else if (element.msRequestFullscreen) {
-        element.msRequestFullscreen();
-    }
-}
+
 
 // Version switching functionality
 function switchToVersion(versionId) {
