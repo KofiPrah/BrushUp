@@ -1,0 +1,223 @@
+/* Upload Wizard Styles */
+
+/* Step transitions */
+.step-content {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Upload zone hover effects */
+.upload-zone {
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.05) 100%);
+}
+
+.upload-zone:hover {
+  background: linear-gradient(135deg, 
+    rgba(13, 110, 253, 0.1) 0%, 
+    rgba(13, 110, 253, 0.05) 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+}
+
+/* Progress indicator styles */
+.progress {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  transition: width 0.6s ease;
+  background: linear-gradient(90deg, #0d6efd 0%, #0056b3 100%);
+  border-radius: 10px;
+}
+
+/* Step circle animations */
+.rounded-circle {
+  transition: all 0.3s ease;
+}
+
+.rounded-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Medium button grid */
+.medium-buttons .btn {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.medium-buttons .btn:hover:not(.btn-primary) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Tag animations */
+.badge {
+  animation: slideInFromLeft 0.3s ease;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Card hover effects */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Navigation button styles */
+.btn {
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+/* Image preview styles */
+.uploaded-preview img {
+  transition: all 0.3s ease;
+}
+
+.uploaded-preview img:hover {
+  transform: scale(1.02);
+}
+
+/* Form controls enhanced styling */
+.form-control, .form-select {
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Alert animations */
+.alert {
+  animation: slideInFromTop 0.4s ease;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Toggle switch enhancement */
+.form-check-input {
+  transition: all 0.3s ease;
+}
+
+.form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .upload-zone {
+    min-height: 200px;
+  }
+  
+  .step-content {
+    padding: 0 10px;
+  }
+  
+  .medium-buttons .btn {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+/* Loading state */
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner-border-sm {
+  animation: spinner-border 0.75s linear infinite;
+}
+
+/* Success state animations */
+.text-success {
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Focus area buttons */
+.focus-area-btn {
+  transition: all 0.2s ease;
+  border-radius: 10px;
+}
+
+.focus-area-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Review section styling */
+.review-summary {
+  background: linear-gradient(135deg, 
+    rgba(248, 249, 250, 0.8) 0%, 
+    rgba(255, 255, 255, 0.9) 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  .upload-zone {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.05) 0%, 
+      rgba(255, 255, 255, 0.02) 100%);
+  }
+  
+  .card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}

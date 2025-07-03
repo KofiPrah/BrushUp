@@ -1,0 +1,107 @@
+# 🎨 BrushUp – Upload Artwork Page Revamp
+
+## ✨ Goals
+
+- Transform the artwork upload form into a **multi-step onboarding flow**
+- Prioritize **clarity, visual delight**, and **progressive disclosure**
+- Tailor experience for users with the **Artist** role
+- Enable both quick submissions and detailed metadata
+- Improve **critique engagement** by prompting users
+
+---
+
+## 🔁 Current Issues (Summary)
+
+- Flat, form-like UI
+- Optional fields lack guidance
+- Critique request buried in inputs
+- Functional, but not welcoming or engaging
+
+---
+
+## ✅ Proposed UX Flow (Multi-Step Wizard)
+
+### **Step 1: Upload Artwork**
+- Drag-and-drop or browse
+- Show full-bleed preview
+- Required: Image
+
+### **Step 2: Title & Description**
+- Required: Title
+- Optional but encouraged: Description
+- Prompts:
+  - _“What’s this piece called?”_
+  - _“Tell us the story behind it”_
+
+### **Step 3: Medium & Dimensions**
+- Medium dropdown + custom entry
+- Dimensions placeholder: e.g., _“24x36 inches”_
+
+### **Step 4: Tags & Folder**
+- Tags: comma-separated or chip input
+- Folder: dropdown or thumbnail cards
+
+### **Step 5: Seeking Critique**
+- Toggle: “Yes, I’d like feedback”
+- Optional: Checkboxes for focus areas (Technique, Composition, etc.)
+- Short explainer of how critiques work
+
+### **Final Step: Review & Upload**
+- Show summary card of input
+- Upload with visual progress and playful copy:  
+  _“Uploading your brilliance…”_
+
+---
+
+## 🛠 Backend Readiness
+
+✅ `/api/artworks/` endpoint supports:
+
+- `title`, `description`, `image`, `medium`, `dimensions`, `tags`, `folder`, `seeking_critique`
+
+No backend changes needed.
+
+---
+
+## ⚛ Frontend Plan (React)
+
+Refactor `ArtworkUpload.jsx`:
+
+- Use `useState(step)` to control wizard flow
+- Break into subcomponents:
+  - `Step1UploadImage`
+  - `Step2Details`
+  - `Step3Meta`
+  - `Step4TagsFolder`
+  - `Step5Critique`
+  - `Step6Review`
+- Final submission: assemble `FormData`, POST to `/api/artworks/`
+
+Use:
+- Bootstrap 5 cards
+- Bootstrap Icons (brush, upload, layers, etc.)
+- Transitions (fade/slide)
+
+---
+
+## 🖋 Sample Copy Enhancements
+
+- **Step 1 Prompt:** _“Drop your masterpiece here or click to select”_
+- **Critique CTA:** _“Want feedback? Let the community help you grow.”_
+
+---
+
+## ✅ Optionally Replace Django Template
+
+- You can mount this React component at `/artworks/upload/`
+- Or progressively enhance the current `artwork_upload.html` with JavaScript and hide/show steps
+
+---
+
+## 🔧 Optional Next Tasks
+
+- [ ] Scaffold React steps and routing logic
+- [ ] Integrate with existing `artworkAPI.uploadArtwork()`
+- [ ] Replace HTML template with React component via routing
+- [ ] Add loading/preview/feedback animations
+

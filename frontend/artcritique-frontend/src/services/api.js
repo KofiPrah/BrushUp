@@ -151,7 +151,13 @@ export const artworkAPI = {
   updateArtwork: (id, data) => API.put(`/artworks/${id}/`, data),
   deleteArtwork: (id) => API.delete(`/artworks/${id}/`),
   likeArtwork: (id) => API.post(`/artworks/${id}/like/`),
-  getUserArtworks: () => API.get('/artworks/my-artworks/')
+  getUserArtworks: () => API.get('/artworks/my-artworks/'),
+  
+  // Folder endpoints
+  getFolders: () => API.get('/folders/'),
+  createFolder: (data) => API.post('/folders/', data),
+  updateFolder: (id, data) => API.put(`/folders/${id}/`, data),
+  deleteFolder: (id) => API.delete(`/folders/${id}/`)
 };
 
 // Critique API endpoints
