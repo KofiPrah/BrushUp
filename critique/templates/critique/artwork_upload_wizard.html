@@ -1046,6 +1046,12 @@ class UploadWizard {
             }
             formData.append('image', this.formData.image);
             
+            // Log what we're sending for debugging
+            console.log('Submitting form data:');
+            console.log('- Title:', this.formData.title);
+            console.log('- Image:', this.formData.image ? this.formData.image.name : 'No image');
+            console.log('- Seeking critique:', this.formData.seekingCritique);
+            
             // Get CSRF token
             const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
             
@@ -1066,8 +1072,37 @@ class UploadWizard {
                     window.location.href = `/artworks/${data.id}/`;
                 }, 2000);
             } else {
-                const errorData = await response.json();
-                this.showMessage(errorData.detail || 'Error uploading artwork. Please try again.', 'danger');
+                console.error('Upload failed with status:', response.status);
+                let errorMessage = 'Error uploading artwork. Please try again.';
+                
+                try {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    
+                    if (errorData.detail) {
+                        errorMessage = errorData.detail;
+                    } else if (errorData.error) {
+                        errorMessage = errorData.error;
+                    } else if (typeof errorData === 'object') {
+                        // Handle field-specific errors
+                        const errors = [];
+                        for (const [field, messages] of Object.entries(errorData)) {
+                            if (Array.isArray(messages)) {
+                                errors.push(`${field}: ${messages.join(', ')}`);
+                            } else if (typeof messages === 'string') {
+                                errors.push(`${field}: ${messages}`);
+                            }
+                        }
+                        if (errors.length > 0) {
+                            errorMessage = errors.join('<br>');
+                        }
+                    }
+                } catch (parseError) {
+                    console.error('Could not parse error response:', parseError);
+                    errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                }
+                
+                this.showMessage(errorMessage, 'danger');
             }
         } catch (error) {
             this.showMessage('Network error. Please check your connection and try again.', 'danger');
