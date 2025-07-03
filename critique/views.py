@@ -255,10 +255,18 @@ class ProfileUpdateView(LoginRequiredMixin, UpdateView):
 @login_required
 def artwork_upload_view(request):
     """
-    View for displaying the artwork upload form. 
-    The actual upload will be handled by the API.
+    View for displaying the enhanced multi-step artwork upload wizard.
+    Now includes progressive disclosure and better UX.
     """
-    return render(request, 'critique/artwork_upload.html')
+    # Get user's folders for the folder selection step
+    folders = request.user.folders.all().order_by('name')
+    
+    context = {
+        'folders': folders,
+        'user': request.user,
+    }
+    
+    return render(request, 'critique/artwork_upload_wizard.html', context)
 
 class MyArtworksListView(LoginRequiredMixin, ListView):
     """

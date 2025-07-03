@@ -1,0 +1,1044 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}Upload Artwork - Brush Up{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient bg-primary text-white">
+                    <h1 class="h3 mb-0">
+                        <i class="bi bi-upload me-2"></i>
+                        Share Your Artwork
+                    </h1>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Progress indicator -->
+                    <div class="mb-5" id="progress-indicator">
+                        <div class="progress mb-4" style="height: 6px;">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: 0%" id="progress-bar"></div>
+                        </div>
+                        <div class="row g-0 text-center" id="step-indicators">
+                            <div class="col step-indicator" data-step="1">
+                                <div class="step-circle active">
+                                    <i class="bi bi-cloud-upload"></i>
+                                </div>
+                                <div class="step-label">Upload</div>
+                            </div>
+                            <div class="col step-indicator" data-step="2">
+                                <div class="step-circle">
+                                    <i class="bi bi-pencil-square"></i>
+                                </div>
+                                <div class="step-label">Details</div>
+                            </div>
+                            <div class="col step-indicator" data-step="3">
+                                <div class="step-circle">
+                                    <i class="bi bi-palette"></i>
+                                </div>
+                                <div class="step-label">Medium</div>
+                            </div>
+                            <div class="col step-indicator" data-step="4">
+                                <div class="step-circle">
+                                    <i class="bi bi-tags"></i>
+                                </div>
+                                <div class="step-label">Tags</div>
+                            </div>
+                            <div class="col step-indicator" data-step="5">
+                                <div class="step-circle">
+                                    <i class="bi bi-chat-heart"></i>
+                                </div>
+                                <div class="step-label">Critique</div>
+                            </div>
+                            <div class="col step-indicator" data-step="6">
+                                <div class="step-circle">
+                                    <i class="bi bi-check-circle"></i>
+                                </div>
+                                <div class="step-label">Review</div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <small class="text-muted">Step <span id="current-step">1</span> of 6</small>
+                        </div>
+                    </div>
+
+                    <!-- Error/Success messages -->
+                    <div id="message-container"></div>
+
+                    <!-- Step content container -->
+                    <form id="upload-form">
+                        {% csrf_token %}
+                        <div id="step-content" class="mb-4">
+                            <!-- Steps will be loaded here dynamically -->
+                        </div>
+
+                        <!-- Navigation buttons -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <button type="button" id="prev-btn" class="btn btn-outline-secondary" style="display: none;">
+                                    <i class="bi bi-arrow-left me-2"></i>Previous
+                                </button>
+                            </div>
+                            <div>
+                                <button type="button" id="next-btn" class="btn btn-primary">
+                                    Next<i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                                <button type="submit" id="submit-btn" class="btn btn-success btn-lg" style="display: none;">
+                                    <i class="bi bi-cloud-upload me-2"></i>Upload Artwork
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden form data -->
+<input type="hidden" id="folders-data" value="{{ folders|safe }}">
+
+<style>
+/* Upload Wizard Styles */
+.step-content {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.upload-zone {
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    cursor: pointer;
+}
+
+.upload-zone:hover {
+    background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    background-color: #e9ecef;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.step-circle.active {
+    background-color: var(--bs-primary);
+    color: white;
+    border-color: var(--bs-primary);
+}
+
+.step-circle.completed {
+    background-color: var(--bs-success);
+    color: white;
+    border-color: var(--bs-success);
+}
+
+.step-label {
+    margin-top: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.step-indicator.active .step-label {
+    color: var(--bs-primary);
+    font-weight: 600;
+}
+
+.step-indicator.completed .step-label {
+    color: var(--bs-success);
+    font-weight: 600;
+}
+
+.progress-bar {
+    transition: width 0.6s ease;
+}
+
+.medium-btn, .tag-btn {
+    transition: all 0.2s ease;
+}
+
+.medium-btn:hover, .tag-btn:hover {
+    transform: translateY(-1px);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+</style>
+
+<script>
+class UploadWizard {
+    constructor() {
+        this.currentStep = 1;
+        this.totalSteps = 6;
+        this.formData = {
+            image: null,
+            imagePreview: null,
+            title: '',
+            description: '',
+            medium: '',
+            dimensions: '',
+            tags: '',
+            folder: '',
+            seekingCritique: false,
+            critiqueFocus: []
+        };
+        this.folders = [];
+        
+        this.init();
+    }
+    
+    init() {
+        this.loadFolders();
+        this.bindEvents();
+        this.renderStep();
+    }
+    
+    loadFolders() {
+        // Get folders from Django context
+        try {
+            const foldersData = document.getElementById('folders-data').value;
+            this.folders = foldersData ? JSON.parse(foldersData) : [];
+        } catch (e) {
+            this.folders = [];
+        }
+    }
+    
+    bindEvents() {
+        document.getElementById('next-btn').addEventListener('click', () => this.nextStep());
+        document.getElementById('prev-btn').addEventListener('click', () => this.prevStep());
+        document.getElementById('upload-form').addEventListener('submit', (e) => this.submitForm(e));
+    }
+    
+    nextStep() {
+        if (this.validateCurrentStep()) {
+            if (this.currentStep < this.totalSteps) {
+                this.currentStep++;
+                this.renderStep();
+                this.updateProgress();
+            }
+        }
+    }
+    
+    prevStep() {
+        if (this.currentStep > 1) {
+            this.currentStep--;
+            this.renderStep();
+            this.updateProgress();
+        }
+    }
+    
+    validateCurrentStep() {
+        const errors = [];
+        
+        switch (this.currentStep) {
+            case 1:
+                if (!this.formData.image) {
+                    errors.push('Please select an image for your artwork');
+                }
+                break;
+            case 2:
+                if (!this.formData.title.trim()) {
+                    errors.push('Title is required');
+                }
+                break;
+        }
+        
+        if (errors.length > 0) {
+            this.showMessage(errors.join('<br>'), 'danger');
+            return false;
+        }
+        
+        this.hideMessage();
+        return true;
+    }
+    
+    updateProgress() {
+        const progressPercentage = ((this.currentStep - 1) / (this.totalSteps - 1)) * 100;
+        document.getElementById('progress-bar').style.width = progressPercentage + '%';
+        document.getElementById('current-step').textContent = this.currentStep;
+        
+        // Update step indicators
+        document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+            const stepNum = index + 1;
+            const circle = indicator.querySelector('.step-circle');
+            
+            if (stepNum < this.currentStep) {
+                circle.className = 'step-circle completed';
+                circle.innerHTML = '<i class="bi bi-check"></i>';
+                indicator.className = 'col step-indicator completed';
+            } else if (stepNum === this.currentStep) {
+                circle.className = 'step-circle active';
+                circle.innerHTML = this.getStepIcon(stepNum);
+                indicator.className = 'col step-indicator active';
+            } else {
+                circle.className = 'step-circle';
+                circle.innerHTML = this.getStepIcon(stepNum);
+                indicator.className = 'col step-indicator';
+            }
+        });
+        
+        // Update navigation buttons
+        document.getElementById('prev-btn').style.display = this.currentStep > 1 ? 'block' : 'none';
+        document.getElementById('next-btn').style.display = this.currentStep < this.totalSteps ? 'block' : 'none';
+        document.getElementById('submit-btn').style.display = this.currentStep === this.totalSteps ? 'block' : 'none';
+    }
+    
+    getStepIcon(step) {
+        const icons = {
+            1: '<i class="bi bi-cloud-upload"></i>',
+            2: '<i class="bi bi-pencil-square"></i>',
+            3: '<i class="bi bi-palette"></i>',
+            4: '<i class="bi bi-tags"></i>',
+            5: '<i class="bi bi-chat-heart"></i>',
+            6: '<i class="bi bi-check-circle"></i>'
+        };
+        return icons[step] || '';
+    }
+    
+    renderStep() {
+        const container = document.getElementById('step-content');
+        container.className = 'step-content mb-4';
+        
+        switch (this.currentStep) {
+            case 1:
+                container.innerHTML = this.renderStep1();
+                this.bindStep1Events();
+                break;
+            case 2:
+                container.innerHTML = this.renderStep2();
+                this.bindStep2Events();
+                break;
+            case 3:
+                container.innerHTML = this.renderStep3();
+                this.bindStep3Events();
+                break;
+            case 4:
+                container.innerHTML = this.renderStep4();
+                this.bindStep4Events();
+                break;
+            case 5:
+                container.innerHTML = this.renderStep5();
+                this.bindStep5Events();
+                break;
+            case 6:
+                container.innerHTML = this.renderStep6();
+                break;
+        }
+        
+        this.updateProgress();
+    }
+    
+    renderStep1() {
+        return `
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-brush display-4 text-primary mb-3"></i>
+                    <h2 class="h4 mb-2">Upload Your Masterpiece</h2>
+                    <p class="text-muted">Let's start by adding your artwork</p>
+                </div>
+                
+                ${!this.formData.imagePreview ? `
+                    <div class="upload-zone border-3 border-dashed rounded-4 p-5 mb-3" id="upload-zone" 
+                         style="min-height: 300px; display: flex; flex-direction: column; justify-content: center;">
+                        <div>
+                            <i class="bi bi-cloud-upload display-1 text-muted mb-3"></i>
+                            <h5 class="text-muted mb-2">Drop your masterpiece here or click to select</h5>
+                            <p class="text-muted mb-2">Drag & drop your artwork file here</p>
+                            <button type="button" class="btn btn-outline-primary" id="browse-btn">
+                                <i class="bi bi-folder2-open me-2"></i>Browse Files
+                            </button>
+                            <div class="mt-3">
+                                <small class="text-muted">Supported formats: JPEG, PNG, GIF, WebP, SVG, BMP, TIFF (max 20MB)</small>
+                            </div>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="uploaded-preview">
+                        <div class="position-relative d-inline-block">
+                            <img src="${this.formData.imagePreview}" alt="Artwork preview" 
+                                 class="img-fluid rounded-3 shadow" style="max-height: 400px; max-width: 100%;">
+                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" 
+                                    id="remove-image-btn" title="Remove image">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        <div class="mt-3">
+                            <p class="text-success mb-2">
+                                <i class="bi bi-check-circle me-2"></i>Great! Your artwork looks amazing
+                            </p>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="change-image-btn">
+                                <i class="bi bi-arrow-repeat me-2"></i>Change Image
+                            </button>
+                        </div>
+                    </div>
+                `}
+                
+                <input type="file" id="file-input" class="d-none" accept="image/*">
+            </div>
+        `;
+    }
+    
+    renderStep2() {
+        return `
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-pencil-square display-4 text-primary mb-3"></i>
+                    <h2 class="h4 mb-2">Tell Us About Your Creation</h2>
+                    <p class="text-muted">Give your artwork a title and share its story</p>
+                </div>
+                
+                <div class="text-start">
+                    <div class="mb-4">
+                        <label for="title" class="form-label fw-bold">
+                            <i class="bi bi-tag me-2"></i>What's this piece called? *
+                        </label>
+                        <input type="text" class="form-control form-control-lg" id="title" 
+                               value="${this.formData.title}" placeholder="Enter a compelling title for your artwork" maxlength="200">
+                        <div class="form-text"><span id="title-count">0</span>/200 characters</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="description" class="form-label fw-bold">
+                            <i class="bi bi-journal-text me-2"></i>Tell us the story behind it
+                        </label>
+                        <p class="text-muted small mb-2">Share your inspiration, technique, or what makes this piece special</p>
+                        <textarea class="form-control" id="description" rows="5" 
+                                  placeholder="What inspired this piece? What techniques did you use? What story does it tell?" 
+                                  maxlength="1000">${this.formData.description}</textarea>
+                        <div class="form-text">
+                            <span id="desc-count">0</span>/1000 characters
+                            <span class="text-muted ms-2">• Optional, but recommended for better engagement</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-lightbulb text-warning me-2"></i>Tips for great descriptions
+                            </h6>
+                            <ul class="mb-0 small text-muted">
+                                <li>Share your creative process or inspiration</li>
+                                <li>Mention any unique techniques you used</li>
+                                <li>Describe the mood or feeling you wanted to convey</li>
+                                <li>Include any interesting backstory or challenges faced</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    renderStep3() {
+        const commonMediums = [
+            'Oil Painting', 'Acrylic Painting', 'Watercolor', 'Digital Art', 
+            'Photography', 'Pencil Drawing', 'Charcoal Drawing', 'Ink Drawing',
+            'Mixed Media', 'Sculpture', 'Printmaking', 'Collage'
+        ];
+        
+        return `
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-palette display-4 text-primary mb-3"></i>
+                    <h2 class="h4 mb-2">Artwork Details</h2>
+                    <p class="text-muted">Help viewers understand your medium and scale</p>
+                </div>
+                
+                <div class="text-start">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-brush me-2"></i>What medium did you use?
+                        </label>
+                        <div class="row g-2 mt-2">
+                            ${commonMediums.map(medium => `
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <button type="button" class="btn w-100 medium-btn ${this.formData.medium === medium ? 'btn-primary' : 'btn-outline-secondary'}" 
+                                            data-medium="${medium}">${medium}</button>
+                                </div>
+                            `).join('')}
+                            <div class="col-6 col-md-4 col-lg-3">
+                                <button type="button" class="btn w-100 btn-outline-secondary" id="custom-medium-btn">Other</button>
+                            </div>
+                        </div>
+                        <div id="custom-medium-input" class="mt-3" style="display: none;">
+                            <input type="text" class="form-control" id="custom-medium" placeholder="Enter your custom medium">
+                        </div>
+                        <div class="form-text">This helps viewers understand your artistic technique</div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="dimensions" class="form-label fw-bold">
+                            <i class="bi bi-aspect-ratio me-2"></i>What are the dimensions?
+                        </label>
+                        <input type="text" class="form-control" id="dimensions" value="${this.formData.dimensions}"
+                               placeholder="e.g., 24×36 inches, 1920×1080 pixels, 8×10 cm">
+                        <div class="form-text">Optional • Include units (inches, cm, pixels, etc.)</div>
+                    </div>
+                    
+                    <div class="card bg-light border-0">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-info-circle text-info me-2"></i>Why does this matter?
+                            </h6>
+                            <p class="mb-0 small text-muted">
+                                Medium and dimensions help viewers appreciate the scale and technique of your work. 
+                                Digital artists might include pixel dimensions, while traditional artists often use inches or centimeters.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    renderStep4() {
+        const suggestedTags = [
+            'abstract', 'landscape', 'portrait', 'still-life', 'digital', 'traditional',
+            'fantasy', 'realistic', 'colorful', 'monochrome', 'experimental', 'nature',
+            'urban', 'conceptual', 'surreal', 'minimalist'
+        ];
+        
+        const tagsList = this.formData.tags ? this.formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+        
+        return `
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-tags display-4 text-primary mb-3"></i>
+                    <h2 class="h4 mb-2">Organize & Categorize</h2>
+                    <p class="text-muted">Add tags and choose a folder to help people find your work</p>
+                </div>
+                
+                <div class="text-start">
+                    <div class="mb-5">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-tag me-2"></i>Tags
+                        </label>
+                        <p class="text-muted small mb-3">Help people discover your artwork with descriptive tags</p>
+                        
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="tag-input" 
+                                   placeholder="Type a tag and press Enter">
+                            <div class="form-text">Press Enter or comma to add tags</div>
+                        </div>
+                        
+                        ${tagsList.length > 0 ? `
+                            <div class="mb-3">
+                                <div class="d-flex flex-wrap gap-2" id="current-tags">
+                                    ${tagsList.map(tag => `
+                                        <span class="badge bg-primary d-flex align-items-center">
+                                            ${tag}
+                                            <button type="button" class="btn-close btn-close-white ms-2" 
+                                                    style="font-size: 0.65em;" data-tag="${tag}"></button>
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div>
+                            <h6 class="text-muted mb-2">Popular tags:</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                ${suggestedTags.map(tag => `
+                                    <button type="button" class="btn btn-sm tag-btn ${tagsList.includes(tag) ? 'btn-primary' : 'btn-outline-secondary'}" 
+                                            data-tag="${tag}" ${tagsList.includes(tag) ? 'disabled' : ''}>${tag}</button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-folder me-2"></i>Portfolio Folder
+                        </label>
+                        <p class="text-muted small mb-3">Optional • Organize your artwork into folders</p>
+                        
+                        <select class="form-select" id="folder-select">
+                            <option value="">No folder (keep in main gallery)</option>
+                            ${this.folders.map(folder => `
+                                <option value="${folder.id}" ${this.formData.folder == folder.id ? 'selected' : ''}>${folder.name}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    renderStep5() {
+        const focusAreas = [
+            { id: 'technique', label: 'Technique & Skills', icon: 'bi-brush' },
+            { id: 'composition', label: 'Composition & Layout', icon: 'bi-grid-3x3' },
+            { id: 'color', label: 'Color & Lighting', icon: 'bi-palette' },
+            { id: 'style', label: 'Artistic Style', icon: 'bi-star' },
+            { id: 'concept', label: 'Concept & Storytelling', icon: 'bi-chat-quote' },
+            { id: 'improvement', label: 'Areas for Improvement', icon: 'bi-graph-up' }
+        ];
+        
+        return `
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-chat-heart display-4 text-primary mb-3"></i>
+                    <h2 class="h4 mb-2">Want Feedback?</h2>
+                    <p class="text-muted">Let the community help you grow as an artist</p>
+                </div>
+                
+                <div class="text-start">
+                    <div class="card border-2 mb-4">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5 class="card-title mb-2">
+                                        <i class="bi bi-people me-2"></i>Seeking Critique
+                                    </h5>
+                                    <p class="card-text text-muted mb-0">
+                                        Would you like other artists to provide feedback on this piece?
+                                    </p>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="seeking-critique" 
+                                               ${this.formData.seekingCritique ? 'checked' : ''} style="transform: scale(1.5);">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="focus-areas" style="display: ${this.formData.seekingCritique ? 'block' : 'none'};">
+                        <h6 class="fw-bold mb-3">
+                            <i class="bi bi-bullseye me-2"></i>What areas would you like feedback on? (Optional)
+                        </h6>
+                        <p class="text-muted small mb-3">Select specific areas you'd like reviewers to focus on</p>
+                        
+                        <div class="row g-2">
+                            ${focusAreas.map(area => `
+                                <div class="col-md-6">
+                                    <button type="button" class="btn w-100 text-start d-flex align-items-center focus-btn 
+                                            ${this.formData.critiqueFocus.includes(area.id) ? 'btn-primary' : 'btn-outline-secondary'}" 
+                                            data-focus="${area.id}">
+                                        <i class="${area.icon} me-2"></i>${area.label}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="card bg-light border-0 mt-4">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-info-circle text-info me-2"></i>How critiques work
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="mb-0 small text-muted">
+                                        <li>Other artists can provide constructive feedback</li>
+                                        <li>You'll receive thoughtful insights to improve your skills</li>
+                                        <li>Both giving and receiving critiques earns karma points</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="mb-0 small text-muted">
+                                        <li>Community reactions help identify helpful feedback</li>
+                                        <li>You can always turn off critique requests later</li>
+                                        <li>Quality feedback builds your artistic reputation</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    ${this.formData.seekingCritique ? `
+                        <div class="alert alert-success mt-3">
+                            <i class="bi bi-check-circle me-2"></i>
+                            <strong>Great choice!</strong> Your artwork will be open for community feedback. 
+                            This is a wonderful way to grow as an artist and connect with other creatives.
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
+    renderStep6() {
+        const tagsList = this.formData.tags ? this.formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+        const selectedFolder = this.folders.find(f => f.id == this.formData.folder);
+        
+        return `
+            <div class="text-center">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle display-4 text-success mb-3"></i>
+                    <h2 class="h4 mb-2">Ready to Share Your Art?</h2>
+                    <p class="text-muted">Review your artwork details before uploading</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-image me-2"></i>Artwork Preview</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="${this.formData.imagePreview}" alt="Artwork preview" 
+                                     class="img-fluid rounded-3 shadow" style="max-height: 300px; max-width: 100%;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="card h-100">
+                            <div class="card-header">
+                                <h6 class="mb-0"><i class="bi bi-list-check me-2"></i>Artwork Details</h6>
+                            </div>
+                            <div class="card-body text-start">
+                                <div class="mb-3">
+                                    <strong class="text-muted small d-block">TITLE</strong>
+                                    <div class="fw-bold">${this.formData.title || 'Untitled'}</div>
+                                </div>
+                                
+                                ${this.formData.description ? `
+                                    <div class="mb-3">
+                                        <strong class="text-muted small d-block">DESCRIPTION</strong>
+                                        <div class="small text-muted" style="max-height: 60px; overflow: hidden;">
+                                            ${this.formData.description.length > 100 
+                                                ? this.formData.description.substring(0, 100) + '...' 
+                                                : this.formData.description}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${this.formData.medium ? `
+                                    <div class="mb-3">
+                                        <strong class="text-muted small d-block">MEDIUM</strong>
+                                        <div>${this.formData.medium}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${this.formData.dimensions ? `
+                                    <div class="mb-3">
+                                        <strong class="text-muted small d-block">DIMENSIONS</strong>
+                                        <div>${this.formData.dimensions}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${selectedFolder ? `
+                                    <div class="mb-3">
+                                        <strong class="text-muted small d-block">FOLDER</strong>
+                                        <div><i class="bi bi-folder me-2"></i>${selectedFolder.name}</div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${tagsList.length > 0 ? `
+                                    <div class="mb-3">
+                                        <strong class="text-muted small d-block">TAGS</strong>
+                                        <div class="d-flex flex-wrap gap-1">
+                                            ${tagsList.slice(0, 5).map(tag => `<span class="badge bg-secondary small">${tag}</span>`).join('')}
+                                            ${tagsList.length > 5 ? `<span class="badge bg-light text-muted small">+${tagsList.length - 5} more</span>` : ''}
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="mb-3">
+                                    <strong class="text-muted small d-block">SEEKING CRITIQUE</strong>
+                                    <div class="${this.formData.seekingCritique ? 'text-success' : 'text-muted'}">
+                                        <i class="bi ${this.formData.seekingCritique ? 'bi-check-circle' : 'bi-x-circle'} me-2"></i>
+                                        ${this.formData.seekingCritique ? 'Yes, open to feedback' : 'No, just sharing'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>Your artwork will be visible to the community once uploaded
+                    </small>
+                </div>
+            </div>
+        `;
+    }
+    
+    bindStep1Events() {
+        const fileInput = document.getElementById('file-input');
+        const uploadZone = document.getElementById('upload-zone');
+        const browseBtn = document.getElementById('browse-btn');
+        const removeBtn = document.getElementById('remove-image-btn');
+        const changeBtn = document.getElementById('change-image-btn');
+        
+        if (browseBtn) {
+            browseBtn.addEventListener('click', () => fileInput.click());
+        }
+        
+        if (uploadZone) {
+            uploadZone.addEventListener('click', () => fileInput.click());
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.classList.add('border-primary');
+            });
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.classList.remove('border-primary');
+            });
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove('border-primary');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    this.handleImageFile(files[0]);
+                }
+            });
+        }
+        
+        if (removeBtn) {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.formData.image = null;
+                this.formData.imagePreview = null;
+                this.renderStep();
+            });
+        }
+        
+        if (changeBtn) {
+            changeBtn.addEventListener('click', () => fileInput.click());
+        }
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.handleImageFile(e.target.files[0]);
+            }
+        });
+    }
+    
+    handleImageFile(file) {
+        if (!file.type.match('image.*')) {
+            this.showMessage('Please select an image file (JPEG, PNG, etc.)', 'danger');
+            return;
+        }
+        
+        if (file.size > 20 * 1024 * 1024) {
+            this.showMessage('File size must be less than 20MB', 'danger');
+            return;
+        }
+        
+        this.formData.image = file;
+        this.formData.imagePreview = URL.createObjectURL(file);
+        this.renderStep();
+    }
+    
+    bindStep2Events() {
+        const titleInput = document.getElementById('title');
+        const descInput = document.getElementById('description');
+        const titleCount = document.getElementById('title-count');
+        const descCount = document.getElementById('desc-count');
+        
+        titleInput.addEventListener('input', (e) => {
+            this.formData.title = e.target.value;
+            titleCount.textContent = e.target.value.length;
+        });
+        
+        descInput.addEventListener('input', (e) => {
+            this.formData.description = e.target.value;
+            descCount.textContent = e.target.value.length;
+        });
+        
+        // Update character counts
+        titleCount.textContent = this.formData.title.length;
+        descCount.textContent = this.formData.description.length;
+    }
+    
+    bindStep3Events() {
+        document.querySelectorAll('.medium-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.medium-btn').forEach(b => {
+                    b.className = 'btn w-100 medium-btn btn-outline-secondary';
+                });
+                e.target.className = 'btn w-100 medium-btn btn-primary';
+                this.formData.medium = e.target.dataset.medium;
+                document.getElementById('custom-medium-input').style.display = 'none';
+            });
+        });
+        
+        document.getElementById('custom-medium-btn').addEventListener('click', () => {
+            document.getElementById('custom-medium-input').style.display = 'block';
+            document.getElementById('custom-medium').focus();
+            this.formData.medium = '';
+        });
+        
+        document.getElementById('custom-medium').addEventListener('input', (e) => {
+            this.formData.medium = e.target.value;
+        });
+        
+        document.getElementById('dimensions').addEventListener('input', (e) => {
+            this.formData.dimensions = e.target.value;
+        });
+    }
+    
+    bindStep4Events() {
+        const tagInput = document.getElementById('tag-input');
+        
+        tagInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                this.addTag(tagInput.value.trim());
+                tagInput.value = '';
+            }
+        });
+        
+        document.querySelectorAll('.tag-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.addTag(e.target.dataset.tag);
+            });
+        });
+        
+        document.querySelectorAll('.btn-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.removeTag(e.target.dataset.tag);
+            });
+        });
+        
+        document.getElementById('folder-select').addEventListener('change', (e) => {
+            this.formData.folder = e.target.value;
+        });
+    }
+    
+    addTag(tag) {
+        if (!tag) return;
+        
+        const tagsList = this.formData.tags ? this.formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+        const cleanTag = tag.toLowerCase();
+        
+        if (!tagsList.includes(cleanTag)) {
+            tagsList.push(cleanTag);
+            this.formData.tags = tagsList.join(', ');
+            this.renderStep();
+        }
+    }
+    
+    removeTag(tag) {
+        const tagsList = this.formData.tags ? this.formData.tags.split(',').map(t => t.trim()).filter(t => t) : [];
+        const filteredTags = tagsList.filter(t => t !== tag);
+        this.formData.tags = filteredTags.join(', ');
+        this.renderStep();
+    }
+    
+    bindStep5Events() {
+        const seekingInput = document.getElementById('seeking-critique');
+        const focusAreas = document.getElementById('focus-areas');
+        
+        seekingInput.addEventListener('change', (e) => {
+            this.formData.seekingCritique = e.target.checked;
+            focusAreas.style.display = e.target.checked ? 'block' : 'none';
+            if (!e.target.checked) {
+                this.formData.critiqueFocus = [];
+            }
+        });
+        
+        document.querySelectorAll('.focus-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const focusId = e.currentTarget.dataset.focus;
+                const currentFocus = this.formData.critiqueFocus || [];
+                
+                if (currentFocus.includes(focusId)) {
+                    this.formData.critiqueFocus = currentFocus.filter(id => id !== focusId);
+                    e.currentTarget.className = 'btn w-100 text-start d-flex align-items-center focus-btn btn-outline-secondary';
+                } else {
+                    this.formData.critiqueFocus = [...currentFocus, focusId];
+                    e.currentTarget.className = 'btn w-100 text-start d-flex align-items-center focus-btn btn-primary';
+                }
+            });
+        });
+    }
+    
+    async submitForm(e) {
+        e.preventDefault();
+        
+        if (!this.validateCurrentStep()) return;
+        
+        const submitBtn = document.getElementById('submit-btn');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading your brilliance...';
+        submitBtn.disabled = true;
+        
+        try {
+            const formData = new FormData();
+            formData.append('title', this.formData.title);
+            if (this.formData.description.trim()) formData.append('description', this.formData.description);
+            if (this.formData.medium.trim()) formData.append('medium', this.formData.medium);
+            if (this.formData.dimensions.trim()) formData.append('dimensions', this.formData.dimensions);
+            if (this.formData.tags.trim()) formData.append('tags', this.formData.tags);
+            if (this.formData.folder) formData.append('folder', this.formData.folder);
+            formData.append('seeking_critique', this.formData.seekingCritique);
+            if (this.formData.critiqueFocus.length > 0) {
+                formData.append('critique_focus', this.formData.critiqueFocus.join(','));
+            }
+            formData.append('image', this.formData.image);
+            
+            // Get CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            
+            const response = await fetch('/api/artworks/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                },
+                credentials: 'same-origin',
+                body: formData
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.showMessage('Artwork uploaded successfully!', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = `/artworks/${data.id}/`;
+                }, 2000);
+            } else {
+                const errorData = await response.json();
+                this.showMessage(errorData.detail || 'Error uploading artwork. Please try again.', 'danger');
+            }
+        } catch (error) {
+            this.showMessage('Network error. Please check your connection and try again.', 'danger');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+    
+    showMessage(message, type = 'info') {
+        const container = document.getElementById('message-container');
+        container.innerHTML = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="bi bi-${type === 'danger' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    }
+    
+    hideMessage() {
+        document.getElementById('message-container').innerHTML = '';
+    }
+}
+
+// Initialize the wizard when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    new UploadWizard();
+});
+</script>
+{% endblock %}

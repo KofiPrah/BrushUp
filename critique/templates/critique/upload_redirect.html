@@ -1,0 +1,77 @@
+{% extends 'critique/base.html' %}
+
+{% block title %}Upload Artwork - Brush Up{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="mb-4">
+                        <i class="bi bi-upload display-1 text-primary mb-3"></i>
+                        <h2 class="h3 mb-3">Enhanced Upload Experience</h2>
+                        <p class="text-muted mb-4">
+                            We've upgraded the artwork upload experience with a new multi-step wizard 
+                            that makes sharing your art more engaging and organized.
+                        </p>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <i class="bi bi-cloud-upload text-primary h2"></i>
+                            <h6 class="mt-2">Easy Upload</h6>
+                            <p class="small text-muted">Drag & drop your artwork with instant preview</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="bi bi-tags text-primary h2"></i>
+                            <h6 class="mt-2">Smart Organization</h6>
+                            <p class="small text-muted">Tag suggestions and folder management</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <i class="bi bi-chat-heart text-primary h2"></i>
+                            <h6 class="mt-2">Critique Ready</h6>
+                            <p class="small text-muted">Choose if you want community feedback</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button id="redirectButton" class="btn btn-primary btn-lg">
+                            <i class="bi bi-arrow-right me-2"></i>
+                            Continue to New Upload Experience
+                        </button>
+                        <small class="text-muted mt-2">
+                            You'll be redirected to the enhanced upload wizard
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const redirectButton = document.getElementById('redirectButton');
+    
+    if (redirectButton) {
+        redirectButton.addEventListener('click', function() {
+            // Update button text to show loading
+            redirectButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Loading...';
+            redirectButton.disabled = true;
+            
+            // For now, redirect to the API-based upload since we need to integrate React properly
+            // In the future, this will redirect to the React frontend route
+            window.location.href = '/upload-wizard/';
+        });
+    }
+    
+    // Auto-redirect after 3 seconds
+    setTimeout(function() {
+        if (redirectButton && !redirectButton.disabled) {
+            redirectButton.click();
+        }
+    }, 3000);
+});
+</script>
+{% endblock %}

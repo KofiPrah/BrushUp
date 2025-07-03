@@ -135,6 +135,20 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
+### July 03, 2025 - Multi-Step Upload Wizard Implementation ✓
+- **Transformed upload experience**: Replaced single-form upload with sophisticated 6-step wizard using progressive disclosure
+- **Step 1 - Image Upload**: Drag-and-drop interface with instant preview, file validation, and visual feedback
+- **Step 2 - Details**: Enhanced title and description inputs with character counters and helpful prompts
+- **Step 3 - Medium & Dimensions**: Interactive medium selection with common options and custom input capability
+- **Step 4 - Tags & Organization**: Smart tag suggestions, folder selection, and portfolio organization tools
+- **Step 5 - Critique Settings**: Toggle for seeking feedback with focus area selection for targeted critiques
+- **Step 6 - Review & Submit**: Comprehensive summary with final validation before upload
+- **Enhanced UX**: Progress indicator, smooth animations, step validation, and engaging copy throughout
+- **API Integration**: Seamlessly integrates with existing `/api/artworks/` endpoint and folder management
+- **Responsive Design**: Optimized for all device sizes with Bootstrap 5 components and custom styling
+- **Error Handling**: Comprehensive validation, file type checking, size limits, and user-friendly error messages
+- **Template Architecture**: Built using Django templates with vanilla JavaScript for maximum compatibility
+
 ### July 01, 2025 - Enhanced Focus Mode Implementation ✓
 - **Fixed template syntax error**: Removed duplicate {% block content %} tags that were causing Django template errors
 - **Resolved artwork disappearing issue**: Removed duplicate image block in main-content section that caused visual conflicts

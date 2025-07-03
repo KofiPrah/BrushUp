@@ -103,7 +103,7 @@ const AppRoutes = () => {
             path="/upload" 
             element={
               <ProtectedRoute>
-                <ArtworkForm mode="create" />
+                <ArtworkUpload />
               </ProtectedRoute>
             } 
           />
