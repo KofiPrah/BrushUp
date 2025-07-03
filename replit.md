@@ -135,6 +135,16 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
+### July 03, 2025 - Advanced Version Management System Overhaul ✓
+- **Added current_version pointer system**: Implemented foreign key relationship from ArtWork to ArtWorkVersion for tracking the active version
+- **Fixed critical deletion bug**: Prevented deletion of current versions and ensured proper version management safety
+- **Enhanced API security**: Added proper authentication and ownership checks to version switching endpoints
+- **Improved endpoint consistency**: Fixed URL pattern mismatches between frontend JavaScript and backend API endpoints
+- **Database migration applied**: Created and ran migration 0021 to add current_version field with proper data population
+- **Updated display methods**: Templates now consistently use get_display_image_url() for reliable image display
+- **Enhanced version creation**: New versions are automatically set as current and properly linked to artwork
+- **Comprehensive permission checks**: Version switching now requires artwork ownership and proper authentication
+
 ### July 03, 2025 - Upload System Fixes and Enhancements ✓
 - **Fixed description field requirement**: Made artwork description field optional in model and API
 - **Applied database migration**: Updated schema to allow empty descriptions (migration 0020)

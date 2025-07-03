@@ -1894,6 +1894,8 @@ def create_artwork_version(request, artwork_id):
                 new_image = request.FILES['image']
                 artwork.image = new_image  # Only update artwork, NOT the version
             
+            # Set the new version as current
+            artwork.current_version = version
             artwork.save()
             
             serializer = ArtWorkVersionSerializer(version)
@@ -1986,17 +1988,17 @@ def delete_artwork_version(request, version_id):
                       status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['POST'])
-@permission_classes([permissions.AllowAny])
+@permission_classes([permissions.IsAuthenticated])
 def switch_artwork_version(request, artwork_id, version_id):
     """Switch the main artwork display to a specific version."""
     try:
         artwork = ArtWork.objects.get(id=artwork_id)
         
-        # Check if user has permission to view this artwork
-        if artwork.folder and not artwork.folder.is_viewable_by(request.user):
+        # Only artwork owner can switch versions
+        if artwork.author != request.user:
             return Response(
-                {'error': 'Not found'}, 
-                status=status.HTTP_404_NOT_FOUND
+                {'error': 'Permission denied'}, 
+                status=status.HTTP_403_FORBIDDEN
             )
         
         # Get the version
@@ -2008,6 +2010,10 @@ def switch_artwork_version(request, artwork_id, version_id):
                 {'error': 'Version not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+        
+        # Update the artwork's current_version pointer
+        artwork.current_version = version
+        artwork.save(update_fields=['current_version'])
         
         # Return version data for frontend to update the display
         return Response({
