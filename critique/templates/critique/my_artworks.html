@@ -128,40 +128,53 @@
     transition: all 0.3s ease;
 }
 
-.folder-sidebar.collapsed .sidebar-content {
-    display: none;
-}
-
 .folder-sidebar.collapsed {
-    min-height: auto;
-    width: 60px;
+    min-height: auto !important;
+    width: 60px !important;
     padding: 0.75rem 0.5rem !important;
+    overflow: hidden !important;
 }
 
 .sidebar-wrapper.collapsed {
-    flex: 0 0 60px;
-    max-width: 60px;
+    flex: 0 0 60px !important;
+    max-width: 60px !important;
 }
 
 .sidebar-content {
-    transition: opacity 0.3s ease;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.folder-sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
 }
 
 .folder-sidebar.collapsed h6 {
-    display: none;
+    display: none !important;
+}
+
+.folder-sidebar.collapsed .d-flex {
+    justify-content: center !important;
 }
 
 .folder-sidebar.collapsed #sidebarCollapseBtn {
-    margin: 0 auto;
-    display: block;
+    margin: 0 auto !important;
+    display: block !important;
 }
 
 #sidebarCollapseBtn i {
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease !important;
 }
 
-.folder-sidebar.collapsed #sidebarCollapseBtn i {
-    transform: rotate(180deg);
+.collapsed #sidebarCollapseBtn i {
+    transform: rotate(180deg) !important;
+}
+
+.folder-sidebar:not(.collapsed) #sidebarCollapseBtn i {
+    transform: rotate(0deg) !important;
 }
 
 .folder-sidebar::-webkit-scrollbar {
@@ -1390,43 +1403,60 @@ function createBackdrop() {
 
 // Sidebar collapse functionality
 function toggleSidebarCollapse() {
+    console.log('toggleSidebarCollapse called');
+    
     const sidebar = document.getElementById('folderSidebar');
-    const sidebarWrapper = sidebar.closest('.sidebar-wrapper');
+    const sidebarWrapper = sidebar ? sidebar.closest('.sidebar-wrapper') : null;
     const mainContent = document.querySelector('.main-content');
     const collapseBtn = document.getElementById('sidebarCollapseBtn');
-    const chevronIcon = collapseBtn.querySelector('i');
     
-    if (sidebar && sidebarWrapper && mainContent) {
+    console.log('Elements found:', {
+        sidebar: !!sidebar,
+        sidebarWrapper: !!sidebarWrapper,
+        mainContent: !!mainContent,
+        collapseBtn: !!collapseBtn
+    });
+    
+    if (sidebar && sidebarWrapper && mainContent && collapseBtn) {
         const isCollapsed = sidebar.classList.contains('collapsed');
+        console.log('Current collapsed state:', isCollapsed);
         
         if (isCollapsed) {
             // Expand sidebar
+            console.log('Expanding sidebar');
             sidebar.classList.remove('collapsed');
             sidebarWrapper.classList.remove('collapsed');
-            sidebarWrapper.className = sidebarWrapper.className.replace(/col-\w+-\d+/g, '');
+            
+            // Reset grid classes
+            sidebarWrapper.classList.remove('col-auto');
             sidebarWrapper.classList.add('col-lg-3', 'col-xl-2');
-            mainContent.className = mainContent.className.replace(/col-\w+-\d+/g, '');
+            
+            mainContent.classList.remove('col');
             mainContent.classList.add('col-lg-9', 'col-xl-10');
+            
             collapseBtn.title = 'Collapse sidebar';
             
-            // Animate chevron back
-            chevronIcon.style.transform = 'rotate(0deg)';
         } else {
             // Collapse sidebar
+            console.log('Collapsing sidebar');
             sidebar.classList.add('collapsed');
             sidebarWrapper.classList.add('collapsed');
-            sidebarWrapper.className = sidebarWrapper.className.replace(/col-\w+-\d+/g, '');
-            sidebarWrapper.classList.add('col-auto');
-            mainContent.className = mainContent.className.replace(/col-\w+-\d+/g, '');
-            mainContent.classList.add('col');
-            collapseBtn.title = 'Expand sidebar';
             
-            // Animate chevron
-            chevronIcon.style.transform = 'rotate(180deg)';
+            // Adjust grid classes
+            sidebarWrapper.classList.remove('col-lg-3', 'col-xl-2');
+            sidebarWrapper.classList.add('col-auto');
+            
+            mainContent.classList.remove('col-lg-9', 'col-xl-10');
+            mainContent.classList.add('col');
+            
+            collapseBtn.title = 'Expand sidebar';
         }
         
         // Save collapse state
         localStorage.setItem('sidebarCollapsed', !isCollapsed);
+        console.log('New collapsed state saved:', !isCollapsed);
+    } else {
+        console.error('Missing required elements for sidebar collapse');
     }
 }
 
