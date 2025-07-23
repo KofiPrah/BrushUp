@@ -125,6 +125,43 @@
     top: 20px;
     max-height: calc(100vh - 40px);
     overflow-y: auto;
+    transition: all 0.3s ease;
+}
+
+.folder-sidebar.collapsed .sidebar-content {
+    display: none;
+}
+
+.folder-sidebar.collapsed {
+    min-height: auto;
+    width: 60px;
+    padding: 0.75rem 0.5rem !important;
+}
+
+.sidebar-wrapper.collapsed {
+    flex: 0 0 60px;
+    max-width: 60px;
+}
+
+.sidebar-content {
+    transition: opacity 0.3s ease;
+}
+
+.folder-sidebar.collapsed h6 {
+    display: none;
+}
+
+.folder-sidebar.collapsed #sidebarCollapseBtn {
+    margin: 0 auto;
+    display: block;
+}
+
+#sidebarCollapseBtn i {
+    transition: transform 0.3s ease;
+}
+
+.folder-sidebar.collapsed #sidebarCollapseBtn i {
+    transform: rotate(180deg);
 }
 
 .folder-sidebar::-webkit-scrollbar {
@@ -533,12 +570,18 @@
                                 <i class="bi bi-folder2 me-2"></i>
                                 Portfolio Folders
                             </h6>
-                            <button class="btn btn-sm btn-outline-light d-lg-none" onclick="toggleFolderSidebar()">
-                                <i class="bi bi-x"></i>
-                            </button>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-light" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" title="Collapse sidebar">
+                                    <i class="bi bi-chevron-left"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-light d-lg-none" onclick="toggleFolderSidebar()">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                            </div>
                         </div>
                         
                         <!-- Folder List -->
+                        <div class="sidebar-content" id="sidebarContent">
                         <div class="folder-list">
                             {% for folder in folders %}
                             <div class="folder-item mb-2" data-folder-id="{{ folder.id }}">
@@ -615,6 +658,7 @@
                                 Organize Portfolio
                             </a>
                         </div>
+                        </div> <!-- End sidebar-content -->
                     </div>
                 </div>
                 {% endif %}
@@ -1343,6 +1387,56 @@ function createBackdrop() {
     document.body.appendChild(backdrop);
     return backdrop;
 }
+
+// Sidebar collapse functionality
+function toggleSidebarCollapse() {
+    const sidebar = document.getElementById('folderSidebar');
+    const sidebarWrapper = sidebar.closest('.sidebar-wrapper');
+    const mainContent = document.querySelector('.main-content');
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    const chevronIcon = collapseBtn.querySelector('i');
+    
+    if (sidebar && sidebarWrapper && mainContent) {
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        
+        if (isCollapsed) {
+            // Expand sidebar
+            sidebar.classList.remove('collapsed');
+            sidebarWrapper.classList.remove('collapsed');
+            sidebarWrapper.className = sidebarWrapper.className.replace(/col-\w+-\d+/g, '');
+            sidebarWrapper.classList.add('col-lg-3', 'col-xl-2');
+            mainContent.className = mainContent.className.replace(/col-\w+-\d+/g, '');
+            mainContent.classList.add('col-lg-9', 'col-xl-10');
+            collapseBtn.title = 'Collapse sidebar';
+            
+            // Animate chevron back
+            chevronIcon.style.transform = 'rotate(0deg)';
+        } else {
+            // Collapse sidebar
+            sidebar.classList.add('collapsed');
+            sidebarWrapper.classList.add('collapsed');
+            sidebarWrapper.className = sidebarWrapper.className.replace(/col-\w+-\d+/g, '');
+            sidebarWrapper.classList.add('col-auto');
+            mainContent.className = mainContent.className.replace(/col-\w+-\d+/g, '');
+            mainContent.classList.add('col');
+            collapseBtn.title = 'Expand sidebar';
+            
+            // Animate chevron
+            chevronIcon.style.transform = 'rotate(180deg)';
+        }
+        
+        // Save collapse state
+        localStorage.setItem('sidebarCollapsed', !isCollapsed);
+    }
+}
+
+// Restore collapse state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (isCollapsed) {
+        setTimeout(() => toggleSidebarCollapse(), 100);
+    }
+});
 
 // Bulk Actions (remove duplicate declaration)
 bulkSelectionMode = false;

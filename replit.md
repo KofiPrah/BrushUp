@@ -143,6 +143,7 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 - **Enhanced folder filtering system**: Users can now filter artworks by folder with active state styling and automatic statistics recalculation
 - **Optimized layout structure**: Main artwork grid now uses remaining space more efficiently with responsive column adjustments
 - **Added folder management integration**: Direct access to Portfolio Builder from sidebar for easy folder organization
+- **Implemented collapsible sidebar functionality**: Added collapse/expand button with smooth animations, localStorage persistence, and dynamic layout adjustments for maximized workspace
 
 ### July 03, 2025 - Advanced Version Management System Overhaul ✓
 - **Added current_version pointer system**: Implemented foreign key relationship from ArtWork to ArtWorkVersion for tracking the active version
