@@ -118,6 +118,93 @@
     background-color: rgba(0,123,255,0.1);
 }
 
+/* Folder Sidebar Styling */
+.folder-sidebar {
+    min-height: 400px;
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.folder-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.folder-sidebar::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+}
+
+.folder-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+}
+
+.folder-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+.folder-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.folder-card:hover, .folder-card.active {
+    background: rgba(13, 110, 253, 0.2) !important;
+    border-color: rgba(13, 110, 253, 0.5);
+    transform: translateX(2px);
+}
+
+.hover-highlight {
+    transition: all 0.2s ease;
+}
+
+.folder-thumbnails img {
+    transition: transform 0.2s ease;
+}
+
+.folder-card:hover .folder-thumbnails img {
+    transform: scale(1.05);
+}
+
+/* Mobile sidebar toggle */
+@media (max-width: 991.98px) {
+    .folder-sidebar {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 280px;
+        height: 100vh;
+        z-index: 1050;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+    }
+    
+    .folder-sidebar.show {
+        left: 0;
+    }
+    
+    .sidebar-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0,0,0,0.5);
+        z-index: 1040;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .sidebar-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
 .artwork-checkbox {
     background: rgba(255,255,255,0.9);
     border-radius: 8px;
@@ -435,6 +522,115 @@
         </div>
         
         <div class="card-body">
+            <!-- Sidebar and Main Content Layout -->
+            <div class="row g-0">
+                <!-- Portfolio Folders Sidebar -->
+                {% if folders %}
+                <div class="col-lg-3 col-xl-2 sidebar-wrapper">
+                    <div class="folder-sidebar bg-dark text-white p-3 rounded-3 me-3 mb-4" id="folderSidebar">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 fw-bold">
+                                <i class="bi bi-folder2 me-2"></i>
+                                Portfolio Folders
+                            </h6>
+                            <button class="btn btn-sm btn-outline-light d-lg-none" onclick="toggleFolderSidebar()">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Folder List -->
+                        <div class="folder-list">
+                            {% for folder in folders %}
+                            <div class="folder-item mb-2" data-folder-id="{{ folder.id }}">
+                                <div class="folder-card bg-secondary bg-opacity-25 rounded p-2 hover-highlight" 
+                                     onclick="filterByFolder({{ folder.id }})">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-folder me-2 text-primary"></i>
+                                            <div>
+                                                <div class="folder-name fw-semibold small">{{ folder.name }}</div>
+                                                <div class="folder-count text-muted" style="font-size: 0.75rem;">
+                                                    {{ folder.artworks.count }} artwork{{ folder.artworks.count|pluralize }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-primary">{{ folder.artworks.count }}</span>
+                                    </div>
+                                    
+                                    <!-- Folder Preview Thumbnails -->
+                                    {% if folder.artworks.exists %}
+                                    <div class="folder-thumbnails mt-2">
+                                        <div class="row g-1">
+                                            {% for artwork in folder.artworks.all|slice:":2" %}
+                                            <div class="col-6">
+                                                {% if artwork.get_display_image_url %}
+                                                    <img src="{{ artwork.get_display_image_url }}" 
+                                                         class="img-fluid rounded" 
+                                                         alt="{{ artwork.title }}"
+                                                         style="width: 100%; height: 30px; object-fit: cover;">
+                                                {% else %}
+                                                    <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                                                         style="height: 30px;">
+                                                        <i class="bi bi-image text-muted" style="font-size: 0.7rem;"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% if folder.artworks.count > 2 %}
+                                        <div class="text-center mt-1">
+                                            <small class="text-muted" style="font-size: 0.65rem;">+{{ folder.artworks.count|add:"-2" }} more</small>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                            
+                            <!-- All Artworks Option -->
+                            <div class="folder-item mb-2">
+                                <div class="folder-card bg-primary bg-opacity-25 rounded p-2 hover-highlight" 
+                                     onclick="clearFolderFilter()">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-collection me-2 text-info"></i>
+                                            <div>
+                                                <div class="folder-name fw-semibold small">All Artworks</div>
+                                                <div class="folder-count text-muted" style="font-size: 0.75rem;">
+                                                    Show all pieces
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-info">{{ artworks.count }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Portfolio Management Button -->  
+                        <div class="mt-3 pt-3 border-top border-secondary">
+                            <a href="{% url 'critique:portfolio_builder' %}" class="btn btn-sm btn-outline-light w-100">
+                                <i class="bi bi-tools me-1"></i>
+                                Organize Portfolio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Main Content Area -->
+                <div class="{% if folders %}col-lg-9 col-xl-10{% else %}col-12{% endif %} main-content">
+                    <!-- Mobile Folder Toggle -->
+                    {% if folders %}
+                    <div class="d-lg-none mb-3">
+                        <button class="btn btn-outline-primary btn-sm" onclick="toggleFolderSidebar()">
+                            <i class="bi bi-folder2 me-1"></i>
+                            Browse Folders
+                        </button>
+                    </div>
+                    {% endif %}
+                    
             <!-- Advanced Studio Filters -->
             <div class="studio-filters-panel p-4 rounded-3 shadow-sm mb-4">
                 <div class="row g-3 mb-3">
@@ -552,116 +748,6 @@
                 </div>
             </div>
             
-            <!-- Portfolio Folders Overview -->
-            {% if folders %}
-            <div class="portfolio-folders-section mb-5">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="mb-0">
-                        <i class="bi bi-folder2 me-2"></i>
-                        Portfolio Folders
-                    </h4>
-                    <a href="{% url 'critique:portfolio_builder' %}" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-tools me-1"></i>
-                        Organize Portfolio
-                    </a>
-                </div>
-                
-                <div class="row g-3">
-                    {% for folder in folders %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card folder-preview-card h-100" data-folder-id="{{ folder.id }}">
-                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0">
-                                    <i class="bi bi-folder me-2"></i>
-                                    {{ folder.name }}
-                                </h6>
-                                <span class="badge bg-light text-dark">{{ folder.artworks.count }}</span>
-                            </div>
-                            <div class="card-body p-0">
-                                {% if folder.cover_image %}
-                                <!-- Use cover image if available -->
-                                <div class="folder-cover-preview position-relative">
-                                    <a href="/folders/{{ folder.id }}/" class="d-block">
-                                        <img src="{{ folder.cover_image.url }}" 
-                                             class="img-fluid w-100 folder-cover-image" 
-                                             alt="{{ folder.name }} cover"
-                                             style="height: 200px; object-fit: cover;">
-                                    </a>
-                                    <!-- Edit cover overlay -->
-                                    <div class="position-absolute top-0 end-0 p-2">
-                                        <button type="button" 
-                                                class="btn btn-sm btn-light btn-cover-edit" 
-                                                onclick="openCoverImageUpload({{ folder.id }})"
-                                                title="Change cover image">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                    </div>
-                                    {% if folder.artworks.count > 0 %}
-                                    <div class="position-absolute bottom-0 start-0 end-0 bg-dark bg-opacity-75 text-white p-2">
-                                        <small>{{ folder.artworks.count }} artwork{{ folder.artworks.count|pluralize }}</small>
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                {% elif folder.artworks.exists %}
-                                <!-- Show artwork thumbnails if no cover image -->
-                                <div class="folder-artworks-preview p-2 position-relative">
-                                    <!-- Edit cover overlay for thumbnail folders -->
-                                    <div class="position-absolute top-0 end-0 p-2 z-1">
-                                        <button type="button" 
-                                                class="btn btn-sm btn-light btn-cover-edit" 
-                                                onclick="openCoverImageUpload({{ folder.id }})"
-                                                title="Add cover image">
-                                            <i class="bi bi-pencil"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="row g-2">
-                                        {% for artwork in folder.artworks.all|slice:":4" %}
-                                        <div class="col-6">
-                                            <div class="position-relative">
-                                                <a href="/folders/{{ folder.id }}/" class="d-block">
-                                                    {% if artwork.get_display_image_url %}
-                                                        <img src="{{ artwork.get_display_image_url }}" 
-                                                             class="img-fluid rounded folder-thumbnail" 
-                                                             alt="{{ artwork.title }}"
-                                                             style="width: 100%; height: 120px; object-fit: cover;">
-                                                    {% else %}
-                                                        <div class="bg-light d-flex align-items-center justify-content-center rounded" 
-                                                             style="height: 120px;">
-                                                            <i class="bi bi-image text-muted"></i>
-                                                        </div>
-                                                    {% endif %}
-                                                </a>
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                        {% if folder.artworks.count > 4 %}
-                                        <div class="col-12 mt-2">
-                                            <small class="text-muted">+{{ folder.artworks.count|add:"-4" }} more artworks</small>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                {% else %}
-                                <!-- Empty folder state -->
-                                <div class="text-center text-muted py-5 position-relative">
-                                    <i class="bi bi-folder-plus display-6 mb-2"></i>
-                                    <p class="mb-0 small">Empty folder</p>
-                                    <button type="button" 
-                                            class="btn btn-sm btn-outline-primary mt-2" 
-                                            onclick="openCoverImageUpload({{ folder.id }})">
-                                        Add Cover Image
-                                    </button>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-            {% endif %}
-            
             {% if artworks %}
                 <!-- Bulk Actions Bar (Hidden by default) -->
                 <div id="bulk-actions-bar" class="alert alert-info d-none mb-4">
@@ -682,7 +768,8 @@
                         <div class="col artwork-item" data-artwork-id="{{ artwork.id }}" 
                              data-status="{% if artwork.is_published %}published{% else %}draft{% endif %}"
                              data-visibility="{{ artwork.visibility|default:'public' }}"
-                             data-seeking-critique="{% if artwork.seeking_critique %}true{% else %}false{% endif %}">
+                             data-seeking-critique="{% if artwork.seeking_critique %}true{% else %}false{% endif %}"
+                             data-folder-id="{{ artwork.folder.id|default:'' }}">
                             <div class="card h-100 position-relative artwork-card">
                                 <!-- Bulk Selection Checkbox -->
                                 <div class="artwork-checkbox position-absolute top-0 start-0 p-2 d-none bulk-hidden">
@@ -917,9 +1004,11 @@
                     </a>
                 </div>
             {% endif %}
-        </div>
-    </div>
-</div>
+                </div> <!-- End Main Content -->
+            </div> <!-- End Row -->
+        </div> <!-- End Card Body -->
+    </div> <!-- End Card -->
+</div> <!-- End Container -->
 
 <script>
 // Get CSRF token
@@ -1138,7 +1227,121 @@ function clearAllFilters() {
         item.style.display = '';
     });
     
+    // Clear folder filter
+    clearFolderFilter();
+    
     localStorage.removeItem('studio_filters');
+}
+
+// Folder filtering functions
+let currentFolderId = null;
+
+function filterByFolder(folderId) {
+    currentFolderId = folderId;
+    
+    // Update active folder styling
+    document.querySelectorAll('.folder-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    const activeFolder = document.querySelector(`[data-folder-id="${folderId}"] .folder-card`);
+    if (activeFolder) {
+        activeFolder.classList.add('active');
+    }
+    
+    // Filter artworks by folder
+    document.querySelectorAll('.artwork-item').forEach(item => {
+        const artworkFolderId = item.dataset.folderId;
+        if (artworkFolderId == folderId) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    // Update statistics
+    updateFolderStatistics(folderId);
+    
+    // Close mobile sidebar
+    if (window.innerWidth < 992) {
+        toggleFolderSidebar();
+    }
+}
+
+function clearFolderFilter() {
+    currentFolderId = null;
+    
+    // Remove active styling from all folders
+    document.querySelectorAll('.folder-card').forEach(card => {
+        card.classList.remove('active');
+    });
+    
+    // Show all artworks
+    document.querySelectorAll('.artwork-item').forEach(item => {
+        item.style.display = '';
+    });
+    
+    // Update statistics
+    calculateStatistics();
+    
+    // Close mobile sidebar
+    if (window.innerWidth < 992) {
+        toggleFolderSidebar();
+    }
+}
+
+function updateFolderStatistics(folderId) {
+    const folderArtworks = document.querySelectorAll(`[data-folder-id="${folderId}"]`);
+    const totalCount = folderArtworks.length;
+    
+    let draftCount = 0;
+    let seekingCritiqueCount = 0;
+    let totalInteractions = 0;
+    
+    folderArtworks.forEach(item => {
+        if (item.dataset.status === 'draft') draftCount++;
+        if (item.dataset.seekingCritique === 'true') seekingCritiqueCount++;
+        
+        const likesElement = item.querySelector('.likes-count');
+        if (likesElement) {
+            totalInteractions += parseInt(likesElement.textContent) || 0;
+        }
+    });
+    
+    // Update display
+    document.getElementById('total-artworks').textContent = totalCount;
+    document.getElementById('draft-count').textContent = draftCount;
+    document.getElementById('seeking-critique-count').textContent = seekingCritiqueCount;
+    document.getElementById('total-interactions').textContent = totalInteractions;
+}
+
+// Mobile sidebar toggle functionality
+function toggleFolderSidebar() {
+    const sidebar = document.getElementById('folderSidebar');
+    const backdrop = document.getElementById('sidebarBackdrop') || createBackdrop();
+    
+    if (sidebar && window.innerWidth < 992) {
+        const isShowing = sidebar.classList.contains('show');
+        
+        if (isShowing) {
+            sidebar.classList.remove('show');
+            backdrop.classList.remove('show');
+            document.body.style.overflow = '';
+        } else {
+            sidebar.classList.add('show');
+            backdrop.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+    }
+}
+
+function createBackdrop() {
+    const backdrop = document.createElement('div');
+    backdrop.id = 'sidebarBackdrop';
+    backdrop.className = 'sidebar-backdrop';
+    backdrop.onclick = toggleFolderSidebar;
+    document.body.appendChild(backdrop);
+    return backdrop;
 }
 
 // Bulk Actions (remove duplicate declaration)

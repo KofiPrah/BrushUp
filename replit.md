@@ -135,6 +135,15 @@ The application is specifically configured to run in HTTP-only mode to ensure co
 
 ## Recent Changes
 
+### July 23, 2025 - Portfolio Folders Sidebar Redesign ✓
+- **Converted horizontal folders section to modern sidebar layout**: Transformed the wide Portfolio Folders section into a compact, collapsible sidebar on the left side of the Artist Studio page
+- **Enhanced user experience with interactive folder navigation**: Added folder filtering functionality with real-time statistics updates and visual feedback
+- **Implemented responsive mobile sidebar**: Created slide-in sidebar for mobile devices with backdrop overlay and smooth animations
+- **Added thumbnail previews in sidebar**: Each folder displays mini previews of contained artworks for quick visual identification
+- **Enhanced folder filtering system**: Users can now filter artworks by folder with active state styling and automatic statistics recalculation
+- **Optimized layout structure**: Main artwork grid now uses remaining space more efficiently with responsive column adjustments
+- **Added folder management integration**: Direct access to Portfolio Builder from sidebar for easy folder organization
+
 ### July 03, 2025 - Advanced Version Management System Overhaul ✓
 - **Added current_version pointer system**: Implemented foreign key relationship from ArtWork to ArtWorkVersion for tracking the active version
 - **Fixed critical deletion bug**: Prevented deletion of current versions and ensured proper version management safety
