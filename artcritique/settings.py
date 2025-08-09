@@ -86,6 +86,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
 
     # Third-party apps
+    'channels',  # Django Channels for WebSocket support
     'rest_framework',
     'corsheaders',
     'django_filters',  # Django filter backend
@@ -102,6 +103,23 @@ INSTALLED_APPS = [
 
 # django-allauth configuration
 SITE_ID = 1
+
+# Django Channels Configuration
+ASGI_APPLICATION = 'artcritique.asgi.application'
+
+# Channel layers configuration
+CHANNEL_LAYERS = {
+    'default': {
+        # Use Redis in production for scalability
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    } if os.environ.get('USE_REDIS', 'False') == 'True' else {
+        # Use in-memory channel layer for development
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    }
+}
 
 # Email configuration for allauth and password reset
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development

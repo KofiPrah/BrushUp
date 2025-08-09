@@ -23,7 +23,8 @@ The application is built on a robust Django backend with a RESTful API, compleme
 - **Frontend Technologies**: Django templates, Bootstrap 5.3.6, Vanilla JavaScript (ES6+).
 - **Database**: PostgreSQL 16.
 - **Authentication**: Django Allauth with Google OAuth.
-- **Server**: Gunicorn WSGI server.
+- **Server**: Gunicorn WSGI server with ASGI support for WebSockets.
+- **Real-Time Communication**: Django Channels with WebSocket consumers and in-memory channel layers.
 - **Image Processing**: Pillow library for artwork manipulation.
 - **Media Management**: AWS S3 integration for storage; pre-signed URLs for secure access.
 - **API Design**: Comprehensive REST API endpoints for all core functionalities, using Django REST Framework serializers.
@@ -37,6 +38,8 @@ The application is built on a robust Django backend with a RESTful API, compleme
 - **Enhanced Focus Mode**: Improved layout for artwork display, action bars, and interactive elements.
 - **Visual Polish**: Consistent styling across the platform, including enhanced filter bars, critique card highlighting, and refined reaction count styling.
 - **Achievement Badges**: Display of earned and in-progress achievement badges on user profiles.
+- **Real-Time Notifications**: WebSocket-powered live notifications with automatic fallback to polling, featuring toast notifications, badge counts, and comprehensive notification management.
+- **Advanced Search & Filtering**: Comprehensive gallery with infinite scroll, search functionality, and multiple filter options for enhanced artwork discovery.
 
 ## External Dependencies
 
@@ -49,6 +52,9 @@ The application is built on a robust Django backend with a RESTful API, compleme
 - `gunicorn`
 - `boto3`
 - `pillow`
+- `channels` (Django Channels for WebSocket support)
+- `channels-redis` (Redis backend for channel layers)
+- `asgiref` (ASGI utilities for async operations)
 
 ### Frontend Dependencies
 - `Bootstrap 5.3.6`

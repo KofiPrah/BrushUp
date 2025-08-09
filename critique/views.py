@@ -75,6 +75,13 @@ def gallery_demo_view(request):
     """
     return render(request, 'critique/gallery_demo.html')
 
+@login_required
+def notifications_demo_view(request):
+    """
+    Phase 13 real-time notifications demo view for testing WebSocket functionality.
+    """
+    return render(request, 'critique/notifications_demo.html')
+
 class ArtWorkListView(ListView):
     """
     View for displaying a list of all artworks with search and filtering capabilities.

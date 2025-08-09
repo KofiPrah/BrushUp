@@ -1,0 +1,383 @@
+{% extends "critique/base.html" %}
+{% load static %}
+
+{% block title %}Real-Time Notifications Demo - Brush Up{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h3 mb-0">Real-Time Notifications Demo</h1>
+                <small class="text-muted">Test WebSocket notifications and fallback polling</small>
+            </div>
+            <div class="card-body">
+                <!-- Connection Status -->
+                <div class="alert alert-info" id="connectionStatusAlert">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm me-2" id="connectionSpinner"></div>
+                        <div>
+                            <strong>Connection Status:</strong>
+                            <span id="connectionStatusText">Connecting to WebSocket...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Controls -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">Test Notifications</div>
+                            <div class="card-body">
+                                <button class="btn btn-primary mb-2 w-100" onclick="testCritiqueNotification()">
+                                    <i class="bi bi-chat-text"></i> Test Critique Notification
+                                </button>
+                                <button class="btn btn-success mb-2 w-100" onclick="testReactionNotification()">
+                                    <i class="bi bi-heart"></i> Test Reaction Notification
+                                </button>
+                                <button class="btn btn-warning mb-2 w-100" onclick="testLikeNotification()">
+                                    <i class="bi bi-star"></i> Test Like Notification
+                                </button>
+                                <hr>
+                                <button class="btn btn-secondary w-100" onclick="requestNotificationsList()">
+                                    <i class="bi bi-list"></i> Load Recent Notifications
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">Connection Controls</div>
+                            <div class="card-body">
+                                <button class="btn btn-info mb-2 w-100" onclick="reconnectWebSocket()">
+                                    <i class="bi bi-arrow-clockwise"></i> Reconnect WebSocket
+                                </button>
+                                <button class="btn btn-danger mb-2 w-100" onclick="disconnectWebSocket()">
+                                    <i class="bi bi-x-circle"></i> Disconnect WebSocket
+                                </button>
+                                <button class="btn btn-secondary w-100" onclick="togglePollingFallback()">
+                                    <i class="bi bi-clock"></i> Toggle Polling Fallback
+                                </button>
+                                <hr>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enableToasts" checked>
+                                    <label class="form-check-label" for="enableToasts">
+                                        Enable Toast Notifications
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Notifications Count -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row text-center">
+                                    <div class="col-4">
+                                        <h5 class="card-title">Unread</h5>
+                                        <span class="badge bg-danger fs-4" id="unreadCountDisplay">0</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 class="card-title">Total</h5>
+                                        <span class="badge bg-info fs-4" id="totalNotificationsDisplay">0</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <h5 class="card-title">Connection</h5>
+                                        <span class="badge bg-secondary fs-6" id="connectionTypeDisplay">None</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Log -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Live Activity Log</span>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="clearLog()">
+                            <i class="bi bi-trash"></i> Clear Log
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="activityLog" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; background-color: #f8f9fa; font-family: 'Courier New', monospace; font-size: 12px;">
+                            <div class="text-muted">Notification system initializing...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="alert alert-info mt-4">
+                    <h6><i class="bi bi-info-circle"></i> How to Test:</h6>
+                    <ol class="mb-0">
+                        <li><strong>WebSocket Test:</strong> Use the test buttons above to simulate notifications</li>
+                        <li><strong>Real Notifications:</strong> Open another browser tab, create artwork, and post critiques</li>
+                        <li><strong>Fallback Test:</strong> Disconnect WebSocket to test polling fallback</li>
+                        <li><strong>Multi-tab Test:</strong> Open this page in multiple tabs to see real-time sync</li>
+                        <li><strong>Network Test:</strong> Try disconnecting/reconnecting internet to test resilience</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let activityLog = [];
+
+// Logging function
+function logActivity(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${type.toUpperCase()}: ${message}`;
+    activityLog.push(logEntry);
+    
+    // Keep only last 50 entries
+    if (activityLog.length > 50) {
+        activityLog.shift();
+    }
+    
+    updateLogDisplay();
+    console.log(logEntry);
+}
+
+function updateLogDisplay() {
+    const logElement = document.getElementById('activityLog');
+    if (logElement) {
+        logElement.innerHTML = activityLog.map(entry => 
+            `<div style="margin-bottom: 3px;">${entry}</div>`
+        ).join('');
+        logElement.scrollTop = logElement.scrollHeight;
+    }
+}
+
+function clearLog() {
+    activityLog = [];
+    updateLogDisplay();
+}
+
+// Test functions
+function testCritiqueNotification() {
+    logActivity('Simulating critique notification...', 'test');
+    if (window.notificationManager) {
+        // Simulate a new notification
+        const testNotification = {
+            id: Math.floor(Math.random() * 1000),
+            type: 'critique_posted',
+            title: 'New Critique Posted',
+            message: 'TestUser posted a critique on your artwork: "Mountain Landscape"',
+            url: '/artworks/123/',
+            read: false,
+            created_at: new Date().toISOString()
+        };
+        window.notificationManager.handleNewNotification(testNotification);
+        logActivity('Test critique notification sent', 'test');
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+function testReactionNotification() {
+    logActivity('Simulating reaction notification...', 'test');
+    if (window.notificationManager) {
+        const testNotification = {
+            id: Math.floor(Math.random() * 1000),
+            type: 'reaction_received',
+            title: 'New Reaction',
+            message: 'AnotherUser found your critique helpful on "Abstract Art Piece"',
+            url: '/artworks/456/',
+            read: false,
+            created_at: new Date().toISOString()
+        };
+        window.notificationManager.handleNewNotification(testNotification);
+        logActivity('Test reaction notification sent', 'test');
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+function testLikeNotification() {
+    logActivity('Simulating like notification...', 'test');
+    if (window.notificationManager) {
+        const testNotification = {
+            id: Math.floor(Math.random() * 1000),
+            type: 'artwork_liked',
+            title: 'Artwork Liked',
+            message: 'CoolUser liked your artwork: "Digital Portrait"',
+            url: '/artworks/789/',
+            read: false,
+            created_at: new Date().toISOString()
+        };
+        window.notificationManager.handleNewNotification(testNotification);
+        logActivity('Test like notification sent', 'test');
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+function requestNotificationsList() {
+    logActivity('Requesting notifications list...', 'test');
+    if (window.notificationManager) {
+        window.notificationManager.requestInitialNotifications();
+        logActivity('Notifications list requested', 'test');
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+function reconnectWebSocket() {
+    logActivity('Attempting WebSocket reconnection...', 'action');
+    if (window.notificationManager) {
+        window.notificationManager.reconnect();
+        logActivity('WebSocket reconnection initiated', 'action');
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+function disconnectWebSocket() {
+    logActivity('Disconnecting WebSocket...', 'action');
+    if (window.notificationManager) {
+        window.notificationManager.disconnect();
+        logActivity('WebSocket disconnected', 'action');
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+function togglePollingFallback() {
+    logActivity('Toggling polling fallback...', 'action');
+    if (window.notificationManager) {
+        if (window.notificationManager.pollTimer) {
+            window.notificationManager.stopPolling();
+            logActivity('Polling stopped', 'action');
+        } else {
+            window.notificationManager.startPolling();
+            logActivity('Polling started', 'action');
+        }
+    } else {
+        logActivity('NotificationManager not available', 'error');
+    }
+}
+
+// Override console methods to capture logs
+const originalLog = console.log;
+const originalError = console.error;
+
+console.log = function(...args) {
+    originalLog.apply(console, args);
+    if (args[0] && typeof args[0] === 'string' && args[0].includes('WebSocket')) {
+        logActivity(args[0], 'websocket');
+        updateConnectionStatus();
+    }
+};
+
+console.error = function(...args) {
+    originalError.apply(console, args);
+    if (args[0] && typeof args[0] === 'string') {
+        logActivity(args[0], 'error');
+        updateConnectionStatus();
+    }
+};
+
+// Update connection status display
+function updateConnectionStatus() {
+    const statusAlert = document.getElementById('connectionStatusAlert');
+    const statusText = document.getElementById('connectionStatusText');
+    const connectionSpinner = document.getElementById('connectionSpinner');
+    const connectionTypeDisplay = document.getElementById('connectionTypeDisplay');
+    
+    if (window.notificationManager) {
+        const isConnected = window.notificationManager.isConnected;
+        const hasPolling = window.notificationManager.pollTimer !== null;
+        
+        if (isConnected) {
+            statusAlert.className = 'alert alert-success';
+            statusText.textContent = 'Connected via WebSocket';
+            connectionSpinner.style.display = 'none';
+            connectionTypeDisplay.textContent = 'WebSocket';
+            connectionTypeDisplay.className = 'badge bg-success fs-6';
+        } else if (hasPolling) {
+            statusAlert.className = 'alert alert-warning';
+            statusText.textContent = 'Connected via Polling Fallback';
+            connectionSpinner.style.display = 'none';
+            connectionTypeDisplay.textContent = 'Polling';
+            connectionTypeDisplay.className = 'badge bg-warning fs-6';
+        } else {
+            statusAlert.className = 'alert alert-danger';
+            statusText.textContent = 'Disconnected';
+            connectionSpinner.style.display = 'none';
+            connectionTypeDisplay.textContent = 'Offline';
+            connectionTypeDisplay.className = 'badge bg-danger fs-6';
+        }
+    } else {
+        statusAlert.className = 'alert alert-secondary';
+        statusText.textContent = 'Notification system not initialized';
+        connectionSpinner.style.display = 'inline-block';
+        connectionTypeDisplay.textContent = 'None';
+        connectionTypeDisplay.className = 'badge bg-secondary fs-6';
+    }
+}
+
+// Monitor notification count changes
+function updateNotificationCounts() {
+    const unreadCountElement = document.getElementById('unreadCountDisplay');
+    const totalNotificationsElement = document.getElementById('totalNotificationsDisplay');
+    
+    if (window.notificationManager) {
+        const unreadCount = window.notificationManager.unreadCount || 0;
+        const totalNotifications = window.notificationManager.notifications?.length || 0;
+        
+        if (unreadCountElement) {
+            unreadCountElement.textContent = unreadCount;
+        }
+        if (totalNotificationsElement) {
+            totalNotificationsElement.textContent = totalNotifications;
+        }
+    }
+}
+
+// Check for toast preferences
+document.getElementById('enableToasts')?.addEventListener('change', function() {
+    if (window.notificationManager) {
+        window.notificationManager.options.enableToastNotifications = this.checked;
+        logActivity(`Toast notifications ${this.checked ? 'enabled' : 'disabled'}`, 'setting');
+    }
+});
+
+// Initialize demo
+document.addEventListener('DOMContentLoaded', function() {
+    logActivity('Notifications demo page loaded', 'info');
+    
+    // Wait for notification manager to initialize
+    let checkCount = 0;
+    const checkNotificationManager = setInterval(() => {
+        checkCount++;
+        if (window.notificationManager) {
+            clearInterval(checkNotificationManager);
+            logActivity('NotificationManager found and initialized', 'success');
+            updateConnectionStatus();
+            updateNotificationCounts();
+            
+            // Set up periodic status updates
+            setInterval(() => {
+                updateConnectionStatus();
+                updateNotificationCounts();
+            }, 2000);
+            
+        } else if (checkCount > 10) {
+            clearInterval(checkNotificationManager);
+            logActivity('NotificationManager failed to initialize after 10 seconds', 'error');
+        }
+    }, 1000);
+    
+    // Initial log entry
+    logActivity('Demo initialized, waiting for NotificationManager...', 'info');
+});
+</script>
+{% endblock %}
