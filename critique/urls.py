@@ -48,6 +48,7 @@ urlpatterns = [
     # Authentication test
     path('auth-test/', views.auth_test, name='auth_test'),
     
-    # Real-time notifications demo
+    # Real-time notifications
     path('notifications-demo/', views.notifications_demo_view, name='notifications_demo'),
+    path('notifications-status/', views.notifications_status_view, name='notifications_status'),
 ]

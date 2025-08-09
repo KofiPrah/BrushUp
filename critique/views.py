@@ -82,6 +82,12 @@ def notifications_demo_view(request):
     """
     return render(request, 'critique/notifications_demo.html')
 
+def notifications_status_view(request):
+    """
+    Status page showing the current state of the notification system implementation.
+    """
+    return render(request, 'critique/notifications_status.html')
+
 class ArtWorkListView(ListView):
     """
     View for displaying a list of all artworks with search and filtering capabilities.

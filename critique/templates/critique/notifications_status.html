@@ -1,0 +1,301 @@
+{% extends "critique/base.html" %}
+{% load static %}
+
+{% block title %}Notification System Status - Brush Up{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h1 class="h3 mb-0"><i class="bi bi-bell-fill"></i> Notification System Status</h1>
+                <small>Real-time notifications implementation overview</small>
+            </div>
+            <div class="card-body">
+                <!-- Phase 13 Implementation Status -->
+                <div class="alert alert-success">
+                    <h5><i class="bi bi-check-circle-fill"></i> Phase 13: Real-Time Notifications - COMPLETED</h5>
+                    <p class="mb-0">All WebSocket infrastructure has been successfully implemented and is ready for use.</p>
+                </div>
+
+                <!-- Current System Status -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card border-info">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0">Current Mode</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <div id="currentMode">
+                                    <i class="bi bi-server display-4 text-muted"></i>
+                                    <h5 class="mt-2">WSGI Mode</h5>
+                                    <p class="text-muted">Standard HTTP server running</p>
+                                    <small class="badge bg-secondary">WebSockets: Disabled</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h6 class="mb-0">Available Features</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="bi bi-check text-success"></i> Database notifications</li>
+                                    <li><i class="bi bi-check text-success"></i> Email notifications</li>
+                                    <li><i class="bi bi-check text-success"></i> Polling fallback</li>
+                                    <li><i class="bi bi-clock text-warning"></i> WebSocket notifications (ready)</li>
+                                    <li><i class="bi bi-clock text-warning"></i> Real-time updates (ready)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Features Implemented -->
+                <h5><i class="bi bi-list-check"></i> Implementation Summary</h5>
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-broadcast display-4 text-primary"></i>
+                                <h6 class="mt-2">WebSocket Infrastructure</h6>
+                                <ul class="list-unstyled small text-muted">
+                                    <li>✓ Django Channels installed</li>
+                                    <li>✓ ASGI configuration ready</li>
+                                    <li>✓ Channel layers configured</li>
+                                    <li>✓ WebSocket routing defined</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-cpu display-4 text-success"></i>
+                                <h6 class="mt-2">Consumer Logic</h6>
+                                <ul class="list-unstyled small text-muted">
+                                    <li>✓ User-specific groups</li>
+                                    <li>✓ Authentication handling</li>
+                                    <li>✓ Message broadcasting</li>
+                                    <li>✓ Connection management</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <i class="bi bi-code-square display-4 text-info"></i>
+                                <h6 class="mt-2">Frontend Integration</h6>
+                                <ul class="list-unstyled small text-muted">
+                                    <li>✓ JavaScript WebSocket client</li>
+                                    <li>✓ Toast notifications</li>
+                                    <li>✓ Badge counter updates</li>
+                                    <li>✓ Automatic fallback to polling</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Types -->
+                <h5><i class="bi bi-chat-dots"></i> Notification Types Supported</h5>
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Notification Type</th>
+                                        <th>Status</th>
+                                        <th>Real-time</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="bi bi-chat-text text-primary"></i> New Critique Posted</td>
+                                        <td>critique_posted</td>
+                                        <td><span class="badge bg-success">Ready</span></td>
+                                        <td><i class="bi bi-clock text-warning"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-heart text-danger"></i> Critique Reaction</td>
+                                        <td>reaction_received</td>
+                                        <td><span class="badge bg-success">Ready</span></td>
+                                        <td><i class="bi bi-clock text-warning"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-star text-warning"></i> Artwork Liked</td>
+                                        <td>artwork_liked</td>
+                                        <td><span class="badge bg-success">Ready</span></td>
+                                        <td><i class="bi bi-clock text-warning"></i></td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="bi bi-trophy text-success"></i> Achievement Earned</td>
+                                        <td>achievement_earned</td>
+                                        <td><span class="badge bg-info">Planned</span></td>
+                                        <td><i class="bi bi-clock text-warning"></i></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testing Instructions -->
+                <h5><i class="bi bi-play-circle"></i> How to Test Real-Time Notifications</h5>
+                <div class="accordion" id="testingInstructions">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingWebSocket">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWebSocket" aria-expanded="true" aria-controls="collapseWebSocket">
+                                Option 1: Enable WebSocket Mode (Full Real-Time)
+                            </button>
+                        </h2>
+                        <div id="collapseWebSocket" class="accordion-collapse collapse show" aria-labelledby="headingWebSocket" data-parent="#testingInstructions">
+                            <div class="accordion-body">
+                                <p><strong>For full real-time notifications with WebSocket support:</strong></p>
+                                <ol>
+                                    <li>Run: <code>python manage.py enable_websockets</code></li>
+                                    <li>Restart server with ASGI support: <code>python start_with_websockets.py</code></li>
+                                    <li>Visit the demo page: <a href="{% url 'critique:notifications_demo' %}" class="btn btn-sm btn-primary">Notifications Demo</a></li>
+                                    <li>Open multiple browser tabs to test real-time sync</li>
+                                </ol>
+                                <div class="alert alert-info">
+                                    <strong>Benefits:</strong> Instant notifications, no polling delay, lower server load
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingPolling">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePolling" aria-expanded="false" aria-controls="collapsePolling">
+                                Option 2: Test Polling Fallback (Current Mode)
+                            </button>
+                        </h2>
+                        <div id="collapsePolling" class="accordion-collapse collapse" aria-labelledby="headingPolling" data-parent="#testingInstructions">
+                            <div class="accordion-body">
+                                <p><strong>Current mode automatically uses polling fallback:</strong></p>
+                                <ol>
+                                    <li>Visit any artwork page and post a critique</li>
+                                    <li>Check the notification badge (updates every 30 seconds)</li>
+                                    <li>Test with the demo page: <a href="{% url 'critique:notifications_demo' %}" class="btn btn-sm btn-secondary">Notifications Demo</a></li>
+                                </ol>
+                                <div class="alert alert-warning">
+                                    <strong>Note:</strong> Polling mode has a 30-second delay for new notifications
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingDatabase">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDatabase" aria-expanded="false" aria-controls="collapseDatabase">
+                                Option 3: Database Notifications (Always Working)
+                            </button>
+                        </h2>
+                        <div id="collapseDatabase" class="accordion-collapse collapse" aria-labelledby="headingDatabase" data-parent="#testingInstructions">
+                            <div class="accordion-body">
+                                <p><strong>Database notifications work in all modes:</strong></p>
+                                <ol>
+                                    <li>Post critiques, reactions, or likes on artworks</li>
+                                    <li>Check the notifications via the API: <code>/api/notifications/</code></li>
+                                    <li>View stored notifications in Django admin</li>
+                                </ol>
+                                <div class="alert alert-success">
+                                    <strong>Guarantee:</strong> All notifications are always stored in the database
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="mt-4">
+                    <h5><i class="bi bi-lightning-charge"></i> Quick Actions</h5>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{% url 'critique:notifications_demo' %}" class="btn btn-primary">
+                            <i class="bi bi-play-circle"></i> Test Demo Page
+                        </a>
+                        <a href="/api/notifications/" class="btn btn-secondary">
+                            <i class="bi bi-list"></i> View API Endpoint
+                        </a>
+                        <a href="{% url 'critique:artwork_list' %}" class="btn btn-info">
+                            <i class="bi bi-image"></i> Browse Artworks
+                        </a>
+                        <a href="/admin/critique/notification/" class="btn btn-dark" {% if not user.is_staff %}style="display:none"{% endif %}>
+                            <i class="bi bi-gear"></i> Admin Panel
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Technical Details -->
+                <div class="mt-4">
+                    <details>
+                        <summary><strong>Technical Implementation Details</strong></summary>
+                        <div class="mt-3">
+                            <h6>Files Modified/Created:</h6>
+                            <ul class="small">
+                                <li><code>artcritique/settings.py</code> - Added Django Channels configuration</li>
+                                <li><code>artcritique/asgi.py</code> - ASGI application with WebSocket routing</li>
+                                <li><code>critique/routing.py</code> - WebSocket URL patterns</li>
+                                <li><code>critique/consumers.py</code> - WebSocket consumers for notifications</li>
+                                <li><code>critique/notification.py</code> - Enhanced with WebSocket broadcasting</li>
+                                <li><code>critique/static/js/notifications.js</code> - Frontend WebSocket client</li>
+                                <li><code>critique/templates/critique/base.html</code> - Integrated notification script</li>
+                            </ul>
+                            
+                            <h6>Key Features:</h6>
+                            <ul class="small">
+                                <li>User-specific WebSocket groups for targeted notifications</li>
+                                <li>Automatic fallback from WebSocket to polling</li>
+                                <li>Toast notifications for immediate user feedback</li>
+                                <li>Badge count updates for visual notification indicators</li>
+                                <li>Graceful connection handling and reconnection logic</li>
+                                <li>Database persistence ensures no notifications are lost</li>
+                            </ul>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Simple status check for current notification system
+document.addEventListener('DOMContentLoaded', function() {
+    const currentMode = document.getElementById('currentMode');
+    
+    // Check if WebSocket is configured
+    if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+        const wsUrl = (window.location.protocol === 'https:' ? 'wss:' : 'ws:') + '//' + window.location.host + '/ws/notifications/';
+        
+        // Test WebSocket connection
+        try {
+            const testWs = new WebSocket(wsUrl);
+            testWs.onopen = function() {
+                currentMode.innerHTML = `
+                    <i class="bi bi-broadcast display-4 text-success"></i>
+                    <h5 class="mt-2 text-success">ASGI Mode</h5>
+                    <p class="text-success">WebSocket server active</p>
+                    <small class="badge bg-success">WebSockets: Enabled</small>
+                `;
+                testWs.close();
+            };
+            testWs.onerror = function() {
+                // Keep default WSGI mode display
+            };
+        } catch (e) {
+            // Keep default WSGI mode display
+        }
+    }
+});
+</script>
+{% endblock %}

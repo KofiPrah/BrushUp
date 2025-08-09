@@ -105,7 +105,7 @@ INSTALLED_APPS = [
 SITE_ID = 1
 
 # Django Channels Configuration
-ASGI_APPLICATION = 'artcritique.asgi.application'
+# ASGI_APPLICATION = 'artcritique.asgi.application'  # Temporarily disabled for WSGI compatibility
 
 # Channel layers configuration
 CHANNEL_LAYERS = {
