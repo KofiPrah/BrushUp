@@ -30,14 +30,6 @@ ALLOWED_HOSTS = ['*', '.replit.app']
 
 # Get Replit domain from environment
 REPLIT_DOMAIN = os.environ.get('REPLIT_DOMAIN', '*')
-CSRF_TRUSTED_ORIGINS = [
-    'https://brushup.replit.app',
-    'https://*.replit.app',
-    'https://*.replit.dev',
-    'https://61dced89-3318-4924-8e29-81233afc8678-00-qa67r5b70zxi.worf.replit.dev',
-    f'https://{REPLIT_DOMAIN}',
-    f'https://*.{REPLIT_DOMAIN}'
-]
 
 # Configure SSL based on environment variable
 # Forced to False for Replit to work with the load balancer
@@ -131,11 +123,11 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # CORS middleware
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'critique.middleware.ReplitCSRFMiddleware',  # Custom CSRF middleware for Replit compatibility
     'critique.api.middleware.FixImageUrlsMiddleware',  # Fix relative image URLs
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'critique.middleware.ReplitHeadersMiddleware',  # Headers for Replit compatibility
     'allauth.account.middleware.AccountMiddleware',  # Required for django-allauth
 ]
 
@@ -303,6 +295,26 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_SAMESITE = 'Lax'  # For development only, should be more restrictive in production
 CORS_ALLOW_CREDENTIALS = True
+
+# CSRF settings for Replit preview environment compatibility
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = False  # Allow CSRF cookies over HTTP in development
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5000',
+    'http://127.0.0.1:5000',
+    'https://brushup.replit.app',
+    'https://*.replit.app',
+    'https://*.replit.dev',
+    'https://*.repl.co',
+    'https://61dced89-3318-4924-8e29-81233afc8678-00-qa67r5b70zxi.worf.replit.dev',
+    f'https://{REPLIT_DOMAIN}',
+    f'https://*.{REPLIT_DOMAIN}'
+]
+
+# Session settings for better preview compatibility
+SESSION_COOKIE_SECURE = False  # Allow session cookies over HTTP in development
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 3600 * 24 * 7  # 1 week
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
