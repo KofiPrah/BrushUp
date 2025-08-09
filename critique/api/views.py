@@ -180,6 +180,36 @@ class ArtWorkViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @action(detail=False, methods=['get'], url_path='infinite-scroll')
+    def infinite_scroll(self, request):
+        """
+        Infinite scroll endpoint optimized for mobile and desktop gallery.
+        
+        Returns artwork data optimized for infinite scrolling with smaller page sizes
+        and efficient loading. Uses InfiniteScrollPagination for better UX.
+        
+        Parameters:
+        - page: Page number to load
+        - page_size: Number of items per page (max 24)
+        - All standard filtering and search parameters apply
+        
+        Example: /api/artworks/infinite-scroll/?page=2&search=landscape
+        """
+        # Use specialized pagination for infinite scroll
+        self.pagination_class = InfiniteScrollPagination
+        
+        # Get the same filtered queryset as the main list
+        queryset = self.filter_queryset(self.get_queryset())
+        
+        # Paginate and return
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
     def retrieve(self, request, *args, **kwargs):
         """Override retrieve to enforce artwork and folder visibility rules."""
         artwork = self.get_object()

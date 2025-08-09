@@ -69,6 +69,12 @@ def auth_test(request):
     """
     return render(request, 'critique/auth_test.html')
 
+def gallery_demo_view(request):
+    """
+    Phase 11 gallery demo view showcasing search, filtering, and pagination features.
+    """
+    return render(request, 'critique/gallery_demo.html')
+
 class ArtWorkListView(ListView):
     """
     View for displaying a list of all artworks with search and filtering capabilities.

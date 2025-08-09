@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('api/', views.api_root, name='api-root'),
     path('artworks/', views.ArtWorkListView.as_view(), name='artwork_list'),
+    path('gallery-demo/', views.gallery_demo_view, name='gallery_demo'),
     path('artworks/<int:pk>/', views.ArtWorkDetailView.as_view(), name='artwork_detail'),
     path('artworks/upload/', views.artwork_upload_view, name='artwork_upload'),
     path('artworks/<int:pk>/edit/', views.ArtWorkEditView.as_view(), name='artwork_edit'),

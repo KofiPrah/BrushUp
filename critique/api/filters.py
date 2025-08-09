@@ -51,11 +51,21 @@ class ArtWorkFilter(django_filters.FilterSet):
     )
     
     # Visibility filtering (for Phase 12 - private/public artworks)
-    # This field doesn't exist yet but is prepared for future use
-    # visibility = django_filters.ChoiceFilter(
-    #     choices=[('public', 'Public'), ('private', 'Private')],
-    #     help_text="Filter by visibility"
-    # )
+    visibility = django_filters.ChoiceFilter(
+        choices=[('public', 'Public'), ('private', 'Private'), ('unlisted', 'Unlisted')],
+        help_text="Filter by artwork visibility"
+    )
+    
+    # Folder filtering
+    folder = django_filters.ModelChoiceFilter(
+        queryset=None,  # Will be set dynamically based on user permissions
+        help_text="Filter by folder"
+    )
+    
+    folder__name = django_filters.CharFilter(
+        lookup_expr='icontains',
+        help_text="Filter by folder name (partial match)"
+    )
     
     class Meta:
         model = ArtWork

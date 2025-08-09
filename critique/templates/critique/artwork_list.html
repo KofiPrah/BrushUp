@@ -158,6 +158,87 @@
                 <p>No artworks have been added yet. <a href="{% url 'critique:artwork_upload' %}" class="btn btn-primary btn-sm ms-2">Upload First Artwork</a></p>
             </div>
         {% endif %}
+
+        <!-- Pagination Controls -->
+        {% if is_paginated %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <nav aria-label="Artwork pagination">
+                    <ul class="pagination justify-content-center">
+                        <!-- Previous page -->
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link bg-dark border-secondary text-white" 
+                                   href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link bg-secondary border-secondary text-muted">
+                                    <i class="bi bi-chevron-left"></i> Previous
+                                </span>
+                            </li>
+                        {% endif %}
+                        
+                        <!-- Page numbers -->
+                        {% for page_num in page_obj.paginator.page_range %}
+                            {% if page_num == page_obj.number %}
+                                <li class="page-item active">
+                                    <span class="page-link bg-primary border-primary">{{ page_num }}</span>
+                                </li>
+                            {% elif page_num > page_obj.number|add:'-3' and page_num < page_obj.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link bg-dark border-secondary text-white" 
+                                       href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_num }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% elif page_num == 1 or page_num == page_obj.paginator.num_pages %}
+                                <li class="page-item">
+                                    <a class="page-link bg-dark border-secondary text-white" 
+                                       href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_num }}">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                                {% if page_num == 1 and page_obj.number > 4 %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link bg-secondary border-secondary">...</span>
+                                    </li>
+                                {% elif page_num == page_obj.paginator.num_pages and page_obj.number < page_obj.paginator.num_pages|add:'-3' %}
+                                    <li class="page-item disabled">
+                                        <span class="page-link bg-secondary border-secondary">...</span>
+                                    </li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        <!-- Next page -->
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link bg-dark border-secondary text-white" 
+                                   href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link bg-secondary border-secondary text-muted">
+                                    Next <i class="bi bi-chevron-right"></i>
+                                </span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                
+                <!-- Pagination Info -->
+                <p class="text-center text-muted mt-2">
+                    Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} 
+                    of {{ page_obj.paginator.count }} artworks
+                </p>
+            </div>
+        </div>
+        {% endif %}
     </div>
 
     <!-- JavaScript for Enhanced Search Functionality -->

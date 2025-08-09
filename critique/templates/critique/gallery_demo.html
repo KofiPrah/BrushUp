@@ -1,0 +1,213 @@
+{% extends 'critique/base.html' %}
+
+{% load static %}
+
+{% block title %}Gallery Demo - Phase 11 Implementation{% endblock %}
+
+{% block extra_css %}
+<style>
+    .artwork-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .artwork-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+    
+    .filter-section {
+        background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .gallery-tabs .nav-link {
+        color: #adb5bd;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        margin-right: 0.5rem;
+    }
+    
+    .gallery-tabs .nav-link.active {
+        background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center mb-5">
+                <h1 class="display-4 text-gradient mb-3">Phase 11: Gallery & Search Demo</h1>
+                <p class="lead text-muted">
+                    Interactive gallery with advanced search, filtering, and pagination features
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <span class="badge bg-success fs-6">✓ Backend Search & Filtering</span>
+                    <span class="badge bg-success fs-6">✓ Frontend Gallery</span>
+                    <span class="badge bg-success fs-6">✓ Pagination</span>
+                    <span class="badge bg-success fs-6">✓ Popularity Sorting</span>
+                </div>
+            </div>
+            
+            <!-- Gallery Mode Tabs -->
+            <ul class="nav nav-tabs gallery-tabs justify-content-center mb-4" id="galleryTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="django-tab" data-bs-toggle="tab" data-bs-target="#django-gallery" type="button" role="tab">
+                        <i class="bi bi-server"></i> Django Template Gallery
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="api-tab" data-bs-toggle="tab" data-bs-target="#api-gallery" type="button" role="tab">
+                        <i class="bi bi-code-slash"></i> JavaScript API Gallery
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="galleryTabsContent">
+                <!-- Django Template Gallery -->
+                <div class="tab-pane fade show active" id="django-gallery" role="tabpanel">
+                    <div class="alert alert-info">
+                        <h5><i class="bi bi-info-circle"></i> Django Template Gallery</h5>
+                        <p class="mb-0">Traditional server-side rendered gallery with pagination. This uses Django's ListView with comprehensive filtering and search capabilities.</p>
+                        <div class="mt-2">
+                            <a href="{% url 'critique:artwork_list' %}" class="btn btn-primary btn-sm">
+                                View Full Django Gallery
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Mini version of the Django gallery for demo -->
+                    <div class="card bg-dark border-secondary mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Django Template Features</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>✓ Search & Filtering Features:</h6>
+                                    <ul class="text-muted">
+                                        <li>Full-text search (title, description, tags, artist)</li>
+                                        <li>Filter by artist username</li>
+                                        <li>Filter by medium</li>
+                                        <li>Date range filtering</li>
+                                        <li>Popularity-based sorting</li>
+                                        <li>Multiple sort options</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>✓ User Experience:</h6>
+                                    <ul class="text-muted">
+                                        <li>Collapsible advanced filters</li>
+                                        <li>Search result summaries</li>
+                                        <li>Pagination with page numbers</li>
+                                        <li>Responsive grid layout</li>
+                                        <li>Clear all filters functionality</li>
+                                        <li>Auto-submit on sort change</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- JavaScript API Gallery -->
+                <div class="tab-pane fade" id="api-gallery" role="tabpanel">
+                    <div class="alert alert-success">
+                        <h5><i class="bi bi-lightning"></i> JavaScript API Gallery</h5>
+                        <p class="mb-0">Dynamic client-side gallery powered by the REST API with infinite scroll capabilities and real-time filtering.</p>
+                    </div>
+                    
+                    <!-- This div will be populated by the JavaScript gallery component -->
+                    <div id="artworkGalleryApp"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- API Endpoints Reference -->
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-dark border-secondary">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-api"></i> Phase 11 API Endpoints
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Main Gallery API</h6>
+                            <code class="text-info">/api/artworks/</code>
+                            <p class="text-muted small mt-1">
+                                Standard paginated gallery with comprehensive search and filtering
+                            </p>
+                            
+                            <h6 class="mt-3">Infinite Scroll API</h6>
+                            <code class="text-info">/api/artworks/infinite-scroll/</code>
+                            <p class="text-muted small mt-1">
+                                Optimized for infinite scrolling with smaller page sizes
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Example API Calls:</h6>
+                            <div class="bg-secondary p-2 rounded">
+                                <small>
+                                    <code class="text-warning"># Search artworks</code><br>
+                                    <code>/api/artworks/?search=landscape</code><br><br>
+                                    
+                                    <code class="text-warning"># Filter by artist</code><br>
+                                    <code>/api/artworks/?author__username=artist</code><br><br>
+                                    
+                                    <code class="text-warning"># Sort by popularity</code><br>
+                                    <code>/api/artworks/?ordering=-popularity_score</code><br><br>
+                                    
+                                    <code class="text-warning"># Infinite scroll page 2</code><br>
+                                    <code>/api/artworks/infinite-scroll/?page=2</code>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Include the gallery JavaScript component -->
+<script src="{% static 'js/gallery.js' %}"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Tab switching handler
+    const tabLinks = document.querySelectorAll('#galleryTabs .nav-link');
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // If switching to API gallery tab and gallery isn't initialized yet
+            if (this.id === 'api-tab') {
+                setTimeout(() => {
+                    // Check if gallery already exists
+                    if (!window.artworkGallery && document.getElementById('artworkGalleryApp')) {
+                        // Initialize the JavaScript gallery
+                        window.artworkGallery = new ArtworkGallery('artworkGalleryApp', {
+                            pageSize: 8,
+                            loadMoreButton: true,
+                            autoInfiniteScroll: false
+                        });
+                    }
+                }, 100);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
