@@ -1,286 +1,61 @@
 # Brush Up - Art Critique Platform
 
 ## Overview
+Brush Up is a Django-powered web application designed for art professionals to share, critique, and engage with creative works digitally. It offers user authentication via Google OAuth, secure artwork uploads with S3 storage, a comprehensive critique system with reactions, and a karma point system to foster community contributions. The platform aims to facilitate innovative digital interactions within the art community, providing a robust environment for artistic exchange and feedback.
 
-Brush Up (formerly Art Critique) is a Django-powered web application that provides a comprehensive platform for art professionals to share, critique, and engage with creative works through innovative digital interactions. The platform features user authentication via Google OAuth, artwork uploads with S3 storage integration, a critique system with reactions, and a karma point system for community contributions.
+## User Preferences
+Preferred communication style: Simple, everyday language.
 
 ## System Architecture
 
-### Backend Architecture
-- **Framework**: Django 5.0.2 with Django REST Framework for API endpoints
-- **Server**: Gunicorn WSGI server optimized for production deployment
-- **Database**: PostgreSQL for primary data storage
-- **Authentication**: Django Allauth with Google OAuth integration
-- **API**: RESTful API with comprehensive serializers for frontend integration
+### Core Design Principles
+The application is built on a robust Django backend with a RESTful API, complemented by Django templates and vanilla JavaScript for a responsive and dynamic frontend. Key architectural decisions include:
+- **Scalable Media Storage**: Integration with AWS S3 for efficient and scalable handling of artwork uploads.
+- **Secure Authentication**: Utilizing Google OAuth via Django Allauth for seamless and secure user access.
+- **HTTP-Only Configuration**: Optimized for Replit's deployment environment, with SSL termination handled at the infrastructure level.
+- **Progressive Disclosure**: Implementation of a multi-step upload wizard to streamline the artwork submission process, enhancing user experience.
+- **Advanced Version Management**: A sophisticated system for artwork versioning, allowing history preservation, comparison, and restoration.
+- **Dynamic Critique System**: Features multi-type reactions, karma points, and advanced filtering for community engagement and feedback.
+- **Responsive UI/UX**: Designed with Bootstrap 5 for a consistent and adaptive user experience across various devices. Aesthetic choices include subtle shadows, consistent box shadows, enhanced action buttons, and color-coded rating systems.
 
-### Frontend Architecture
-- **Templates**: Django templates with Bootstrap 5.3.6 for responsive design
-- **JavaScript**: Vanilla JavaScript with modern ES6+ features
-- **Styling**: Bootstrap Icons and custom CSS for enhanced user experience
-- **Interactive Elements**: Dynamic artwork galleries, critique systems, and user profiles
+### Technical Implementation Details
+- **Backend Framework**: Django 5.0.2 with Django REST Framework.
+- **Frontend Technologies**: Django templates, Bootstrap 5.3.6, Vanilla JavaScript (ES6+).
+- **Database**: PostgreSQL 16.
+- **Authentication**: Django Allauth with Google OAuth.
+- **Server**: Gunicorn WSGI server.
+- **Image Processing**: Pillow library for artwork manipulation.
+- **Media Management**: AWS S3 integration for storage; pre-signed URLs for secure access.
+- **API Design**: Comprehensive REST API endpoints for all core functionalities, using Django REST Framework serializers.
+- **Deployment Strategy**: Configured for Replit Autoscale with specific Gunicorn settings for memory management and health monitoring.
 
-### HTTP-Only Configuration
-The application is specifically configured to run in HTTP-only mode to ensure compatibility with Replit's load balancer and deployment environment. SSL termination is handled at the infrastructure level.
-
-## Key Components
-
-### Core Applications
-- **artcritique/**: Main Django application with project settings and URL configuration
-- **critique/**: Core functionality for artwork management, critique system, and user profiles
-- **API Layer**: Comprehensive REST API endpoints for all major features
-
-### Authentication System
-- Google OAuth integration via Django Allauth
-- User profiles with karma tracking
-- Session management and security features
-
-### Artwork Management
-- File upload handling with support for multiple formats (JPEG, PNG, GIF, WebP, SVG, BMP, TIFF)
-- S3 integration for scalable media storage
-- Image processing and display optimization
-- **Advanced Version Management System**:
-  - Preserves image history during version creation
-  - Safe version restoration with auto-backup of current state
-  - Drag-and-drop version comparison interface
-  - Version archiving and management tools
-
-### Critique System
-- Multi-type reactions (Helpful, Inspiring, Detailed)
-- Karma point system for community engagement
-- Real-time reaction counting and display
-- Advanced filtering and sorting capabilities
-
-### Storage Integration
-- AWS S3 bucket (brushup-media) for media file storage
-- Local media fallback for development
-- Pre-signed URL generation for secure access
-- Optimized image delivery and caching
-
-## Data Flow
-
-### User Registration and Authentication
-1. Users register via Google OAuth or standard Django authentication
-2. Profile creation with karma initialization
-3. Session management and permission handling
-
-### Artwork Upload Process
-1. User uploads artwork through Django forms
-2. Files are processed and stored in S3 bucket
-3. Metadata is saved to PostgreSQL database
-4. Karma points are awarded for contributions
-
-### Critique and Interaction Flow
-1. Users browse artwork gallery with advanced filtering
-2. Critiques are submitted and processed through API endpoints
-3. Reactions are tracked and karma is calculated
-4. Real-time updates to reaction counts and user profiles
-
-### API Data Exchange
-1. Frontend makes requests to Django REST API endpoints
-2. Serializers handle data transformation and validation
-3. Database queries are optimized for performance
-4. Responses include computed fields like reaction counts
+### Key Features
+- **Authentication**: Google OAuth, user profiles with karma tracking.
+- **Artwork Management**: Multi-format file uploads, S3 storage, image processing, advanced version management with history preservation, comparison, and restoration.
+- **Critique System**: Multi-type reactions (Helpful, Inspiring, Detailed), karma point system, real-time reaction counting, advanced filtering.
+- **Multi-Step Upload Wizard**: A 6-step progressive disclosure wizard for image upload, details, medium/dimensions, tags/organization, critique settings, and review.
+- **Enhanced Focus Mode**: Improved layout for artwork display, action bars, and interactive elements.
+- **Visual Polish**: Consistent styling across the platform, including enhanced filter bars, critique card highlighting, and refined reaction count styling.
+- **Achievement Badges**: Display of earned and in-progress achievement badges on user profiles.
 
 ## External Dependencies
 
 ### Python Packages
-- **Django 5.0.2**: Web framework foundation
-- **djangorestframework 3.16.0**: API development
-- **django-allauth 65.8.0**: Authentication system
-- **django-cors-headers 4.7.0**: Cross-origin request handling
-- **psycopg2-binary 2.9.9**: PostgreSQL database adapter
-- **gunicorn 23.0.0**: WSGI HTTP server
-- **boto3**: AWS S3 integration
-- **pillow**: Image processing capabilities
+- `Django`
+- `djangorestframework`
+- `django-allauth`
+- `django-cors-headers`
+- `psycopg2-binary`
+- `gunicorn`
+- `boto3`
+- `pillow`
 
 ### Frontend Dependencies
-- **Bootstrap 5.3.6**: CSS framework for responsive design
-- **Bootstrap Icons 1.13.1**: Icon library
-- **Axios 1.9.0**: HTTP client for API requests
+- `Bootstrap 5.3.6`
+- `Bootstrap Icons 1.13.1`
+- `Axios`
 
 ### Infrastructure Services
-- **PostgreSQL 16**: Primary database server
-- **AWS S3**: Cloud storage for media files
-- **Replit Autoscale**: Deployment platform
-
-## Deployment Strategy
-
-### Production Configuration
-- Gunicorn server with optimized worker configuration
-- Single worker process to prevent memory issues on autoscale
-- 120-second timeout for startup operations
-- Memory management with request limits (1000 requests per worker)
-
-### HTTP-Only Mode
-- SSL termination handled by Replit infrastructure
-- Empty certificate files to satisfy workflow requirements
-- Environment variables configured for HTTP operation
-- Port configuration with dynamic binding (PORT environment variable)
-
-### Health Monitoring
-- Comprehensive health check endpoint at `/api/health/`
-- Database connectivity testing
-- Service status reporting with proper HTTP status codes
-
-### Environment Variables
-- `DJANGO_SETTINGS_MODULE`: Django configuration
-- `SSL_ENABLED`: Set to 'false' for HTTP-only operation
-- `HTTP_ONLY`: Flag for HTTP mode configuration
-- `PORT`: Dynamic port binding for deployment
-
-### Database Management
-- PostgreSQL connection with proper connection pooling
-- Migration management for schema updates
-- Karma system database tables and relationships
-
-## Recent Changes
-
-### July 23, 2025 - Portfolio Folders Sidebar Redesign ✓
-- **Converted horizontal folders section to modern sidebar layout**: Transformed the wide Portfolio Folders section into a compact, collapsible sidebar on the left side of the Artist Studio page
-- **Enhanced user experience with interactive folder navigation**: Added folder filtering functionality with real-time statistics updates and visual feedback
-- **Implemented responsive mobile sidebar**: Created slide-in sidebar for mobile devices with backdrop overlay and smooth animations
-- **Added thumbnail previews in sidebar**: Each folder displays mini previews of contained artworks for quick visual identification
-- **Enhanced folder filtering system**: Users can now filter artworks by folder with active state styling and automatic statistics recalculation
-- **Optimized layout structure**: Main artwork grid now uses remaining space more efficiently with responsive column adjustments
-- **Added folder management integration**: Direct access to Portfolio Builder from sidebar for easy folder organization
-- **Implemented collapsible sidebar functionality**: Added collapse/expand button with smooth animations, localStorage persistence, and dynamic layout adjustments for maximized workspace
-
-### July 03, 2025 - Advanced Version Management System Overhaul ✓
-- **Added current_version pointer system**: Implemented foreign key relationship from ArtWork to ArtWorkVersion for tracking the active version
-- **Fixed critical deletion bug**: Prevented deletion of current versions and ensured proper version management safety
-- **Enhanced API security**: Added proper authentication and ownership checks to version switching endpoints
-- **Improved endpoint consistency**: Fixed URL pattern mismatches between frontend JavaScript and backend API endpoints
-- **Database migration applied**: Created and ran migration 0021 to add current_version field with proper data population
-- **Updated display methods**: Templates now consistently use get_display_image_url() for reliable image display
-- **Enhanced version creation**: New versions are automatically set as current and properly linked to artwork
-- **Comprehensive permission checks**: Version switching now requires artwork ownership and proper authentication
-
-### July 03, 2025 - Upload System Fixes and Enhancements ✓
-- **Fixed description field requirement**: Made artwork description field optional in model and API
-- **Applied database migration**: Updated schema to allow empty descriptions (migration 0020)
-- **Enhanced upload debugging**: Added comprehensive error logging and field-specific error handling
-- **Fixed all tooltip styling**: Updated remaining tooltips in steps 3 and 5 to use dark backgrounds
-
-### July 03, 2025 - Multi-Step Upload Wizard Implementation ✓
-- **Transformed upload experience**: Replaced single-form upload with sophisticated 6-step wizard using progressive disclosure
-- **Step 1 - Image Upload**: Drag-and-drop interface with instant preview, file validation, and visual feedback
-- **Step 2 - Details**: Enhanced title and description inputs with character counters and helpful prompts
-- **Step 3 - Medium & Dimensions**: Interactive medium selection with common options and custom input capability
-- **Step 4 - Tags & Organization**: Smart tag suggestions, folder selection, and portfolio organization tools
-- **Step 5 - Critique Settings**: Toggle for seeking feedback with focus area selection for targeted critiques
-- **Step 6 - Review & Submit**: Comprehensive summary with final validation before upload
-- **Enhanced UX**: Progress indicator, smooth animations, step validation, and engaging copy throughout
-- **API Integration**: Seamlessly integrates with existing `/api/artworks/` endpoint and folder management
-- **Responsive Design**: Optimized for all device sizes with Bootstrap 5 components and custom styling
-- **Error Handling**: Comprehensive validation, file type checking, size limits, and user-friendly error messages
-- **Template Architecture**: Built using Django templates with vanilla JavaScript for maximum compatibility
-
-### July 01, 2025 - Enhanced Focus Mode Implementation ✓
-- **Fixed template syntax error**: Removed duplicate {% block content %} tags that were causing Django template errors
-- **Resolved artwork disappearing issue**: Removed duplicate image block in main-content section that caused visual conflicts
-- **Implemented seamless Focus Mode experience**: Updated layout to use min-height instead of fixed height for better flow preservation
-- **Enhanced actions bar layout**: Redesigned cramped button positioning with modern pill-shaped bar featuring proper spacing and visual hierarchy
-- **Restored custom heart button**: Implemented custom ♥ button with glassmorphism styling and pink hover effects
-- **Added bounce animation**: Smooth actions bar entrance with bounceIn animation after 2-second delay
-- **Improved button interactions**: Enhanced hover states with scale transforms and better touch targets for mobile
-- **Added scroll-triggered reveals**: Implemented smooth transitions with Intersection Observer API for progressive content disclosure
-- **Enhanced user interactions**: Added fullscreen toggle button and improved favorite functionality with visual feedback
-- **Improved accessibility**: Added proper focus states, keyboard navigation support, and screen reader friendly elements
-- **Optimized performance**: Reduced layout shifts and improved animation performance with CSS transforms
-
-### July 01, 2025 - Artwork Detail Page Visual Enhancement Implementation ✓
-- **Enhanced artwork prominence**: Improved shadows, borders, and visual hierarchy to make artworks more prominent
-- **Upgraded metadata section**: Better spacing and refined layout structure for artwork information
-- **Implemented enhanced action buttons**: Improved dropdown styling and button interactions
-- **Added color-coded rating system**: Visual progress indicators with icons for critique rating sections
-- **Enhanced version history layout**: Added version-history-card class and improved spacing
-- **Implemented enhanced critique sorting controls**: Comprehensive sorting with icons, filtering by ratings, and compact view toggle
-- **Added visual progress indicators**: Color-coded rating bars with different visual states (excellent, good, average, poor)
-- **Created sophisticated critique controls**: Gradient backgrounds, enhanced dropdowns with icons, and real-time filtering
-- **Added smooth animations**: Critique sorting with staggered animations and visual feedback
-- **Integrated toast notifications**: User feedback for all sorting and filtering actions
-
-### July 01, 2025 - Visual Refinement Polish Implementation ✓
-- **Artwork Info Sidebar Enhancement**: Added subtle vertical rule border and improved metadata spacing with `.mb-1` classes
-- **Call-to-Action Area**: Implemented unified CTA container with soft background and responsive full-width buttons on mobile
-- **Version History Sticky Sidebar**: Added sticky positioning for version history on large screens (top: 80px)
-- **Enhanced Version Thumbnails**: Implemented hover states with purple outline and transform effects
-- **Critique Card Polish**: Added consistent box shadows (0 1px 3px rgba(0,0,0,0.15)) and improved hover states
-- **Reaction Button Enhancement**: Improved spacing with gap-3, enhanced hover feedback with scale and glow effects
-- **Rating Section Styling**: Added subtle dividers and improved label typography with uppercase styling
-- **Visual Consistency**: Applied consistent shadows across all cards and components for professional appearance
-- **Tooltip Integration**: Added Bootstrap tooltip initialization for improved user experience on interactive elements
-
-### July 01, 2025 - Pro-Grade Final Polish Implementation ✓
-- **Enhanced Filter Bar**: Added subtle background (rgba(255,255,255,0.02)) with border radius and filter icon integration
-- **Critique Card Left Border Accent**: Implemented dynamic left border (4px solid primary) on hover for visual pull
-- **Highly Rated Critique Highlighting**: Automatic green left border and gradient background for critiques with 8+ average rating
-- **Refined Reaction Count Styling**: Reduced contrast on reaction badges for better visual balance
-- **Enhanced Add Critique Button**: Gradient background with hover state flip to outline style with plus-circle icon
-- **Artwork Meta Section Labels**: Added uppercase styling for section headers with proper spacing and typography
-- **Automatic Rating Detection**: JavaScript function to identify and highlight high-scoring critiques automatically
-- **Professional Visual Hierarchy**: Complete implementation of pro-grade design patterns and interactions
-
-### July 01, 2025 - Achievement Badges Frontend Display Implementation ✓
-- **Added achievement badges section**: Created comprehensive badges display on user profile pages
-- **Improved visual design**: Enhanced badge cards with proper spacing, shadows, and color-coded progress bars
-- **Public badge viewing**: Updated API permissions to allow viewing badges on any user's profile
-- **Progress tracking**: Display shows both earned badges and progress toward next achievements
-- **Responsive layout**: Badges display optimally on different screen sizes with proper gap spacing
-- **Category organization**: Badges sorted by progress percentage with visual hierarchy improvements
-
-### June 28, 2025 - OAuth Password Management System Implementation ✓
-- **Fixed import issues**: Added missing CommentForm and ReplyForm to forms.py to resolve 500 errors
-- **Implemented OAuth password management**: Created comprehensive password management system for Google OAuth users
-- **Fixed authentication backend error**: Resolved ValueError when setting passwords by specifying explicit backend
-- **Enhanced form visibility**: Fixed missing form fields in password management interface
-- **Applied dark theme styling**: Ensured all password management forms follow consistent dark background theme
-- **Integrated security features**: Users can now set, change, or remove passwords while maintaining OAuth functionality
-- **Fixed version deletion 405 error**: Updated API endpoint to handle DELETE requests for artwork version removal
-- **Implemented dynamic version renumbering**: Versions are now automatically renumbered sequentially after deletion to maintain v1, v2, v3 ordering
-
-### June 17, 2025 - Comprehensive Version History System Enhancement ✓
-- **Fixed save current state API**: Resolved 400 error by adding `force_create` parameter to bypass change detection
-- **Implemented version deletion**: Users can now delete versions with safety checks to prevent deleting the only version
-- **Enhanced thumbnail refresh**: New version uploads immediately update thumbnails without requiring page refresh
-- **Added restoration snapshots**: Version restoration now creates automatic snapshots of current state before switching
-- **Critique-version associations**: Critiques are now linked to specific artwork versions, eliminating shared critique counts
-- **Fixed z-index overlap**: Version history card no longer interferes with main navigation dropdown
-- **Fixed deletion endpoints**: Resolved 405 error for version deletion and 404 error for critique reply deletion
-- **Enhanced user feedback control**: Users can now delete their own replies regardless of engagement levels
-
-### June 14, 2025 - Version Management System Fixes
-- **Fixed critical version creation bug**: Versions now properly preserve old images instead of overwriting them
-- **Improved version switching**: Changed "restore" to "set as current" - no unnecessary version creation
-- **Enhanced version integrity**: All version operations now maintain proper image history
-- **Cleaner user experience**: Version switching is now intuitive and doesn't create version clutter
-
-### Technical Details
-#### June 17, 2025 Updates
-- Added `artwork_version` foreign key to Critique model with proper migration
-- Enhanced version creation API with `force_create` parameter for saving current state
-- Implemented comprehensive version deletion with artwork ownership and safety validations
-- Added real-time thumbnail updates using cache-busting timestamps
-- Modified restoration to create automatic snapshots before version switching
-- Fixed frontend delete functionality with proper API endpoint routing
-- Set version history card z-index to 1 to resolve navigation overlap
-
-#### June 14, 2025 Updates
-- Updated `create_artwork_version` API to preserve old images in versions while updating artwork with new images
-- Modified `ArtworkVersionRestoreView` to simply set selected version as current without creating new versions
-- Ensured version records are never modified after creation, maintaining data integrity
-- Updated UI terminology from "Restore" to "Set as Current" for clarity
-
-## Changelog
-
-```
-Changelog:
-- June 17, 2025. Comprehensive version history system enhancements with deletion, snapshots, and critique associations
-- June 14, 2025. Initial setup and version management system fixes
-```
-
-## User Preferences
-
-```
-Preferred communication style: Simple, everyday language.
-```
+- `PostgreSQL 16`
+- `AWS S3`
+- `Replit Autoscale`
