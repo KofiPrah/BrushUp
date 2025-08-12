@@ -1,0 +1,176 @@
+Love this direction. Let’s design a **two‑at‑a‑time critique feed** that (1) forces attention, (2) makes low‑friction feedback fast, and (3) still supports richer critique when someone has the time.
+
+# The Feed: “Spotlight + Counterpoint”
+
+**Layout (mobile-first):**
+
+* Full‑bleed card on top: **Spotlight** (dominant).
+* Second card peeking below: **Counterpoint** (slightly smaller). Tap “Swap” to flip which is Spotlight.
+* Persistent bottom drawer: **Quick Critique Bar** with Pro/Con tags (chips), “Add note”, “Add ratings”, “Skip”, “Next pair”.
+
+**Interaction rules:**
+
+* You always see exactly two works per “round”.
+* “Next pair” stays disabled until you either:
+
+  * add ≥1 Pro/Con tag to at least one piece, or
+  * explicitly “Skip both”.
+* Keyboard: `A` tag left, `L` tag right, `S` swap, `N` next.
+* Microcopy nudges: “Don’t overthink—pick 1–2 tags.”
+
+**Why two?** You avoid Pinterest-style skimming because attention has to land somewhere; pairing also creates a micro‑comparison that helps people articulate *why* they feel a certain way.
+
+# Low‑Friction → High‑Value Critique
+
+**Tier 1 — Quick Tags (1–5s):**
+
+* Tap Pro/Con chips like “color harmony”, “anatomy”, “muddy values”, “compelling concept”.
+* Users can add a custom tag (auto‑suggested into taxonomy).
+* Behind the scenes this stores structured signals and builds “Critique Karma” when others mark your quick take as helpful.
+
+**Tier 2 — One‑line Note (5–15s):**
+
+* Optional single text box with prompts (“One specific suggestion?”).
+
+**Tier 3 — Sliders (when they want) (15–45s):**
+
+* Optional sliders for Composition, Technique, Originality. Gate the text prompt only for very low/high extremes to keep signal quality.
+
+**Auto‑Summary (AI):**
+
+* If no note is added, we can generate a concise summary from chosen tags so the artist still receives a readable critique; users can accept/edit before sending. (Matches the “structured critique + quick tags” direction in your brief.)
+
+# Feed Ranking (who gets surfaced)
+
+**Pair generator (per user session):**
+
+1. Build a candidate pool filtered to visibility & safe content.
+2. Score each artwork:
+   `score = need_weight * freshness * diversity_boost * distance_from_user_history`
+
+   * `need_weight = 1 / (1 + critique_count_weighted_by_reputation)`
+   * `freshness`: boost for uploads/updates in last X days.
+   * `diversity_boost`: avoid repeating same author/style/medium; explore unseen tags.
+   * `distance_from_user_history`: nudge toward pieces the user *hasn’t* engaged with.
+3. Sample one high‑need piece (**Spotlight**) and one complementary (**Counterpoint**) that differs by style/medium/skill band.
+4. Cache that pair id so “Skip” won’t instantly resurface them.
+
+This directly supports your goal of **routing attention to under‑critiqued work** while keeping variety. (You already planned critic‑focused surfacing and weighted community scoring—this plugs into that.)
+
+# Data model (Django)
+
+```python
+# critique/models.py
+class Tag(models.Model):
+    label = models.CharField(max_length=64, unique=True)
+    polarity = models.CharField(max_length=3, choices=[('PRO','PRO'),('CON','CON')])
+    category = models.CharField(max_length=32, blank=True)  # e.g., 'composition','technique','concept'
+    is_system = models.BooleanField(default=False)
+
+class QuickCrit(models.Model):
+    artwork = models.ForeignKey(ArtWork, on_delete=models.CASCADE)
+    author  = models.ForeignKey(User, on_delete=models.CASCADE)
+    tags    = models.ManyToManyField(Tag, through='QuickCritTag')
+    note    = models.TextField(blank=True)
+    summary = models.TextField(blank=True)  # AI-filled if note is blank
+    created_at = models.DateTimeField(auto_now_add=True)
+
+class QuickCritTag(models.Model):
+    quickcrit = models.ForeignKey(QuickCrit, on_delete=models.CASCADE)
+    tag       = models.ForeignKey(Tag, on_delete=models.CASCADE)
+```
+
+(Your existing critiques with sliders can remain as the “Structured Critique” model; QuickCrit serves the train‑ride use case and rolls up into the same karma signals.)
+
+# API (DRF)
+
+* `GET /api/feed/next?pair=1` → `{pair_id, spotlight, counterpoint, chips: {pro:[], con:[]}}`
+* `POST /api/quick-crits/` → `{artwork_id, tag_ids|new_tags[], note?}` → returns saved QuickCrit (plus auto‑summary if generated)
+* `POST /api/quick-crits/{id}/react/` (Helpful/Inspiring/Detailed) → returns updated counts (feeds karma)
+* `GET /api/tags?category=technique&polarity=CON` → chips list
+
+# Frontend (Django Templates + Bootstrap 5 + Vanilla JS)
+
+**Template skeleton (mobile)**
+
+```html
+<section id="pair">
+  <article id="spotlight" class="card ratio ratio-1x1 mb-3"> … </article>
+  <article id="counterpoint" class="card ratio ratio-16x9 opacity-75"> … </article>
+</section>
+
+<div id="quickbar" class="fixed-bottom bg-dark p-2 border-top">
+  <div class="d-flex gap-2 overflow-auto" id="pro-chips"></div>
+  <div class="d-flex gap-2 overflow-auto mt-1" id="con-chips"></div>
+  <div class="mt-2 d-flex gap-2">
+    <button class="btn btn-outline-light" id="swap">Swap</button>
+    <button class="btn btn-outline-light" id="add-note">Add note</button>
+    <button class="btn btn-outline-light" id="add-ratings">Add ratings</button>
+    <button class="btn btn-secondary ms-auto" id="skip">Skip both</button>
+    <button class="btn btn-primary" id="next" disabled>Next pair</button>
+  </div>
+</div>
+```
+
+**JS flow (pseudo):**
+
+```js
+let pair = null, chosen = {left:[], right:[]};
+
+async function loadPair(){ pair = await api('/api/feed/next?pair=1'); render(pair); }
+function tag(side, tagId){ chosen[side].push(tagId); enableNextIf(chosen); }
+async function submitQuick(side){
+  if(!chosen[side].length) return;
+  await api('/api/quick-crits/', {artwork_id: pair[side].id, tag_ids: chosen[side], note: noteFor(side) });
+}
+document.querySelector('#next').onclick = async () => {
+  await Promise.all(['left','right'].map(submitQuick)); 
+  resetState(); loadPair();
+};
+```
+
+**Offline on a train:** queue POSTs in `localStorage` and flush when online; disable “Next” only while offline if nothing is queued.
+
+# Tag system (starter taxonomy)
+
+* **Composition**: framing, balance, focal point, perspective, muddy values (CON), strong silhouette (PRO)
+* **Technique**: brushwork, line quality, anatomy/proportion, rendering, color accuracy
+* **Concept/Originality**: narrative clarity, symbolism, mood, novelty, cliché (CON)
+
+Seed these as `is_system=True`; when users add customs, flag `is_system=False` and merge via moderation later.
+
+# AI Summarization UX
+
+* If no note: “Generate summary from tags” (one tap).
+  Output pattern: “Strengths: … • Opportunities: …”. User can edit before posting.
+  (You already framed structured + quick tiers; this is the glue.)
+
+# Reputation & guardrails
+
+* Each QuickCrit can be reacted to (Helpful/Inspiring/Detailed). Counts roll into **Critique Karma** and surface better feedback, as in your brief.
+* Rate limit: max X “Skip both” per hour to discourage drive‑by skipping.
+* “Needs critique” flag boosts need\_weight for works with few/hollow critiques.
+
+# Implementation checklist (dev-ready)
+
+**Backend**
+
+* [ ] Models: `Tag`, `QuickCrit`, `QuickCritTag`.
+* [ ] Endpoints: feed/next, quick‑crits CRUD, tags list, react.
+* [ ] Pair selection service with scoring & session cache.
+* [ ] (Optional) AI summary endpoint that takes `{artwork_id, tag_ids}` and returns 1–2 sentence summary.
+
+**Frontend**
+
+* [ ] Pair view template + CSS.
+* [ ] Quickbar chips (two rows: Pro/Con).
+* [ ] State machine to require minimal action before “Next”.
+* [ ] Offline queue + toast on flush.
+
+**Data/UX**
+
+* [ ] Seed tag taxonomy.
+* [ ] Microcopy for prompts.
+* [ ] Analytics: time-to-first-tag, tags-per-round, skip rate, summary usage.
+
+If you want, I can turn this into **exact Replit prompts** (models, serializers, views, and the template/JS) so you can paste‑run.

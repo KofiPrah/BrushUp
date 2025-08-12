@@ -1,0 +1,476 @@
+Awesome — here’s a paste‑ready, minimal-yet-complete first cut to ship the **two‑at‑a‑time feed + quick‑critique**. It slots cleanly into your Django + DRF + Bootstrap stack and follows the “tiered feedback (tags → optional note → optional sliders)” you outlined.
+
+---
+
+# 1) Backend (Django + DRF)
+
+## models.py (new app: `feed`, or fold into your existing `critique` app)
+
+```python
+# critique/models.py
+from django.conf import settings
+from django.db import models
+
+User = settings.AUTH_USER_MODEL
+
+class Tag(models.Model):
+    PRO, CON = "PRO", "CON"
+    POLARITY_CHOICES = [(PRO, "Pro"), (CON, "Con")]
+
+    label = models.CharField(max_length=64, unique=True)
+    polarity = models.CharField(max_length=3, choices=POLARITY_CHOICES)
+    category = models.CharField(max_length=32, blank=True)  # composition/technique/concept/etc.
+    is_system = models.BooleanField(default=False)
+
+    def __str__(self): return f"{self.polarity}:{self.label}"
+
+
+class QuickCrit(models.Model):
+    artwork = models.ForeignKey("art.Artwork", on_delete=models.CASCADE, related_name="quick_crits")
+    author  = models.ForeignKey(User, on_delete=models.CASCADE, related_name="quick_crits")
+    note    = models.TextField(blank=True)
+    summary = models.TextField(blank=True)  # AI fill if note is blank
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
+class QuickCritTag(models.Model):
+    quickcrit = models.ForeignKey(QuickCrit, on_delete=models.CASCADE, related_name="qc_tags")
+    tag       = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    class Meta:
+        unique_together = ("quickcrit", "tag")
+
+
+class PairSession(models.Model):
+    """Helps avoid immediate repeats for a user; keep tiny & prune by created_at."""
+    user      = models.ForeignKey(User, on_delete=models.CASCADE)
+    spotlight = models.ForeignKey("art.Artwork", on_delete=models.CASCADE, related_name="+")
+    counter   = models.ForeignKey("art.Artwork", on_delete=models.CASCADE, related_name="+")
+    created_at = models.DateTimeField(auto_now_add=True)
+```
+
+> Assumes your artwork model is `art.Artwork` with `author`, `created_at`, maybe `seeking_critique` booleans, etc.
+
+---
+
+## serializers.py
+
+```python
+# critique/serializers.py
+from rest_framework import serializers
+from .models import Tag, QuickCrit, QuickCritTag
+from art.models import Artwork  # your existing app
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ["id", "label", "polarity", "category", "is_system"]
+
+class ArtworkCardSerializer(serializers.ModelSerializer):
+    artist_name = serializers.CharField(source="author.username", read_only=True)
+    class Meta:
+        model = Artwork
+        fields = ["id", "image_url", "title", "caption", "artist_name"]  # adjust to your fields
+
+class QuickCritSerializer(serializers.ModelSerializer):
+    tag_ids = serializers.ListField(child=serializers.IntegerField(), write_only=True, required=False)
+    new_tags = serializers.ListField(child=serializers.CharField(), write_only=True, required=False)
+    class Meta:
+        model = QuickCrit
+        fields = ["id", "artwork", "note", "summary", "tag_ids", "new_tags", "created_at"]
+        read_only_fields = ["id", "summary", "created_at"]
+
+    def create(self, validated):
+        user = self.context["request"].user
+        tag_ids = validated.pop("tag_ids", [])
+        new_tags = validated.pop("new_tags", [])
+        qc = QuickCrit.objects.create(author=user, **validated)
+
+        # attach existing tags
+        if tag_ids:
+            QuickCritTag.objects.bulk_create([
+                QuickCritTag(quickcrit=qc, tag_id=tid) for tid in set(tag_ids)
+            ])
+
+        # create custom tags as CONSTRUCTIVE by default unless prefixed +/-
+        for raw in new_tags:
+            raw = raw.strip()
+            if not raw:
+                continue
+            pol = Tag.PRO if raw.startswith("+") else Tag.CON if raw.startswith("-") else Tag.CON
+            label = raw.lstrip("+-").strip()[:64]
+            tag, _ = Tag.objects.get_or_create(label__iexact=label, defaults={
+                "label": label, "polarity": pol, "is_system": False
+            })
+            QuickCritTag.objects.get_or_create(quickcrit=qc, tag=tag)
+
+        # If no note, leave summary blank now; you can fill via async/LLM later.
+        return qc
+```
+
+---
+
+## views.py
+
+```python
+# critique/views.py
+import random
+from datetime import timedelta
+from django.utils import timezone
+from django.db.models import Count, Q, F
+from rest_framework import permissions, viewsets
+from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.response import Response
+
+from art.models import Artwork
+from .models import PairSession, QuickCrit, Tag
+from .serializers import ArtworkCardSerializer, QuickCritSerializer, TagSerializer
+
+class IsAuthenticatedOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
+    pass
+
+def _candidate_qs(user):
+    # High-need (few critiques), fresh, different from user’s recent engagements.
+    recent = timezone.now() - timedelta(days=14)
+    qs = (Artwork.objects.filter(is_public=True)  # adapt to your visibility
+          .annotate(crit_count=Count("quick_crits"))
+          .order_by("-created_at"))
+
+    if user.is_authenticated:
+        # avoid user's own art and recently seen pairs
+        seen_ids = PairSession.objects.filter(user=user).order_by("-created_at").values_list("spotlight_id", flat=True)[:200]
+        seen2_ids = PairSession.objects.filter(user=user).order_by("-created_at").values_list("counter_id", flat=True)[:200]
+        qs = qs.exclude(Q(author=user) | Q(id__in=seen_ids) | Q(id__in=seen2_ids))
+
+    return qs
+
+def _pick_pair(user):
+    qs = _candidate_qs(user)
+
+    # score = need_weight * freshness * diversity; here we approximate with ordering & random
+    top_need = list(qs.order_by("crit_count", "-created_at")[:80])
+    if not top_need:
+        return None, None
+    spotlight = random.choice(top_need)
+
+    # counterpoint: different author/style/medium if possible
+    counter = (qs.exclude(author=spotlight.author)
+                 .exclude(style=spotlight.style)
+                 .exclude(medium=spotlight.medium)
+                 .exclude(id=spotlight.id)
+                 .order_by("crit_count", "-created_at")
+                 .first())
+    if not counter:
+        # fallback
+        pool = qs.exclude(id=spotlight.id)[:80]
+        counter = random.choice(list(pool)) if pool else None
+    return spotlight, counter
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticatedOrReadOnly])
+def next_pair(request):
+    spotlight, counter = _pick_pair(request.user)
+    if not spotlight or not counter:
+        return Response({"pair_id": None, "spotlight": None, "counterpoint": None, "chips": {"pro": [], "con": []}})
+
+    if request.user.is_authenticated:
+        PairSession.objects.create(user=request.user, spotlight=spotlight, counter=counter)
+
+    data = {
+        "pair_id": f"{spotlight.id}-{counter.id}-{int(timezone.now().timestamp())}",
+        "spotlight": ArtworkCardSerializer(spotlight).data,
+        "counterpoint": ArtworkCardSerializer(counter).data,
+        "chips": {
+            "pro": TagSerializer(Tag.objects.filter(polarity=Tag.PRO).order_by("is_system").all(), many=True).data,
+            "con": TagSerializer(Tag.objects.filter(polarity=Tag.CON).order_by("is_system").all(), many=True).data
+        }
+    }
+    return Response(data)
+
+
+class QuickCritViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = QuickCritSerializer
+    queryset = QuickCrit.objects.select_related("artwork", "author").all()
+
+    def create(self, request, *args, **kwargs):
+        # allow single or batch (left/right) submissions
+        payload = request.data
+        many = isinstance(payload, list)
+        serializer = self.get_serializer(data=payload, many=many)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response(serializer.data, status=201)
+```
+
+---
+
+## urls.py
+
+```python
+# critique/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import next_pair, QuickCritViewSet
+
+router = DefaultRouter()
+router.register(r'quick-crits', QuickCritViewSet, basename='quick-crit')
+
+urlpatterns = [
+    path('feed/next/', next_pair, name='feed-next'),
+    path('', include(router.urls)),
+]
+```
+
+Add to your project `urls.py`:
+
+```python
+path('api/', include('critique.urls')),
+```
+
+---
+
+## seed\_tags.py (management command – optional but handy)
+
+```python
+# critique/management/commands/seed_quickcrit_tags.py
+from django.core.management.base import BaseCommand
+from critique.models import Tag
+
+SEED = {
+  "PRO": {
+    "composition": ["strong focal point", "balanced layout", "clear silhouette"],
+    "technique": ["confident brushwork", "clean linework", "color harmony"],
+    "concept": ["compelling concept", "evocative mood", "original idea"]
+  },
+  "CON": {
+    "composition": ["muddy values", "tangent issues", "awkward cropping"],
+    "technique": ["anatomy off", "perspective issues", "overworked rendering"],
+    "concept": ["unclear narrative", "cliché", "tone mismatch"]
+  }
+}
+
+class Command(BaseCommand):
+    def handle(self, *args, **kwargs):
+        created = 0
+        for pol, cats in SEED.items():
+            for cat, labels in cats.items():
+                for label in labels:
+                    _, was_created = Tag.objects.get_or_create(
+                        label__iexact=label,
+                        defaults=dict(label=label, polarity=pol, category=cat, is_system=True)
+                    )
+                    created += int(was_created)
+        self.stdout.write(self.style.SUCCESS(f"Seeded {created} tags"))
+```
+
+---
+
+# 2) Frontend (Django Templates + Bootstrap 5 + Vanilla JS)
+
+## Template (mobile‑first pair view)
+
+```html
+{% extends "base.html" %}
+{% block content %}
+<section id="pair" class="container py-2">
+
+  <article id="spotlight" class="card mb-3 shadow-sm">
+    <div class="ratio ratio-1x1">
+      <img id="spotlight-img" class="card-img-top object-fit-cover" alt="">
+    </div>
+    <div class="card-body">
+      <h5 id="spotlight-title" class="card-title mb-1"></h5>
+      <p id="spotlight-caption" class="card-text text-muted small"></p>
+    </div>
+  </article>
+
+  <article id="counter" class="card mb-5 opacity-75">
+    <div class="ratio ratio-16x9">
+      <img id="counter-img" class="card-img-top object-fit-cover" alt="">
+    </div>
+    <div class="card-body">
+      <h6 id="counter-title" class="card-title mb-1"></h6>
+      <p id="counter-caption" class="card-text text-muted small"></p>
+    </div>
+  </article>
+</section>
+
+<div id="quickbar" class="fixed-bottom bg-dark text-light p-2 border-top">
+  <div class="d-flex gap-2 overflow-auto small" id="pro-chips"></div>
+  <div class="d-flex gap-2 overflow-auto small mt-1" id="con-chips"></div>
+
+  <div class="mt-2 d-flex gap-2">
+    <button class="btn btn-outline-light btn-sm" id="swap">Swap</button>
+    <button class="btn btn-outline-light btn-sm" id="add-note">Add note</button>
+    <button class="btn btn-secondary btn-sm ms-auto" id="skip">Skip both</button>
+    <button class="btn btn-primary btn-sm" id="next" disabled>Next pair</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const state = {
+  pair: null,
+  chosen: {spotlight: {tag_ids:[], new_tags:[], note:""}, counter: {tag_ids:[], new_tags:[], note:""}},
+  offlineQueue: JSON.parse(localStorage.getItem("qc_queue")||"[]")
+};
+
+function h(tag, attrs={}, text=""){
+  const el = document.createElement(tag);
+  Object.entries(attrs).forEach(([k,v]) => el.setAttribute(k,v));
+  if(text) el.textContent=text;
+  return el;
+}
+
+async function api(url, opts={}){
+  const r = await fetch(url, {credentials:'include', headers: {'X-Requested-With':'XMLHttpRequest'}, ...opts});
+  if(!r.ok) throw new Error(await r.text());
+  return await r.json();
+}
+
+function renderPair(p){
+  state.pair = p;
+  document.getElementById('spotlight-img').src = p.spotlight.image_url;
+  document.getElementById('spotlight-title').textContent = p.spotlight.title + " — " + p.spotlight.artist_name;
+  document.getElementById('spotlight-caption').textContent = p.spotlight.caption || "";
+  document.getElementById('counter-img').src = p.counterpoint.image_url;
+  document.getElementById('counter-title').textContent = p.counterpoint.title + " — " + p.counterpoint.artist_name;
+  document.getElementById('counter-caption').textContent = p.counterpoint.caption || "";
+
+  const pro = document.getElementById('pro-chips'); pro.innerHTML = "";
+  const con = document.getElementById('con-chips'); con.innerHTML = "";
+  p.chips.pro.forEach(t => pro.appendChild(chip(t, 'PRO')));
+  p.chips.con.forEach(t => con.appendChild(chip(t, 'CON')));
+}
+
+function chip(t, pol){
+  const b = h('button', {class:'btn btn-sm btn-outline-light flex-shrink-0', 'data-id':t.id, 'data-pol':pol});
+  b.textContent = (pol==='PRO'?'+ ':'- ') + t.label;
+  b.onclick = () => {
+    addTag('spotlight', t.id);  // default to spotlight; long-press for counter?
+    document.getElementById('next').disabled = !hasAnyTag();
+    b.classList.toggle('btn-outline-light');
+    b.classList.toggle('btn-light');
+    b.classList.toggle('text-dark');
+  }
+  b.oncontextmenu = (e)=>{ e.preventDefault(); addTag('counter', t.id); document.getElementById('next').disabled = !hasAnyTag(); }
+  return b;
+}
+
+function addTag(side, id){ 
+  if(!state.chosen[side].tag_ids.includes(id)) state.chosen[side].tag_ids.push(id);
+}
+
+function hasAnyTag(){
+  return state.chosen.spotlight.tag_ids.length || state.chosen.counter.tag_ids.length ||
+         state.chosen.spotlight.new_tags.length || state.chosen.counter.new_tags.length;
+}
+
+async function loadPair(){
+  const p = await api('/api/feed/next/');
+  if(!p.spotlight){ document.getElementById('next').disabled=true; return; }
+  renderPair(p);
+  state.chosen = {spotlight:{tag_ids:[],new_tags:[],note:""}, counter:{tag_ids:[],new_tags:[],note:""}};
+  document.getElementById('next').disabled = true;
+}
+
+async function submitQuick(){
+  const payload = [];
+  if (hasAnyTag()) {
+    if(state.chosen.spotlight.tag_ids.length || state.chosen.spotlight.new_tags.length || state.chosen.spotlight.note){
+      payload.push({ artwork: state.pair.spotlight.id, note: state.chosen.spotlight.note,
+                     tag_ids: state.chosen.spotlight.tag_ids, new_tags: state.chosen.spotlight.new_tags });
+    }
+    if(state.chosen.counter.tag_ids.length || state.chosen.counter.new_tags.length || state.chosen.counter.note){
+      payload.push({ artwork: state.pair.counterpoint.id, note: state.chosen.counter.note,
+                     tag_ids: state.chosen.counter.tag_ids, new_tags: state.chosen.counter.new_tags });
+    }
+  }
+  if(!payload.length) return;
+
+  try{
+    await api('/api/quick-crits/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
+  }catch(e){
+    // offline queue
+    state.offlineQueue.push(...payload);
+    localStorage.setItem("qc_queue", JSON.stringify(state.offlineQueue));
+  }
+}
+
+async function flushQueue(){
+  if(!state.offlineQueue.length) return;
+  try{
+    await api('/api/quick-crits/', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(state.offlineQueue)});
+    state.offlineQueue = [];
+    localStorage.setItem("qc_queue", "[]");
+  }catch(e){}
+}
+
+document.getElementById('swap').onclick = ()=>{
+  // Just swap the DOM & state references visually
+  const s = state.pair.spotlight; state.pair.spotlight = state.pair.counterpoint; state.pair.counterpoint = s;
+  renderPair(state.pair);
+}
+
+document.getElementById('add-note').onclick = ()=>{
+  const side = confirm("OK = add note to Spotlight\nCancel = add to Counterpoint") ? 'spotlight' : 'counter';
+  const text = prompt("One short suggestion or thought?");
+  if(text) state.chosen[side].note = text;
+  document.getElementById('next').disabled = !hasAnyTag();
+}
+
+document.getElementById('skip').onclick = async ()=>{
+  await loadPair();
+};
+
+document.getElementById('next').onclick = async ()=>{
+  await submitQuick();
+  await flushQueue();
+  await loadPair();
+};
+
+window.addEventListener('online', flushQueue);
+loadPair();
+</script>
+{% endblock %}
+```
+
+> UX details:
+>
+> * Tap chip = tag for Spotlight; long‑press/right‑click = tag for Counterpoint.
+> * “Add note” prompt is single‑line, optional.
+> * Offline: queued payloads stored and flushed on reconnect.
+
+---
+
+# 3) Tiny CSS niceties (optional)
+
+```css
+/* app.css */
+.object-fit-cover { object-fit: cover; }
+#quickbar { backdrop-filter: blur(6px); }
+#pair .card { border-radius: 1rem; overflow: hidden; }
+```
+
+---
+
+# 4) How this supports your product goals
+
+* **Forces attention with only two works visible**, preventing “Pinterest skimming,” and creates a natural micro‑comparison that makes it easier to articulate *why* (even for pieces they don’t love).
+* **Tiered, low‑friction critique**: 1–2 taps on chips, optional one‑liner, with room to add your “full structured sliders” later from the same screen without blocking the fast path.
+* **Routing attention to under‑critiqued works**: pairing and selection logic favors low‑critique, fresh, and diverse works; avoids repeats per session and your own uploads.
+* **Fast train‑ride loop**: keyboard‑free, offline‑tolerant, one button to move on.
+
+---
+
+# 5) Next steps I can wire up (say the word)
+
+* AI **auto‑summary** endpoint that turns selected tags into a concise “Strengths / Opportunities” blurb, pre‑filled before submit.
+* Lightweight **reputation signal**: allow “Helpful/Inspiring/Detailed” reactions on QuickCrits and roll into your existing Karma system.
+* A/B toggles in the picker (e.g., adjust weights for “need” vs “freshness”) and metrics: time‑to‑first‑tag, skip rate, tags‑per‑pair.
+
+Want me to go ahead and add the **auto‑summary endpoint**, or the **Helpful/Inspiring/Detailed** reactions on QuickCrits next?
