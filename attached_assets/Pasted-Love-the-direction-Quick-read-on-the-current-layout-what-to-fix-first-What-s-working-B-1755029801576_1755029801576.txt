@@ -1,0 +1,212 @@
+Love the direction. Quick read on the current layout + what to fix first:
+
+# What’s working
+
+* Big, single “Spotlight” card with a smaller “Counterpoint” below → forces attention and comparison (good).
+* Quickbar on mobile is usable; chips communicate “fast feedback”.
+
+# What’s hurting you
+
+1. **Images not showing** → likely a URL issue (serializer/CloudFront/S3) rather than layout.
+2. **Not centered on desktop** → the feed column isn’t constrained or is offset by container padding.
+3. **Too much right-side empty space** → column width doesn’t match the viewport; chips overflow horizontally.
+4. **Card not clickable** → people expect to open details by clicking anywhere on the artwork.
+5. **Only one round then stops** → pair generator/“seen” cache or front-end state reset needs a small fix.
+6. **Scroll/keyboard next** → you need a natural “keep me moving” affordance (scroll-snap or wheel/spacebar to advance).
+
+Below is a paste-ready **Replit prompt** that addresses all six quickly.
+
+---
+
+## Replit — make these changes
+
+**Goal:** Fix image URLs, center the feed on desktop, make cards clickable, add scroll/keyboard advance, and ensure the pair queue continues.
+
+### 1) Backend: image URLs + “seen” logic
+
+* **Edit** `critique/serializers.py` → ensure artworks expose a working `image_url`.
+
+```python
+# Add helper to ArtworkCardSerializer
+class ArtworkCardSerializer(serializers.ModelSerializer):
+    artist_name = serializers.CharField(source="author.username", read_only=True)
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Artwork
+        fields = ["id", "image_url", "title", "caption", "artist_name"]
+
+    def get_image_url(self, obj):
+        req = self.context.get("request")
+        try:
+            url = obj.image.url  # works with django-storages + public-read
+        except Exception:
+            url = ""
+        if req and url and url.startswith("/"):
+            return req.build_absolute_uri(url)
+        return url
+```
+
+* **Edit** `critique/views.py` in `next_pair()` so serializers receive `context={"request": request}` and tighten “seen” tracking so we don’t serve the same pair again.
+
+```python
+data = {
+    "pair_id": f"{spotlight.id}-{counter.id}-{int(timezone.now().timestamp())}",
+    "spotlight": ArtworkCardSerializer(spotlight, context={"request": request}).data,
+    "counterpoint": ArtworkCardSerializer(counter, context={"request": request}).data,
+    ...
+}
+```
+
+```python
+def _candidate_qs(user):
+    qs = (Artwork.objects.filter(is_public=True)
+          .annotate(crit_count=Count("quick_crits"))
+          .order_by("crit_count", "-created_at"))
+
+    if user.is_authenticated:
+        seen = PairSession.objects.filter(user=user).order_by("-created_at")[:300]
+        seen_ids = set(list(seen.values_list("spotlight_id", flat=True)) + list(seen.values_list("counter_id", flat=True)))
+        qs = qs.exclude(Q(author=user) | Q(id__in=seen_ids))
+    return qs
+```
+
+### 2) Frontend: center column, clickable cards, scroll/keyboard “next”
+
+* **Edit** the feed template (where you render the pair).
+
+```html
+<main class="container-xxl py-3">
+  <div class="feed-shell mx-auto">
+    <!-- Spotlight card -->
+    <article id="spotlight" class="card mb-4 shadow-sm position-relative">
+      <a id="spotlight-link" class="stretched-link" href="#"></a>
+      <div class="ratio ratio-4x5">
+        <img id="spotlight-img" class="w-100 h-100 object-fit-cover" alt="">
+      </div>
+      <div class="card-body">
+        <h5 id="spotlight-title" class="card-title mb-1"></h5>
+        <p id="spotlight-caption" class="card-text text-muted small"></p>
+      </div>
+    </article>
+
+    <!-- Counterpoint card -->
+    <article id="counter" class="card mb-5 opacity-75 position-relative">
+      <a id="counter-link" class="stretched-link" href="#"></a>
+      <div class="ratio ratio-16x9">
+        <img id="counter-img" class="w-100 h-100 object-fit-cover" alt="">
+      </div>
+      <div class="card-body">
+        <h6 id="counter-title" class="card-title mb-1"></h6>
+        <p id="counter-caption" class="card-text text-muted small"></p>
+      </div>
+    </article>
+  </div>
+</main>
+```
+
+* **Add** CSS (your main CSS file):
+
+```css
+.feed-shell{ max-width: 980px; }
+.object-fit-cover{ object-fit: cover; }
+#quickbar{ backdrop-filter: blur(6px); }
+@media (min-width: 1200px){
+  /* Limit chip rows and prevent a huge horizontal scroll bar */
+  #pro-chips, #con-chips { flex-wrap: wrap; overflow-x: visible; }
+}
+```
+
+* **JS tweaks** (where you render):
+
+```js
+function renderPair(p){
+  state.pair = p;
+  // images + links
+  const s = p.spotlight, c = p.counterpoint;
+  document.getElementById('spotlight-img').src = s.image_url || '';
+  document.getElementById('counter-img').src   = c.image_url || '';
+  document.getElementById('spotlight-link').href = `/artworks/${s.id}/`;
+  document.getElementById('counter-link').href   = `/artworks/${c.id}/`;
+  ...
+}
+```
+
+* **Scroll/keyboard to advance** (keeps it gentle—no hard hijack):
+
+```js
+// Space / ArrowRight → Next pair
+document.addEventListener('keydown', (e)=>{
+  if (['INPUT','TEXTAREA'].includes((e.target.tagName||''))) return;
+  if (e.code === 'Space' || e.code === 'ArrowRight') {
+    e.preventDefault(); document.getElementById('next').click();
+  }
+});
+
+// Soft scroll-advance: when user hits bottom 15% of the page, go next (if ready)
+let ticking=false;
+window.addEventListener('scroll', ()=>{
+  if(ticking) return; ticking=true;
+  requestAnimationFrame(()=>{
+    const doc = document.documentElement;
+    const atBottom = (doc.scrollTop + window.innerHeight) / doc.scrollHeight > 0.85;
+    if(atBottom && !document.getElementById('next').disabled){ document.getElementById('next').click(); }
+    ticking=false;
+  });
+});
+```
+
+### 3) Quickbar chip overflow improvement
+
+Show a manageable number by default; reveal the rest:
+
+```js
+function renderChips(list, el){
+  el.innerHTML = "";
+  const MAX = 8;
+  list.slice(0,MAX).forEach(t=> el.appendChild(chip(t)));
+  if(list.length > MAX){
+    const more = h('button',{class:'btn btn-sm btn-outline-secondary'}, `+ ${list.length-MAX} more`);
+    more.onclick = ()=>{ el.innerHTML=""; list.forEach(t=> el.appendChild(chip(t))); more.remove(); };
+    el.appendChild(more);
+  }
+}
+const pro = document.getElementById('pro-chips');
+const con = document.getElementById('con-chips');
+renderChips(p.chips.pro, pro);
+renderChips(p.chips.con, con);
+```
+
+### 4) Notes & AI summary endpoints status
+
+* **Yes:** notes are supported already via `POST /api/quick-crits/` payload `{ artwork, note, tag_ids[], new_tags[] }`.
+* **Not yet:** AI summarization. If you want a visible stub now, add:
+
+```python
+# critique/views.py
+@api_view(["POST"])
+@permission_classes([permissions.IsAuthenticated])
+def summarize_tags(request):
+    tags = request.data.get("tags", [])
+    strengths = [t for t in tags if t.get("polarity")=="PRO"]
+    opps      = [t for t in tags if t.get("polarity")=="CON"]
+    return Response({
+      "summary": f"Strengths: {', '.join([t['label'] for t in strengths])}. "
+                 f"Opportunities: {', '.join([t['label'] for t in opps])}."
+    })
+```
+
+Add URL: `path('quick-crits/summarize/', summarize_tags)`
+
+---
+
+## TL;DR on the layout
+
+* Keep the **single centered column** on desktop (max-width \~980px). It reads like a focused “review lane” and kills the dead space.
+* Make the **entire card clickable** to detail; retain Swap, but visually de-emphasize it.
+* Add **space/arrow next**, and a gentle **scroll-to-next** at page bottom.
+* Cap chip rows by default; **“+ more”** reveals the full taxonomy.
+* Fix images via serializer `image_url` and S3 config; the gray boxes will disappear once the URLs are correct.
+* The queue issue should resolve with better “seen” filtering + resetting state each Next.
+
+Want me to also drop a quick **Figma → CSS** translation for spacing, type scale, and chip sizes to match your mock precisely?

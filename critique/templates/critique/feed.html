@@ -28,11 +28,64 @@
         }
         
         .desktop-layout {
+            display: flex;
+            flex-direction: column;
+            padding: 20px 40px;
+            min-height: calc(100vh - 200px);
+        }
+        
+        /* Horizontal Image Queue */
+        .image-queue-container {
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+        
+        .image-queue {
+            display: flex;
+            gap: 30px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            padding: 10px 0;
+            justify-content: center;
+        }
+        
+        .queue-artwork {
+            flex: 0 0 auto;
+            width: 280px;
+            height: 200px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .queue-artwork:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        
+        .queue-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .queue-artwork .loading-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #bdc3c7;
+        }
+        
+        /* Three-Column Critique Interface */
+        .critique-interface {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             gap: 40px;
-            padding: 20px 40px;
-            min-height: calc(100vh - 200px);
         }
         
         .critique-column {
@@ -46,28 +99,6 @@
             font-size: 1.5rem;
             margin-bottom: 30px;
             text-align: center;
-        }
-        
-        .column-artwork {
-            width: 100%;
-            max-width: 350px;
-            margin-bottom: 30px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-        }
-        
-        .column-artwork:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }
-        
-        .column-artwork img {
-            width: 100%;
-            height: 280px;
-            object-fit: cover;
-            display: block;
         }
         
         .tag-selection-area {
@@ -383,60 +414,60 @@
     </div>
 </div>
 
-<!-- Desktop Three-Column Layout -->
+<!-- Desktop Layout -->
 <div id="pair-container">
     <div class="desktop-layout">
-        <!-- Strengths Column -->
-        <div class="critique-column">
-            <h3>Strengths</h3>
-            <div id="strengths-artwork" class="column-artwork" data-artwork-id="">
-                <img id="strengths-img" alt="Artwork for strengths" style="display: none;">
-                <div class="loading-placeholder">
-                    <div class="text-muted">
+        <!-- Horizontal Image Queue -->
+        <div class="image-queue-container">
+            <div class="image-queue">
+                <div class="queue-artwork" data-artwork-id="">
+                    <img id="queue-img-1" alt="Artwork view 1" style="display: none;">
+                    <div class="loading-placeholder">
                         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                        Loading artwork...
                     </div>
                 </div>
-            </div>
-            <div class="tag-selection-area">
-                <div id="pro-tags" class="d-flex flex-wrap justify-content-center"></div>
-            </div>
-        </div>
-
-        <!-- Your Feedback Column -->
-        <div class="critique-column">
-            <h3>Your Feedback</h3>
-            <div id="feedback-artwork" class="column-artwork" data-artwork-id="">
-                <img id="feedback-img" alt="Artwork for feedback" style="display: none;">
-                <div class="loading-placeholder">
-                    <div class="text-muted">
+                <div class="queue-artwork" data-artwork-id="">
+                    <img id="queue-img-2" alt="Artwork view 2" style="display: none;">
+                    <div class="loading-placeholder">
                         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                        Loading artwork...
                     </div>
                 </div>
-            </div>
-            <div class="tag-selection-area">
-                <textarea id="general-feedback" class="feedback-textarea" placeholder="Share specific feedback or suggestions..."></textarea>
-                <div class="text-center">
-                    <button id="desktop-submit-btn" class="submit-button">Submit</button>
+                <div class="queue-artwork" data-artwork-id="">
+                    <img id="queue-img-3" alt="Artwork view 3" style="display: none;">
+                    <div class="loading-placeholder">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Opportunities Column -->
-        <div class="critique-column">
-            <h3>Opportunities</h3>
-            <div id="opportunities-artwork" class="column-artwork" data-artwork-id="">
-                <img id="opportunities-img" alt="Artwork for opportunities" style="display: none;">
-                <div class="loading-placeholder">
-                    <div class="text-muted">
-                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                        Loading artwork...
+        <!-- Three-Column Critique Interface -->
+        <div class="critique-interface">
+            <!-- Strengths Column -->
+            <div class="critique-column">
+                <h3>Strengths</h3>
+                <div class="tag-selection-area">
+                    <div id="pro-tags" class="d-flex flex-wrap justify-content-center"></div>
+                </div>
+            </div>
+
+            <!-- Your Feedback Column -->
+            <div class="critique-column">
+                <h3>Your Feedback</h3>
+                <div class="tag-selection-area">
+                    <textarea id="general-feedback" class="feedback-textarea" placeholder="Share specific feedback or suggestions..."></textarea>
+                    <div class="text-center">
+                        <button id="desktop-submit-btn" class="submit-button">Submit</button>
                     </div>
                 </div>
             </div>
-            <div class="tag-selection-area">
-                <div id="con-tags" class="d-flex flex-wrap justify-content-center"></div>
+
+            <!-- Opportunities Column -->
+            <div class="critique-column">
+                <h3>Opportunities</h3>
+                <div class="tag-selection-area">
+                    <div id="con-tags" class="d-flex flex-wrap justify-content-center"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -643,18 +674,18 @@ function renderPair(pairData) {
 }
 
 function renderDesktopLayout(pairData) {
-    // Use spotlight artwork for all three columns in desktop layout
+    // Use spotlight artwork for the horizontal image queue (3 times)
     const artwork = pairData.spotlight;
     
-    // Render artwork in all three columns
-    renderDesktopArtwork('strengths', artwork);
-    renderDesktopArtwork('feedback', artwork);
-    renderDesktopArtwork('opportunities', artwork);
+    // Render artwork in all three queue positions
+    renderQueueArtwork(1, artwork);
+    renderQueueArtwork(2, artwork);
+    renderQueueArtwork(3, artwork);
 }
 
-function renderDesktopArtwork(type, artworkData) {
-    const img = document.getElementById(`${type}-img`);
-    const container = document.getElementById(`${type}-artwork`);
+function renderQueueArtwork(position, artworkData) {
+    const img = document.getElementById(`queue-img-${position}`);
+    const container = img.closest('.queue-artwork');
     const placeholder = container.querySelector('.loading-placeholder');
     
     // Set artwork ID for click handling
@@ -730,26 +761,37 @@ function renderDesktopTagChips(chips) {
     proContainer.innerHTML = '';
     conContainer.innerHTML = '';
     
-    if (!chips || chips.length === 0) {
+    if (!chips || (!chips.pro && !chips.con)) {
         proContainer.innerHTML = '<p class="text-muted text-center py-3">No tags available</p>';
         conContainer.innerHTML = '<p class="text-muted text-center py-3">No tags available</p>';
         return;
     }
     
-    chips.forEach(chip => {
-        const chipEl = document.createElement('button');
-        chipEl.className = `tag-chip ${chip.category}-chip`;
-        chipEl.dataset.chipId = chip.id;
-        chipEl.dataset.category = chip.category;
-        chipEl.textContent = chip.text;
-        chipEl.onclick = () => toggleTagChip(chipEl, chip);
-        
-        if (chip.category === 'pro') {
+    // Render pro tags
+    if (chips.pro && Array.isArray(chips.pro)) {
+        chips.pro.forEach(chip => {
+            const chipEl = document.createElement('button');
+            chipEl.className = `tag-chip pro-chip`;
+            chipEl.dataset.chipId = chip.id;
+            chipEl.dataset.category = 'pro';
+            chipEl.textContent = chip.label;
+            chipEl.onclick = () => toggleTagChip(chipEl, chip);
             proContainer.appendChild(chipEl);
-        } else {
+        });
+    }
+    
+    // Render con tags
+    if (chips.con && Array.isArray(chips.con)) {
+        chips.con.forEach(chip => {
+            const chipEl = document.createElement('button');
+            chipEl.className = `tag-chip con-chip`;
+            chipEl.dataset.chipId = chip.id;
+            chipEl.dataset.category = 'con';
+            chipEl.textContent = chip.label;
+            chipEl.onclick = () => toggleTagChip(chipEl, chip);
             conContainer.appendChild(chipEl);
-        }
-    });
+        });
+    }
 }
 
 function renderMobileTagChips(chips) {
@@ -758,29 +800,45 @@ function renderMobileTagChips(chips) {
     
     container.innerHTML = '';
     
-    if (!chips || chips.length === 0) {
+    if (!chips || (!chips.pro && !chips.con)) {
         container.innerHTML = '<p class="text-muted text-center py-3">No tags available</p>';
         return;
     }
     
-    chips.forEach(chip => {
-        const chipEl = document.createElement('button');
-        chipEl.className = `tag-chip ${chip.category}-chip btn btn-sm btn-outline-secondary me-2 mb-2`;
-        chipEl.dataset.chipId = chip.id;
-        chipEl.dataset.category = chip.category;
-        chipEl.textContent = chip.text;
-        chipEl.onclick = () => toggleTagChip(chipEl, chip);
-        container.appendChild(chipEl);
-    });
+    // Render pro tags
+    if (chips.pro && Array.isArray(chips.pro)) {
+        chips.pro.forEach(chip => {
+            const chipEl = document.createElement('button');
+            chipEl.className = `tag-chip pro-chip btn btn-sm btn-outline-secondary me-2 mb-2`;
+            chipEl.dataset.chipId = chip.id;
+            chipEl.dataset.category = 'pro';
+            chipEl.textContent = chip.label;
+            chipEl.onclick = () => toggleTagChip(chipEl, chip);
+            container.appendChild(chipEl);
+        });
+    }
+    
+    // Render con tags
+    if (chips.con && Array.isArray(chips.con)) {
+        chips.con.forEach(chip => {
+            const chipEl = document.createElement('button');
+            chipEl.className = `tag-chip con-chip btn btn-sm btn-outline-secondary me-2 mb-2`;
+            chipEl.dataset.chipId = chip.id;
+            chipEl.dataset.category = 'con';
+            chipEl.textContent = chip.label;
+            chipEl.onclick = () => toggleTagChip(chipEl, chip);
+            container.appendChild(chipEl);
+        });
+    }
 }
 
 // Desktop artwork click handlers
 function addDesktopClickHandlers() {
-    const artworks = ['strengths', 'feedback', 'opportunities'];
-    
-    artworks.forEach(type => {
-        const container = document.getElementById(`${type}-artwork`);
-        if (container) {
+    // Handle clicks on queue artworks
+    for (let i = 1; i <= 3; i++) {
+        const img = document.getElementById(`queue-img-${i}`);
+        if (img) {
+            const container = img.closest('.queue-artwork');
             container.onclick = function(e) {
                 e.preventDefault();
                 const artworkId = this.dataset.artworkId;
@@ -789,7 +847,7 @@ function addDesktopClickHandlers() {
                 }
             };
         }
-    });
+    }
     
     // Add desktop submit button handler
     const desktopSubmitBtn = document.getElementById('desktop-submit-btn');
