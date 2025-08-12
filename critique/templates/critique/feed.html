@@ -674,13 +674,13 @@ function renderPair(pairData) {
 }
 
 function renderDesktopLayout(pairData) {
-    // Use spotlight artwork for the horizontal image queue (3 times)
-    const artwork = pairData.spotlight;
-    
-    // Render artwork in all three queue positions
-    renderQueueArtwork(1, artwork);
-    renderQueueArtwork(2, artwork);
-    renderQueueArtwork(3, artwork);
+    // Show different artworks in the horizontal image queue
+    // Position 1: Spotlight artwork
+    // Position 2: Counterpoint artwork  
+    // Position 3: Spotlight artwork (focused artwork for critique)
+    renderQueueArtwork(1, pairData.spotlight);
+    renderQueueArtwork(2, pairData.counterpoint);
+    renderQueueArtwork(3, pairData.spotlight);
 }
 
 function renderQueueArtwork(position, artworkData) {
