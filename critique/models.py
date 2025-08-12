@@ -792,3 +792,83 @@ class UserAchievement(models.Model):
     
     def __str__(self):
         return f"{self.user.username} earned {self.badge.name}"
+
+
+# Two-at-a-Time Critique Feed Models
+
+class Tag(models.Model):
+    """
+    Model for critique tags that can be applied as quick feedback.
+    Supports Pro/Con polarity for structured feedback.
+    """
+    PRO, CON = "PRO", "CON"
+    POLARITY_CHOICES = [(PRO, "Pro"), (CON, "Con")]
+
+    label = models.CharField(max_length=64, unique=True, help_text="The tag label (e.g., 'strong focal point', 'muddy values')")
+    polarity = models.CharField(max_length=3, choices=POLARITY_CHOICES, help_text="Whether this is a positive (Pro) or constructive (Con) tag")
+    category = models.CharField(max_length=32, blank=True, help_text="Category like 'composition', 'technique', 'concept'")
+    is_system = models.BooleanField(default=False, help_text="System-provided tags vs user-created tags")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['polarity', 'category', 'label']
+        verbose_name = 'Critique Tag'
+        verbose_name_plural = 'Critique Tags'
+
+    def __str__(self):
+        return f"{self.polarity}:{self.label}"
+
+
+class QuickCrit(models.Model):
+    """
+    Model for quick critiques that use tags and optional notes.
+    Part of the two-at-a-time critique feed system.
+    """
+    artwork = models.ForeignKey(ArtWork, on_delete=models.CASCADE, related_name="quick_crits")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="quick_crits")
+    note = models.TextField(blank=True, help_text="Optional detailed note from the critic")
+    summary = models.TextField(blank=True, help_text="AI-generated summary if note is blank")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = 'Quick Critique'
+        verbose_name_plural = 'Quick Critiques'
+
+    def __str__(self):
+        return f"Quick critique by {self.author.username} on {self.artwork.title}"
+
+
+class QuickCritTag(models.Model):
+    """
+    Junction table linking quick critiques to their tags.
+    """
+    quickcrit = models.ForeignKey(QuickCrit, on_delete=models.CASCADE, related_name="qc_tags")
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, related_name="quick_crits")
+    
+    class Meta:
+        unique_together = ("quickcrit", "tag")
+        verbose_name = 'Quick Critique Tag'
+        verbose_name_plural = 'Quick Critique Tags'
+
+    def __str__(self):
+        return f"{self.tag.label} on {self.quickcrit.artwork.title}"
+
+
+class PairSession(models.Model):
+    """
+    Model to track which artwork pairs a user has seen to avoid immediate repeats.
+    Helps create better user experience in the two-at-a-time feed.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="pair_sessions")
+    spotlight = models.ForeignKey(ArtWork, on_delete=models.CASCADE, related_name="spotlight_sessions")
+    counter = models.ForeignKey(ArtWork, on_delete=models.CASCADE, related_name="counter_sessions")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        verbose_name = 'Pair Session'
+        verbose_name_plural = 'Pair Sessions'
+
+    def __str__(self):
+        return f"{self.user.username} saw {self.spotlight.title} + {self.counter.title}"

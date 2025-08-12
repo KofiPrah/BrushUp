@@ -11,6 +11,7 @@ from .views import (
     AchievementBadgeViewSet, UserAchievementViewSet, user_badge_overview, trigger_badge_check, badge_leaderboard
 )
 from .move_artwork import move_artwork_to_folder
+from .feed_views import feed_next_pair, QuickCritViewSet, TagViewSet
 
 # Create a router and register our viewsets with it
 router = DefaultRouter()
@@ -24,11 +25,16 @@ router.register(r'folders', FolderViewSet, basename='folder')
 router.register(r'versions', ArtworkVersionViewSet, basename='version')
 router.register(r'badges', AchievementBadgeViewSet, basename='badge')
 router.register(r'achievements', UserAchievementViewSet, basename='achievement')
+router.register(r'quick-crits', QuickCritViewSet, basename='quick-crit')
+router.register(r'tags', TagViewSet, basename='tag')
 
 # The API URLs are determined automatically by the router
 urlpatterns = [
     # Custom endpoints that need to be before the router
     path('artworks/move-to-folder/', move_artwork_to_folder, name='artwork-move-to-folder'),
+    
+    # Two-at-a-time critique feed endpoints
+    path('feed/next/', feed_next_pair, name='feed-next'),
     
     # Achievement system endpoints - must be before router to prevent conflicts
     path('badges/overview/', user_badge_overview, name='user-badge-overview'),

@@ -51,4 +51,7 @@ urlpatterns = [
     # Real-time notifications
     path('notifications-demo/', views.notifications_demo_view, name='notifications_demo'),
     path('notifications-status/', views.notifications_status_view, name='notifications_status'),
+    
+    # Two-at-a-time critique feed
+    path('feed/', views.feed_view, name='feed'),
 ]

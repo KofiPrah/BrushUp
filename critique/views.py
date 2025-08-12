@@ -1063,3 +1063,11 @@ def send_password_reset_to_oauth_user(request):
         return JsonResponse({'error': 'User with this email does not exist'}, status=404)
     except Exception as e:
         return JsonResponse({'error': 'Failed to send email'}, status=500)
+
+
+def feed_view(request):
+    """
+    Two-at-a-time critique feed view for focused artwork critiquing.
+    Presents artworks in pairs to encourage comparative feedback.
+    """
+    return render(request, 'critique/feed.html')

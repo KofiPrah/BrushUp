@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from critique.models import ArtWork, ArtWorkVersion, Profile, Critique, Notification, Reaction, CritiqueReply, Folder, AchievementBadge, UserAchievement
+from critique.models import (
+    ArtWork, ArtWorkVersion, Profile, Critique, Notification, Reaction, 
+    CritiqueReply, Folder, AchievementBadge, UserAchievement,
+    Tag, QuickCrit, QuickCritTag, PairSession
+)
 from critique.api.missing_image_handler import get_image_url
 
 class ProfileSerializer(serializers.ModelSerializer):
@@ -683,3 +687,121 @@ class UserBadgeOverviewSerializer(serializers.Serializer):
         earned_count = len(obj.get('earned_badges', []))
         progress_count = len(obj.get('badge_progress', []))
         return earned_count + progress_count
+
+
+# ============================================================================
+# TWO-AT-A-TIME CRITIQUE FEED SERIALIZERS
+# ============================================================================
+
+class TagSerializer(serializers.ModelSerializer):
+    """Serializer for critique tags used in the quick critique system."""
+    
+    class Meta:
+        model = Tag
+        fields = ["id", "label", "polarity", "category", "is_system"]
+        read_only_fields = ["id"]
+
+
+class ArtworkCardSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for artwork cards in the critique feed."""
+    artist_name = serializers.CharField(source="author.username", read_only=True)
+    image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ArtWork
+        fields = ["id", "image_url", "title", "description", "artist_name", "medium", "tags"]
+        read_only_fields = ["id", "artist_name"]
+    
+    def get_image_url(self, obj):
+        """Get the display image URL for the artwork."""
+        return obj.get_display_image_url()
+
+
+class QuickCritSerializer(serializers.ModelSerializer):
+    """Serializer for quick critiques with tag handling."""
+    tag_ids = serializers.ListField(
+        child=serializers.IntegerField(), 
+        write_only=True, 
+        required=False,
+        help_text="List of existing tag IDs to apply"
+    )
+    new_tags = serializers.ListField(
+        child=serializers.CharField(), 
+        write_only=True, 
+        required=False,
+        help_text="List of new tag labels to create and apply"
+    )
+    tags = TagSerializer(source="qc_tags.tag", many=True, read_only=True)
+    author_name = serializers.CharField(source="author.username", read_only=True)
+    
+    class Meta:
+        model = QuickCrit
+        fields = ["id", "artwork", "note", "summary", "tag_ids", "new_tags", "tags", "author_name", "created_at"]
+        read_only_fields = ["id", "summary", "tags", "author_name", "created_at"]
+
+    def create(self, validated_data):
+        """Create a new quick critique with tags."""
+        user = self.context["request"].user
+        tag_ids = validated_data.pop("tag_ids", [])
+        new_tags = validated_data.pop("new_tags", [])
+        
+        # Create the quick critique
+        qc = QuickCrit.objects.create(author=user, **validated_data)
+
+        # Attach existing tags
+        if tag_ids:
+            from critique.models import QuickCritTag
+            QuickCritTag.objects.bulk_create([
+                QuickCritTag(quickcrit=qc, tag_id=tid) for tid in set(tag_ids)
+            ])
+
+        # Create and attach new tags
+        for raw in new_tags:
+            raw = raw.strip()
+            if not raw:
+                continue
+            
+            # Determine polarity from prefix (+/-) or default to CON (constructive)
+            polarity = Tag.PRO if raw.startswith("+") else Tag.CON if raw.startswith("-") else Tag.CON
+            label = raw.lstrip("+-").strip()[:64]
+            
+            if label:
+                from critique.models import Tag, QuickCritTag
+                tag, _ = Tag.objects.get_or_create(
+                    label__iexact=label, 
+                    defaults={
+                        "label": label, 
+                        "polarity": polarity, 
+                        "is_system": False
+                    }
+                )
+                QuickCritTag.objects.get_or_create(quickcrit=qc, tag=tag)
+
+        return qc
+
+
+class ArtworkCardSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for artwork cards in the critique feed."""
+    artist_name = serializers.CharField(source='author.username', read_only=True)
+    image_url = serializers.SerializerMethodField()
+    critique_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ArtWork
+        fields = [
+            'id', 'title', 'description', 'artist_name', 'image_url', 
+            'medium', 'created_at', 'critique_count'
+        ]
+        read_only_fields = ['id', 'created_at']
+    
+    def get_image_url(self, obj):
+        """Return the best available image URL for this artwork."""
+        if obj.image and hasattr(obj.image, 'url'):
+            return obj.image.url
+        elif obj.image_url:
+            return obj.image_url
+        return None
+    
+    def get_critique_count(self, obj):
+        """Return the number of critiques this artwork has received."""
+        return obj.critiques.count() + getattr(obj, 'quick_crits', obj.quick_crits).count()
