@@ -11,7 +11,7 @@
         padding-bottom: 120px; /* Space for quickbar */
     }
     
-    /* Desktop Layout - Three Column Design */
+    /* Desktop Layout - Refined Design */
     @media (min-width: 992px) {
         body {
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
@@ -23,97 +23,139 @@
         }
         
         #pair-container {
-            max-width: none;
-            padding: 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
         
         .desktop-layout {
+            display: grid;
+            grid-template-columns: 2fr 1.2fr;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        /* Spotlight (Big Left Side) */
+        .spotlight-section {
             display: flex;
             flex-direction: column;
-            padding: 20px 40px;
-            min-height: calc(100vh - 200px);
         }
         
-        /* Horizontal Image Queue */
-        .image-queue-container {
-            margin-bottom: 40px;
-            padding: 20px 0;
-        }
-        
-        .image-queue {
-            display: flex;
-            gap: 30px;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding: 10px 0;
-            justify-content: center;
-        }
-        
-        .queue-artwork {
-            flex: 0 0 auto;
-            width: 280px;
-            height: 200px;
-            border-radius: 12px;
+        .spotlight-artwork {
+            width: 100%;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.4);
             transition: all 0.3s ease;
             cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .spotlight-artwork:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        
+        .spotlight-artwork .ratio-lg {
+            aspect-ratio: 4 / 3;
             position: relative;
         }
         
-        .queue-artwork:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
-        }
-        
-        .queue-artwork img {
+        .spotlight-artwork img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
         }
         
-        .queue-artwork .loading-placeholder {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #bdc3c7;
+        /* Right Side Container */
+        .right-section {
+            display: grid;
+            gap: 24px;
+        }
+        
+        /* Counterpoint (Smaller Right Side) */
+        .counter-artwork {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .counter-artwork:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+        }
+        
+        .counter-artwork .ratio-sm {
+            aspect-ratio: 16 / 10;
+            position: relative;
+        }
+        
+        .counter-artwork img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
         
         /* Three-Column Critique Interface */
         .critique-interface {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .critique-columns {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 40px;
+            gap: 24px;
         }
         
-        .critique-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .critique-column h3 {
+        .critique-column h6 {
             color: #bdc3c7;
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
         }
         
-        .tag-selection-area {
-            width: 100%;
-            max-width: 350px;
+        /* Chip Management */
+        .chips-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .chips-wrap.is-expanded {
+            max-height: none;
+        }
+        
+        .chips-fade {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 40px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(255,255,255,0.05));
+            pointer-events: none;
         }
         
         .tag-chip {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #ecf0f1;
-            margin: 4px;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -139,52 +181,79 @@
             border-color: #c0392b;
         }
         
-        #quickbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
-            z-index: 1000;
+        .more-chips {
+            margin-top: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #bdc3c7;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .more-chips:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
         }
         
         .feedback-textarea {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 12px;
             width: 100%;
-            min-height: 80px;
+            min-height: 100px;
             resize: vertical;
+            font-size: 0.9rem;
         }
         
         .feedback-textarea::placeholder {
             color: rgba(255,255,255,0.6);
         }
         
-        .submit-button {
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .btn-submit {
             background: #3498db;
             border: none;
             color: white;
-            padding: 12px 30px;
-            border-radius: 25px;
-            font-weight: 600;
-            margin-top: 20px;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.85rem;
             transition: all 0.2s ease;
         }
         
-        .submit-button:hover {
+        .btn-submit:hover {
             background: #2980b9;
             transform: translateY(-1px);
         }
         
-        .submit-button:disabled {
+        .btn-secondary {
             background: rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #bdc3c7;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        
+        /* Hide quickbar on desktop */
+        #quickbar {
+            display: none;
         }
     }
     
@@ -417,56 +486,77 @@
 <!-- Desktop Layout -->
 <div id="pair-container">
     <div class="desktop-layout">
-        <!-- Horizontal Image Queue -->
-        <div class="image-queue-container">
-            <div class="image-queue">
-                <div class="queue-artwork" data-artwork-id="">
-                    <img id="queue-img-1" alt="Artwork view 1" style="display: none;">
-                    <div class="loading-placeholder">
+        <!-- Left: Spotlight Artwork (Big) -->
+        <div class="spotlight-section">
+            <div class="spotlight-artwork" data-artwork-id="">
+                <div class="ratio-lg">
+                    <img id="spotlight-img" alt="Spotlight artwork" style="display: none;">
+                    <div class="loading-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #bdc3c7;">
                         <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading artwork...
                     </div>
                 </div>
-                <div class="queue-artwork" data-artwork-id="">
-                    <img id="queue-img-2" alt="Artwork view 2" style="display: none;">
-                    <div class="loading-placeholder">
-                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                    </div>
-                </div>
-                <div class="queue-artwork" data-artwork-id="">
-                    <img id="queue-img-3" alt="Artwork view 3" style="display: none;">
-                    <div class="loading-placeholder">
-                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                    </div>
+            </div>
+            <div class="card-body">
+                <h5 id="spotlight-title" class="card-title mb-2"></h5>
+                <p id="spotlight-caption" class="card-text text-muted small"></p>
+                <div id="spotlight-meta" class="d-flex justify-content-between align-items-center text-muted small">
+                    <span id="spotlight-medium"></span>
+                    <span id="spotlight-date"></span>
                 </div>
             </div>
         </div>
 
-        <!-- Three-Column Critique Interface -->
-        <div class="critique-interface">
-            <!-- Strengths Column -->
-            <div class="critique-column">
-                <h3>Strengths</h3>
-                <div class="tag-selection-area">
-                    <div id="pro-tags" class="d-flex flex-wrap justify-content-center"></div>
+        <!-- Right: Counterpoint + Critique Interface -->
+        <div class="right-section">
+            <!-- Counterpoint Artwork (Smaller) -->
+            <div class="counter-artwork" data-artwork-id="">
+                <div class="ratio-sm">
+                    <img id="counter-img" alt="Counterpoint artwork" style="display: none;">
+                    <div class="loading-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #bdc3c7;">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        Loading artwork...
+                    </div>
                 </div>
-            </div>
-
-            <!-- Your Feedback Column -->
-            <div class="critique-column">
-                <h3>Your Feedback</h3>
-                <div class="tag-selection-area">
-                    <textarea id="general-feedback" class="feedback-textarea" placeholder="Share specific feedback or suggestions..."></textarea>
-                    <div class="text-center">
-                        <button id="desktop-submit-btn" class="submit-button">Submit</button>
+                <div class="card-body">
+                    <h6 id="counter-title" class="card-title mb-2"></h6>
+                    <p id="counter-caption" class="card-text text-muted small"></p>
+                    <div id="counter-meta" class="d-flex justify-content-between align-items-center text-muted small">
+                        <span id="counter-medium"></span>
+                        <span id="counter-date"></span>
                     </div>
                 </div>
             </div>
 
-            <!-- Opportunities Column -->
-            <div class="critique-column">
-                <h3>Opportunities</h3>
-                <div class="tag-selection-area">
-                    <div id="con-tags" class="d-flex flex-wrap justify-content-center"></div>
+            <!-- Three-Column Critique Interface -->
+            <div class="critique-interface">
+                <div class="critique-columns">
+                    <!-- Strengths Column -->
+                    <div class="critique-column">
+                        <h6>Strengths</h6>
+                        <div id="pro-chips" class="chips-wrap"></div>
+                        <div class="chips-fade"></div>
+                        <button id="pro-more" class="more-chips" style="display: none;">Show more</button>
+                    </div>
+
+                    <!-- Your Feedback Column -->
+                    <div class="critique-column">
+                        <h6>Your Feedback</h6>
+                        <textarea id="general-feedback" class="feedback-textarea" placeholder="Share specific feedback..."></textarea>
+                        <div class="action-buttons">
+                            <button id="desktop-submit-btn" class="btn-submit">Submit</button>
+                            <button id="desktop-swap-btn" class="btn-secondary">Swap</button>
+                            <button id="desktop-next-btn" class="btn-secondary ms-auto" disabled>Next →</button>
+                        </div>
+                    </div>
+
+                    <!-- Opportunities Column -->
+                    <div class="critique-column">
+                        <h6>Opportunities</h6>
+                        <div id="con-chips" class="chips-wrap"></div>
+                        <div class="chips-fade"></div>
+                        <button id="con-more" class="more-chips" style="display: none;">Show more</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -674,19 +764,21 @@ function renderPair(pairData) {
 }
 
 function renderDesktopLayout(pairData) {
-    // Show different artworks in the horizontal image queue
-    // Position 1: Spotlight artwork
-    // Position 2: Counterpoint artwork  
-    // Position 3: Spotlight artwork (focused artwork for critique)
-    renderQueueArtwork(1, pairData.spotlight);
-    renderQueueArtwork(2, pairData.counterpoint);
-    renderQueueArtwork(3, pairData.spotlight);
+    // Render spotlight artwork (big left side)
+    renderDesktopArtwork('spotlight', pairData.spotlight);
+    
+    // Render counterpoint artwork (smaller right side)
+    renderDesktopArtwork('counter', pairData.counterpoint);
 }
 
-function renderQueueArtwork(position, artworkData) {
-    const img = document.getElementById(`queue-img-${position}`);
-    const container = img.closest('.queue-artwork');
+function renderDesktopArtwork(type, artworkData) {
+    const img = document.getElementById(`${type}-img`);
+    const container = img.closest(`.${type}-artwork`);
     const placeholder = container.querySelector('.loading-placeholder');
+    const title = document.getElementById(`${type}-title`);
+    const caption = document.getElementById(`${type}-caption`);
+    const medium = document.getElementById(`${type}-medium`);
+    const date = document.getElementById(`${type}-date`);
     
     // Set artwork ID for click handling
     container.dataset.artworkId = artworkData.id;
@@ -703,6 +795,17 @@ function renderQueueArtwork(position, artworkData) {
         img.src = artworkData.image_url;
     } else {
         placeholder.innerHTML = '<div class="text-muted"><i class="bi bi-image"></i> No image available</div>';
+    }
+    
+    // Set content
+    if (title) title.textContent = `${artworkData.title} — ${artworkData.artist_name}`;
+    if (caption) caption.textContent = artworkData.description || '';
+    if (medium) medium.textContent = artworkData.medium || '';
+    
+    // Format date
+    if (date && artworkData.created_at) {
+        const date_obj = new Date(artworkData.created_at);
+        date.textContent = date_obj.toLocaleDateString();
     }
 }
 
@@ -755,43 +858,63 @@ function renderTagChips(chips) {
 }
 
 function renderDesktopTagChips(chips) {
-    const proContainer = document.getElementById('pro-tags');
-    const conContainer = document.getElementById('con-tags');
+    if (!chips || (!chips.pro && !chips.con)) return;
     
-    proContainer.innerHTML = '';
-    conContainer.innerHTML = '';
-    
-    if (!chips || (!chips.pro && !chips.con)) {
-        proContainer.innerHTML = '<p class="text-muted text-center py-3">No tags available</p>';
-        conContainer.innerHTML = '<p class="text-muted text-center py-3">No tags available</p>';
-        return;
-    }
-    
-    // Render pro tags
+    // Render pro tags with limited display
     if (chips.pro && Array.isArray(chips.pro)) {
-        chips.pro.forEach(chip => {
-            const chipEl = document.createElement('button');
-            chipEl.className = `tag-chip pro-chip`;
-            chipEl.dataset.chipId = chip.id;
-            chipEl.dataset.category = 'pro';
-            chipEl.textContent = chip.label;
-            chipEl.onclick = () => toggleTagChip(chipEl, chip);
-            proContainer.appendChild(chipEl);
-        });
+        renderChipsLimited(chips.pro.map(t => ({...t, polarity: 'PRO'})), 'pro-chips', 'pro-more');
     }
     
-    // Render con tags
+    // Render con tags with limited display
     if (chips.con && Array.isArray(chips.con)) {
-        chips.con.forEach(chip => {
-            const chipEl = document.createElement('button');
-            chipEl.className = `tag-chip con-chip`;
-            chipEl.dataset.chipId = chip.id;
-            chipEl.dataset.category = 'con';
-            chipEl.textContent = chip.label;
-            chipEl.onclick = () => toggleTagChip(chipEl, chip);
-            conContainer.appendChild(chipEl);
-        });
+        renderChipsLimited(chips.con.map(t => ({...t, polarity: 'CON'})), 'con-chips', 'con-more');
     }
+}
+
+function renderChipsLimited(list, containerId, moreBtnId) {
+    const wrap = document.getElementById(containerId);
+    const moreBtn = document.getElementById(moreBtnId);
+    const MAX = 12;
+    let expanded = false;
+
+    function render() {
+        wrap.innerHTML = "";
+        const items = expanded ? list : list.slice(0, MAX);
+        
+        items.forEach(chip => {
+            const chipEl = document.createElement('button');
+            const polarity = chip.polarity === 'PRO' ? 'pro' : 'con';
+            chipEl.className = `tag-chip ${polarity}-chip`;
+            chipEl.dataset.chipId = chip.id;
+            chipEl.dataset.category = polarity;
+            chipEl.textContent = (chip.polarity === 'PRO' ? '+ ' : '• ') + chip.label;
+            chipEl.onclick = () => toggleTagChip(chipEl, chip);
+            wrap.appendChild(chipEl);
+        });
+        
+        wrap.classList.toggle("is-expanded", expanded);
+        
+        // Show/hide fade overlay
+        const fadeEl = wrap.nextElementSibling;
+        if (fadeEl && fadeEl.classList.contains('chips-fade')) {
+            fadeEl.style.display = (!expanded && list.length > MAX) ? "block" : "none";
+        }
+        
+        // Show/hide more button
+        if (moreBtn) {
+            moreBtn.style.display = (list.length > MAX) ? "inline-flex" : "none";
+            moreBtn.textContent = expanded ? "Show less" : `Show ${list.length - MAX} more`;
+        }
+    }
+
+    if (moreBtn) {
+        moreBtn.onclick = () => { 
+            expanded = !expanded; 
+            render(); 
+        };
+    }
+    
+    render();
 }
 
 function renderMobileTagChips(chips) {
@@ -834,22 +957,31 @@ function renderMobileTagChips(chips) {
 
 // Desktop artwork click handlers
 function addDesktopClickHandlers() {
-    // Handle clicks on queue artworks
-    for (let i = 1; i <= 3; i++) {
-        const img = document.getElementById(`queue-img-${i}`);
-        if (img) {
-            const container = img.closest('.queue-artwork');
-            container.onclick = function(e) {
-                e.preventDefault();
-                const artworkId = this.dataset.artworkId;
-                if (artworkId) {
-                    window.open(`/artworks/${artworkId}/`, '_blank');
-                }
-            };
-        }
+    // Handle clicks on spotlight artwork
+    const spotlightContainer = document.querySelector('.spotlight-artwork');
+    if (spotlightContainer) {
+        spotlightContainer.onclick = function(e) {
+            e.preventDefault();
+            const artworkId = this.dataset.artworkId;
+            if (artworkId) {
+                window.open(`/artworks/${artworkId}/`, '_blank');
+            }
+        };
     }
     
-    // Add desktop submit button handler
+    // Handle clicks on counter artwork
+    const counterContainer = document.querySelector('.counter-artwork');
+    if (counterContainer) {
+        counterContainer.onclick = function(e) {
+            e.preventDefault();
+            const artworkId = this.dataset.artworkId;
+            if (artworkId) {
+                window.open(`/artworks/${artworkId}/`, '_blank');
+            }
+        };
+    }
+    
+    // Desktop submit button handler
     const desktopSubmitBtn = document.getElementById('desktop-submit-btn');
     if (desktopSubmitBtn) {
         desktopSubmitBtn.onclick = async function() {
@@ -858,7 +990,6 @@ function addDesktopClickHandlers() {
             this.classList.add('loading');
             
             try {
-                // Collect feedback from desktop layout
                 const feedbackText = document.getElementById('general-feedback').value.trim();
                 if (hasSelectedTags() || feedbackText) {
                     await submitDesktopCritique(feedbackText);
@@ -872,6 +1003,43 @@ function addDesktopClickHandlers() {
             }
         };
     }
+    
+    // Desktop swap button handler
+    const desktopSwapBtn = document.getElementById('desktop-swap-btn');
+    if (desktopSwapBtn) {
+        desktopSwapBtn.onclick = function() {
+            // Swap spotlight and counterpoint
+            const spotlightData = { ...feedState.pair.spotlight };
+            feedState.pair.spotlight = { ...feedState.pair.counterpoint };
+            feedState.pair.counterpoint = spotlightData;
+            renderPair(feedState.pair);
+        };
+    }
+    
+    // Desktop next button handler  
+    const desktopNextBtn = document.getElementById('desktop-next-btn');
+    if (desktopNextBtn) {
+        desktopNextBtn.onclick = async function() {
+            if (this.disabled) return;
+            await loadNextPair();
+        };
+    }
+    
+    // Feedback textarea handler to enable/disable next button
+    const feedbackTextarea = document.getElementById('general-feedback');
+    if (feedbackTextarea) {
+        feedbackTextarea.addEventListener('input', function() {
+            updateDesktopNextButtonState();
+        });
+    }
+}
+
+function updateDesktopNextButtonState() {
+    const nextBtn = document.getElementById('desktop-next-btn');
+    if (!nextBtn) return;
+    
+    const hasContent = hasSelectedTags() || document.getElementById('general-feedback').value.trim().length > 0;
+    nextBtn.disabled = !hasContent;
 }
 
 function toggleTag(artwork, tagId, chipElement) {
