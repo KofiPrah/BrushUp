@@ -1,0 +1,186 @@
+gotcha — here’s a tight “replit-ready” patch to (a) stop the endless chip list, (b) make the artwork big, and (c) remove the bottom nav on desktop (keep it on mobile if you want).
+
+---
+
+# 1) CSS: bigger art, 3-column desktop layout, chip collapse, hide quickbar on desktop
+
+**Edit** `static/css/brushup-theme.css` and add/replace these blocks:
+
+```css
+/* ===== Layout: make artwork big & centered ===== */
+.feed-shell{ max-width: 1200px; margin-inline:auto; padding-inline:16px; }
+.pair-grid{ display:grid; gap:24px; align-items:start; }
+@media (min-width: 992px){ .pair-grid{ grid-template-columns: 2fr 1.2fr; } }  /* big Spotlight, smaller Counter */
+.spotlight .ratio-lg{ aspect-ratio: 4 / 3; }   /* bigger image */
+.counter   .ratio-sm{ aspect-ratio: 16 / 10; }
+
+/* ===== Chips: show a short list by default, expandable ===== */
+.chips-wrap{ display:flex; flex-wrap:wrap; gap:8px; max-height:220px; overflow:hidden; position:relative; }
+.chips-wrap.is-expanded{ max-height:none; }
+.chips-fade{ position:absolute; left:0; right:0; bottom:0; height:56px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0), var(--surface)); pointer-events:none; }
+.more-chips{ margin-top:8px; }
+
+/* ===== Kill bottom bar on desktop (keep on mobile) ===== */
+#quickbar{ display:none; }
+@media (max-width: 991px){
+  #quickbar{ display:grid; }
+  .has-quickbar-bottom{ padding-bottom: 96px; }
+}
+@media (min-width: 992px){
+  .has-quickbar-bottom{ padding-bottom: 0 !important; }
+}
+```
+
+---
+
+# 2) Template: grid the pair + 3 columns for “Strengths | Feedback | Opportunities”
+
+**Update your feed template body** to this structure (keep your header/nav):
+
+```html
+<main class="container-xxl py-3 has-quickbar-bottom">
+  <div class="feed-shell">
+    <div class="pair-grid">
+      <!-- LEFT: Spotlight (big) -->
+      <article id="spotlight" class="card spotlight position-relative">
+        <a id="spotlight-link" class="stretched-link" href="#"></a>
+        <div class="ratio-lg">
+          <img id="spotlight-img" class="object-fit-cover" alt="">
+        </div>
+        <div class="card-body">
+          <h5 id="spotlight-title" class="card-title mb-1"></h5>
+          <p id="spotlight-caption" class="card-text text-muted small"></p>
+        </div>
+      </article>
+
+      <!-- RIGHT: Counterpoint + Critique UI -->
+      <div class="d-grid gap-4">
+        <article id="counter" class="card counter position-relative">
+          <a id="counter-link" class="stretched-link" href="#"></a>
+          <div class="ratio-sm">
+            <img id="counter-img" class="object-fit-cover" alt="">
+          </div>
+          <div class="card-body">
+            <h6 id="counter-title" class="card-title mb-1"></h6>
+            <p id="counter-caption" class="card-text text-muted small"></p>
+          </div>
+        </article>
+
+        <!-- 3-column chips & note (desktop) -->
+        <section class="card">
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-lg-4">
+                <h6 class="text-muted mb-2">Strengths</h6>
+                <div id="pro-chips" class="chips-wrap"></div>
+                <div class="chips-fade"></div>
+                <button id="pro-more" class="btn btn-sm btn-outline-secondary more-chips">Show more</button>
+              </div>
+              <div class="col-lg-4">
+                <h6 class="text-muted mb-2">Your Feedback</h6>
+                <textarea id="quick-note" class="form-control mb-2" rows="4"
+                  placeholder="Share a specific suggestion..."></textarea>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-primary" id="submit-note">Submit</button>
+                  <button class="btn btn-outline-secondary" id="swap">Swap</button>
+                  <button class="btn btn-outline-secondary ms-auto" id="next" disabled>Next Pair →</button>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <h6 class="text-muted mb-2">Opportunities</h6>
+                <div id="con-chips" class="chips-wrap"></div>
+                <div class="chips-fade"></div>
+                <button id="con-more" class="btn btn-sm btn-outline-secondary more-chips">Show more</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Keep the existing #quickbar in the file if you want it on mobile only; CSS hides it on desktop -->
+```
+
+---
+
+# 3) JS: limit chips to a small set, add “Show more”, wire bigger image links
+
+**In your feed JS**, add/replace these helpers:
+
+```js
+function renderChipsLimited(list, containerId, moreBtnId, side){
+  const wrap = document.getElementById(containerId);
+  const moreBtn = document.getElementById(moreBtnId);
+  const MAX = 12;                       // show only 12 by default
+  let expanded = false;
+
+  function render(){
+    wrap.innerHTML = "";
+    const items = expanded ? list : list.slice(0, MAX);
+    items.forEach(t => wrap.appendChild(chip(t, side)));
+    wrap.classList.toggle("is-expanded", expanded);
+    // fade overlay only when collapsed and overflowed
+    wrap.nextElementSibling.style.display = (!expanded && list.length > MAX) ? "block" : "none";
+    moreBtn.style.display = (list.length > MAX) ? "inline-flex" : "none";
+    moreBtn.textContent = expanded ? "Show less" : `Show ${list.length - MAX} more`;
+  }
+
+  moreBtn.onclick = () => { expanded = !expanded; render(); };
+  render();
+}
+
+// update your renderPair:
+function renderPair(p){
+  state.pair = p;
+  const s = p.spotlight, c = p.counterpoint;
+  document.getElementById('spotlight-img').src   = s.image_url || '';
+  document.getElementById('counter-img').src     = c.image_url || '';
+  document.getElementById('spotlight-link').href = `/artworks/${s.id}/`;
+  document.getElementById('counter-link').href   = `/artworks/${c.id}/`;
+
+  renderChipsLimited(p.chips.pro.map(t=>({...t, polarity:'PRO'})), "pro-chips", "pro-more", "spotlight");
+  renderChipsLimited(p.chips.con.map(t=>({...t, polarity:'CON'})), "con-chips", "con-more", "spotlight");
+}
+```
+
+…and keep your existing `chip()` function, but make sure it accepts a `side`:
+
+```js
+function chip(t, side){
+  const pol = t.polarity === 'PRO' ? '-pro' : '-con';
+  const b = h('button', {class:`chip ${pol}`, 'data-id':t.id});
+  b.textContent = (t.polarity==='PRO'?'+ ':'• ') + t.label;
+  b.onclick = ()=>{
+    addTag(side, t.id);
+    b.classList.toggle('is-selected');
+    document.getElementById('next').disabled = !hasAnyTag() && !document.getElementById('quick-note').value.trim();
+  };
+  return b;
+}
+```
+
+**Note button / Next enabling:**
+
+```js
+document.getElementById('submit-note').onclick = ()=>{
+  state.chosen.spotlight.note = document.getElementById('quick-note').value.trim();
+  document.getElementById('next').disabled = !hasAnyTag() && !state.chosen.spotlight.note;
+};
+document.getElementById('quick-note').addEventListener('input', (e)=>{
+  state.chosen.spotlight.note = e.target.value.trim();
+  document.getElementById('next').disabled = !hasAnyTag() && !state.chosen.spotlight.note;
+});
+```
+
+---
+
+## What this does
+
+* **Chips:** shows only 12 per column with a *Show more* toggle and a subtle fade. No giant lists.
+* **Artwork:** Spotlight image now fills a much larger 4:3 card; Counterpoint uses a smaller 16:10 card to the right.
+* **Bottom bar:** hidden on desktop automatically; still available on mobile (≤991px). If you want it gone everywhere, just delete the `#quickbar` markup.
+
+If you want the exact sizes/colors to match your Figma tokens, paste those values and I’ll tune the CSS variables precisely.
