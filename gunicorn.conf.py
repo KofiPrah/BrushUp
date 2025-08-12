@@ -1,56 +1,36 @@
-"""
-Production Gunicorn configuration for Brush Up deployment
-Optimized for Replit Autoscale with memory and timeout management
-"""
-
+# Gunicorn configuration for Replit deployment
 import os
 
-# Server socket
-bind = f"0.0.0.0:{os.environ.get('PORT', '8080')}"
-backlog = 2048
+# Port configuration - use environment variable or default to 5000
+port = int(os.environ.get("PORT", 5000))
+bind = f"0.0.0.0:{port}"
 
-# Worker processes
-workers = 1  # Reduced to prevent memory issues on autoscale
+# Worker configuration
+workers = 2
 worker_class = "sync"
 worker_connections = 1000
-timeout = 120  # Increased timeout for startup
-keepalive = 2
 
-# Restart workers after this many requests, to help control memory usage
-max_requests = 1000
-max_requests_jitter = 100
+# Timeout configuration
+timeout = 30
+keepalive = 60
 
-# Preload application for better memory usage
+# Preload app for better performance
 preload_app = True
 
-# Logging
+# Enable reloading in development
+reload = os.environ.get("DJANGO_DEBUG", "false").lower() == "true"
+
+# Logging configuration
+loglevel = "info"
 accesslog = "-"
 errorlog = "-"
-loglevel = "info"
-access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
 
 # Process naming
-proc_name = "brushup"
+proc_name = "artcritique"
 
-# Server mechanics
-daemon = False
-pidfile = None
-user = None
-group = None
-tmp_upload_dir = None
+# Security
+limit_request_line = 4094
+limit_request_fields = 100
+limit_request_field_size = 8190
 
-# SSL (disabled for Replit)
-keyfile = None
-certfile = None
-
-def when_ready(server):
-    server.log.info("Server is ready. Spawning workers")
-
-def worker_int(worker):
-    worker.log.info("worker received INT or QUIT signal")
-
-def pre_fork(server, worker):
-    server.log.info("Worker spawned (pid: %s)", worker.pid)
-
-def post_fork(server, worker):
-    server.log.info("Worker spawned (pid: %s)", worker.pid)
+print(f"Gunicorn configured to bind to {bind}")
