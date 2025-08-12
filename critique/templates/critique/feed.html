@@ -9,6 +9,8 @@
     #pair-container {
         min-height: calc(100vh - 200px);
         padding-bottom: 120px; /* Space for quickbar */
+        max-width: 800px;
+        margin: 0 auto;
     }
     
     #spotlight {
@@ -107,15 +109,72 @@
         cursor: pointer;
         border-radius: 12px;
         overflow: hidden;
+        position: relative;
     }
     
     .artwork-card:hover {
         box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateY(-2px);
     }
     
     .artwork-image {
         object-fit: cover;
         background: #f8f9fa;
+        width: 100%;
+        height: 100%;
+        display: block;
+    }
+    
+    .artwork-image-container {
+        position: relative;
+        background: linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+                   linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+                   linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+                   linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+    
+    .loading-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    /* Responsive improvements */
+    @media (max-width: 768px) {
+        #pair-container {
+            padding: 0 15px 120px 15px;
+        }
+        
+        .artwork-card {
+            margin-bottom: 20px;
+        }
+        
+        #quickbar {
+            padding: 15px;
+        }
+    }
+    
+    @media (min-width: 769px) {
+        #pair-container {
+            padding: 20px 0 120px 0;
+        }
+        
+        .artwork-card {
+            margin-bottom: 30px;
+        }
+        
+        #spotlight .ratio {
+            padding-bottom: 60%; /* 5:3 ratio for desktop spotlight */
+        }
+        
+        #counter .ratio {
+            padding-bottom: 50%; /* 2:1 ratio for desktop counter */
+        }
     }
     
     .action-buttons {
@@ -160,63 +219,77 @@
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-3">
-        <div class="col-12 text-center">
-            <h2 class="mb-2">Critique Feed</h2>
-            <p class="text-muted">Help fellow artists improve by giving quick, focused feedback</p>
-        </div>
-    </div>
-
-    <!-- Pair Container -->
-    <div id="pair-container" class="row justify-content-center">
-        <div class="col-lg-8 col-xl-6">
-            
-            <!-- Spotlight Artwork -->
-            <article id="spotlight" class="artwork-card card mb-4 shadow-sm">
-                <div class="ratio ratio-1x1">
-                    <img id="spotlight-img" class="artwork-image card-img-top" alt="Spotlight artwork" style="display: none;">
-                    <div class="d-flex align-items-center justify-content-center bg-light">
-                        <div class="text-muted">Loading artwork...</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h5 id="spotlight-title" class="card-title mb-1"></h5>
-                    <p id="spotlight-caption" class="card-text text-muted small"></p>
-                    <div id="spotlight-tags" class="d-flex flex-wrap gap-1 mb-2"></div>
-                </div>
-            </article>
-
-            <!-- Counterpoint Artwork -->
-            <article id="counter" class="artwork-card card mb-5 opacity-75">
-                <div class="ratio ratio-16x9">
-                    <img id="counter-img" class="artwork-image card-img-top" alt="Counterpoint artwork" style="display: none;">
-                    <div class="d-flex align-items-center justify-content-center bg-light">
-                        <div class="text-muted">Loading artwork...</div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <h6 id="counter-title" class="card-title mb-1"></h6>
-                    <p id="counter-caption" class="card-text text-muted small"></p>
-                    <div id="counter-tags" class="d-flex flex-wrap gap-1 mb-2"></div>
-                </div>
-            </article>
-            
-            <!-- No artworks message -->
-            <div id="no-pairs-message" class="text-center py-5" style="display: none;">
-                <div class="mb-4">
-                    <i class="bi bi-palette2" style="font-size: 4rem; color: #6c757d;"></i>
-                </div>
-                <h4 class="text-muted mb-3">No more pairs available</h4>
-                <p class="text-muted">Check back later for new artworks to critique!</p>
-                <a href="{% url 'critique:artwork_list' %}" class="btn btn-primary">
-                    <i class="bi bi-grid"></i> Browse All Artworks
-                </a>
-            </div>
-        </div>
+<!-- Header -->
+<div class="container text-center mb-4">
+    <h2 class="mb-2">Critique Feed</h2>
+    <p class="text-muted">Help fellow artists improve by giving quick, focused feedback</p>
+    <div class="d-flex justify-content-center gap-3 small text-muted">
+        <span><i class="bi bi-mouse"></i> Click artworks for details</span>
+        <span><i class="bi bi-arrow-down"></i> Scroll or use arrow keys</span>
+        <span><i class="bi bi-keyboard"></i> Press N to advance</span>
     </div>
 </div>
+
+    <!-- Pair Container -->
+    <div id="pair-container">
+        <!-- Spotlight Artwork -->
+        <article id="spotlight" class="artwork-card card mb-4 shadow-sm" data-artwork-id="">
+            <div class="ratio ratio-4x3">
+                <div class="artwork-image-container">
+                    <img id="spotlight-img" class="artwork-image" alt="Spotlight artwork" style="display: none;">
+                    <div class="loading-placeholder">
+                        <div class="text-muted">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Loading artwork...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h5 id="spotlight-title" class="card-title mb-2"></h5>
+                <p id="spotlight-caption" class="card-text text-muted small mb-2"></p>
+                <div id="spotlight-meta" class="d-flex justify-content-between align-items-center text-muted small">
+                    <span id="spotlight-medium"></span>
+                    <span id="spotlight-date"></span>
+                </div>
+            </div>
+        </article>
+
+        <!-- Counterpoint Artwork -->
+        <article id="counter" class="artwork-card card mb-5" data-artwork-id="">
+            <div class="ratio ratio-16x9">
+                <div class="artwork-image-container">
+                    <img id="counter-img" class="artwork-image" alt="Counterpoint artwork" style="display: none;">
+                    <div class="loading-placeholder">
+                        <div class="text-muted">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            Loading artwork...
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <h6 id="counter-title" class="card-title mb-2"></h6>
+                <p id="counter-caption" class="card-text text-muted small mb-2"></p>
+                <div id="counter-meta" class="d-flex justify-content-between align-items-center text-muted small">
+                    <span id="counter-medium"></span>
+                    <span id="counter-date"></span>
+                </div>
+            </div>
+        </article>
+            
+        <!-- No artworks message -->
+        <div id="no-pairs-message" class="text-center py-5" style="display: none;">
+            <div class="mb-4">
+                <i class="bi bi-palette2" style="font-size: 4rem; color: #6c757d;"></i>
+            </div>
+            <h4 class="text-muted mb-3">No more pairs available</h4>
+            <p class="text-muted">Check back later for new artworks to critique!</p>
+            <a href="{% url 'critique:artwork_list' %}" class="btn btn-primary">
+                <i class="bi bi-grid"></i> Browse All Artworks
+            </a>
+        </div>
+    </div>
 
 <!-- Quick Critique Bar -->
 <div id="quickbar" class="p-3">
@@ -334,24 +407,10 @@ function renderPair(pairData) {
     feedState.pair = pairData;
     
     // Render spotlight artwork
-    const spotlightImg = document.getElementById('spotlight-img');
-    const spotlightTitle = document.getElementById('spotlight-title');
-    const spotlightCaption = document.getElementById('spotlight-caption');
+    renderArtworkCard('spotlight', pairData.spotlight);
     
-    spotlightImg.src = pairData.spotlight.image_url;
-    spotlightImg.style.display = 'block';
-    spotlightTitle.textContent = `${pairData.spotlight.title} — ${pairData.spotlight.artist_name}`;
-    spotlightCaption.textContent = pairData.spotlight.description || '';
-    
-    // Render counter artwork
-    const counterImg = document.getElementById('counter-img');
-    const counterTitle = document.getElementById('counter-title');
-    const counterCaption = document.getElementById('counter-caption');
-    
-    counterImg.src = pairData.counterpoint.image_url;
-    counterImg.style.display = 'block';
-    counterTitle.textContent = `${pairData.counterpoint.title} — ${pairData.counterpoint.artist_name}`;
-    counterCaption.textContent = pairData.counterpoint.description || '';
+    // Render counter artwork  
+    renderArtworkCard('counter', pairData.counterpoint);
     
     // Render tag chips
     renderTagChips(pairData.chips);
@@ -363,6 +422,44 @@ function renderPair(pairData) {
     };
     
     updateNextButtonState();
+}
+
+function renderArtworkCard(type, artworkData) {
+    const card = document.getElementById(type);
+    const img = document.getElementById(`${type}-img`);
+    const title = document.getElementById(`${type}-title`);
+    const caption = document.getElementById(`${type}-caption`);
+    const medium = document.getElementById(`${type}-medium`);
+    const date = document.getElementById(`${type}-date`);
+    const placeholder = card.querySelector('.loading-placeholder');
+    
+    // Set artwork ID for click handling
+    card.dataset.artworkId = artworkData.id;
+    
+    // Handle image loading
+    if (artworkData.image_url) {
+        img.onload = function() {
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
+        };
+        img.onerror = function() {
+            placeholder.innerHTML = '<div class="text-muted"><i class="bi bi-image"></i> Image not available</div>';
+        };
+        img.src = artworkData.image_url;
+    } else {
+        placeholder.innerHTML = '<div class="text-muted"><i class="bi bi-image"></i> No image available</div>';
+    }
+    
+    // Set content
+    title.textContent = `${artworkData.title} — ${artworkData.artist_name}`;
+    caption.textContent = artworkData.description || '';
+    medium.textContent = artworkData.medium || '';
+    
+    // Format date
+    if (artworkData.created_at) {
+        const date_obj = new Date(artworkData.created_at);
+        date.textContent = date_obj.toLocaleDateString();
+    }
 }
 
 function renderTagChips(chips) {
@@ -520,13 +617,45 @@ function hideNoPairsMessage() {
 }
 
 function showError(message) {
-    // You can integrate with your toast notification system here
-    console.error(message);
+    createToast(message, 'error');
 }
 
 function showInfo(message) {
-    // You can integrate with your toast notification system here  
-    console.info(message);
+    createToast(message, 'info');
+}
+
+function createToast(message, type = 'info') {
+    const toastContainer = getOrCreateToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'primary'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    toastContainer.appendChild(toast);
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+    
+    // Remove toast element after it's hidden
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+function getOrCreateToastContainer() {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container';
+        container.className = 'toast-container position-fixed top-0 end-0 p-3';
+        container.style.zIndex = '9999';
+        document.body.appendChild(container);
+    }
+    return container;
 }
 
 // Event listeners
@@ -561,12 +690,32 @@ document.addEventListener('DOMContentLoaded', function() {
         this.classList.add('loading');
         
         try {
-            await submitQuickCritique();
+            if (hasSelectedTags()) {
+                await submitQuickCritique();
+            }
             await loadNextPair();
         } catch (error) {
             console.error('Error processing next pair:', error);
+            showError('Failed to process critique. Please try again.');
         } finally {
             this.classList.remove('loading');
+        }
+    };
+    
+    // Artwork click handlers for detail views
+    document.getElementById('spotlight').onclick = function(e) {
+        e.preventDefault();
+        const artworkId = this.dataset.artworkId;
+        if (artworkId) {
+            window.open(`/artworks/${artworkId}/`, '_blank');
+        }
+    };
+    
+    document.getElementById('counter').onclick = function(e) {
+        e.preventDefault();
+        const artworkId = this.dataset.artworkId;
+        if (artworkId) {
+            window.open(`/artworks/${artworkId}/`, '_blank');
         }
     };
     
@@ -599,7 +748,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
     
-    // Keyboard shortcuts
+    // Keyboard shortcuts and scroll handling
     document.addEventListener('keydown', function(e) {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         
@@ -609,6 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('swap-btn').click();
                 break;
             case 'n':
+            case 'enter':
                 e.preventDefault();
                 if (!document.getElementById('next-btn').disabled) {
                     document.getElementById('next-btn').click();
@@ -617,7 +767,42 @@ document.addEventListener('DOMContentLoaded', function() {
             case 'escape':
                 document.getElementById('skip-btn').click();
                 break;
+            case 'arrowdown':
+            case 'space':
+                e.preventDefault();
+                // Smooth scroll to next artwork or quickbar
+                const counter = document.getElementById('counter');
+                const quickbar = document.getElementById('quickbar');
+                if (window.scrollY < counter.offsetTop - 100) {
+                    counter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    quickbar.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }
+                break;
+            case 'arrowup':
+                e.preventDefault();
+                document.getElementById('spotlight').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                break;
         }
+    });
+    
+    // Auto-advance on scroll to bottom
+    let scrollTimeout;
+    window.addEventListener('scroll', function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollHeight = document.documentElement.scrollHeight;
+            const scrollTop = document.documentElement.scrollTop;
+            const clientHeight = document.documentElement.clientHeight;
+            
+            // If scrolled to bottom and has tags selected, auto-advance
+            if (scrollTop + clientHeight >= scrollHeight - 50 && hasSelectedTags()) {
+                const nextBtn = document.getElementById('next-btn');
+                if (!nextBtn.disabled && !nextBtn.classList.contains('loading')) {
+                    nextBtn.click();
+                }
+            }
+        }, 200);
     });
 });
 
