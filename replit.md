@@ -6,6 +6,14 @@ Brush Up is a Django-powered web application designed for art professionals to s
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+**Date: August 12, 2025**
+- ✅ Fixed deployment failures by resolving Django import errors in critique/api/feed_views.py
+- ✅ Added root health check endpoint at `/` for deployment monitoring
+- ✅ Updated gunicorn configuration to bind to port 5000 (resolving port mismatch)
+- ✅ Reorganized URL patterns to support deployment health checks
+- ✅ Application now deployment-ready with all health checks passing
+
 ## System Architecture
 
 ### Core Design Principles

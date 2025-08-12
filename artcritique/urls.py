@@ -40,13 +40,18 @@ def health_check(request):
             "service": "artcritique"
         }, status=503)
 
+def root_health_check(request):
+    """Root health check endpoint for deployment health checks"""
+    return health_check(request)
+
 urlpatterns = [
-    path('', include('critique.urls')),  # Main Brush Up art platform at root
-    path('health/', health_check, name='health_check'),  # Health check moved to /health/
+    path('', root_health_check, name='root_health_check'),  # Root health check for deployment
+    path('health/', health_check, name='health_check'),  # Additional health check endpoint
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('allauth.urls')),
     path('api/', include('critique.api.urls')),  # DRF API endpoints
+    path('app/', include('critique.urls')),  # Main Brush Up art platform moved to /app/
 ]
 
 # Serve static and media files in all environments since we're using local storage
