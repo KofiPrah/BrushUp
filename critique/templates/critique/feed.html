@@ -10,15 +10,21 @@
     body{ background: linear-gradient(135deg,#2c3e50 0%,#34495e 100%); color:#fff; }
     #quickbar{ display:none !important; } /* hide bottom bar on desktop */
   }
-  #pair-container{ max-width:1200px; margin:0 auto; padding:20px; }
-  .desktop-layout{ display:grid; grid-template-columns:2fr 1.2fr; gap:40px; align-items:start; }
-  .spotlight-artwork,.counter-artwork{ border-radius:16px; overflow:hidden; box-shadow:0 12px 48px rgba(0,0,0,.35); background:#111; }
-  .spotlight-artwork .ratio-lg{ aspect-ratio:4/3; position:relative; }
-  .counter-artwork .ratio-sm{ aspect-ratio:16/10; position:relative; }
-  .spotlight-artwork img,.counter-artwork img{ width:100%; height:100%; object-fit:cover; display:block; }
+  #feed-container{ max-width:800px; margin:0 auto; padding:20px; }
+  .single-layout{ display:flex; flex-direction:column; gap:20px; }
+  
+  .artwork-display{ 
+    border-radius:16px; overflow:hidden; box-shadow:0 12px 48px rgba(0,0,0,.35); 
+    background:#111; margin-bottom:20px;
+  }
+  .artwork-display .ratio-artwork{ aspect-ratio:4/3; position:relative; }
+  .artwork-display img{ width:100%; height:100%; object-fit:cover; display:block; }
 
-  .critique-interface{ background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:24px; backdrop-filter:blur(10px); }
-  .critique-columns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:24px; }
+  .critique-interface{ 
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); 
+    border-radius:16px; padding:24px; backdrop-filter:blur(10px); 
+  }
+  .critique-columns{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
   .critique-column h6{ color:#bdc3c7; font-size:.9rem; text-transform:uppercase; margin-bottom:12px; }
 
   /* Chips (collapse with Show more) */
@@ -32,9 +38,22 @@
   .pro-chip.selected{ background:#27ae60; border-color:#219a52; }
   .con-chip.selected{ background:#e67e22; border-color:#c86b17; }
 
+  .feedback-section {
+    grid-column: 1 / -1;
+    margin-top: 16px;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
   /* Mobile container */
   @media (max-width: 991px){
-    #pair-container{ padding:0 15px 120px; }
+    #feed-container{ padding:0 15px 120px; }
+    .critique-columns{ grid-template-columns:1fr; gap:16px; }
   }
 
   /* Quickbar (mobile) */
@@ -50,47 +69,30 @@
 
 {% block content %}
 
-<!-- Desktop Layout -->
-<div id="pair-container" class="desktop-layout">
-  <!-- LEFT: Spotlight -->
-  <section id="spotlight-desktop" class="spotlight-section">
-    <div class="spotlight-artwork" data-artwork-id="">
-      <div class="ratio-lg">
-        <img id="spotlight-img-desktop" alt="Spotlight artwork" style="display:none;">
+<!-- Single Artwork Layout -->
+<div id="feed-container" class="single-layout">
+  <!-- Artwork Display -->
+  <section id="artwork-section" class="artwork-section">
+    <div class="artwork-display" data-artwork-id="">
+      <div class="ratio-artwork">
+        <img id="artwork-img" alt="Featured artwork" style="display:none;">
         <div class="loading-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#bdc3c7;">
           <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading artwork...
         </div>
       </div>
-    </div>
-    <div class="card-body">
-      <h5 id="spotlight-title-desktop" class="card-title mb-2"></h5>
-      <p id="spotlight-caption-desktop" class="card-text text-muted small"></p>
-      <div id="spotlight-meta-desktop" class="d-flex justify-content-between align-items-center text-muted small">
-        <span id="spotlight-medium-desktop"></span>
-        <span id="spotlight-date-desktop"></span>
+      <div class="card-body p-3">
+        <h5 id="artwork-title" class="card-title mb-2"></h5>
+        <p id="artwork-caption" class="card-text text-muted small"></p>
+        <div id="artwork-meta" class="d-flex justify-content-between align-items-center text-muted small">
+          <span id="artwork-medium"></span>
+          <span id="artwork-date"></span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- RIGHT: Counter + Critique UI -->
-  <section class="right-section">
-    <div id="counter-desktop" class="counter-artwork" data-artwork-id="">
-      <div class="ratio-sm">
-        <img id="counter-img-desktop" alt="Counterpoint artwork" style="display:none;">
-        <div class="loading-placeholder" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#bdc3c7;">
-          <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading artwork...
-        </div>
-      </div>
-      <div class="card-body">
-        <h6 id="counter-title-desktop" class="card-title mb-2"></h6>
-        <p id="counter-caption-desktop" class="card-text text-muted small"></p>
-        <div id="counter-meta-desktop" class="d-flex justify-content-between align-items-center text-muted small">
-          <span id="counter-medium-desktop"></span>
-          <span id="counter-date-desktop"></span>
-        </div>
-      </div>
-    </div>
-
+  <!-- Critique Interface -->
+  <section class="critique-section">
     <div class="critique-interface">
       <div class="critique-columns">
         <div class="critique-column">
@@ -100,19 +102,19 @@
           <button id="pro-more" class="more-chips" style="display:none;">Show more</button>
         </div>
         <div class="critique-column">
-          <h6>Your Feedback</h6>
-          <textarea id="general-feedback" class="form-control mb-2" rows="4" placeholder="Share a specific suggestion..."></textarea>
-          <div class="d-flex gap-2">
-            <button id="desktop-submit-btn" class="btn btn-primary">Submit</button>
-            <button id="desktop-swap-btn" class="btn btn-outline-secondary">Swap</button>
-            <button id="desktop-next-btn" class="btn btn-outline-secondary ms-auto" disabled>Next →</button>
-          </div>
-        </div>
-        <div class="critique-column">
           <h6>Opportunities</h6>
           <div id="con-tags" class="chips-wrap"></div>
           <div class="chips-fade"></div>
           <button id="con-more" class="more-chips" style="display:none;">Show more</button>
+        </div>
+        <div class="feedback-section">
+          <h6>Your Feedback</h6>
+          <textarea id="general-feedback" class="form-control mb-3" rows="4" placeholder="Share your thoughts about this artwork..."></textarea>
+          <div class="action-buttons">
+            <button id="submit-btn" class="btn btn-primary">Submit Feedback</button>
+            <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
+            <button id="next-btn" class="btn btn-outline-success" disabled>Next Artwork →</button>
+          </div>
         </div>
       </div>
     </div>
@@ -133,11 +135,11 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Share feedback..."></textarea>
+      <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Share your thoughts..."></textarea>
       <div class="d-flex gap-2">
         <button id="mobile-submit-btn" class="btn btn-primary btn-sm">Submit</button>
-        <button id="mobile-swap-btn" class="btn btn-outline-secondary btn-sm">Swap</button>
-        <button id="mobile-next-btn" class="btn btn-outline-secondary btn-sm ms-auto" disabled>Next →</button>
+        <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">Skip</button>
+        <button id="mobile-next-btn" class="btn btn-outline-success btn-sm ms-auto" disabled>Next →</button>
       </div>
     </div>
   </div>
@@ -151,40 +153,63 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadFeedData() {
-  // Fetch two artworks for comparison
-  fetch('/api/feed/pair/')
+  // Fetch single artwork for critique
+  fetch('/api/feed/single/')
     .then(response => response.json())
     .then(data => {
-      if (data.artworks && data.artworks.length >= 2) {
-        displayArtworks(data.artworks[0], data.artworks[1]);
+      if (data.artwork) {
+        displayArtwork(data.artwork);
       } else {
-        console.error('Not enough artworks for feed');
+        console.error('No artwork available for feed');
+        showNoArtworkMessage();
       }
     })
     .catch(error => {
       console.error('Error loading feed data:', error);
+      // Fallback to artwork list API if single endpoint doesn't exist yet
+      fetch('/api/artworks/')
+        .then(response => response.json())
+        .then(data => {
+          if (data.results && data.results.length > 0) {
+            // Pick a random artwork from the results
+            const randomArtwork = data.results[Math.floor(Math.random() * data.results.length)];
+            displayArtwork(randomArtwork);
+          } else {
+            showNoArtworkMessage();
+          }
+        })
+        .catch(fallbackError => {
+          console.error('Fallback API also failed:', fallbackError);
+          showNoArtworkMessage();
+        });
     });
 }
 
-function displayArtworks(spotlight, counter) {
-  // Display spotlight artwork
-  document.getElementById('spotlight-img-desktop').src = spotlight.image_url;
-  document.getElementById('spotlight-img-desktop').style.display = 'block';
-  document.getElementById('spotlight-title-desktop').textContent = spotlight.title;
-  document.getElementById('spotlight-caption-desktop').textContent = spotlight.description || '';
-  document.getElementById('spotlight-medium-desktop').textContent = spotlight.medium || '';
-  document.getElementById('spotlight-date-desktop').textContent = new Date(spotlight.created_at).toLocaleDateString();
-
-  // Display counter artwork
-  document.getElementById('counter-img-desktop').src = counter.image_url;
-  document.getElementById('counter-img-desktop').style.display = 'block';
-  document.getElementById('counter-title-desktop').textContent = counter.title;
-  document.getElementById('counter-caption-desktop').textContent = counter.description || '';
-  document.getElementById('counter-medium-desktop').textContent = counter.medium || '';
-  document.getElementById('counter-date-desktop').textContent = new Date(counter.created_at).toLocaleDateString();
+function displayArtwork(artwork) {
+  // Display the artwork
+  const artworkImg = document.getElementById('artwork-img');
+  const imageUrl = artwork.image_url || artwork.image || '/static/images/placeholder.jpg';
+  
+  artworkImg.src = imageUrl;
+  artworkImg.style.display = 'block';
+  
+  document.getElementById('artwork-title').textContent = artwork.title || 'Untitled';
+  document.getElementById('artwork-caption').textContent = artwork.description || 'No description available';
+  document.getElementById('artwork-medium').textContent = artwork.medium || 'Mixed Media';
+  
+  const createdDate = artwork.created_at ? new Date(artwork.created_at).toLocaleDateString() : 'Recently';
+  document.getElementById('artwork-date').textContent = createdDate;
+  
+  // Store artwork ID for critique submission
+  document.querySelector('.artwork-display').dataset.artworkId = artwork.id || '';
 
   // Hide loading placeholders
   document.querySelectorAll('.loading-placeholder').forEach(el => el.style.display = 'none');
+}
+
+function showNoArtworkMessage() {
+  document.querySelector('.loading-placeholder').innerHTML = 
+    '<div class="text-center"><i class="bi bi-palette2"></i><br>No artworks available for critique right now.<br><small>Check back later!</small></div>';
 }
 
 function initializeFeedInterface() {
@@ -192,14 +217,14 @@ function initializeFeedInterface() {
   loadCritiqueTags();
   
   // Bind event handlers
-  document.getElementById('desktop-submit-btn').addEventListener('click', submitCritique);
-  document.getElementById('desktop-swap-btn').addEventListener('click', swapArtworks);
-  document.getElementById('desktop-next-btn').addEventListener('click', loadNextPair);
+  document.getElementById('submit-btn').addEventListener('click', submitCritique);
+  document.getElementById('skip-btn').addEventListener('click', skipArtwork);
+  document.getElementById('next-btn').addEventListener('click', loadNextArtwork);
   
   // Mobile handlers
   document.getElementById('mobile-submit-btn').addEventListener('click', submitCritique);
-  document.getElementById('mobile-swap-btn').addEventListener('click', swapArtworks);
-  document.getElementById('mobile-next-btn').addEventListener('click', loadNextPair);
+  document.getElementById('mobile-skip-btn').addEventListener('click', skipArtwork);
+  document.getElementById('mobile-next-btn').addEventListener('click', loadNextArtwork);
 }
 
 function loadCritiqueTags() {
@@ -236,12 +261,37 @@ function submitCritique() {
     return;
   }
   
+  const artworkId = document.querySelector('.artwork-display').dataset.artworkId;
+  
   // Submit critique data
-  console.log('Submitting critique:', { feedback, selectedProTags, selectedConTags });
+  const critiqueData = {
+    artwork_id: artworkId,
+    feedback: feedback.trim(),
+    pro_tags: selectedProTags,
+    con_tags: selectedConTags
+  };
+  
+  console.log('Submitting critique:', critiqueData);
+  
+  // Show success message
+  const submitBtn = document.getElementById('submit-btn');
+  const mobileSubmitBtn = document.getElementById('mobile-submit-btn');
+  
+  submitBtn.textContent = 'Submitted!';
+  submitBtn.disabled = true;
+  mobileSubmitBtn.textContent = 'Submitted!';
+  mobileSubmitBtn.disabled = true;
   
   // Enable next button
-  document.getElementById('desktop-next-btn').disabled = false;
+  document.getElementById('next-btn').disabled = false;
   document.getElementById('mobile-next-btn').disabled = false;
+  
+  setTimeout(() => {
+    submitBtn.textContent = 'Submit Feedback';
+    submitBtn.disabled = false;
+    mobileSubmitBtn.textContent = 'Submit';
+    mobileSubmitBtn.disabled = false;
+  }, 2000);
 }
 
 function getSelectedTags(chipClass) {
@@ -249,49 +299,35 @@ function getSelectedTags(chipClass) {
     .map(chip => chip.textContent);
 }
 
-function swapArtworks() {
-  // Swap the spotlight and counter artworks
-  const spotlightData = {
-    img: document.getElementById('spotlight-img-desktop').src,
-    title: document.getElementById('spotlight-title-desktop').textContent,
-    caption: document.getElementById('spotlight-caption-desktop').textContent,
-    medium: document.getElementById('spotlight-medium-desktop').textContent,
-    date: document.getElementById('spotlight-date-desktop').textContent
-  };
-  
-  const counterData = {
-    img: document.getElementById('counter-img-desktop').src,
-    title: document.getElementById('counter-title-desktop').textContent,
-    caption: document.getElementById('counter-caption-desktop').textContent,
-    medium: document.getElementById('counter-medium-desktop').textContent,
-    date: document.getElementById('counter-date-desktop').textContent
-  };
-  
-  // Swap the data
-  document.getElementById('spotlight-img-desktop').src = counterData.img;
-  document.getElementById('spotlight-title-desktop').textContent = counterData.title;
-  document.getElementById('spotlight-caption-desktop').textContent = counterData.caption;
-  document.getElementById('spotlight-medium-desktop').textContent = counterData.medium;
-  document.getElementById('spotlight-date-desktop').textContent = counterData.date;
-  
-  document.getElementById('counter-img-desktop').src = spotlightData.img;
-  document.getElementById('counter-title-desktop').textContent = spotlightData.title;
-  document.getElementById('counter-caption-desktop').textContent = spotlightData.caption;
-  document.getElementById('counter-medium-desktop').textContent = spotlightData.medium;
-  document.getElementById('counter-date-desktop').textContent = spotlightData.date;
+function skipArtwork() {
+  // Enable next button and move to next artwork
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('mobile-next-btn').disabled = false;
+  loadNextArtwork();
 }
 
-function loadNextPair() {
+function loadNextArtwork() {
   // Reset form
-  document.getElementById('general-feedback').value = '';
-  document.getElementById('general-feedback-mobile').value = '';
+  const feedbackField = document.getElementById('general-feedback');
+  const mobileFeedbackField = document.getElementById('general-feedback-mobile');
+  
+  if (feedbackField) feedbackField.value = '';
+  if (mobileFeedbackField) mobileFeedbackField.value = '';
+  
   document.querySelectorAll('.tag-chip.selected').forEach(chip => chip.classList.remove('selected'));
   
   // Disable next button
-  document.getElementById('desktop-next-btn').disabled = true;
+  document.getElementById('next-btn').disabled = true;
   document.getElementById('mobile-next-btn').disabled = true;
   
-  // Load new pair
+  // Show loading state
+  document.getElementById('artwork-img').style.display = 'none';
+  document.querySelectorAll('.loading-placeholder').forEach(el => {
+    el.style.display = 'flex';
+    el.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading next artwork...';
+  });
+  
+  // Load new artwork
   loadFeedData();
 }
 </script>
