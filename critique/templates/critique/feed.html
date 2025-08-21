@@ -17,7 +17,13 @@
     border-radius:16px; overflow:hidden; box-shadow:0 12px 48px rgba(0,0,0,.35); 
     background:#111; margin-bottom:20px; display:flex; justify-content:center; align-items:center;
   }
-  .artwork-display .ratio-artwork{ position:relative; display:flex; justify-content:center; align-items:center; }
+  .artwork-display .ratio-artwork{ 
+    position:relative; display:flex; justify-content:center; align-items:center; 
+    min-height:500px; transition:min-height 0.3s ease-out;
+  }
+  .artwork-display .ratio-artwork.has-image{ 
+    min-height:auto;
+  }
   .artwork-display img{ 
     max-width:100%; max-height:80vh; width:auto; height:auto; 
     object-fit:contain; display:block; border-radius:8px;
@@ -66,6 +72,13 @@
     .artwork-display{ 
       background:#fff; box-shadow:0 6px 24px rgba(0,0,0,.1); 
       display:flex; justify-content:center; align-items:center;
+    }
+    .artwork-display .ratio-artwork{ 
+      position:relative; display:flex; justify-content:center; align-items:center; 
+      min-height:400px; transition:min-height 0.3s ease-out;
+    }
+    .artwork-display .ratio-artwork.has-image{ 
+      min-height:auto;
     }
     .artwork-display img{ 
       max-width:100%; max-height:70vh; width:auto; height:auto; 
@@ -226,11 +239,13 @@ function loadFeedData() {
 function displayArtwork(artwork) {
   // Display the artwork
   const artworkImg = document.getElementById('artwork-img');
+  const ratioContainer = document.querySelector('.ratio-artwork');
   const imageUrl = artwork.image_display_url || artwork.image_url || artwork.image;
   
   // Reset image state for new load
   artworkImg.classList.remove('loaded');
   artworkImg.style.display = 'none';
+  ratioContainer.classList.remove('has-image');
   
   if (imageUrl) {
     // Create new image for preloading
@@ -244,6 +259,9 @@ function displayArtwork(artwork) {
       // Trigger animation after a brief delay to ensure display is rendered
       setTimeout(() => {
         artworkImg.classList.add('loaded');
+        // Allow container to adapt to image dimensions
+        ratioContainer.classList.add('has-image');
+        
         // Fade out loading placeholder
         const placeholder = document.querySelector('.loading-placeholder');
         placeholder.style.opacity = '0';
@@ -397,10 +415,13 @@ function loadNextArtwork() {
   
   // Show loading state with smooth transition
   const artworkImg = document.getElementById('artwork-img');
+  const ratioContainer = document.querySelector('.ratio-artwork');
   const placeholder = document.querySelector('.loading-placeholder');
   
-  // Fade out current image
+  // Fade out current image and reset container to loading state
   artworkImg.classList.remove('loaded');
+  ratioContainer.classList.remove('has-image');
+  
   setTimeout(() => {
     artworkImg.style.display = 'none';
     
