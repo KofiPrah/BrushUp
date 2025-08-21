@@ -21,6 +21,11 @@
   .artwork-display img{ 
     max-width:100%; max-height:80vh; width:auto; height:auto; 
     object-fit:contain; display:block; border-radius:8px;
+    opacity:0; transition:opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+    transform:scale(0.98);
+  }
+  .artwork-display img.loaded{ 
+    opacity:1; transform:scale(1);
   }
 
   .critique-interface{ 
@@ -65,6 +70,11 @@
     .artwork-display img{ 
       max-width:100%; max-height:70vh; width:auto; height:auto; 
       object-fit:contain; border-radius:8px;
+      opacity:0; transition:opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
+      transform:scale(0.98);
+    }
+    .artwork-display img.loaded{ 
+      opacity:1; transform:scale(1);
     }
     .critique-interface{ background:#fff; border:1px solid #e0e0e0; }
   }
@@ -77,6 +87,21 @@
     padding:15px;
   }
   .chip-row{ max-height:120px; overflow-x:auto; overflow-y:hidden; }
+  
+  /* Loading placeholder animations */
+  .loading-placeholder {
+    transition: opacity 0.4s ease-out;
+  }
+  
+  /* Enhanced spinner animation */
+  .spinner-border {
+    animation: spinner-grow 1.2s ease-in-out infinite;
+  }
+  
+  @keyframes spinner-grow {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
 </style>
 {% endblock %}
 
@@ -203,22 +228,47 @@ function displayArtwork(artwork) {
   const artworkImg = document.getElementById('artwork-img');
   const imageUrl = artwork.image_display_url || artwork.image_url || artwork.image;
   
+  // Reset image state for new load
+  artworkImg.classList.remove('loaded');
+  artworkImg.style.display = 'none';
+  
   if (imageUrl) {
-    artworkImg.src = imageUrl;
-    artworkImg.style.display = 'block';
+    // Create new image for preloading
+    const tempImg = new Image();
     
-    // Handle image load errors
-    artworkImg.onerror = function() {
-      this.style.display = 'none';
+    tempImg.onload = function() {
+      // Image loaded successfully - show with smooth animation
+      artworkImg.src = imageUrl;
+      artworkImg.style.display = 'block';
+      
+      // Trigger animation after a brief delay to ensure display is rendered
+      setTimeout(() => {
+        artworkImg.classList.add('loaded');
+        // Fade out loading placeholder
+        const placeholder = document.querySelector('.loading-placeholder');
+        placeholder.style.opacity = '0';
+        setTimeout(() => {
+          placeholder.style.display = 'none';
+        }, 400);
+      }, 50);
+    };
+    
+    tempImg.onerror = function() {
+      // Handle image load errors
       const placeholder = document.querySelector('.loading-placeholder');
       placeholder.innerHTML = '<div class="text-center text-muted"><i class="bi bi-image" style="font-size: 3rem;"></i><br>Image not available</div>';
       placeholder.style.display = 'flex';
+      placeholder.style.opacity = '1';
     };
+    
+    // Start loading the image
+    tempImg.src = imageUrl;
   } else {
     // No image available
     const placeholder = document.querySelector('.loading-placeholder');
     placeholder.innerHTML = '<div class="text-center text-muted"><i class="bi bi-image" style="font-size: 3rem;"></i><br>No image available</div>';
     placeholder.style.display = 'flex';
+    placeholder.style.opacity = '1';
   }
   
   document.getElementById('artwork-title').textContent = artwork.title || 'Untitled';
@@ -230,11 +280,6 @@ function displayArtwork(artwork) {
   
   // Store artwork ID for critique submission
   document.querySelector('.artwork-display').dataset.artworkId = artwork.id || '';
-
-  // Hide loading placeholders if image loads successfully
-  if (imageUrl) {
-    document.querySelectorAll('.loading-placeholder').forEach(el => el.style.display = 'none');
-  }
 }
 
 function showNoArtworkMessage() {
@@ -350,15 +395,25 @@ function loadNextArtwork() {
   document.getElementById('next-btn').disabled = true;
   document.getElementById('mobile-next-btn').disabled = true;
   
-  // Show loading state
-  document.getElementById('artwork-img').style.display = 'none';
-  document.querySelectorAll('.loading-placeholder').forEach(el => {
-    el.style.display = 'flex';
-    el.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading next artwork...';
-  });
+  // Show loading state with smooth transition
+  const artworkImg = document.getElementById('artwork-img');
+  const placeholder = document.querySelector('.loading-placeholder');
   
-  // Load new artwork
-  loadFeedData();
+  // Fade out current image
+  artworkImg.classList.remove('loaded');
+  setTimeout(() => {
+    artworkImg.style.display = 'none';
+    
+    // Show loading placeholder with animation
+    placeholder.style.display = 'flex';
+    placeholder.style.opacity = '1';
+    placeholder.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading next artwork...';
+    
+    // Load new artwork after brief delay for smoother transition
+    setTimeout(() => {
+      loadFeedData();
+    }, 200);
+  }, 300);
 }
 </script>
 
