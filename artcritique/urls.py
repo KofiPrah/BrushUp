@@ -20,6 +20,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.db import connection
+from django.shortcuts import redirect
 
 def health_check(request):
     """Health check endpoint for deployment monitoring"""
@@ -40,18 +41,18 @@ def health_check(request):
             "service": "artcritique"
         }, status=503)
 
-def root_health_check(request):
-    """Root health check endpoint for deployment health checks"""
-    return health_check(request)
+def root_redirect(request):
+    """Redirect root URL to the main application"""
+    return redirect('/app/')
 
 urlpatterns = [
-    path('', root_health_check, name='root_health_check'),  # Root health check for deployment
-    path('health/', health_check, name='health_check'),  # Additional health check endpoint
+    path('', root_redirect, name='root_redirect'),  # Redirect root to main app
+    path('health/', health_check, name='health_check'),  # Health check endpoint
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('accounts/', include('allauth.urls')),
     path('api/', include('critique.api.urls')),  # DRF API endpoints
-    path('app/', include('critique.urls')),  # Main Brush Up art platform moved to /app/
+    path('app/', include('critique.urls')),  # Main Brush Up art platform
 ]
 
 # Serve static and media files in all environments since we're using local storage

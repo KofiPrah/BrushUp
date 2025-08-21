@@ -110,4 +110,190 @@
         </div>
         <div class="critique-column">
           <h6>Opportunities</h6>
-          <div
+          <div id="con-tags" class="chips-wrap"></div>
+          <div class="chips-fade"></div>
+          <button id="con-more" class="more-chips" style="display:none;">Show more</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Mobile Quickbar -->
+<div id="quickbar" class="d-lg-none">
+  <div class="row chip-row mb-3">
+    <div class="col-6">
+      <h6 class="small text-muted mb-2">Strengths</h6>
+      <div id="pro-tags-mobile" class="d-flex flex-wrap gap-2"></div>
+    </div>
+    <div class="col-6">
+      <h6 class="small text-muted mb-2">Opportunities</h6>
+      <div id="con-tags-mobile" class="d-flex flex-wrap gap-2"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Share feedback..."></textarea>
+      <div class="d-flex gap-2">
+        <button id="mobile-submit-btn" class="btn btn-primary btn-sm">Submit</button>
+        <button id="mobile-swap-btn" class="btn btn-outline-secondary btn-sm">Swap</button>
+        <button id="mobile-next-btn" class="btn btn-outline-secondary btn-sm ms-auto" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Load feed data and initialize interface
+  loadFeedData();
+  initializeFeedInterface();
+});
+
+function loadFeedData() {
+  // Fetch two artworks for comparison
+  fetch('/api/feed/pair/')
+    .then(response => response.json())
+    .then(data => {
+      if (data.artworks && data.artworks.length >= 2) {
+        displayArtworks(data.artworks[0], data.artworks[1]);
+      } else {
+        console.error('Not enough artworks for feed');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading feed data:', error);
+    });
+}
+
+function displayArtworks(spotlight, counter) {
+  // Display spotlight artwork
+  document.getElementById('spotlight-img-desktop').src = spotlight.image_url;
+  document.getElementById('spotlight-img-desktop').style.display = 'block';
+  document.getElementById('spotlight-title-desktop').textContent = spotlight.title;
+  document.getElementById('spotlight-caption-desktop').textContent = spotlight.description || '';
+  document.getElementById('spotlight-medium-desktop').textContent = spotlight.medium || '';
+  document.getElementById('spotlight-date-desktop').textContent = new Date(spotlight.created_at).toLocaleDateString();
+
+  // Display counter artwork
+  document.getElementById('counter-img-desktop').src = counter.image_url;
+  document.getElementById('counter-img-desktop').style.display = 'block';
+  document.getElementById('counter-title-desktop').textContent = counter.title;
+  document.getElementById('counter-caption-desktop').textContent = counter.description || '';
+  document.getElementById('counter-medium-desktop').textContent = counter.medium || '';
+  document.getElementById('counter-date-desktop').textContent = new Date(counter.created_at).toLocaleDateString();
+
+  // Hide loading placeholders
+  document.querySelectorAll('.loading-placeholder').forEach(el => el.style.display = 'none');
+}
+
+function initializeFeedInterface() {
+  // Initialize critique tag selections
+  loadCritiqueTags();
+  
+  // Bind event handlers
+  document.getElementById('desktop-submit-btn').addEventListener('click', submitCritique);
+  document.getElementById('desktop-swap-btn').addEventListener('click', swapArtworks);
+  document.getElementById('desktop-next-btn').addEventListener('click', loadNextPair);
+  
+  // Mobile handlers
+  document.getElementById('mobile-submit-btn').addEventListener('click', submitCritique);
+  document.getElementById('mobile-swap-btn').addEventListener('click', swapArtworks);
+  document.getElementById('mobile-next-btn').addEventListener('click', loadNextPair);
+}
+
+function loadCritiqueTags() {
+  // Sample critique tags
+  const proTags = ['Strong composition', 'Great use of color', 'Excellent technique', 'Creative concept', 'Good lighting', 'Nice details'];
+  const conTags = ['Could improve composition', 'Color balance needs work', 'Technique could be refined', 'Needs more contrast', 'Background distracting'];
+  
+  populateTags('pro-tags', proTags, 'pro-chip');
+  populateTags('con-tags', conTags, 'con-chip');
+  populateTags('pro-tags-mobile', proTags, 'pro-chip');
+  populateTags('con-tags-mobile', conTags, 'con-chip');
+}
+
+function populateTags(containerId, tags, chipClass) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  
+  tags.forEach(tag => {
+    const chip = document.createElement('span');
+    chip.className = `tag-chip ${chipClass}`;
+    chip.textContent = tag;
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    container.appendChild(chip);
+  });
+}
+
+function submitCritique() {
+  const feedback = document.getElementById('general-feedback').value || document.getElementById('general-feedback-mobile').value;
+  const selectedProTags = getSelectedTags('pro-chip');
+  const selectedConTags = getSelectedTags('con-chip');
+  
+  if (!feedback.trim() && selectedProTags.length === 0 && selectedConTags.length === 0) {
+    alert('Please provide some feedback or select tags before submitting.');
+    return;
+  }
+  
+  // Submit critique data
+  console.log('Submitting critique:', { feedback, selectedProTags, selectedConTags });
+  
+  // Enable next button
+  document.getElementById('desktop-next-btn').disabled = false;
+  document.getElementById('mobile-next-btn').disabled = false;
+}
+
+function getSelectedTags(chipClass) {
+  return Array.from(document.querySelectorAll(`.${chipClass}.selected`))
+    .map(chip => chip.textContent);
+}
+
+function swapArtworks() {
+  // Swap the spotlight and counter artworks
+  const spotlightData = {
+    img: document.getElementById('spotlight-img-desktop').src,
+    title: document.getElementById('spotlight-title-desktop').textContent,
+    caption: document.getElementById('spotlight-caption-desktop').textContent,
+    medium: document.getElementById('spotlight-medium-desktop').textContent,
+    date: document.getElementById('spotlight-date-desktop').textContent
+  };
+  
+  const counterData = {
+    img: document.getElementById('counter-img-desktop').src,
+    title: document.getElementById('counter-title-desktop').textContent,
+    caption: document.getElementById('counter-caption-desktop').textContent,
+    medium: document.getElementById('counter-medium-desktop').textContent,
+    date: document.getElementById('counter-date-desktop').textContent
+  };
+  
+  // Swap the data
+  document.getElementById('spotlight-img-desktop').src = counterData.img;
+  document.getElementById('spotlight-title-desktop').textContent = counterData.title;
+  document.getElementById('spotlight-caption-desktop').textContent = counterData.caption;
+  document.getElementById('spotlight-medium-desktop').textContent = counterData.medium;
+  document.getElementById('spotlight-date-desktop').textContent = counterData.date;
+  
+  document.getElementById('counter-img-desktop').src = spotlightData.img;
+  document.getElementById('counter-title-desktop').textContent = spotlightData.title;
+  document.getElementById('counter-caption-desktop').textContent = spotlightData.caption;
+  document.getElementById('counter-medium-desktop').textContent = spotlightData.medium;
+  document.getElementById('counter-date-desktop').textContent = spotlightData.date;
+}
+
+function loadNextPair() {
+  // Reset form
+  document.getElementById('general-feedback').value = '';
+  document.getElementById('general-feedback-mobile').value = '';
+  document.querySelectorAll('.tag-chip.selected').forEach(chip => chip.classList.remove('selected'));
+  
+  // Disable next button
+  document.getElementById('desktop-next-btn').disabled = true;
+  document.getElementById('mobile-next-btn').disabled = true;
+  
+  // Load new pair
+  loadFeedData();
+}
+</script>
+
+{% endblock %}
