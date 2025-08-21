@@ -133,6 +133,7 @@
 {% endblock %}
 
 {% block content %}
+{% csrf_token %}
 
 <!-- Single Artwork Layout -->
 <div id="feed-container" class="single-layout">
@@ -180,9 +181,15 @@
           <h6>Your Feedback</h6>
           <textarea id="general-feedback" class="form-control mb-3" rows="4" placeholder="Share your thoughts about this artwork..."></textarea>
           <div class="action-buttons">
-            <button id="submit-btn" class="btn btn-primary">Submit Feedback</button>
-            <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
-            <button id="next-btn" class="btn btn-outline-success" disabled>Next Artwork →</button>
+            {% if user.is_authenticated %}
+              <button id="submit-btn" class="btn btn-primary">Submit Feedback</button>
+              <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
+              <button id="next-btn" class="btn btn-outline-success" disabled>Next Artwork →</button>
+            {% else %}
+              <a href="/accounts/login/" class="btn btn-primary">Login to Submit Feedback</a>
+              <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
+              <button id="next-btn" class="btn btn-outline-success" disabled>Next Artwork →</button>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -206,7 +213,11 @@
     <div class="col-12">
       <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Share your thoughts..."></textarea>
       <div class="d-flex gap-2">
-        <button id="mobile-submit-btn" class="btn btn-primary btn-sm">Submit</button>
+        {% if user.is_authenticated %}
+          <button id="mobile-submit-btn" class="btn btn-primary btn-sm">Submit</button>
+        {% else %}
+          <a href="/accounts/login/" class="btn btn-primary btn-sm">Login to Submit</a>
+        {% endif %}
         <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">Skip</button>
         <button id="mobile-next-btn" class="btn btn-outline-success btn-sm ms-auto" disabled>Next →</button>
       </div>
@@ -362,7 +373,14 @@ function populateTags(containerId, tags, chipClass) {
   });
 }
 
-function submitCritique() {
+async function submitCritique() {
+  // Check if user is authenticated
+  {% if not user.is_authenticated %}
+    alert('Please log in to submit feedback.');
+    window.location.href = '/accounts/login/';
+    return;
+  {% endif %}
+  
   const feedback = document.getElementById('general-feedback').value || document.getElementById('general-feedback-mobile').value;
   const selectedProTags = getSelectedTags('pro-chip');
   const selectedConTags = getSelectedTags('con-chip');
@@ -374,35 +392,112 @@ function submitCritique() {
   
   const artworkId = document.querySelector('.artwork-display').dataset.artworkId;
   
-  // Submit critique data
-  const critiqueData = {
-    artwork_id: artworkId,
-    feedback: feedback.trim(),
-    pro_tags: selectedProTags,
-    con_tags: selectedConTags
-  };
+  if (!artworkId) {
+    alert('No artwork selected. Please refresh the page.');
+    return;
+  }
   
-  console.log('Submitting critique:', critiqueData);
+  // Build critique text combining feedback and selected tags
+  let critiqueText = feedback.trim();
   
-  // Show success message
+  if (selectedProTags.length > 0) {
+    critiqueText += (critiqueText ? '\n\n' : '') + 'Strengths: ' + selectedProTags.join(', ');
+  }
+  
+  if (selectedConTags.length > 0) {
+    critiqueText += (critiqueText ? '\n\n' : '') + 'Areas for improvement: ' + selectedConTags.join(', ');
+  }
+  
+  // Show loading state
   const submitBtn = document.getElementById('submit-btn');
   const mobileSubmitBtn = document.getElementById('mobile-submit-btn');
   
-  submitBtn.textContent = 'Submitted!';
+  const originalText = submitBtn.textContent;
+  const originalMobileText = mobileSubmitBtn.textContent;
+  
+  submitBtn.textContent = 'Submitting...';
   submitBtn.disabled = true;
-  mobileSubmitBtn.textContent = 'Submitted!';
+  mobileSubmitBtn.textContent = 'Submitting...';
   mobileSubmitBtn.disabled = true;
   
-  // Enable next button
-  document.getElementById('next-btn').disabled = false;
-  document.getElementById('mobile-next-btn').disabled = false;
-  
-  setTimeout(() => {
-    submitBtn.textContent = 'Submit Feedback';
-    submitBtn.disabled = false;
-    mobileSubmitBtn.textContent = 'Submit';
-    mobileSubmitBtn.disabled = false;
-  }, 2000);
+  try {
+    // Get CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                     getCookie('csrftoken');
+    
+    // Submit critique to API
+    const response = await fetch(`/api/artworks/${artworkId}/add_critique/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        text: critiqueText,
+        composition_score: null,
+        technique_score: null,
+        originality_score: null
+      })
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Critique submitted successfully:', result);
+      
+      // Show success state
+      submitBtn.textContent = 'Submitted!';
+      mobileSubmitBtn.textContent = 'Submitted!';
+      
+      // Enable next button
+      document.getElementById('next-btn').disabled = false;
+      document.getElementById('mobile-next-btn').disabled = false;
+      
+      // Reset button after delay
+      setTimeout(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        mobileSubmitBtn.textContent = originalMobileText;
+        mobileSubmitBtn.disabled = false;
+      }, 2000);
+      
+    } else {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+  } catch (error) {
+    console.error('Error submitting critique:', error);
+    
+    // Show error state
+    submitBtn.textContent = 'Error - Try Again';
+    mobileSubmitBtn.textContent = 'Error - Try Again';
+    
+    // Reset button after delay
+    setTimeout(() => {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+      mobileSubmitBtn.textContent = originalMobileText;
+      mobileSubmitBtn.disabled = false;
+    }, 3000);
+    
+    alert('Failed to submit critique. Please try again.');
+  }
+}
+
+// Helper function to get CSRF token from cookies
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
 }
 
 function getSelectedTags(chipClass) {
