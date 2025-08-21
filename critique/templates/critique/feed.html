@@ -188,10 +188,25 @@ function loadFeedData() {
 function displayArtwork(artwork) {
   // Display the artwork
   const artworkImg = document.getElementById('artwork-img');
-  const imageUrl = artwork.image_url || artwork.image || '/static/images/placeholder.jpg';
+  const imageUrl = artwork.image_display_url || artwork.image_url || artwork.image;
   
-  artworkImg.src = imageUrl;
-  artworkImg.style.display = 'block';
+  if (imageUrl) {
+    artworkImg.src = imageUrl;
+    artworkImg.style.display = 'block';
+    
+    // Handle image load errors
+    artworkImg.onerror = function() {
+      this.style.display = 'none';
+      const placeholder = document.querySelector('.loading-placeholder');
+      placeholder.innerHTML = '<div class="text-center text-muted"><i class="bi bi-image" style="font-size: 3rem;"></i><br>Image not available</div>';
+      placeholder.style.display = 'flex';
+    };
+  } else {
+    // No image available
+    const placeholder = document.querySelector('.loading-placeholder');
+    placeholder.innerHTML = '<div class="text-center text-muted"><i class="bi bi-image" style="font-size: 3rem;"></i><br>No image available</div>';
+    placeholder.style.display = 'flex';
+  }
   
   document.getElementById('artwork-title').textContent = artwork.title || 'Untitled';
   document.getElementById('artwork-caption').textContent = artwork.description || 'No description available';
@@ -203,8 +218,10 @@ function displayArtwork(artwork) {
   // Store artwork ID for critique submission
   document.querySelector('.artwork-display').dataset.artworkId = artwork.id || '';
 
-  // Hide loading placeholders
-  document.querySelectorAll('.loading-placeholder').forEach(el => el.style.display = 'none');
+  // Hide loading placeholders if image loads successfully
+  if (imageUrl) {
+    document.querySelectorAll('.loading-placeholder').forEach(el => el.style.display = 'none');
+  }
 }
 
 function showNoArtworkMessage() {
