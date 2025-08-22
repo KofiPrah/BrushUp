@@ -43,7 +43,7 @@
     background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); 
     border-radius:16px; padding:24px; backdrop-filter:blur(10px); 
   }
-  .critique-columns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+  .critique-columns{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
   .critique-column h6{ color:#bdc3c7; font-size:.9rem; text-transform:uppercase; margin-bottom:8px; }
   
   .tag-section-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
@@ -104,6 +104,56 @@
   }
   .category-content.expanded{ display:block; }
   .category-content .chips-wrap{ max-height:120px; margin-bottom:0; }
+  
+  /* Tab System */
+  .tag-tabs{ display:flex; gap:8px; justify-content:center; }
+  .tab-button{ 
+    padding:10px 16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.2); 
+    border-radius:8px; color:#bdc3c7; cursor:pointer; transition:all 0.2s ease;
+    display:flex; align-items:center; gap:6px; font-size:0.9rem;
+  }
+  .tab-button:hover{ background:rgba(255,255,255,.12); }
+  .tab-button.active{ background:#3498db; border-color:#2980b9; color:#fff; }
+  .tab-button .badge{ font-size:0.75rem; margin-left:4px; }
+  
+  .tab-content{ display:none; }
+  .tab-content.active{ display:block; }
+  
+  /* Selected Tags Summary */
+  .selected-tags-column{ 
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:16px; min-height:300px;
+  }
+  .selected-tags-column h6{ 
+    color:#bdc3c7; font-size:0.9rem; text-transform:uppercase; 
+    margin-bottom:16px; display:flex; align-items:center; gap:6px;
+  }
+  
+  .selected-group{ margin-bottom:20px; }
+  .selected-group-header{ 
+    display:flex; align-items:center; gap:8px; margin-bottom:8px; 
+    font-size:0.85rem; font-weight:600; color:#ecf0f1;
+  }
+  .group-icon{ 
+    width:20px; height:20px; border-radius:50%; display:flex; 
+    align-items:center; justify-content:center; font-size:0.7rem; color:#fff;
+  }
+  
+  .selected-tags-list{ min-height:40px; }
+  .selected-tag-item{ 
+    display:inline-block; padding:4px 8px; margin:2px; 
+    background:rgba(255,255,255,.1); border-radius:12px; 
+    font-size:0.75rem; color:#ecf0f1; position:relative;
+  }
+  .selected-tag-item.strength{ background:rgba(39, 174, 96, 0.2); border:1px solid #27ae60; }
+  .selected-tag-item.opportunity{ background:rgba(230, 126, 34, 0.2); border:1px solid #e67e22; }
+  .selected-tag-item .remove-tag{ 
+    margin-left:4px; cursor:pointer; opacity:0.7; 
+    font-size:0.7rem; font-weight:bold;
+  }
+  .selected-tag-item .remove-tag:hover{ opacity:1; }
+  
+  .selection-stats{ text-align:center; padding-top:12px; border-top:1px solid rgba(255,255,255,.1); }
 
   .feedback-section {
     grid-column: 1 / -1;
@@ -212,162 +262,208 @@
   <!-- Critique Interface -->
   <section class="critique-section">
     <div class="critique-interface">
+      <!-- Tab Navigation -->
+      <div class="tag-tabs mb-3">
+        <button id="strengths-tab" class="tab-button active" data-tab="strengths">
+          <i class="bi bi-hand-thumbs-up"></i> Strengths <span id="strengths-badge" class="badge bg-success">0</span>
+        </button>
+        <button id="opportunities-tab" class="tab-button" data-tab="opportunities">
+          <i class="bi bi-lightbulb"></i> Opportunities <span id="opportunities-badge" class="badge bg-warning">0</span>
+        </button>
+      </div>
+
       <div class="critique-columns">
-        <div class="critique-column">
-          <div class="tag-section-header">
-            <h6>Strengths</h6>
-            <button id="refresh-pro-tags" class="btn btn-sm btn-outline-secondary">
-              <i class="bi bi-arrow-clockwise"></i>
-            </button>
-          </div>
-          <div class="tag-search-container mb-2">
-            <input type="text" id="pro-search" class="form-control form-control-sm" placeholder="Search strength tags...">
-            <div id="pro-suggestions" class="tag-suggestions"></div>
-          </div>
-          
-          <!-- Category Toggle -->
-          <div class="category-toggle mb-2">
-            <button id="toggle-pro-categories" class="btn btn-sm btn-outline-light">
-              <i class="bi bi-collection"></i> Browse by Category
-            </button>
-          </div>
-          
-          <!-- Random Tags (Default View) -->
-          <div id="pro-tags" class="chips-wrap"></div>
-          
-          <!-- Categorized Tags (Expandable View) -->
-          <div id="pro-categories" class="tag-categories" style="display:none;">
-            <div class="category-group">
-              <div class="category-header" data-category="technique-pro">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Technique</span>
-                <small class="category-count">(8)</small>
-              </div>
-              <div class="category-content" id="technique-pro-tags"></div>
+        <!-- Strengths Tab Content -->
+        <div id="strengths-content" class="tab-content active">
+          <div class="critique-column">
+            <div class="tag-section-header">
+              <h6>Strengths</h6>
+              <button id="refresh-pro-tags" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+            <div class="tag-search-container mb-2">
+              <input type="text" id="pro-search" class="form-control form-control-sm" placeholder="Search strength tags...">
+              <div id="pro-suggestions" class="tag-suggestions"></div>
             </div>
             
-            <div class="category-group">
-              <div class="category-header" data-category="color-pro">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Color</span>
-                <small class="category-count">(8)</small>
-              </div>
-              <div class="category-content" id="color-pro-tags"></div>
+            <!-- Category Toggle -->
+            <div class="category-toggle mb-2">
+              <button id="toggle-pro-categories" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-collection"></i> Browse by Category
+              </button>
             </div>
             
-            <div class="category-group">
-              <div class="category-header" data-category="lighting-pro">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Lighting & Mood</span>
-                <small class="category-count">(8)</small>
+            <!-- Random Tags (Default View) -->
+            <div id="pro-tags" class="chips-wrap"></div>
+            
+            <!-- Categorized Tags (Expandable View) -->
+            <div id="pro-categories" class="tag-categories" style="display:none;">
+              <div class="category-group">
+                <div class="category-header" data-category="technique-pro">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Technique</span>
+                  <small class="category-count">(8)</small>
+                </div>
+                <div class="category-content" id="technique-pro-tags"></div>
               </div>
-              <div class="category-content" id="lighting-pro-tags"></div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="color-pro">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Color</span>
+                  <small class="category-count">(8)</small>
+                </div>
+                <div class="category-content" id="color-pro-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="lighting-pro">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Lighting & Mood</span>
+                  <small class="category-count">(8)</small>
+                </div>
+                <div class="category-content" id="lighting-pro-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="creativity-pro">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Creativity</span>
+                  <small class="category-count">(8)</small>
+                </div>
+                <div class="category-content" id="creativity-pro-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="impact-pro">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Overall Impact</span>
+                  <small class="category-count">(8)</small>
+                </div>
+                <div class="category-content" id="impact-pro-tags"></div>
+              </div>
             </div>
             
-            <div class="category-group">
-              <div class="category-header" data-category="creativity-pro">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Creativity</span>
-                <small class="category-count">(8)</small>
-              </div>
-              <div class="category-content" id="creativity-pro-tags"></div>
+            <div class="selected-count">
+              <small class="text-muted"><span id="pro-count">0</span>/5 selected</small>
             </div>
-            
-            <div class="category-group">
-              <div class="category-header" data-category="impact-pro">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Overall Impact</span>
-                <small class="category-count">(8)</small>
-              </div>
-              <div class="category-content" id="impact-pro-tags"></div>
-            </div>
-          </div>
-          
-          <div class="selected-count">
-            <small class="text-muted"><span id="pro-count">0</span>/5 selected</small>
           </div>
         </div>
-        <div class="critique-column">
-          <div class="tag-section-header">
-            <h6>Opportunities</h6>
-            <button id="refresh-con-tags" class="btn btn-sm btn-outline-secondary">
-              <i class="bi bi-arrow-clockwise"></i>
-            </button>
+
+        <!-- Opportunities Tab Content -->
+        <div id="opportunities-content" class="tab-content">
+          <div class="critique-column">
+            <div class="tag-section-header">
+              <h6>Opportunities for Improvement</h6>
+              <button id="refresh-con-tags" class="btn btn-sm btn-outline-secondary">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+            </div>
+            <div class="tag-search-container mb-2">
+              <input type="text" id="con-search" class="form-control form-control-sm" placeholder="Search opportunity tags...">
+              <div id="con-suggestions" class="tag-suggestions"></div>
+            </div>
+            
+            <!-- Category Toggle -->
+            <div class="category-toggle mb-2">
+              <button id="toggle-con-categories" class="btn btn-sm btn-outline-light">
+                <i class="bi bi-collection"></i> Browse by Category
+              </button>
+            </div>
+            
+            <!-- Random Tags (Default View) -->
+            <div id="con-tags" class="chips-wrap"></div>
+            
+            <!-- Categorized Tags (Expandable View) -->
+            <div id="con-categories" class="tag-categories" style="display:none;">
+              <div class="category-group">
+                <div class="category-header" data-category="composition-con">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Composition</span>
+                  <small class="category-count">(7)</small>
+                </div>
+                <div class="category-content" id="composition-con-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="technical-con">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Technical Areas</span>
+                  <small class="category-count">(6)</small>
+                </div>
+                <div class="category-content" id="technical-con-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="color-con">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Color Issues</span>
+                  <small class="category-count">(7)</small>
+                </div>
+                <div class="category-content" id="color-con-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="lighting-con">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Lighting Problems</span>
+                  <small class="category-count">(7)</small>
+                </div>
+                <div class="category-content" id="lighting-con-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="environment-con">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Background & Environment</span>
+                  <small class="category-count">(5)</small>
+                </div>
+                <div class="category-content" id="environment-con-tags"></div>
+              </div>
+              
+              <div class="category-group">
+                <div class="category-header" data-category="polish-con">
+                  <i class="bi bi-chevron-right category-icon"></i>
+                  <span>Overall Polish</span>
+                  <small class="category-count">(7)</small>
+                </div>
+                <div class="category-content" id="polish-con-tags"></div>
+              </div>
+            </div>
+            
+            <div class="selected-count">
+              <small class="text-muted"><span id="con-count">0</span>/5 selected</small>
+            </div>
           </div>
-          <div class="tag-search-container mb-2">
-            <input type="text" id="con-search" class="form-control form-control-sm" placeholder="Search opportunity tags...">
-            <div id="con-suggestions" class="tag-suggestions"></div>
+        </div>
+
+        <!-- Selected Tags Summary Column -->
+        <div class="selected-tags-column">
+          <h6><i class="bi bi-check2-circle"></i> Your Selected Tags</h6>
+          
+          <div class="selected-summary">
+            <div class="selected-group">
+              <div class="selected-group-header">
+                <span class="group-icon bg-success"><i class="bi bi-hand-thumbs-up"></i></span>
+                <span>Strengths</span>
+              </div>
+              <div id="selected-pro-tags" class="selected-tags-list"></div>
+            </div>
+            
+            <div class="selected-group">
+              <div class="selected-group-header">
+                <span class="group-icon bg-warning"><i class="bi bi-lightbulb"></i></span>
+                <span>Opportunities</span>
+              </div>
+              <div id="selected-con-tags" class="selected-tags-list"></div>
+            </div>
           </div>
           
-          <!-- Category Toggle -->
-          <div class="category-toggle mb-2">
-            <button id="toggle-con-categories" class="btn btn-sm btn-outline-light">
-              <i class="bi bi-collection"></i> Browse by Category
-            </button>
-          </div>
-          
-          <!-- Random Tags (Default View) -->
-          <div id="con-tags" class="chips-wrap"></div>
-          
-          <!-- Categorized Tags (Expandable View) -->
-          <div id="con-categories" class="tag-categories" style="display:none;">
-            <div class="category-group">
-              <div class="category-header" data-category="composition-con">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Composition</span>
-                <small class="category-count">(7)</small>
-              </div>
-              <div class="category-content" id="composition-con-tags"></div>
-            </div>
-            
-            <div class="category-group">
-              <div class="category-header" data-category="technical-con">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Technical Areas</span>
-                <small class="category-count">(6)</small>
-              </div>
-              <div class="category-content" id="technical-con-tags"></div>
-            </div>
-            
-            <div class="category-group">
-              <div class="category-header" data-category="color-con">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Color Issues</span>
-                <small class="category-count">(7)</small>
-              </div>
-              <div class="category-content" id="color-con-tags"></div>
-            </div>
-            
-            <div class="category-group">
-              <div class="category-header" data-category="lighting-con">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Lighting Problems</span>
-                <small class="category-count">(7)</small>
-              </div>
-              <div class="category-content" id="lighting-con-tags"></div>
-            </div>
-            
-            <div class="category-group">
-              <div class="category-header" data-category="environment-con">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Background & Environment</span>
-                <small class="category-count">(5)</small>
-              </div>
-              <div class="category-content" id="environment-con-tags"></div>
-            </div>
-            
-            <div class="category-group">
-              <div class="category-header" data-category="polish-con">
-                <i class="bi bi-chevron-right category-icon"></i>
-                <span>Overall Polish</span>
-                <small class="category-count">(7)</small>
-              </div>
-              <div class="category-content" id="polish-con-tags"></div>
-            </div>
-          </div>
-          
-          <div class="selected-count">
-            <small class="text-muted"><span id="con-count">0</span>/5 selected</small>
+          <div class="selection-stats mt-3">
+            <small class="text-muted">
+              Total: <span id="total-selected">0</span>/10 tags
+            </small>
           </div>
         </div>
         <div class="feedback-section">
@@ -578,9 +674,15 @@ function loadCritiqueTags() {
   // Bind category toggle handlers
   setupCategoryToggle('pro');
   setupCategoryToggle('con');
+  
+  // Setup tab system
+  setupTabSystem();
 }
 
 function loadTagSet(type) {
+  // Store currently selected tags before refreshing
+  const currentlySelected = getSelectedTags(type);
+  
   const flatPool = getFlatTagPool(type);
   
   // Get random selection of 8-12 tags from the pool
@@ -601,7 +703,10 @@ function loadTagSet(type) {
   // Load categorized tags as well
   loadCategorizedTags(type);
   
-  // Reset counts
+  // Restore previously selected tags
+  restoreSelectedTags(type, currentlySelected);
+  
+  // Update counts and states
   updateTagCount(type);
   updateTagCount(`${type}-mobile`);
   updateTagStates(type);
@@ -713,6 +818,23 @@ function updateTagCount(type) {
   }
   if (mobileCountElement) {
     mobileCountElement.textContent = count;
+  }
+  
+  // Update tab badges
+  const tabBadge = document.getElementById(`${baseType === 'pro' ? 'strengths' : 'opportunities'}-badge`);
+  if (tabBadge) {
+    tabBadge.textContent = count;
+  }
+  
+  // Update selected tags summary
+  updateSelectedTagsSummary(baseType);
+  
+  // Update total count
+  const proCount = getSelectedTagCount('pro');
+  const conCount = getSelectedTagCount('con');
+  const totalElement = document.getElementById('total-selected');
+  if (totalElement) {
+    totalElement.textContent = proCount + conCount;
   }
 }
 
@@ -1052,11 +1174,84 @@ function loadNextArtwork() {
     placeholder.style.opacity = '1';
     placeholder.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading next artwork...';
     
-    // Load new artwork after brief delay for smoother transition
+    // Reload to get new artwork (in real app, this would be AJAX)
     setTimeout(() => {
-      loadFeedData();
-    }, 200);
+      window.location.reload();
+    }, 1000);
   }, 300);
+}
+
+function getSelectedTags(type) {
+  return Array.from(document.querySelectorAll(`.${type}-chip.selected`))
+    .map(chip => chip.textContent);
+}
+
+function restoreSelectedTags(type, selectedTags) {
+  if (!selectedTags || selectedTags.length === 0) return;
+  
+  // Find and select matching tags in the new set
+  const allChips = document.querySelectorAll(`.${type}-chip`);
+  allChips.forEach(chip => {
+    if (selectedTags.includes(chip.textContent)) {
+      chip.classList.add('selected');
+    }
+  });
+}
+
+function setupTabSystem() {
+  const strengthsTab = document.getElementById('strengths-tab');
+  const opportunitiesTab = document.getElementById('opportunities-tab');
+  const strengthsContent = document.getElementById('strengths-content');
+  const opportunitiesContent = document.getElementById('opportunities-content');
+  
+  strengthsTab.addEventListener('click', () => {
+    // Switch to strengths tab
+    strengthsTab.classList.add('active');
+    opportunitiesTab.classList.remove('active');
+    strengthsContent.classList.add('active');
+    opportunitiesContent.classList.remove('active');
+  });
+  
+  opportunitiesTab.addEventListener('click', () => {
+    // Switch to opportunities tab
+    opportunitiesTab.classList.add('active');
+    strengthsTab.classList.remove('active');
+    opportunitiesContent.classList.add('active');
+    strengthsContent.classList.remove('active');
+  });
+}
+
+function updateSelectedTagsSummary(type) {
+  const selectedTags = getSelectedTags(type);
+  const summaryContainer = document.getElementById(`selected-${type}-tags`);
+  
+  if (summaryContainer) {
+    if (selectedTags.length === 0) {
+      summaryContainer.innerHTML = '<small class="text-muted">No tags selected</small>';
+    } else {
+      summaryContainer.innerHTML = selectedTags
+        .map(tag => `
+          <span class="selected-tag-item ${type === 'pro' ? 'strength' : 'opportunity'}" data-tag="${tag}">
+            ${tag}
+            <span class="remove-tag" onclick="removeSelectedTag('${type}', '${tag}')">&times;</span>
+          </span>
+        `).join('');
+    }
+  }
+}
+
+function removeSelectedTag(type, tagText) {
+  // Find and deselect the tag
+  const allChips = document.querySelectorAll(`.${type}-chip`);
+  allChips.forEach(chip => {
+    if (chip.textContent === tagText && chip.classList.contains('selected')) {
+      chip.classList.remove('selected');
+    }
+  });
+  
+  // Update counts and states
+  updateTagCount(type);
+  updateTagStates(type);
 }
 </script>
 
