@@ -83,6 +83,27 @@
   }
   
   .selected-count{ text-align:center; margin-top:5px; }
+  
+  /* Category System */
+  .category-toggle{ text-align:center; }
+  .tag-categories{ max-height:300px; overflow-y:auto; }
+  .category-group{ margin-bottom:12px; }
+  .category-header{ 
+    display:flex; align-items:center; gap:6px; padding:8px 12px; 
+    background:rgba(255,255,255,.08); border-radius:8px; cursor:pointer;
+    transition:all 0.2s ease; user-select:none; font-size:0.85rem;
+  }
+  .category-header:hover{ background:rgba(255,255,255,.12); }
+  .category-header.expanded{ background:rgba(255,255,255,.15); }
+  .category-header.expanded .category-icon{ transform:rotate(90deg); }
+  .category-icon{ transition:transform 0.2s ease; font-size:0.75rem; }
+  .category-count{ margin-left:auto; opacity:0.7; }
+  .category-content{ 
+    display:none; padding:8px 16px; 
+    border-left:2px solid rgba(255,255,255,.1); margin-left:8px; margin-top:6px;
+  }
+  .category-content.expanded{ display:block; }
+  .category-content .chips-wrap{ max-height:120px; margin-bottom:0; }
 
   .feedback-section {
     grid-column: 1 / -1;
@@ -203,7 +224,65 @@
             <input type="text" id="pro-search" class="form-control form-control-sm" placeholder="Search strength tags...">
             <div id="pro-suggestions" class="tag-suggestions"></div>
           </div>
+          
+          <!-- Category Toggle -->
+          <div class="category-toggle mb-2">
+            <button id="toggle-pro-categories" class="btn btn-sm btn-outline-light">
+              <i class="bi bi-collection"></i> Browse by Category
+            </button>
+          </div>
+          
+          <!-- Random Tags (Default View) -->
           <div id="pro-tags" class="chips-wrap"></div>
+          
+          <!-- Categorized Tags (Expandable View) -->
+          <div id="pro-categories" class="tag-categories" style="display:none;">
+            <div class="category-group">
+              <div class="category-header" data-category="technique-pro">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Technique</span>
+                <small class="category-count">(8)</small>
+              </div>
+              <div class="category-content" id="technique-pro-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="color-pro">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Color</span>
+                <small class="category-count">(8)</small>
+              </div>
+              <div class="category-content" id="color-pro-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="lighting-pro">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Lighting & Mood</span>
+                <small class="category-count">(8)</small>
+              </div>
+              <div class="category-content" id="lighting-pro-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="creativity-pro">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Creativity</span>
+                <small class="category-count">(8)</small>
+              </div>
+              <div class="category-content" id="creativity-pro-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="impact-pro">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Overall Impact</span>
+                <small class="category-count">(8)</small>
+              </div>
+              <div class="category-content" id="impact-pro-tags"></div>
+            </div>
+          </div>
+          
           <div class="selected-count">
             <small class="text-muted"><span id="pro-count">0</span>/5 selected</small>
           </div>
@@ -219,7 +298,74 @@
             <input type="text" id="con-search" class="form-control form-control-sm" placeholder="Search opportunity tags...">
             <div id="con-suggestions" class="tag-suggestions"></div>
           </div>
+          
+          <!-- Category Toggle -->
+          <div class="category-toggle mb-2">
+            <button id="toggle-con-categories" class="btn btn-sm btn-outline-light">
+              <i class="bi bi-collection"></i> Browse by Category
+            </button>
+          </div>
+          
+          <!-- Random Tags (Default View) -->
           <div id="con-tags" class="chips-wrap"></div>
+          
+          <!-- Categorized Tags (Expandable View) -->
+          <div id="con-categories" class="tag-categories" style="display:none;">
+            <div class="category-group">
+              <div class="category-header" data-category="composition-con">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Composition</span>
+                <small class="category-count">(7)</small>
+              </div>
+              <div class="category-content" id="composition-con-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="technical-con">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Technical Areas</span>
+                <small class="category-count">(6)</small>
+              </div>
+              <div class="category-content" id="technical-con-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="color-con">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Color Issues</span>
+                <small class="category-count">(7)</small>
+              </div>
+              <div class="category-content" id="color-con-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="lighting-con">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Lighting Problems</span>
+                <small class="category-count">(7)</small>
+              </div>
+              <div class="category-content" id="lighting-con-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="environment-con">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Background & Environment</span>
+                <small class="category-count">(5)</small>
+              </div>
+              <div class="category-content" id="environment-con-tags"></div>
+            </div>
+            
+            <div class="category-group">
+              <div class="category-header" data-category="polish-con">
+                <i class="bi bi-chevron-right category-icon"></i>
+                <span>Overall Polish</span>
+                <small class="category-count">(7)</small>
+              </div>
+              <div class="category-content" id="polish-con-tags"></div>
+            </div>
+          </div>
+          
           <div class="selected-count">
             <small class="text-muted"><span id="con-count">0</span>/5 selected</small>
           </div>
@@ -428,14 +574,17 @@ function loadCritiqueTags() {
   // Bind search handlers
   setupTagSearch('pro');
   setupTagSearch('con');
+  
+  // Bind category toggle handlers
+  setupCategoryToggle('pro');
+  setupCategoryToggle('con');
 }
 
 function loadTagSet(type) {
-  const tagPools = getTagPools();
-  const pool = tagPools[type];
+  const flatPool = getFlatTagPool(type);
   
   // Get random selection of 8-12 tags from the pool
-  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+  const shuffled = [...flatPool].sort(() => 0.5 - Math.random());
   const selectedTags = shuffled.slice(0, Math.floor(Math.random() * 5) + 8);
   
   const containerId = `${type}-tags`;
@@ -449,6 +598,9 @@ function loadTagSet(type) {
     populateTags(mobileContainerId, selectedTags, chipClass, type);
   }
   
+  // Load categorized tags as well
+  loadCategorizedTags(type);
+  
   // Reset counts
   updateTagCount(type);
   updateTagCount(`${type}-mobile`);
@@ -457,54 +609,62 @@ function loadTagSet(type) {
 
 function getTagPools() {
   return {
-    pro: [
-      // Technique
-      'Strong composition', 'Excellent technique', 'Great brushwork', 'Skillful rendering',
-      'Nice details', 'Good proportions', 'Solid drawing foundation', 'Clean linework',
-      
-      // Color
-      'Great use of color', 'Beautiful color palette', 'Nice color harmony', 'Bold colors',
-      'Subtle color choices', 'Good color temperature', 'Rich colors', 'Balanced tones',
-      
-      // Lighting & Mood
-      'Good lighting', 'Dramatic lighting', 'Atmospheric mood', 'Great shadows',
-      'Nice highlights', 'Moody atmosphere', 'Cinematic feel', 'Warm feeling',
-      
-      // Creativity & Concept
-      'Creative concept', 'Original idea', 'Unique style', 'Imaginative',
-      'Great storytelling', 'Expressive', 'Emotional impact', 'Compelling subject',
-      
-      // Overall Impact
-      'Eye-catching', 'Professional quality', 'Polished finish', 'Cohesive style',
-      'Strong visual impact', 'Engaging composition', 'Dynamic energy', 'Balanced design'
-    ],
+    pro: {
+      technique: [
+        'Strong composition', 'Excellent technique', 'Great brushwork', 'Skillful rendering',
+        'Nice details', 'Good proportions', 'Solid drawing foundation', 'Clean linework'
+      ],
+      color: [
+        'Great use of color', 'Beautiful color palette', 'Nice color harmony', 'Bold colors',
+        'Subtle color choices', 'Good color temperature', 'Rich colors', 'Balanced tones'
+      ],
+      lighting: [
+        'Good lighting', 'Dramatic lighting', 'Atmospheric mood', 'Great shadows',
+        'Nice highlights', 'Moody atmosphere', 'Cinematic feel', 'Warm feeling'
+      ],
+      creativity: [
+        'Creative concept', 'Original idea', 'Unique style', 'Imaginative',
+        'Great storytelling', 'Expressive', 'Emotional impact', 'Compelling subject'
+      ],
+      impact: [
+        'Eye-catching', 'Professional quality', 'Polished finish', 'Cohesive style',
+        'Strong visual impact', 'Engaging composition', 'Dynamic energy', 'Balanced design'
+      ]
+    },
     
-    con: [
-      // Composition Issues
-      'Could improve composition', 'Needs better focal point', 'Unbalanced layout',
-      'Confusing composition', 'Weak composition', 'Too busy', 'Lacks focus',
-      
-      // Technical Areas
-      'Technique could be refined', 'Anatomy needs work', 'Perspective issues',
-      'Proportions off', 'Drawing needs improvement', 'Rough execution',
-      
-      // Color Issues  
-      'Color balance needs work', 'Colors clash', 'Too saturated', 'Too muted',
-      'Lacks color harmony', 'Muddy colors', 'Color temperature inconsistent',
-      
-      // Lighting Problems
-      'Needs more contrast', 'Lighting unclear', 'Shadows inconsistent',
-      'Too flat', 'Lacks depth', 'Missing highlights', 'Confusing light source',
-      
-      // Background & Environment
-      'Background distracting', 'Background too busy', 'Environment unclear',
-      'Background competes with subject', 'Needs more environment detail',
-      
-      // Overall Polish
-      'Needs more refinement', 'Feels unfinished', 'Could be more polished',
-      'Lacks visual interest', 'Too simple', 'Needs more detail', 'Style inconsistent'
-    ]
+    con: {
+      composition: [
+        'Could improve composition', 'Needs better focal point', 'Unbalanced layout',
+        'Confusing composition', 'Weak composition', 'Too busy', 'Lacks focus'
+      ],
+      technical: [
+        'Technique could be refined', 'Anatomy needs work', 'Perspective issues',
+        'Proportions off', 'Drawing needs improvement', 'Rough execution'
+      ],
+      color: [
+        'Color balance needs work', 'Colors clash', 'Too saturated', 'Too muted',
+        'Lacks color harmony', 'Muddy colors', 'Color temperature inconsistent'
+      ],
+      lighting: [
+        'Needs more contrast', 'Lighting unclear', 'Shadows inconsistent',
+        'Too flat', 'Lacks depth', 'Missing highlights', 'Confusing light source'
+      ],
+      environment: [
+        'Background distracting', 'Background too busy', 'Environment unclear',
+        'Background competes with subject', 'Needs more environment detail'
+      ],
+      polish: [
+        'Needs more refinement', 'Feels unfinished', 'Could be more polished',
+        'Lacks visual interest', 'Too simple', 'Needs more detail', 'Style inconsistent'
+      ]
+    }
   };
+}
+
+// Get flat array of all tags for random selection and search
+function getFlatTagPool(type) {
+  const pools = getTagPools()[type];
+  return Object.values(pools).flat();
 }
 
 function populateTags(containerId, tags, chipClass, type) {
@@ -578,7 +738,7 @@ function showTagLimitWarning(type) {
 function setupTagSearch(type) {
   const searchInput = document.getElementById(`${type}-search`);
   const suggestionsDiv = document.getElementById(`${type}-suggestions`);
-  const tagPools = getTagPools();
+  const flatPool = getFlatTagPool(type);
   
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.toLowerCase().trim();
@@ -588,7 +748,7 @@ function setupTagSearch(type) {
       return;
     }
     
-    const matches = tagPools[type].filter(tag => 
+    const matches = flatPool.filter(tag => 
       tag.toLowerCase().includes(query)
     ).slice(0, 5);
     
@@ -644,6 +804,82 @@ function addCustomTag(tagText, type) {
   
   // Auto-select the new tag
   setTimeout(() => toggleTagSelection(chip, type), 100);
+}
+
+function setupCategoryToggle(type) {
+  const toggleButton = document.getElementById(`toggle-${type}-categories`);
+  const randomTags = document.getElementById(`${type}-tags`);
+  const categories = document.getElementById(`${type}-categories`);
+  
+  toggleButton.addEventListener('click', () => {
+    const isShowingCategories = categories.style.display !== 'none';
+    
+    if (isShowingCategories) {
+      // Switch back to random view
+      categories.style.display = 'none';
+      randomTags.style.display = 'flex';
+      toggleButton.innerHTML = '<i class="bi bi-collection"></i> Browse by Category';
+    } else {
+      // Switch to category view
+      randomTags.style.display = 'none';
+      categories.style.display = 'block';
+      toggleButton.innerHTML = '<i class="bi bi-grid-3x3-gap"></i> Random Tags';
+      
+      // Load categorized tags if not already loaded
+      loadCategorizedTags(type);
+    }
+  });
+  
+  // Setup category header click handlers
+  setupCategoryHeaders(type);
+}
+
+function loadCategorizedTags(type) {
+  const tagPools = getTagPools()[type];
+  
+  Object.keys(tagPools).forEach(categoryKey => {
+    const tags = tagPools[categoryKey];
+    const containerId = `${categoryKey}-${type}-tags`;
+    const container = document.getElementById(containerId);
+    
+    if (container && container.innerHTML === '') {
+      // Create chips wrap
+      const chipsWrap = document.createElement('div');
+      chipsWrap.className = 'chips-wrap';
+      
+      tags.forEach(tag => {
+        const chip = document.createElement('span');
+        chip.className = `tag-chip ${type}-chip`;
+        chip.textContent = tag;
+        chip.addEventListener('click', () => toggleTagSelection(chip, type));
+        chipsWrap.appendChild(chip);
+      });
+      
+      container.appendChild(chipsWrap);
+    }
+  });
+}
+
+function setupCategoryHeaders(type) {
+  const categoryHeaders = document.querySelectorAll(`#${type}-categories .category-header`);
+  
+  categoryHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+      const categoryId = header.dataset.category;
+      const content = document.getElementById(`${categoryId}-tags`);
+      const isExpanded = header.classList.contains('expanded');
+      
+      if (isExpanded) {
+        // Collapse
+        header.classList.remove('expanded');
+        content.classList.remove('expanded');
+      } else {
+        // Expand
+        header.classList.add('expanded');
+        content.classList.add('expanded');
+      }
+    });
+  });
 }
 
 async function submitCritique() {
