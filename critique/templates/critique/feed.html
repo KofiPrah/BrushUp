@@ -817,7 +817,12 @@ function toggleTagSelection(chip, type) {
 }
 
 function getSelectedTagCount(type) {
-  return document.querySelectorAll(`.${type}-chip.selected`).length;
+  // Count unique selected tags to avoid duplicates across sections
+  const uniqueSelectedTags = new Set();
+  document.querySelectorAll(`.${type}-chip.selected`).forEach(chip => {
+    uniqueSelectedTags.add(chip.textContent.trim());
+  });
+  return uniqueSelectedTags.size;
 }
 
 function updateTagCount(type) {
@@ -868,8 +873,8 @@ function updateTagStates(type) {
 }
 
 function showTagLimitWarning(type) {
-  const section = type === 'pro' ? 'Strengths' : 'Opportunities';
-  alert(`Maximum of 5 ${section.toLowerCase()} tags reached. Please deselect a tag first.`);
+  const section = type === 'pro' ? 'strengths' : 'opportunities';
+  alert(`Maximum of 5 ${section} tags reached. Please deselect a tag first.`);
 }
 
 function setupTagSearch(type) {
