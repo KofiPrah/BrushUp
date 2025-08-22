@@ -786,19 +786,34 @@ function populateTags(containerId, tags, chipClass, type) {
 }
 
 function toggleTagSelection(chip, type) {
-  const isSelected = chip.classList.contains('selected');
-  const selectedCount = getSelectedTagCount(type);
-  const maxTags = 5;
+  const baseType = type.replace('-mobile', '');
+  const tagText = chip.textContent.trim();
+  const isCurrentlySelected = chip.classList.contains('selected');
   
-  if (!isSelected && selectedCount >= maxTags) {
-    // Show warning that max tags reached
-    showTagLimitWarning(type);
-    return;
+  if (isCurrentlySelected) {
+    // Deselect this tag across all sections
+    deselectTagEverywhere(baseType, tagText);
+  } else {
+    // Check if tag is already selected elsewhere
+    if (isTagSelectedAnywhere(baseType, tagText)) {
+      // Tag is already selected in another section, do nothing
+      return;
+    }
+    
+    const currentCount = getSelectedTagCount(baseType);
+    if (currentCount >= 5) {
+      showTagLimitWarning(baseType);
+      return;
+    }
+    
+    // Select this tag across all sections where it appears
+    selectTagEverywhere(baseType, tagText);
   }
   
-  chip.classList.toggle('selected');
-  updateTagCount(type);
-  updateTagStates(type);
+  // Update counts and states
+  updateTagCount(baseType);
+  updateTagCount(`${baseType}-mobile`);
+  updateTagStates(baseType);
 }
 
 function getSelectedTagCount(type) {
@@ -1182,19 +1197,20 @@ function loadNextArtwork() {
 }
 
 function getSelectedTags(type) {
-  return Array.from(document.querySelectorAll(`.${type}-chip.selected`))
-    .map(chip => chip.textContent);
+  // Get unique selected tags to avoid duplicates
+  const selectedTags = new Set();
+  document.querySelectorAll(`.${type}-chip.selected`).forEach(chip => {
+    selectedTags.add(chip.textContent.trim());
+  });
+  return Array.from(selectedTags);
 }
 
 function restoreSelectedTags(type, selectedTags) {
   if (!selectedTags || selectedTags.length === 0) return;
   
-  // Find and select matching tags in the new set
-  const allChips = document.querySelectorAll(`.${type}-chip`);
-  allChips.forEach(chip => {
-    if (selectedTags.includes(chip.textContent)) {
-      chip.classList.add('selected');
-    }
+  // Use selectTagEverywhere to ensure consistency across all sections
+  selectedTags.forEach(tagText => {
+    selectTagEverywhere(type, tagText);
   });
 }
 
@@ -1241,17 +1257,37 @@ function updateSelectedTagsSummary(type) {
 }
 
 function removeSelectedTag(type, tagText) {
-  // Find and deselect the tag
-  const allChips = document.querySelectorAll(`.${type}-chip`);
-  allChips.forEach(chip => {
-    if (chip.textContent === tagText && chip.classList.contains('selected')) {
-      chip.classList.remove('selected');
-    }
-  });
+  // Deselect this tag everywhere it appears
+  deselectTagEverywhere(type, tagText);
   
   // Update counts and states
   updateTagCount(type);
   updateTagStates(type);
+}
+
+function isTagSelectedAnywhere(type, tagText) {
+  const allChips = document.querySelectorAll(`.${type}-chip`);
+  return Array.from(allChips).some(chip => 
+    chip.textContent.trim() === tagText && chip.classList.contains('selected')
+  );
+}
+
+function selectTagEverywhere(type, tagText) {
+  const allChips = document.querySelectorAll(`.${type}-chip`);
+  allChips.forEach(chip => {
+    if (chip.textContent.trim() === tagText) {
+      chip.classList.add('selected');
+    }
+  });
+}
+
+function deselectTagEverywhere(type, tagText) {
+  const allChips = document.querySelectorAll(`.${type}-chip`);
+  allChips.forEach(chip => {
+    if (chip.textContent.trim() === tagText) {
+      chip.classList.remove('selected');
+    }
+  });
 }
 </script>
 
