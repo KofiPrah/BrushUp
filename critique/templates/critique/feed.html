@@ -400,6 +400,16 @@
     </div>
 
     <div class="critique-interface" style="display:none;">
+      <!-- Quick Feedback Header with Back Button -->
+      <div class="quick-feedback-header" style="display:none;">
+        <div class="form-header">
+          <h6><i class="bi bi-tags"></i> Quick Feedback</h6>
+          <button class="btn btn-sm btn-outline-secondary back-to-selection">
+            <i class="bi bi-arrow-left"></i> Back to Options
+          </button>
+        </div>
+      </div>
+      
       <!-- Tab Navigation -->
       <div class="tag-tabs mb-3">
         <button id="strengths-tab" class="tab-button active" data-tab="strengths">
@@ -1487,10 +1497,11 @@ function setupEntryPointSelection() {
 
 function setupQuickFeedbackInterface() {
   // Tag interface is already set up, just ensure visibility
+  document.querySelector('.quick-feedback-header').style.display = 'block';
   document.querySelector('.tag-tabs').style.display = 'flex';
   document.querySelector('.critique-columns').style.display = 'grid';
   
-  // Add back button
+  // Add back button functionality
   addBackToSelectionButton();
 }
 
@@ -1569,10 +1580,20 @@ function addBackToSelectionButton() {
   const backButtons = document.querySelectorAll('.back-to-selection');
   
   backButtons.forEach(button => {
-    button.addEventListener('click', () => {
+    // Remove existing event listeners to avoid duplicates
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    
+    newButton.addEventListener('click', () => {
       // Show entry point selection
       document.getElementById('entry-point-selection').style.display = 'block';
       document.querySelector('.critique-interface').style.display = 'none';
+      
+      // Hide quick feedback header
+      const quickHeader = document.querySelector('.quick-feedback-header');
+      if (quickHeader) {
+        quickHeader.style.display = 'none';
+      }
       
       // Clean up any detailed form
       const detailedForm = document.querySelector('.detailed-critique-form');
