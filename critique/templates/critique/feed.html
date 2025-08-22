@@ -43,19 +43,46 @@
     background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); 
     border-radius:16px; padding:24px; backdrop-filter:blur(10px); 
   }
-  .critique-columns{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
-  .critique-column h6{ color:#bdc3c7; font-size:.9rem; text-transform:uppercase; margin-bottom:12px; }
+  .critique-columns{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+  .critique-column h6{ color:#bdc3c7; font-size:.9rem; text-transform:uppercase; margin-bottom:8px; }
+  
+  .tag-section-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .tag-search-container{ position:relative; }
+  .tag-suggestions{ 
+    position:absolute; top:100%; left:0; right:0; z-index:10; 
+    background:#fff; border:1px solid #ddd; border-radius:4px; 
+    max-height:150px; overflow-y:auto; display:none;
+  }
+  .tag-suggestions.show{ display:block; }
+  .suggestion-item{ 
+    padding:8px 12px; cursor:pointer; border-bottom:1px solid #eee; 
+    font-size:0.85rem; color:#333;
+  }
+  .suggestion-item:hover{ background:#f8f9fa; }
+  .suggestion-item:last-child{ border-bottom:none; }
 
-  /* Chips (collapse with Show more) */
-  .chips-wrap{ display:flex; flex-wrap:wrap; gap:8px; max-height:200px; overflow:hidden; position:relative; }
-  .chips-wrap.is-expanded{ max-height:none; }
-  .chips-fade{ position:absolute; left:0; right:0; bottom:0; height:48px; background:linear-gradient(to bottom,rgba(0,0,0,0),rgba(255,255,255,.05)); pointer-events:none; }
-  .more-chips{ margin-top:8px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.2); color:#bdc3c7; padding:6px 12px; border-radius:12px; font-size:.8rem; }
-
-  .tag-chip{ background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); color:#ecf0f1; padding:6px 12px; border-radius:16px; font-size:.82rem; cursor:pointer; }
+  /* Chips */
+  .chips-wrap{ display:flex; flex-wrap:wrap; gap:8px; max-height:180px; overflow-y:auto; margin-bottom:8px; }
+  .tag-chip{ 
+    background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); 
+    color:#ecf0f1; padding:6px 12px; border-radius:16px; font-size:.82rem; 
+    cursor:pointer; transition:all 0.2s ease; user-select:none; position:relative;
+  }
+  .tag-chip:hover{ background:rgba(255,255,255,.2); }
   .tag-chip.selected{ background:#3498db; border-color:#2980b9; color:#fff; }
   .pro-chip.selected{ background:#27ae60; border-color:#219a52; }
   .con-chip.selected{ background:#e67e22; border-color:#c86b17; }
+  .tag-chip.disabled{ opacity:0.5; cursor:not-allowed; }
+  .tag-chip.custom-tag{ 
+    background:rgba(52, 152, 219, 0.2); border-color:#3498db;
+    position:relative;
+  }
+  .tag-chip.custom-tag:before{
+    content:'✨'; position:absolute; left:-2px; top:-2px;
+    font-size:0.7rem; opacity:0.7;
+  }
+  
+  .selected-count{ text-align:center; margin-top:5px; }
 
   .feedback-section {
     grid-column: 1 / -1;
@@ -166,16 +193,36 @@
     <div class="critique-interface">
       <div class="critique-columns">
         <div class="critique-column">
-          <h6>Strengths</h6>
+          <div class="tag-section-header">
+            <h6>Strengths</h6>
+            <button id="refresh-pro-tags" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+          <div class="tag-search-container mb-2">
+            <input type="text" id="pro-search" class="form-control form-control-sm" placeholder="Search strength tags...">
+            <div id="pro-suggestions" class="tag-suggestions"></div>
+          </div>
           <div id="pro-tags" class="chips-wrap"></div>
-          <div class="chips-fade"></div>
-          <button id="pro-more" class="more-chips" style="display:none;">Show more</button>
+          <div class="selected-count">
+            <small class="text-muted"><span id="pro-count">0</span>/5 selected</small>
+          </div>
         </div>
         <div class="critique-column">
-          <h6>Opportunities</h6>
+          <div class="tag-section-header">
+            <h6>Opportunities</h6>
+            <button id="refresh-con-tags" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
+          </div>
+          <div class="tag-search-container mb-2">
+            <input type="text" id="con-search" class="form-control form-control-sm" placeholder="Search opportunity tags...">
+            <div id="con-suggestions" class="tag-suggestions"></div>
+          </div>
           <div id="con-tags" class="chips-wrap"></div>
-          <div class="chips-fade"></div>
-          <button id="con-more" class="more-chips" style="display:none;">Show more</button>
+          <div class="selected-count">
+            <small class="text-muted"><span id="con-count">0</span>/5 selected</small>
+          </div>
         </div>
         <div class="feedback-section">
           <h6>Your Feedback</h6>
@@ -201,12 +248,24 @@
 <div id="quickbar" class="d-lg-none">
   <div class="row chip-row mb-3">
     <div class="col-6">
-      <h6 class="small text-muted mb-2">Strengths</h6>
-      <div id="pro-tags-mobile" class="d-flex flex-wrap gap-2"></div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="small text-muted mb-0">Strengths</h6>
+        <button id="refresh-pro-mobile" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div id="pro-tags-mobile" class="d-flex flex-wrap gap-2 mb-2" style="max-height:120px; overflow-y:auto;"></div>
+      <small class="text-muted"><span id="pro-count-mobile">0</span>/5</small>
     </div>
     <div class="col-6">
-      <h6 class="small text-muted mb-2">Opportunities</h6>
-      <div id="con-tags-mobile" class="d-flex flex-wrap gap-2"></div>
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="small text-muted mb-0">Opportunities</h6>
+        <button id="refresh-con-mobile" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div id="con-tags-mobile" class="d-flex flex-wrap gap-2 mb-2" style="max-height:120px; overflow-y:auto;"></div>
+      <small class="text-muted"><span id="con-count-mobile">0</span>/5</small>
     </div>
   </div>
   <div class="row">
@@ -350,17 +409,105 @@ function initializeFeedInterface() {
 }
 
 function loadCritiqueTags() {
-  // Sample critique tags
-  const proTags = ['Strong composition', 'Great use of color', 'Excellent technique', 'Creative concept', 'Good lighting', 'Nice details'];
-  const conTags = ['Could improve composition', 'Color balance needs work', 'Technique could be refined', 'Needs more contrast', 'Background distracting'];
+  // Load initial tag sets
+  loadTagSet('pro');
+  loadTagSet('con');
   
-  populateTags('pro-tags', proTags, 'pro-chip');
-  populateTags('con-tags', conTags, 'con-chip');
-  populateTags('pro-tags-mobile', proTags, 'pro-chip');
-  populateTags('con-tags-mobile', conTags, 'con-chip');
+  // Bind refresh handlers - desktop
+  document.getElementById('refresh-pro-tags').addEventListener('click', () => loadTagSet('pro'));
+  document.getElementById('refresh-con-tags').addEventListener('click', () => loadTagSet('con'));
+  
+  // Bind refresh handlers - mobile
+  if (document.getElementById('refresh-pro-mobile')) {
+    document.getElementById('refresh-pro-mobile').addEventListener('click', () => loadTagSet('pro'));
+  }
+  if (document.getElementById('refresh-con-mobile')) {
+    document.getElementById('refresh-con-mobile').addEventListener('click', () => loadTagSet('con'));
+  }
+  
+  // Bind search handlers
+  setupTagSearch('pro');
+  setupTagSearch('con');
 }
 
-function populateTags(containerId, tags, chipClass) {
+function loadTagSet(type) {
+  const tagPools = getTagPools();
+  const pool = tagPools[type];
+  
+  // Get random selection of 8-12 tags from the pool
+  const shuffled = [...pool].sort(() => 0.5 - Math.random());
+  const selectedTags = shuffled.slice(0, Math.floor(Math.random() * 5) + 8);
+  
+  const containerId = `${type}-tags`;
+  const chipClass = `${type}-chip`;
+  
+  populateTags(containerId, selectedTags, chipClass, type);
+  
+  // Also populate mobile if exists
+  const mobileContainerId = `${type}-tags-mobile`;
+  if (document.getElementById(mobileContainerId)) {
+    populateTags(mobileContainerId, selectedTags, chipClass, type);
+  }
+  
+  // Reset counts
+  updateTagCount(type);
+  updateTagCount(`${type}-mobile`);
+  updateTagStates(type);
+}
+
+function getTagPools() {
+  return {
+    pro: [
+      // Technique
+      'Strong composition', 'Excellent technique', 'Great brushwork', 'Skillful rendering',
+      'Nice details', 'Good proportions', 'Solid drawing foundation', 'Clean linework',
+      
+      // Color
+      'Great use of color', 'Beautiful color palette', 'Nice color harmony', 'Bold colors',
+      'Subtle color choices', 'Good color temperature', 'Rich colors', 'Balanced tones',
+      
+      // Lighting & Mood
+      'Good lighting', 'Dramatic lighting', 'Atmospheric mood', 'Great shadows',
+      'Nice highlights', 'Moody atmosphere', 'Cinematic feel', 'Warm feeling',
+      
+      // Creativity & Concept
+      'Creative concept', 'Original idea', 'Unique style', 'Imaginative',
+      'Great storytelling', 'Expressive', 'Emotional impact', 'Compelling subject',
+      
+      // Overall Impact
+      'Eye-catching', 'Professional quality', 'Polished finish', 'Cohesive style',
+      'Strong visual impact', 'Engaging composition', 'Dynamic energy', 'Balanced design'
+    ],
+    
+    con: [
+      // Composition Issues
+      'Could improve composition', 'Needs better focal point', 'Unbalanced layout',
+      'Confusing composition', 'Weak composition', 'Too busy', 'Lacks focus',
+      
+      // Technical Areas
+      'Technique could be refined', 'Anatomy needs work', 'Perspective issues',
+      'Proportions off', 'Drawing needs improvement', 'Rough execution',
+      
+      // Color Issues  
+      'Color balance needs work', 'Colors clash', 'Too saturated', 'Too muted',
+      'Lacks color harmony', 'Muddy colors', 'Color temperature inconsistent',
+      
+      // Lighting Problems
+      'Needs more contrast', 'Lighting unclear', 'Shadows inconsistent',
+      'Too flat', 'Lacks depth', 'Missing highlights', 'Confusing light source',
+      
+      // Background & Environment
+      'Background distracting', 'Background too busy', 'Environment unclear',
+      'Background competes with subject', 'Needs more environment detail',
+      
+      // Overall Polish
+      'Needs more refinement', 'Feels unfinished', 'Could be more polished',
+      'Lacks visual interest', 'Too simple', 'Needs more detail', 'Style inconsistent'
+    ]
+  };
+}
+
+function populateTags(containerId, tags, chipClass, type) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   
@@ -368,9 +515,135 @@ function populateTags(containerId, tags, chipClass) {
     const chip = document.createElement('span');
     chip.className = `tag-chip ${chipClass}`;
     chip.textContent = tag;
-    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    chip.addEventListener('click', () => toggleTagSelection(chip, type));
     container.appendChild(chip);
   });
+}
+
+function toggleTagSelection(chip, type) {
+  const isSelected = chip.classList.contains('selected');
+  const selectedCount = getSelectedTagCount(type);
+  const maxTags = 5;
+  
+  if (!isSelected && selectedCount >= maxTags) {
+    // Show warning that max tags reached
+    showTagLimitWarning(type);
+    return;
+  }
+  
+  chip.classList.toggle('selected');
+  updateTagCount(type);
+  updateTagStates(type);
+}
+
+function getSelectedTagCount(type) {
+  return document.querySelectorAll(`.${type}-chip.selected`).length;
+}
+
+function updateTagCount(type) {
+  const baseType = type.replace('-mobile', '');
+  const count = getSelectedTagCount(baseType);
+  
+  // Update both desktop and mobile counters
+  const countElement = document.getElementById(`${baseType}-count`);
+  const mobileCountElement = document.getElementById(`${baseType}-count-mobile`);
+  
+  if (countElement) {
+    countElement.textContent = count;
+  }
+  if (mobileCountElement) {
+    mobileCountElement.textContent = count;
+  }
+}
+
+function updateTagStates(type) {
+  const selectedCount = getSelectedTagCount(type);
+  const maxTags = 5;
+  const chips = document.querySelectorAll(`.${type}-chip`);
+  
+  chips.forEach(chip => {
+    if (selectedCount >= maxTags && !chip.classList.contains('selected')) {
+      chip.classList.add('disabled');
+    } else {
+      chip.classList.remove('disabled');
+    }
+  });
+}
+
+function showTagLimitWarning(type) {
+  const section = type === 'pro' ? 'Strengths' : 'Opportunities';
+  alert(`Maximum of 5 ${section.toLowerCase()} tags reached. Please deselect a tag first.`);
+}
+
+function setupTagSearch(type) {
+  const searchInput = document.getElementById(`${type}-search`);
+  const suggestionsDiv = document.getElementById(`${type}-suggestions`);
+  const tagPools = getTagPools();
+  
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    
+    if (query.length < 2) {
+      suggestionsDiv.classList.remove('show');
+      return;
+    }
+    
+    const matches = tagPools[type].filter(tag => 
+      tag.toLowerCase().includes(query)
+    ).slice(0, 5);
+    
+    if (matches.length > 0) {
+      suggestionsDiv.innerHTML = matches
+        .map(tag => `<div class="suggestion-item" data-tag="${tag}">${tag}</div>`)
+        .join('');
+      suggestionsDiv.classList.add('show');
+      
+      // Bind click handlers for suggestions
+      suggestionsDiv.querySelectorAll('.suggestion-item').forEach(item => {
+        item.addEventListener('click', () => {
+          addCustomTag(item.dataset.tag, type);
+          searchInput.value = '';
+          suggestionsDiv.classList.remove('show');
+        });
+      });
+    } else {
+      suggestionsDiv.classList.remove('show');
+    }
+  });
+  
+  // Hide suggestions when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.classList.remove('show');
+    }
+  });
+}
+
+function addCustomTag(tagText, type) {
+  // Check if tag already exists
+  const existingTags = document.querySelectorAll(`.${type}-chip`);
+  for (let tag of existingTags) {
+    if (tag.textContent === tagText) {
+      // Tag exists, just select it if not already selected
+      if (!tag.classList.contains('selected')) {
+        toggleTagSelection(tag, type);
+      }
+      return;
+    }
+  }
+  
+  // Add new custom tag
+  const container = document.getElementById(`${type}-tags`);
+  const chip = document.createElement('span');
+  chip.className = `tag-chip ${type}-chip custom-tag`;
+  chip.textContent = tagText;
+  chip.addEventListener('click', () => toggleTagSelection(chip, type));
+  
+  // Insert at beginning to make it prominent
+  container.insertBefore(chip, container.firstChild);
+  
+  // Auto-select the new tag
+  setTimeout(() => toggleTagSelection(chip, type), 100);
 }
 
 async function submitCritique() {
