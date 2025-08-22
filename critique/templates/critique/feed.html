@@ -154,6 +154,92 @@
   .selected-tag-item .remove-tag:hover{ opacity:1; }
   
   .selection-stats{ text-align:center; padding-top:12px; border-top:1px solid rgba(255,255,255,.1); }
+  
+  /* Entry Point Selection */
+  .entry-point-container{ 
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); 
+    border-radius:16px; padding:24px; backdrop-filter:blur(10px); margin-bottom:24px;
+  }
+  .entry-point-header{ text-align:center; margin-bottom:24px; }
+  .entry-point-header h5{ color:#ecf0f1; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .entry-point-header p{ margin:0; font-size:0.9rem; }
+  
+  .feedback-options{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+  .feedback-option{ 
+    background:rgba(255,255,255,.03); border:2px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:20px; cursor:pointer; transition:all 0.3s ease;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .feedback-option:hover{ 
+    border-color:rgba(52, 152, 219, 0.5); background:rgba(52, 152, 219, 0.08); 
+    transform:translateY(-2px); box-shadow:0 8px 16px rgba(0,0,0,.2);
+  }
+  .feedback-option.recommended{ border-color:#3498db; background:rgba(52, 152, 219, 0.1); }
+  .feedback-option.recommended::before{
+    content:'Recommended'; position:absolute; top:-8px; right:8px;
+    background:#3498db; color:#fff; padding:2px 8px; border-radius:12px;
+    font-size:0.7rem; font-weight:600;
+  }
+  
+  .option-icon{ 
+    width:48px; height:48px; border-radius:50%; 
+    background:rgba(52, 152, 219, 0.2); border:2px solid #3498db;
+    display:flex; align-items:center; justify-content:center; margin-bottom:12px;
+  }
+  .option-icon i{ font-size:1.2rem; color:#3498db; }
+  
+  .option-content h6{ color:#ecf0f1; margin-bottom:8px; font-size:1rem; }
+  .option-content p{ color:#bdc3c7; font-size:0.85rem; margin-bottom:12px; }
+  
+  .option-features{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; margin-bottom:16px; }
+  .feature-tag{ 
+    background:rgba(255,255,255,.1); color:#bdc3c7; padding:2px 8px; 
+    border-radius:10px; font-size:0.7rem; display:flex; align-items:center; gap:3px;
+  }
+  .feature-tag i{ font-size:0.6rem; }
+  
+  .option-action .btn{ width:100%; }
+  
+  .preference-note{ text-align:center; }
+  
+  @media (max-width: 768px) {
+    .feedback-options{ grid-template-columns:1fr; }
+  }
+  
+  /* Detailed Critique Form */
+  .detailed-critique-form{ margin-top:16px; }
+  .form-header{ 
+    display:flex; justify-content:space-between; align-items:center; 
+    margin-bottom:24px; padding-bottom:12px; border-bottom:1px solid rgba(255,255,255,.1);
+  }
+  .form-header h6{ margin:0; color:#ecf0f1; display:flex; align-items:center; gap:8px; }
+  
+  .critique-scoring{ 
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:20px; margin-bottom:20px;
+  }
+  .score-group{ margin-bottom:20px; }
+  .score-group:last-child{ margin-bottom:0; }
+  .score-group label{ 
+    color:#ecf0f1; font-weight:600; margin-bottom:8px; 
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .score-value{ color:#3498db; font-weight:700; }
+  .form-range{ margin-top:8px; }
+  
+  .written-feedback{ margin-bottom:24px; }
+  .written-feedback label{ color:#ecf0f1; font-weight:600; margin-bottom:8px; display:block; }
+  .written-feedback textarea{ 
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.2); 
+    color:#ecf0f1; resize:vertical;
+  }
+  .written-feedback textarea:focus{ 
+    background:rgba(255,255,255,.08); border-color:#3498db; 
+    box-shadow:0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+  }
+  
+  .form-actions{ display:flex; gap:12px; }
+  .form-actions .btn{ flex:1; }
 
   .feedback-section {
     grid-column: 1 / -1;
@@ -261,7 +347,59 @@
 
   <!-- Critique Interface -->
   <section class="critique-section">
-    <div class="critique-interface">
+    <!-- Entry Point Selection -->
+    <div id="entry-point-selection" class="entry-point-container">
+      <div class="entry-point-header">
+        <h5><i class="bi bi-chat-left-text"></i> How would you like to give feedback?</h5>
+        <p class="text-muted">Choose your preferred feedback style for this artwork</p>
+      </div>
+      
+      <div class="feedback-options">
+        <div class="feedback-option" data-type="quick">
+          <div class="option-icon">
+            <i class="bi bi-tags"></i>
+          </div>
+          <div class="option-content">
+            <h6>Quick Feedback</h6>
+            <p>Select from curated tags to highlight strengths and areas for improvement</p>
+            <div class="option-features">
+              <span class="feature-tag"><i class="bi bi-lightning"></i> Fast</span>
+              <span class="feature-tag"><i class="bi bi-collection"></i> Organized</span>
+              <span class="feature-tag"><i class="bi bi-search"></i> Searchable</span>
+            </div>
+          </div>
+          <div class="option-action">
+            <button class="btn btn-primary">Choose Tags</button>
+          </div>
+        </div>
+        
+        <div class="feedback-option" data-type="detailed">
+          <div class="option-icon">
+            <i class="bi bi-pencil-square"></i>
+          </div>
+          <div class="option-content">
+            <h6>Detailed Critique</h6>
+            <p>Write comprehensive feedback with structured scores and comments</p>
+            <div class="option-features">
+              <span class="feature-tag"><i class="bi bi-star"></i> Rated</span>
+              <span class="feature-tag"><i class="bi bi-text-paragraph"></i> Written</span>
+              <span class="feature-tag"><i class="bi bi-graph-up"></i> Detailed</span>
+            </div>
+          </div>
+          <div class="option-action">
+            <button class="btn btn-outline-primary">Write Critique</button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="preference-note">
+        <small class="text-muted">
+          <i class="bi bi-info-circle"></i> Your choice will be remembered for future artworks
+        </small>
+      </div>
+    </div>
+
+    <div class="critique-interface" style="display:none;">
       <!-- Tab Navigation -->
       <div class="tag-tabs mb-3">
         <button id="strengths-tab" class="tab-button active" data-tab="strengths">
@@ -677,6 +815,9 @@ function loadCritiqueTags() {
   
   // Setup tab system
   setupTabSystem();
+  
+  // Setup entry point selection
+  setupEntryPointSelection();
 }
 
 function loadTagSet(type) {
@@ -1293,6 +1434,158 @@ function deselectTagEverywhere(type, tagText) {
       chip.classList.remove('selected');
     }
   });
+}
+
+function setupEntryPointSelection() {
+  const entryPointContainer = document.getElementById('entry-point-selection');
+  const critiqueInterface = document.querySelector('.critique-interface');
+  const feedbackOptions = document.querySelectorAll('.feedback-option');
+  
+  // Check for saved preference
+  const savedPreference = localStorage.getItem('brushup_feedback_preference');
+  if (savedPreference) {
+    const recommendedOption = document.querySelector(`[data-type="${savedPreference}"]`);
+    if (recommendedOption) {
+      recommendedOption.classList.add('recommended');
+      recommendedOption.style.position = 'relative';
+    }
+  }
+  
+  feedbackOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      const feedbackType = option.dataset.type;
+      
+      // Save preference
+      localStorage.setItem('brushup_feedback_preference', feedbackType);
+      
+      // Hide entry point and show appropriate interface
+      entryPointContainer.style.display = 'none';
+      critiqueInterface.style.display = 'block';
+      
+      if (feedbackType === 'quick') {
+        // Show tag-based interface (already loaded)
+        setupQuickFeedbackInterface();
+      } else {
+        // Show detailed critique interface
+        setupDetailedCritiqueInterface();
+      }
+    });
+  });
+  
+  // Auto-select if user has strong preference (used 3+ times)
+  const usageCount = parseInt(localStorage.getItem('brushup_usage_count') || '0');
+  if (savedPreference && usageCount >= 3) {
+    // Auto-show preferred interface after brief delay
+    setTimeout(() => {
+      const preferredOption = document.querySelector(`[data-type="${savedPreference}"]`);
+      if (preferredOption) {
+        preferredOption.click();
+      }
+    }, 1500);
+  }
+}
+
+function setupQuickFeedbackInterface() {
+  // Tag interface is already set up, just ensure visibility
+  document.querySelector('.tag-tabs').style.display = 'flex';
+  document.querySelector('.critique-columns').style.display = 'grid';
+  
+  // Add back button
+  addBackToSelectionButton();
+}
+
+function setupDetailedCritiqueInterface() {
+  const critiqueInterface = document.querySelector('.critique-interface');
+  
+  // Hide tag interface
+  document.querySelector('.tag-tabs').style.display = 'none';
+  document.querySelector('.critique-columns').style.display = 'none';
+  
+  // Create detailed critique form
+  const detailedForm = document.createElement('div');
+  detailedForm.className = 'detailed-critique-form';
+  detailedForm.innerHTML = `
+    <div class="form-header">
+      <h6><i class="bi bi-pencil-square"></i> Detailed Critique</h6>
+      <button class="btn btn-sm btn-outline-secondary back-to-selection">
+        <i class="bi bi-arrow-left"></i> Back to Options
+      </button>
+    </div>
+    
+    <div class="critique-scoring">
+      <div class="score-group">
+        <label>Composition <span class="score-value" id="composition-value">5</span>/10</label>
+        <input type="range" id="composition-score" min="1" max="10" value="5" class="form-range">
+      </div>
+      <div class="score-group">
+        <label>Technique <span class="score-value" id="technique-value">5</span>/10</label>
+        <input type="range" id="technique-score" min="1" max="10" value="5" class="form-range">
+      </div>
+      <div class="score-group">
+        <label>Originality <span class="score-value" id="originality-value">5</span>/10</label>
+        <input type="range" id="originality-score" min="1" max="10" value="5" class="form-range">
+      </div>
+    </div>
+    
+    <div class="written-feedback">
+      <label for="detailed-feedback">Written Feedback</label>
+      <textarea id="detailed-feedback" class="form-control" rows="6" 
+                placeholder="Share your detailed thoughts on this artwork..."></textarea>
+    </div>
+    
+    <div class="form-actions">
+      <button id="submit-detailed-btn" class="btn btn-primary">
+        <i class="bi bi-send"></i> Submit Detailed Critique
+      </button>
+      <button id="skip-detailed-btn" class="btn btn-outline-secondary">
+        <i class="bi bi-skip-forward"></i> Skip This Artwork
+      </button>
+    </div>
+  `;
+  
+  critiqueInterface.appendChild(detailedForm);
+  
+  // Setup score sliders
+  setupScoreSliders();
+  
+  // Add back button functionality
+  addBackToSelectionButton();
+}
+
+function setupScoreSliders() {
+  const sliders = ['composition', 'technique', 'originality'];
+  
+  sliders.forEach(type => {
+    const slider = document.getElementById(`${type}-score`);
+    const valueDisplay = document.getElementById(`${type}-value`);
+    
+    slider.addEventListener('input', () => {
+      valueDisplay.textContent = slider.value;
+    });
+  });
+}
+
+function addBackToSelectionButton() {
+  const backButtons = document.querySelectorAll('.back-to-selection');
+  
+  backButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      // Show entry point selection
+      document.getElementById('entry-point-selection').style.display = 'block';
+      document.querySelector('.critique-interface').style.display = 'none';
+      
+      // Clean up any detailed form
+      const detailedForm = document.querySelector('.detailed-critique-form');
+      if (detailedForm) {
+        detailedForm.remove();
+      }
+    });
+  });
+}
+
+function incrementUsageCount() {
+  const currentCount = parseInt(localStorage.getItem('brushup_usage_count') || '0');
+  localStorage.setItem('brushup_usage_count', (currentCount + 1).toString());
 }
 </script>
 
