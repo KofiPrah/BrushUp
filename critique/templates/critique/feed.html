@@ -316,10 +316,37 @@
     color:#ecf0f1; font-size:0.9rem; font-weight:600; margin-bottom:8px; display:block;
   }
   .score-dial{ 
-    width:80px; height:80px; margin:8px auto; position:relative; cursor:pointer;
+    width:100px; height:100px; margin:8px auto; position:relative;
   }
   .score-display{ 
-    color:#3498db; font-weight:700; font-size:1.1rem; margin-top:4px;
+    color:#3498db; font-weight:700; font-size:1.1rem; margin-top:8px;
+  }
+  .score-controls{
+    display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px;
+  }
+  .score-btn{
+    width:32px; height:32px; border-radius:50%; 
+    background:rgba(52, 152, 219, 0.2); border:2px solid #3498db;
+    color:#3498db; font-weight:bold; font-size:1.2rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:all 0.2s ease;
+  }
+  .score-btn:hover{
+    background:#3498db; color:#fff; transform:scale(1.1);
+  }
+  .score-btn:disabled{
+    opacity:0.4; cursor:not-allowed; transform:none;
+  }
+  .dial-svg{ overflow:visible; }
+  .dial-background{ fill:none; stroke:rgba(255,255,255,0.1); stroke-width:8; }
+  .dial-segments{ fill:none; stroke-width:8; }
+  .dial-needle{ 
+    stroke:#fff; stroke-width:3; stroke-linecap:round;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+  .dial-center{ fill:#2c3e50; stroke:#3498db; stroke-width:2; }
+  .dial-score-text{ 
+    fill:#ecf0f1; font-size:16px; font-weight:bold; text-anchor:middle; dominant-baseline:central;
   }
   .scoring-title{ color:#ecf0f1; margin-bottom:16px; }
   .scoring-framework{ display:none; }
@@ -846,28 +873,24 @@
               <div class="score-item">
                 <label class="score-label">Composition</label>
                 <div class="score-dial" data-criterion="composition"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
             <div class="col-6">
               <div class="score-item">
                 <label class="score-label">Color Theory</label>
                 <div class="score-dial" data-criterion="color"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
             <div class="col-6">
               <div class="score-item">
                 <label class="score-label">Technique</label>
                 <div class="score-dial" data-criterion="technique"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
             <div class="col-6">
               <div class="score-item">
                 <label class="score-label">Visual Impact</label>
                 <div class="score-dial" data-criterion="impact"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
           </div>
@@ -879,28 +902,24 @@
               <div class="score-item">
                 <label class="score-label">Emotional Impact</label>
                 <div class="score-dial" data-criterion="emotion"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
             <div class="col-6">
               <div class="score-item">
                 <label class="score-label">Concept & Meaning</label>
                 <div class="score-dial" data-criterion="concept"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
             <div class="col-6">
               <div class="score-item">
                 <label class="score-label">Creativity</label>
                 <div class="score-dial" data-criterion="creativity"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
             <div class="col-6">
               <div class="score-item">
                 <label class="score-label">Personal Voice</label>
                 <div class="score-dial" data-criterion="voice"></div>
-                <div class="score-display">5</div>
               </div>
             </div>
           </div>
@@ -3526,40 +3545,105 @@ function setupEmotionSafeScoring() {
       scores[criterion] = 5; // Default score
     }
     
-    // Create a simple SVG dial
-    dial.innerHTML = `
-      <svg width="80" height="80" viewBox="0 0 80 80">
-        <circle cx="40" cy="40" r="30" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="6"/>
-        <circle cx="40" cy="40" r="30" fill="none" stroke="#3498db" stroke-width="6" 
-                stroke-dasharray="${18.84 * scores[criterion]} 188.4" 
-                stroke-dashoffset="-47.1" transform="rotate(-90 40 40)" class="score-arc"/>
-        <text x="40" y="45" text-anchor="middle" fill="#3498db" font-size="14" font-weight="bold">${scores[criterion]}</text>
-      </svg>
-    `;
+    // Create sophisticated SVG dial with color bands and needle
+    const dialHTML = createScoringDial(criterion, scores[criterion]);
+    dial.innerHTML = dialHTML;
     
-    // Add click handler for score adjustment
-    dial.addEventListener('click', (e) => {
-      const rect = dial.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-      let score = Math.round(((angle + Math.PI / 2) / (2 * Math.PI)) * 10);
-      if (score <= 0) score = 10;
-      if (score > 10) score = 10;
-      
-      scores[criterion] = score;
-      
-      // Update the dial display
-      const arc = dial.querySelector('.score-arc');
-      const text = dial.querySelector('text');
-      arc.setAttribute('stroke-dasharray', `${18.84 * score} 188.4`);
-      text.textContent = score;
-      
-      // Update the score display below
-      const display = dial.parentElement.querySelector('.score-display');
-      if (display) display.textContent = score;
+    // Add control buttons
+    const controls = document.createElement('div');
+    controls.className = 'score-controls';
+    controls.innerHTML = `
+      <button class="score-btn" data-action="decrement" data-criterion="${criterion}">−</button>
+      <span class="score-display">${scores[criterion]}</span>
+      <button class="score-btn" data-action="increment" data-criterion="${criterion}">+</button>
+    `;
+    dial.parentElement.appendChild(controls);
+    
+    // Add event listeners for increment/decrement
+    const decrementBtn = controls.querySelector('[data-action="decrement"]');
+    const incrementBtn = controls.querySelector('[data-action="increment"]');
+    const scoreDisplay = controls.querySelector('.score-display');
+    
+    decrementBtn.addEventListener('click', () => {
+      if (scores[criterion] > 1) {
+        scores[criterion]--;
+        updateDialDisplay(dial, criterion, scores[criterion]);
+        scoreDisplay.textContent = scores[criterion];
+        updateButtonStates(decrementBtn, incrementBtn, scores[criterion]);
+      }
     });
+    
+    incrementBtn.addEventListener('click', () => {
+      if (scores[criterion] < 10) {
+        scores[criterion]++;
+        updateDialDisplay(dial, criterion, scores[criterion]);
+        scoreDisplay.textContent = scores[criterion];
+        updateButtonStates(decrementBtn, incrementBtn, scores[criterion]);
+      }
+    });
+    
+    // Set initial button states
+    updateButtonStates(decrementBtn, incrementBtn, scores[criterion]);
   });
+}
+
+function createScoringDial(criterion, score) {
+  const centerX = 50;
+  const centerY = 50;
+  const radius = 35;
+  const startAngle = -135; // Start from top-left
+  const endAngle = 135;   // End at top-right
+  const totalAngle = endAngle - startAngle;
+  
+  // Calculate needle angle based on score (1-10 maps to startAngle to endAngle)
+  const needleAngle = startAngle + (totalAngle * (score - 1) / 9);
+  const needleRad = (needleAngle * Math.PI) / 180;
+  const needleX = centerX + (radius - 8) * Math.cos(needleRad);
+  const needleY = centerY + (radius - 8) * Math.sin(needleRad);
+  
+  return `
+    <svg width="100" height="100" viewBox="0 0 100 100" class="dial-svg">
+      <!-- Background arc -->
+      <path d="M ${centerX + radius * Math.cos(startAngle * Math.PI / 180)} ${centerY + radius * Math.sin(startAngle * Math.PI / 180)} 
+               A ${radius} ${radius} 0 1 1 ${centerX + radius * Math.cos(endAngle * Math.PI / 180)} ${centerY + radius * Math.sin(endAngle * Math.PI / 180)}"
+            class="dial-background"/>
+      
+      <!-- Color segments -->
+      <!-- Red segment (1-3) -->
+      <path d="M ${centerX + radius * Math.cos(startAngle * Math.PI / 180)} ${centerY + radius * Math.sin(startAngle * Math.PI / 180)} 
+               A ${radius} ${radius} 0 0 1 ${centerX + radius * Math.cos((startAngle + totalAngle * 0.3) * Math.PI / 180)} ${centerY + radius * Math.sin((startAngle + totalAngle * 0.3) * Math.PI / 180)}"
+            class="dial-segments" stroke="#e74c3c"/>
+      
+      <!-- Yellow segment (4-6) -->
+      <path d="M ${centerX + radius * Math.cos((startAngle + totalAngle * 0.3) * Math.PI / 180)} ${centerY + radius * Math.sin((startAngle + totalAngle * 0.3) * Math.PI / 180)} 
+               A ${radius} ${radius} 0 0 1 ${centerX + radius * Math.cos((startAngle + totalAngle * 0.7) * Math.PI / 180)} ${centerY + radius * Math.sin((startAngle + totalAngle * 0.7) * Math.PI / 180)}"
+            class="dial-segments" stroke="#f39c12"/>
+      
+      <!-- Green segment (7-10) -->
+      <path d="M ${centerX + radius * Math.cos((startAngle + totalAngle * 0.7) * Math.PI / 180)} ${centerY + radius * Math.sin((startAngle + totalAngle * 0.7) * Math.PI / 180)} 
+               A ${radius} ${radius} 0 0 1 ${centerX + radius * Math.cos(endAngle * Math.PI / 180)} ${centerY + radius * Math.sin(endAngle * Math.PI / 180)}"
+            class="dial-segments" stroke="#27ae60"/>
+      
+      <!-- Needle -->
+      <line x1="${centerX}" y1="${centerY}" x2="${needleX}" y2="${needleY}" class="dial-needle"/>
+      
+      <!-- Center circle -->
+      <circle cx="${centerX}" cy="${centerY}" r="4" class="dial-center"/>
+      
+      <!-- Score text -->
+      <text x="${centerX}" y="${centerY + 20}" class="dial-score-text">${score}</text>
+    </svg>
+  `;
+}
+
+function updateDialDisplay(dial, criterion, score) {
+  const newDialHTML = createScoringDial(criterion, score);
+  dial.innerHTML = newDialHTML;
+}
+
+function updateButtonStates(decrementBtn, incrementBtn, score) {
+  decrementBtn.disabled = score <= 1;
+  incrementBtn.disabled = score >= 10;
 }
 
 function setupFeedbackPreview() {
