@@ -258,23 +258,109 @@
     display:block; font-size:1rem;
   }
   
-  /* Emotion-Safe Score Dials */
-  .score-dial-container{ text-align:center; }
+  /* Enhanced Score Controls */
+  .score-dial-container{ text-align:center; position:relative; }
+  
+  /* Score Dial with Fixed Center */
   .score-dial{ 
-    width:80px; height:80px; border-radius:50%; margin:0 auto 8px; 
-    background:conic-gradient(from 0deg, #e74c3c 0deg 36deg, #f39c12 36deg 108deg, #f1c40f 108deg 180deg, #2ecc71 180deg 252deg, #27ae60 252deg 360deg);
+    width:100px; height:100px; border-radius:50%; margin:0 auto 8px; 
+    background:conic-gradient(from -90deg, #e74c3c 0deg 36deg, #f39c12 36deg 108deg, #f1c40f 108deg 180deg, #2ecc71 180deg 252deg, #27ae60 252deg 360deg);
     display:flex; align-items:center; justify-content:center; position:relative;
-    cursor:pointer; transition:all 0.3s ease;
+    transition:all 0.3s ease; border:3px solid rgba(255,255,255,.1);
   }
+  
+  /* Fixed center circle with score */
   .score-dial:before{ 
-    content:''; position:absolute; width:60px; height:60px; 
+    content:''; position:absolute; width:70px; height:70px; 
     background:rgba(44, 62, 80, 0.95); border-radius:50%; 
+    border:2px solid rgba(255,255,255,.15);
   }
-  .score-dial:after{ 
-    content:attr(data-value); position:absolute; z-index:2; 
-    color:#ecf0f1; font-weight:700; font-size:1.1rem;
+  
+  /* Fixed score number in center */
+  .score-value-display{ 
+    position:absolute; z-index:3; color:#ecf0f1; 
+    font-weight:700; font-size:1.3rem; pointer-events:none;
   }
-  .score-dial:hover{ transform:scale(1.05); }
+  
+  /* Rotating indicator */
+  .score-indicator{ 
+    position:absolute; width:4px; height:35px; 
+    background:linear-gradient(to bottom, #fff, rgba(255,255,255,0.8));
+    border-radius:2px; top:8px; left:calc(50% - 2px);
+    transform-origin:50% 42px; transition:transform 0.3s ease;
+    box-shadow:0 0 8px rgba(255,255,255,0.5);
+  }
+  
+  /* Control buttons */
+  .score-controls{ 
+    display:flex; justify-content:center; gap:8px; margin-top:8px;
+  }
+  
+  .score-btn{ 
+    width:32px; height:32px; border:1px solid rgba(255,255,255,.2); 
+    background:rgba(255,255,255,.05); border-radius:6px; 
+    color:#bdc3c7; cursor:pointer; transition:all 0.2s ease;
+    display:flex; align-items:center; justify-content:center;
+    font-size:0.9rem; font-weight:600;
+  }
+  
+  .score-btn:hover{ 
+    background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.4); 
+    color:#ecf0f1; transform:translateY(-1px);
+  }
+  
+  .score-btn:active{ transform:translateY(0); }
+  
+  /* Add tooltips for better UX */
+  .score-btn[data-action="increase"]:before{ 
+    content:"Increase score"; position:absolute; bottom:100%; left:50%; 
+    transform:translateX(-50%); background:rgba(0,0,0,.8); color:#fff; 
+    padding:4px 8px; border-radius:4px; font-size:0.7rem; white-space:nowrap;
+    opacity:0; pointer-events:none; transition:opacity 0.2s ease; z-index:10;
+  }
+  .score-btn[data-action="decrease"]:before{ 
+    content:"Decrease score"; position:absolute; bottom:100%; left:50%; 
+    transform:translateX(-50%); background:rgba(0,0,0,.8); color:#fff; 
+    padding:4px 8px; border-radius:4px; font-size:0.7rem; white-space:nowrap;
+    opacity:0; pointer-events:none; transition:opacity 0.2s ease; z-index:10;
+  }
+  .score-btn:hover:before{ opacity:1; }
+  
+  /* Score indicator glow based on score value */
+  .score-indicator.low-score{ 
+    background:linear-gradient(to bottom, #e74c3c, rgba(231, 76, 60, 0.8));
+    box-shadow:0 0 12px rgba(231, 76, 60, 0.6);
+  }
+  .score-indicator.medium-score{ 
+    background:linear-gradient(to bottom, #f1c40f, rgba(241, 196, 15, 0.8));
+    box-shadow:0 0 12px rgba(241, 196, 15, 0.6);
+  }
+  .score-indicator.high-score{ 
+    background:linear-gradient(to bottom, #2ecc71, rgba(46, 204, 113, 0.8));
+    box-shadow:0 0 12px rgba(46, 204, 113, 0.6);
+  }
+  
+  /* Alternative: Color gradient slider */
+  .score-slider-container{ 
+    display:none; /* Hidden by default, can be toggled */
+    margin:8px 0;
+  }
+  
+  .score-slider{ 
+    width:100%; height:12px; border-radius:6px; cursor:pointer;
+    background:linear-gradient(to right, #e74c3c 0%, #f39c12 25%, #f1c40f 50%, #2ecc71 75%, #27ae60 100%);
+    position:relative; border:1px solid rgba(255,255,255,.2);
+  }
+  
+  .score-slider-thumb{ 
+    position:absolute; width:20px; height:20px; 
+    background:#fff; border:2px solid #3498db; border-radius:50%;
+    top:-4px; cursor:grab; transition:all 0.2s ease;
+    box-shadow:0 2px 8px rgba(0,0,0,.3);
+  }
+  
+  .score-slider-thumb:hover{ transform:scale(1.1); }
+  .score-slider-thumb:active{ cursor:grabbing; }
   
   .score-description{ 
     color:#bdc3c7; font-size:0.85rem; margin-bottom:12px; 
@@ -1661,7 +1747,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Composition</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="composition-dial"></div>
+            <div class="score-dial" id="composition-dial">
+              <div class="score-value-display" id="composition-value">5</div>
+              <div class="score-indicator" id="composition-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="composition">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="composition">+</button>
+            </div>
             <div class="score-description" id="composition-desc">Balanced and thoughtful</div>
           </div>
           <input type="range" id="composition-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1669,7 +1762,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Technique</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="technique-dial"></div>
+            <div class="score-dial" id="technique-dial">
+              <div class="score-value-display" id="technique-value">5</div>
+              <div class="score-indicator" id="technique-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="technique">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="technique">+</button>
+            </div>
             <div class="score-description" id="technique-desc">Solid foundation</div>
           </div>
           <input type="range" id="technique-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1677,7 +1777,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Originality</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="originality-dial"></div>
+            <div class="score-dial" id="originality-dial">
+              <div class="score-value-display" id="originality-value">5</div>
+              <div class="score-indicator" id="originality-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="originality">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="originality">+</button>
+            </div>
             <div class="score-description" id="originality-desc">Fresh perspective</div>
           </div>
           <input type="range" id="originality-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1685,7 +1792,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Impact</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="impact-dial"></div>
+            <div class="score-dial" id="impact-dial">
+              <div class="score-value-display" id="impact-value">5</div>
+              <div class="score-indicator" id="impact-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="impact">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="impact">+</button>
+            </div>
             <div class="score-description" id="impact-desc">Makes an impression</div>
           </div>
           <input type="range" id="impact-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1696,7 +1810,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Emotional Resonance</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="emotion-dial"></div>
+            <div class="score-dial" id="emotion-dial">
+              <div class="score-value-display" id="emotion-value">5</div>
+              <div class="score-indicator" id="emotion-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="emotion">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="emotion">+</button>
+            </div>
             <div class="score-description" id="emotion-desc">Evokes feeling</div>
           </div>
           <input type="range" id="emotion-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1704,7 +1825,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Storytelling</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="storytelling-dial"></div>
+            <div class="score-dial" id="storytelling-dial">
+              <div class="score-value-display" id="storytelling-value">5</div>
+              <div class="score-indicator" id="storytelling-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="storytelling">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="storytelling">+</button>
+            </div>
             <div class="score-description" id="storytelling-desc">Communicates clearly</div>
           </div>
           <input type="range" id="storytelling-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1712,7 +1840,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Atmosphere</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="atmosphere-dial"></div>
+            <div class="score-dial" id="atmosphere-dial">
+              <div class="score-value-display" id="atmosphere-value">5</div>
+              <div class="score-indicator" id="atmosphere-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="atmosphere">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="atmosphere">+</button>
+            </div>
             <div class="score-description" id="atmosphere-desc">Creates mood</div>
           </div>
           <input type="range" id="atmosphere-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1720,7 +1855,14 @@ function setupDetailedCritiqueInterface() {
         <div class="score-group">
           <label>Personal Connection</label>
           <div class="score-dial-container">
-            <div class="score-dial" id="connection-dial"></div>
+            <div class="score-dial" id="connection-dial">
+              <div class="score-value-display" id="connection-value">5</div>
+              <div class="score-indicator" id="connection-indicator"></div>
+            </div>
+            <div class="score-controls">
+              <button type="button" class="score-btn" data-action="decrease" data-target="connection">−</button>
+              <button type="button" class="score-btn" data-action="increase" data-target="connection">+</button>
+            </div>
             <div class="score-description" id="connection-desc">Speaks to me</div>
           </div>
           <input type="range" id="connection-score" min="1" max="10" value="5" class="form-range d-none">
@@ -1839,6 +1981,8 @@ function setupFrameworkSelection() {
 
 function setupEmotionSafeScoring() {
   const activeFramework = document.querySelector('.scoring-framework.active');
+  if (!activeFramework) return;
+  
   const scoreDials = activeFramework.querySelectorAll('.score-dial');
   
   scoreDials.forEach(dial => {
@@ -1846,41 +1990,74 @@ function setupEmotionSafeScoring() {
     const scoreType = dialId.replace('-dial', '');
     const hiddenInput = document.getElementById(`${scoreType}-score`);
     const description = document.getElementById(`${scoreType}-desc`);
+    const valueDisplay = document.getElementById(`${scoreType}-value`);
+    const indicator = document.getElementById(`${scoreType}-indicator`);
     
     // Initialize with default value
-    updateScoreDial(dial, hiddenInput, description, 5);
-    
-    // Add click interaction for score adjustment
-    dial.addEventListener('click', (e) => {
-      const rect = dial.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+    updateImprovedScoreDial(scoreType, 5);
+  });
+  
+  // Setup button controls for all score types
+  const scoreButtons = activeFramework.querySelectorAll('.score-btn');
+  scoreButtons.forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const action = button.dataset.action;
+      const target = button.dataset.target;
+      const currentScore = parseInt(document.getElementById(`${target}-score`).value);
       
-      // Convert angle to score (1-10)
-      let normalizedAngle = (angle + Math.PI) / (2 * Math.PI);
-      if (normalizedAngle < 0) normalizedAngle += 1;
-      const score = Math.max(1, Math.min(10, Math.round(normalizedAngle * 10)));
+      let newScore = currentScore;
+      if (action === 'increase' && currentScore < 10) {
+        newScore = currentScore + 1;
+      } else if (action === 'decrease' && currentScore > 1) {
+        newScore = currentScore - 1;
+      }
       
-      updateScoreDial(dial, hiddenInput, description, score);
+      if (newScore !== currentScore) {
+        updateImprovedScoreDial(target, newScore);
+        
+        // Add visual feedback
+        button.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          button.style.transform = '';
+        }, 150);
+      }
     });
   });
 }
 
-function updateScoreDial(dial, hiddenInput, description, score) {
+function updateImprovedScoreDial(scoreType, score) {
+  // Update all related elements
+  const hiddenInput = document.getElementById(`${scoreType}-score`);
+  const valueDisplay = document.getElementById(`${scoreType}-value`);
+  const indicator = document.getElementById(`${scoreType}-indicator`);
+  const description = document.getElementById(`${scoreType}-desc`);
+  
+  if (!hiddenInput || !valueDisplay || !indicator || !description) return;
+  
   // Update hidden input
   hiddenInput.value = score;
   
-  // Update dial visual
-  dial.setAttribute('data-value', score);
+  // Update fixed center display (number stays in place)
+  valueDisplay.textContent = score;
   
-  // Rotate dial to show score position
-  const rotation = (score - 1) * 36; // 360 degrees / 10 scores
-  dial.style.transform = `rotate(${rotation}deg)`;
+  // Rotate only the indicator (not the whole dial)
+  const rotation = (score - 1) * 36; // 360 degrees / 10 scores, starting from top
+  indicator.style.transform = `rotate(${rotation}deg)`;
+  
+  // Update indicator styling based on score
+  indicator.className = 'score-indicator';
+  if (score <= 3) {
+    indicator.classList.add('low-score');
+  } else if (score <= 6) {
+    indicator.classList.add('medium-score');
+  } else {
+    indicator.classList.add('high-score');
+  }
   
   // Update emotion-safe description
   const descriptions = getEmotionSafeDescriptions();
-  const descriptionKey = description.id.replace('-desc', '');
+  const descriptionKey = scoreType;
   
   if (descriptions[descriptionKey]) {
     const scoreDescriptions = descriptions[descriptionKey];
@@ -1905,6 +2082,12 @@ function updateScoreDial(dial, hiddenInput, description, score) {
     
     description.textContent = descText;
     description.className = `score-description ${descClass}`;
+  }
+  
+  // Add tooltip for clarity
+  const dial = document.getElementById(`${scoreType}-dial`);
+  if (dial) {
+    dial.title = `Score: ${score}/10 - Use +/- buttons to adjust`;
   }
 }
 
