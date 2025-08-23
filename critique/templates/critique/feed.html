@@ -1860,8 +1860,13 @@ function setupDetailedCritiqueInterface() {
           <label>Emotional Resonance</label>
           <div class="score-dial-container">
             <div class="score-dial" id="emotion-dial">
-              <div class="score-value-display" id="emotion-value">5</div>
-              <div class="score-indicator" id="emotion-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="emotion-value">5</div>
+                <div class="score-indicator" id="emotion-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="emotion">−</button>
