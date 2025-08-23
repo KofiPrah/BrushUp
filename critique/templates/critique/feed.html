@@ -261,32 +261,39 @@
   /* Enhanced Score Controls */
   .score-dial-container{ text-align:center; position:relative; }
   
-  /* Score Dial with Fixed Center - Clean Color Bands */
+  /* Score Dial with Clean SVG Color Bands */
   .score-dial{ 
     width:100px; height:100px; border-radius:50%; margin:0 auto 8px; 
-    background:conic-gradient(from 0deg, 
-      #e74c3c 0deg 108deg,      /* Red: scores 1-3 (0-108°) */
-      #f1c40f 108deg 252deg,    /* Yellow: scores 4-7 (108-252°) */ 
-      #27ae60 252deg 360deg     /* Green: scores 8-10 (252-360°) */
-    );
+    background:#2c3e50; /* Base background */
     display:flex; align-items:center; justify-content:center; position:relative;
     transition:all 0.3s ease; border:3px solid rgba(255,255,255,.1);
-    /* Prevent color band overlap artifacts */
-    image-rendering:-webkit-optimize-contrast;
-    image-rendering:crisp-edges;
+    overflow:hidden;
   }
   
-  /* Score markers for visual reference - aligned with needle positions */
+  /* SVG color bands positioned behind the content */
+  .score-dial-svg {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    pointer-events:none; z-index:1;
+  }
+  
+  /* Ensure dial content appears above SVG */
+  .score-dial .dial-content {
+    position:relative; z-index:2;
+    display:flex; align-items:center; justify-content:center;
+    width:100%; height:100%;
+  }
+  
+  /* Score markers for visual reference */
   .score-dial:after{ 
-    content:''; position:absolute; inset:3px; border-radius:50%;
+    content:''; position:absolute; inset:8px; border-radius:50%;
     background:repeating-conic-gradient(
       from 0deg,
       transparent 0deg 35deg,
-      rgba(255,255,255,.2) 35deg 36deg,
+      rgba(255,255,255,.15) 35deg 36deg,
       transparent 36deg 71deg,
-      rgba(255,255,255,.2) 71deg 72deg
+      rgba(255,255,255,.15) 71deg 72deg
     );
-    pointer-events:none;
+    pointer-events:none; z-index:3;
   }
   
   /* Fixed center circle with score */
@@ -1770,8 +1777,13 @@ function setupDetailedCritiqueInterface() {
           <label>Composition</label>
           <div class="score-dial-container">
             <div class="score-dial" id="composition-dial">
-              <div class="score-value-display" id="composition-value">5</div>
-              <div class="score-indicator" id="composition-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="composition-value">5</div>
+                <div class="score-indicator" id="composition-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="composition">−</button>
@@ -1785,8 +1797,13 @@ function setupDetailedCritiqueInterface() {
           <label>Technique</label>
           <div class="score-dial-container">
             <div class="score-dial" id="technique-dial">
-              <div class="score-value-display" id="technique-value">5</div>
-              <div class="score-indicator" id="technique-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="technique-value">5</div>
+                <div class="score-indicator" id="technique-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="technique">−</button>
@@ -1800,8 +1817,13 @@ function setupDetailedCritiqueInterface() {
           <label>Originality</label>
           <div class="score-dial-container">
             <div class="score-dial" id="originality-dial">
-              <div class="score-value-display" id="originality-value">5</div>
-              <div class="score-indicator" id="originality-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="originality-value">5</div>
+                <div class="score-indicator" id="originality-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="originality">−</button>
@@ -1815,8 +1837,13 @@ function setupDetailedCritiqueInterface() {
           <label>Impact</label>
           <div class="score-dial-container">
             <div class="score-dial" id="impact-dial">
-              <div class="score-value-display" id="impact-value">5</div>
-              <div class="score-indicator" id="impact-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="impact-value">5</div>
+                <div class="score-indicator" id="impact-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="impact">−</button>
@@ -1848,8 +1875,13 @@ function setupDetailedCritiqueInterface() {
           <label>Storytelling</label>
           <div class="score-dial-container">
             <div class="score-dial" id="storytelling-dial">
-              <div class="score-value-display" id="storytelling-value">5</div>
-              <div class="score-indicator" id="storytelling-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="storytelling-value">5</div>
+                <div class="score-indicator" id="storytelling-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="storytelling">−</button>
@@ -1863,8 +1895,13 @@ function setupDetailedCritiqueInterface() {
           <label>Atmosphere</label>
           <div class="score-dial-container">
             <div class="score-dial" id="atmosphere-dial">
-              <div class="score-value-display" id="atmosphere-value">5</div>
-              <div class="score-indicator" id="atmosphere-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="atmosphere-value">5</div>
+                <div class="score-indicator" id="atmosphere-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="atmosphere">−</button>
@@ -1878,8 +1915,13 @@ function setupDetailedCritiqueInterface() {
           <label>Personal Connection</label>
           <div class="score-dial-container">
             <div class="score-dial" id="connection-dial">
-              <div class="score-value-display" id="connection-value">5</div>
-              <div class="score-indicator" id="connection-indicator"></div>
+              <svg class="score-dial-svg" viewBox="0 0 100 100">
+                <!-- SVG arcs will be inserted here -->
+              </svg>
+              <div class="dial-content">
+                <div class="score-value-display" id="connection-value">5</div>
+                <div class="score-indicator" id="connection-indicator"></div>
+              </div>
             </div>
             <div class="score-controls">
               <button type="button" class="score-btn" data-action="decrease" data-target="connection">−</button>
@@ -2003,6 +2045,52 @@ function setupFrameworkSelection() {
   });
 }
 
+// Create clean SVG arcs for color segments
+function createScoreDialSVG(svgElement) {
+  // Clear existing content
+  svgElement.innerHTML = '';
+  
+  // Define color segments: Red (1-3), Yellow (4-7), Green (8-10)
+  const segments = [
+    { start: 0, end: 108, color: '#e74c3c' },     // Red: 0-108 degrees
+    { start: 108, end: 252, color: '#f1c40f' },   // Yellow: 108-252 degrees  
+    { start: 252, end: 360, color: '#27ae60' }    // Green: 252-360 degrees
+  ];
+  
+  const center = 50;
+  const radius = 47;
+  const strokeWidth = 8;
+  
+  segments.forEach(segment => {
+    const { start, end, color } = segment;
+    
+    // Convert degrees to radians
+    const startRad = (start - 90) * Math.PI / 180; // -90 to start from top
+    const endRad = (end - 90) * Math.PI / 180;
+    
+    // Calculate arc endpoints
+    const x1 = center + radius * Math.cos(startRad);
+    const y1 = center + radius * Math.sin(startRad);
+    const x2 = center + radius * Math.cos(endRad);
+    const y2 = center + radius * Math.sin(endRad);
+    
+    // Determine if arc should be large (> 180 degrees)
+    const largeArc = (end - start) > 180 ? 1 : 0;
+    
+    // Create SVG path for the arc
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    const pathData = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`;
+    
+    path.setAttribute('d', pathData);
+    path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', strokeWidth);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke-linecap', 'round');
+    
+    svgElement.appendChild(path);
+  });
+}
+
 function setupEmotionSafeScoring() {
   const activeFramework = document.querySelector('.scoring-framework.active');
   if (!activeFramework) return;
@@ -2016,6 +2104,12 @@ function setupEmotionSafeScoring() {
     const description = document.getElementById(`${scoreType}-desc`);
     const valueDisplay = document.getElementById(`${scoreType}-value`);
     const indicator = document.getElementById(`${scoreType}-indicator`);
+    const svgElement = dial.querySelector('.score-dial-svg');
+    
+    // Create clean SVG color bands
+    if (svgElement) {
+      createScoreDialSVG(svgElement);
+    }
     
     // Initialize with default value
     updateImprovedScoreDial(scoreType, 5);
