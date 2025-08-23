@@ -827,8 +827,9 @@
           </div>
         </div>
         <div class="feedback-section">
-          <h6>Your Feedback</h6>
-          <textarea id="general-feedback" class="form-control mb-3" rows="4" placeholder="Share your thoughts about this artwork..."></textarea>
+          <h6>Your Feedback <small class="text-muted">(Optional)</small></h6>
+          <textarea id="general-feedback" class="form-control mb-3" rows="4" placeholder="Additional thoughts (optional) - tags alone are enough..."></textarea>
+          <small class="text-muted d-block mb-2"><i class="bi bi-info-circle"></i> You can submit with just tags - written feedback is optional</small>
           <div class="action-buttons">
             {% if user.is_authenticated %}
               <button id="submit-btn" class="btn btn-primary">Submit Feedback</button>
@@ -872,7 +873,8 @@
   </div>
   <div class="row">
     <div class="col-12">
-      <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Share your thoughts..."></textarea>
+      <small class="text-muted d-block mb-1"><i class="bi bi-info-circle"></i> Written feedback is optional - tags alone work fine</small>
+      <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Additional thoughts (optional)..."></textarea>
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
           <button id="mobile-submit-btn" class="btn btn-primary btn-sm">Submit</button>
@@ -1400,7 +1402,7 @@ async function submitCritique() {
   const selectedConTags = getSelectedTags('con-chip');
   
   if (!feedback.trim() && selectedProTags.length === 0 && selectedConTags.length === 0) {
-    alert('Please provide some feedback or select tags before submitting.');
+    alert('Please select at least one tag or add written feedback before submitting.');
     return;
   }
   
