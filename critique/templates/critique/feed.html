@@ -261,16 +261,19 @@
   /* Enhanced Score Controls */
   .score-dial-container{ text-align:center; position:relative; }
   
-  /* Score Dial with Fixed Center - Properly Aligned Color Bands */
+  /* Score Dial with Fixed Center - Clean Color Bands */
   .score-dial{ 
     width:100px; height:100px; border-radius:50%; margin:0 auto 8px; 
     background:conic-gradient(from 0deg, 
-      #e74c3c 0deg 108deg,      /* Red: scores 1-3 (needle 0-108 deg) */
-      #f1c40f 108deg 252deg,    /* Yellow: scores 4-7 (needle 108-252 deg) */ 
-      #27ae60 252deg 360deg     /* Green: scores 8-10 (needle 252-360 deg) */
+      #e74c3c 0deg 108deg,      /* Red: scores 1-3 (0-108°) */
+      #f1c40f 108deg 252deg,    /* Yellow: scores 4-7 (108-252°) */ 
+      #27ae60 252deg 360deg     /* Green: scores 8-10 (252-360°) */
     );
     display:flex; align-items:center; justify-content:center; position:relative;
     transition:all 0.3s ease; border:3px solid rgba(255,255,255,.1);
+    /* Prevent color band overlap artifacts */
+    image-rendering:-webkit-optimize-contrast;
+    image-rendering:crisp-edges;
   }
   
   /* Score markers for visual reference - aligned with needle positions */
@@ -1992,8 +1995,10 @@ function setupFrameworkSelection() {
         technicalScores.classList.remove('active');
       }
       
-      // Reinitialize score dials for the new framework
-      setupEmotionSafeScoring();
+      // Reinitialize score dials for the new framework with small delay
+      setTimeout(() => {
+        setupEmotionSafeScoring();
+      }, 50);
     });
   });
 }
@@ -2016,13 +2021,19 @@ function setupEmotionSafeScoring() {
     updateImprovedScoreDial(scoreType, 5);
   });
   
-  // Setup button controls for all score types
+  // Setup button controls for all score types - prevent double event binding
   const scoreButtons = activeFramework.querySelectorAll('.score-btn');
   scoreButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
+    // Remove any existing listeners to prevent double-triggering
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    
+    newButton.addEventListener('click', (e) => {
       e.preventDefault();
-      const action = button.dataset.action;
-      const target = button.dataset.target;
+      e.stopPropagation();
+      
+      const action = newButton.dataset.action;
+      const target = newButton.dataset.target;
       const currentScore = parseInt(document.getElementById(`${target}-score`).value);
       
       let newScore = currentScore;
@@ -2032,13 +2043,14 @@ function setupEmotionSafeScoring() {
         newScore = currentScore - 1;
       }
       
-      if (newScore !== currentScore) {
+      // Only update if the score actually changed
+      if (newScore !== currentScore && newScore >= 1 && newScore <= 10) {
         updateImprovedScoreDial(target, newScore);
         
         // Add visual feedback
-        button.style.transform = 'scale(0.9)';
+        newButton.style.transform = 'scale(0.9)';
         setTimeout(() => {
-          button.style.transform = '';
+          newButton.style.transform = '';
         }, 150);
       }
     });
