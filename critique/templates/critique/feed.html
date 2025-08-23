@@ -604,6 +604,13 @@
         </div>
       </div>
       
+      <!-- Skip Option -->
+      <div class="skip-option mt-3 text-center">
+        <button id="skip-from-entry" class="btn btn-outline-secondary">
+          <i class="bi bi-skip-forward"></i> Skip This Artwork
+        </button>
+      </div>
+      
       <div class="preference-note">
         <small class="text-muted">
           <i class="bi bi-info-circle"></i> Your choice will be remembered for future artworks
@@ -835,16 +842,10 @@
               <button id="submit-btn" class="btn btn-primary">
                 <i class="bi bi-send"></i> Submit Feedback
               </button>
-              <button id="skip-btn" class="btn btn-outline-secondary">
-                <i class="bi bi-skip-forward"></i> Skip This Artwork
-              </button>
             {% else %}
               <a href="/accounts/login/" class="btn btn-primary">
                 <i class="bi bi-box-arrow-in-right"></i> Login to Submit Feedback
               </a>
-              <button id="skip-btn" class="btn btn-outline-secondary">
-                <i class="bi bi-skip-forward"></i> Skip This Artwork
-              </button>
             {% endif %}
           </div>
         </div>
@@ -891,9 +892,6 @@
             <i class="bi bi-box-arrow-in-right"></i> Login to Submit
           </a>
         {% endif %}
-        <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-skip-forward"></i> Skip This Artwork
-        </button>
       </div>
     </div>
   </div>
@@ -1014,11 +1012,12 @@ function initializeFeedInterface() {
   
   // Bind event handlers
   document.getElementById('submit-btn').addEventListener('click', submitCritique);
-  document.getElementById('skip-btn').addEventListener('click', skipArtwork);
   
   // Mobile handlers
   document.getElementById('mobile-submit-btn').addEventListener('click', submitCritique);
-  document.getElementById('mobile-skip-btn').addEventListener('click', skipArtwork);
+  
+  // Entry point skip handler
+  document.getElementById('skip-from-entry').addEventListener('click', skipArtwork);
 }
 
 function loadCritiqueTags() {
@@ -2369,9 +2368,6 @@ function setupDetailedCritiqueInterface() {
       <button id="submit-detailed-btn" class="btn btn-primary" disabled>
         <i class="bi bi-send"></i> Submit Detailed Critique
       </button>
-      <button id="skip-detailed-btn" class="btn btn-outline-secondary">
-        <i class="bi bi-skip-forward"></i> Skip This Artwork
-      </button>
     </div>
   `;
   
@@ -2383,11 +2379,7 @@ function setupDetailedCritiqueInterface() {
   setupGuidedFeedback();
   setupGamifiedValidation();
   
-  // Add skip functionality for detailed critique
-  const skipDetailedBtn = document.getElementById('skip-detailed-btn');
-  if (skipDetailedBtn) {
-    skipDetailedBtn.addEventListener('click', skipArtwork);
-  }
+  // Skip functionality is now handled at entry point
   
   // Add back button functionality
   addBackToSelectionButton();
