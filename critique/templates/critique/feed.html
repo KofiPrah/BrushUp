@@ -832,12 +832,19 @@
           <small class="text-muted d-block mb-2"><i class="bi bi-info-circle"></i> You can submit with just tags - written feedback is optional</small>
           <div class="action-buttons">
             {% if user.is_authenticated %}
-              <button id="submit-btn" class="btn btn-primary">Submit Feedback</button>
-              <button id="skip-btn" class="btn btn-outline-secondary">Skip This Artwork</button>
+              <button id="submit-btn" class="btn btn-primary">
+                <i class="bi bi-send"></i> Submit Feedback
+              </button>
+              <button id="skip-btn" class="btn btn-outline-secondary">
+                <i class="bi bi-skip-forward"></i> Skip This Artwork
+              </button>
             {% else %}
-              <a href="/accounts/login/" class="btn btn-primary">Login to Submit Feedback</a>
-              <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
-              <button id="next-btn" class="btn btn-outline-success" disabled>Next Artwork →</button>
+              <a href="/accounts/login/" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right"></i> Login to Submit Feedback
+              </a>
+              <button id="skip-btn" class="btn btn-outline-secondary">
+                <i class="bi bi-skip-forward"></i> Skip This Artwork
+              </button>
             {% endif %}
           </div>
         </div>
@@ -876,11 +883,17 @@
       <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Additional thoughts (optional)..."></textarea>
       <div class="d-flex gap-2">
         {% if user.is_authenticated %}
-          <button id="mobile-submit-btn" class="btn btn-primary btn-sm">Submit</button>
+          <button id="mobile-submit-btn" class="btn btn-primary btn-sm">
+            <i class="bi bi-send"></i> Submit
+          </button>
         {% else %}
-          <a href="/accounts/login/" class="btn btn-primary btn-sm">Login to Submit</a>
+          <a href="/accounts/login/" class="btn btn-primary btn-sm">
+            <i class="bi bi-box-arrow-in-right"></i> Login to Submit
+          </a>
         {% endif %}
-        <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">Skip This Artwork</button>
+        <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-skip-forward"></i> Skip This Artwork
+        </button>
       </div>
     </div>
   </div>
