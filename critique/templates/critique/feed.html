@@ -261,12 +261,29 @@
   /* Enhanced Score Controls */
   .score-dial-container{ text-align:center; position:relative; }
   
-  /* Score Dial with Fixed Center */
+  /* Score Dial with Fixed Center - Consistent Color Bands */
   .score-dial{ 
     width:100px; height:100px; border-radius:50%; margin:0 auto 8px; 
-    background:conic-gradient(from -90deg, #e74c3c 0deg 36deg, #f39c12 36deg 108deg, #f1c40f 108deg 180deg, #2ecc71 180deg 252deg, #27ae60 252deg 360deg);
+    background:conic-gradient(from -90deg, 
+      #e74c3c 0deg 108deg,     /* Red: scores 1-3 (0-108 degrees) */
+      #f1c40f 108deg 252deg,   /* Yellow: scores 4-7 (108-252 degrees) */ 
+      #27ae60 252deg 360deg     /* Green: scores 8-10 (252-360 degrees) */
+    );
     display:flex; align-items:center; justify-content:center; position:relative;
     transition:all 0.3s ease; border:3px solid rgba(255,255,255,.1);
+  }
+  
+  /* Score markers for visual reference */
+  .score-dial:after{ 
+    content:''; position:absolute; inset:3px; border-radius:50%;
+    background:repeating-conic-gradient(
+      from -90deg,
+      transparent 0deg 35deg,
+      rgba(255,255,255,.15) 35deg 36deg,
+      transparent 36deg 71deg,
+      rgba(255,255,255,.15) 71deg 72deg
+    );
+    pointer-events:none;
   }
   
   /* Fixed center circle with score */
@@ -289,6 +306,8 @@
     border-radius:2px; top:8px; left:calc(50% - 2px);
     transform-origin:50% 42px; transition:transform 0.3s ease;
     box-shadow:0 0 8px rgba(255,255,255,0.5);
+    /* Start pointing upward at 12 o'clock */
+    transform:rotate(0deg);
   }
   
   /* Control buttons */
@@ -326,7 +345,7 @@
   }
   .score-btn:hover:before{ opacity:1; }
   
-  /* Score indicator glow based on score value */
+  /* Score indicator glow based on score value - matching color bands */
   .score-indicator.low-score{ 
     background:linear-gradient(to bottom, #e74c3c, rgba(231, 76, 60, 0.8));
     box-shadow:0 0 12px rgba(231, 76, 60, 0.6);
@@ -336,8 +355,8 @@
     box-shadow:0 0 12px rgba(241, 196, 15, 0.6);
   }
   .score-indicator.high-score{ 
-    background:linear-gradient(to bottom, #2ecc71, rgba(46, 204, 113, 0.8));
-    box-shadow:0 0 12px rgba(46, 204, 113, 0.6);
+    background:linear-gradient(to bottom, #27ae60, rgba(39, 174, 96, 0.8));
+    box-shadow:0 0 12px rgba(39, 174, 96, 0.6);
   }
   
   /* Alternative: Color gradient slider */
@@ -2041,18 +2060,19 @@ function updateImprovedScoreDial(scoreType, score) {
   // Update fixed center display (number stays in place)
   valueDisplay.textContent = score;
   
-  // Rotate only the indicator (not the whole dial)
-  const rotation = (score - 1) * 36; // 360 degrees / 10 scores, starting from top
+  // Rotate needle to match score position - aligned with color bands
+  // Score 1-10 distributed evenly around 360 degrees, starting from top (0 degrees)
+  const rotation = (score - 1) * 36; // Each score is 36 degrees apart
   indicator.style.transform = `rotate(${rotation}deg)`;
   
-  // Update indicator styling based on score
+  // Update indicator styling to match color bands
   indicator.className = 'score-indicator';
-  if (score <= 3) {
-    indicator.classList.add('low-score');
-  } else if (score <= 6) {
-    indicator.classList.add('medium-score');
-  } else {
-    indicator.classList.add('high-score');
+  if (score >= 1 && score <= 3) {
+    indicator.classList.add('low-score');    // Red zone: scores 1-3
+  } else if (score >= 4 && score <= 7) {
+    indicator.classList.add('medium-score'); // Yellow zone: scores 4-7  
+  } else if (score >= 8 && score <= 10) {
+    indicator.classList.add('high-score');   // Green zone: scores 8-10
   }
   
   // Update emotion-safe description
