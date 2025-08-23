@@ -261,27 +261,27 @@
   /* Enhanced Score Controls */
   .score-dial-container{ text-align:center; position:relative; }
   
-  /* Score Dial with Fixed Center - Consistent Color Bands */
+  /* Score Dial with Fixed Center - Properly Aligned Color Bands */
   .score-dial{ 
     width:100px; height:100px; border-radius:50%; margin:0 auto 8px; 
-    background:conic-gradient(from -90deg, 
-      #e74c3c 0deg 108deg,     /* Red: scores 1-3 (0-108 degrees) */
-      #f1c40f 108deg 252deg,   /* Yellow: scores 4-7 (108-252 degrees) */ 
-      #27ae60 252deg 360deg     /* Green: scores 8-10 (252-360 degrees) */
+    background:conic-gradient(from 0deg, 
+      #e74c3c 0deg 108deg,      /* Red: scores 1-3 (needle 0-108 deg) */
+      #f1c40f 108deg 252deg,    /* Yellow: scores 4-7 (needle 108-252 deg) */ 
+      #27ae60 252deg 360deg     /* Green: scores 8-10 (needle 252-360 deg) */
     );
     display:flex; align-items:center; justify-content:center; position:relative;
     transition:all 0.3s ease; border:3px solid rgba(255,255,255,.1);
   }
   
-  /* Score markers for visual reference */
+  /* Score markers for visual reference - aligned with needle positions */
   .score-dial:after{ 
     content:''; position:absolute; inset:3px; border-radius:50%;
     background:repeating-conic-gradient(
-      from -90deg,
+      from 0deg,
       transparent 0deg 35deg,
-      rgba(255,255,255,.15) 35deg 36deg,
+      rgba(255,255,255,.2) 35deg 36deg,
       transparent 36deg 71deg,
-      rgba(255,255,255,.15) 71deg 72deg
+      rgba(255,255,255,.2) 71deg 72deg
     );
     pointer-events:none;
   }
@@ -299,14 +299,14 @@
     font-weight:700; font-size:1.3rem; pointer-events:none;
   }
   
-  /* Rotating indicator */
+  /* Rotating indicator - starts at top, rotates clockwise */
   .score-indicator{ 
     position:absolute; width:4px; height:35px; 
     background:linear-gradient(to bottom, #fff, rgba(255,255,255,0.8));
     border-radius:2px; top:8px; left:calc(50% - 2px);
     transform-origin:50% 42px; transition:transform 0.3s ease;
     box-shadow:0 0 8px rgba(255,255,255,0.5);
-    /* Start pointing upward at 12 o'clock */
+    /* Start pointing upward at 12 o'clock (0 degrees) */
     transform:rotate(0deg);
   }
   
@@ -2060,9 +2060,9 @@ function updateImprovedScoreDial(scoreType, score) {
   // Update fixed center display (number stays in place)
   valueDisplay.textContent = score;
   
-  // Rotate needle to match score position - aligned with color bands
-  // Score 1-10 distributed evenly around 360 degrees, starting from top (0 degrees)
-  const rotation = (score - 1) * 36; // Each score is 36 degrees apart
+  // Rotate needle to match score position - properly aligned with color bands
+  // Score 1 at 0deg (top), Score 10 at 324deg, each score 36deg apart
+  const rotation = (score - 1) * 36; // Score 1=0°, Score 2=36°, Score 3=72°, etc.
   indicator.style.transform = `rotate(${rotation}deg)`;
   
   // Update indicator styling to match color bands
