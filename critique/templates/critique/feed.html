@@ -10,8 +10,19 @@
     body{ background: linear-gradient(135deg,#2c3e50 0%,#34495e 100%); color:#fff; }
     #quickbar{ display:none !important; } /* hide bottom bar on desktop */
   }
-  #feed-container{ max-width:800px; margin:0 auto; padding:20px; }
-  .single-layout{ display:flex; flex-direction:column; gap:20px; }
+  #feed-container{ max-width:1200px; margin:0 auto; padding:20px; }
+  .single-layout{ display:grid; grid-template-columns:1fr 500px; gap:30px; align-items:start; }
+  
+  /* Fixed Artwork on Left */
+  .artwork-section{ 
+    position:sticky; top:20px; z-index:10;
+  }
+  
+  /* Critique Flow on Right */
+  .critique-flow-container{
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); 
+    border-radius:16px; overflow:hidden; min-height:500px;
+  }
   
   .artwork-display{ 
     border-radius:16px; overflow:hidden; box-shadow:0 12px 48px rgba(0,0,0,.35); 
@@ -202,8 +213,54 @@
   
   .preference-note{ text-align:center; }
   
+  /* Progress Indicators */
+  .progress-indicators{
+    display:flex; justify-content:center; align-items:center; gap:12px;
+    padding:20px 0; border-bottom:1px solid rgba(255,255,255,.1);
+  }
+  .progress-step{
+    width:10px; height:10px; border-radius:50%; 
+    background:rgba(255,255,255,.2); transition:all 0.3s ease;
+  }
+  .progress-step.active{ background:#3498db; transform:scale(1.2); }
+  .progress-step.completed{ background:#27ae60; }
+  .progress-connector{
+    width:30px; height:2px; background:rgba(255,255,255,.2);
+  }
+  .progress-connector.completed{ background:#27ae60; }
+  
+  /* Step Container */
+  .step-container{
+    padding:24px; min-height:400px; display:none;
+  }
+  .step-container.active{ display:block; }
+  
+  .step-header{ text-align:center; margin-bottom:24px; }
+  .step-header h5{ color:#ecf0f1; margin-bottom:8px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .step-header p{ margin:0; font-size:0.9rem; color:#bdc3c7; }
+  
+  /* Step Navigation */
+  .step-navigation{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 24px; border-top:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.02);
+  }
+  .step-navigation .btn{ min-width:100px; }
+  
+  /* Quick Feedback Steps */
+  .guided-selection{ margin-bottom:20px; }
+  .selection-prompt{
+    text-align:center; padding:16px; margin-bottom:16px;
+    background:rgba(52, 152, 219, 0.1); border-radius:8px;
+  }
+  .selection-prompt h6{ color:#3498db; margin-bottom:8px; }
+  .selection-prompt p{ margin:0; font-size:0.85rem; }
+  
   @media (max-width: 768px) {
     .feedback-options{ grid-template-columns:1fr; }
+    .single-layout{ display:flex; flex-direction:column; gap:20px; }
+    .artwork-section{ position:relative; }
+    .step-container{ min-height:300px; }
   }
   
   /* Detailed Critique Form */
@@ -557,13 +614,22 @@
     </div>
   </section>
 
-  <!-- Critique Interface -->
-  <section class="critique-section">
-    <!-- Entry Point Selection -->
-    <div id="entry-point-selection" class="entry-point-container">
-      <div class="entry-point-header">
+  <!-- Critique Flow -->
+  <section class="critique-flow-container">
+    <!-- Progress Indicators -->
+    <div class="progress-indicators">
+      <div class="progress-step active" data-step="1"></div>
+      <div class="progress-connector"></div>
+      <div class="progress-step" data-step="2"></div>
+      <div class="progress-connector"></div>
+      <div class="progress-step" data-step="3"></div>
+    </div>
+    
+    <!-- Step 1: Choose Feedback Type -->
+    <div id="step-1" class="step-container active">
+      <div class="step-header">
         <h5><i class="bi bi-chat-left-text"></i> How would you like to give feedback?</h5>
-        <p class="text-muted">Choose your preferred feedback style for this artwork</p>
+        <p>Choose your preferred feedback style for this artwork</p>
       </div>
       
       <div class="feedback-options">
@@ -573,11 +639,10 @@
           </div>
           <div class="option-content">
             <h6>Quick Feedback</h6>
-            <p>Select from curated tags to highlight strengths and areas for improvement</p>
+            <p>Select curated tags for strengths and areas to improve</p>
             <div class="option-features">
               <span class="feature-tag"><i class="bi bi-lightning"></i> Fast</span>
-              <span class="feature-tag"><i class="bi bi-collection"></i> Organized</span>
-              <span class="feature-tag"><i class="bi bi-search"></i> Searchable</span>
+              <span class="feature-tag"><i class="bi bi-collection"></i> Tags</span>
             </div>
           </div>
           <div class="option-action">
@@ -591,11 +656,10 @@
           </div>
           <div class="option-content">
             <h6>Detailed Critique</h6>
-            <p>Write comprehensive feedback with structured scores and comments</p>
+            <p>Structured scoring with comprehensive feedback</p>
             <div class="option-features">
               <span class="feature-tag"><i class="bi bi-star"></i> Rated</span>
               <span class="feature-tag"><i class="bi bi-text-paragraph"></i> Written</span>
-              <span class="feature-tag"><i class="bi bi-graph-up"></i> Detailed</span>
             </div>
           </div>
           <div class="option-action">
@@ -603,21 +667,173 @@
           </div>
         </div>
       </div>
+    </div>
+    
+    <!-- Step 2a: Quick Feedback (Strengths) -->
+    <div id="step-2-quick-strengths" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-hand-thumbs-up"></i> What works well in this artwork?</h5>
+        <p>Select tags that highlight the artwork's strengths</p>
+      </div>
       
-      <!-- Skip Option -->
-      <div class="skip-option mt-3 text-center">
+      <div class="guided-selection">
+        <div class="selection-prompt">
+          <h6>Choose 2-5 strengths</h6>
+          <p>Highlight what the artist did well</p>
+        </div>
+        
+        <div id="strengths-chips" class="chips-wrap"></div>
+        
+        <div class="selected-count">
+          <small class="text-muted">Selected: <span id="strengths-count">0</span></small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2b: Quick Feedback (Opportunities) -->
+    <div id="step-2-quick-opportunities" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-lightbulb"></i> Areas for growth and improvement</h5>
+        <p>Select tags for constructive opportunities (optional)</p>
+      </div>
+      
+      <div class="guided-selection">
+        <div class="selection-prompt">
+          <h6>Choose 0-3 opportunities</h6>
+          <p>Suggest areas where the artist could explore and grow</p>
+        </div>
+        
+        <div id="opportunities-chips" class="chips-wrap"></div>
+        
+        <div class="selected-count">
+          <small class="text-muted">Selected: <span id="opportunities-count">0</span></small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2c: Quick Feedback (Written Note) -->
+    <div id="step-2-quick-note" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-chat-square-text"></i> Add a personal note (optional)</h5>
+        <p>Share additional thoughts or encouragement</p>
+      </div>
+      
+      <div class="guided-selection">
+        <textarea id="quick-written-feedback" class="form-control" rows="4" 
+                  placeholder="Share your thoughts, encouragement, or additional feedback..."></textarea>
+        
+        <div class="mt-2">
+          <small class="text-muted">
+            <i class="bi bi-info-circle"></i> This field is optional but adds a personal touch
+          </small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2d: Detailed Critique (Framework Selection) -->
+    <div id="step-2-detailed-framework" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-diagram-3"></i> Choose your critique framework</h5>
+        <p>Select how you'd like to approach this artwork</p>
+      </div>
+      
+      <div class="framework-selection">
+        <div class="framework-options">
+          <div class="framework-option" data-framework="formalist">
+            <div class="framework-header">
+              <h6>Formalist Approach</h6>
+              <small>Focus on visual elements and composition</small>
+            </div>
+            <div class="framework-criteria">
+              <span class="criteria-tag">Composition</span>
+              <span class="criteria-tag">Color</span>
+              <span class="criteria-tag">Technique</span>
+              <span class="criteria-tag">Visual Impact</span>
+            </div>
+          </div>
+          
+          <div class="framework-option" data-framework="expressive">
+            <div class="framework-header">
+              <h6>Expressive Approach</h6>
+              <small>Focus on emotion and artistic message</small>
+            </div>
+            <div class="framework-criteria">
+              <span class="criteria-tag">Emotional Impact</span>
+              <span class="criteria-tag">Concept</span>
+              <span class="criteria-tag">Creativity</span>
+              <span class="criteria-tag">Personal Voice</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 2e: Detailed Critique (Scoring) -->
+    <div id="step-2-detailed-scoring" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-sliders"></i> Rate the artwork</h5>
+        <p>Use the scoring dials to evaluate each aspect</p>
+      </div>
+      
+      <div id="scoring-container" class="guided-selection">
+        <!-- Scoring dials will be dynamically added here -->
+      </div>
+    </div>
+    
+    <!-- Step 2f: Detailed Critique (Written Feedback) -->
+    <div id="step-2-detailed-written" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-pencil-square"></i> Written feedback</h5>
+        <p>Elaborate on your scores with detailed commentary</p>
+      </div>
+      
+      <div class="guided-selection">
+        <textarea id="detailed-written-feedback" class="form-control" rows="6" 
+                  placeholder="Share your detailed thoughts about this artwork..."></textarea>
+        
+        <div class="mt-2">
+          <small class="text-muted">
+            <i class="bi bi-lightbulb"></i> Consider the artist's technique, concept, and overall execution
+          </small>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Step 3: Confirmation -->
+    <div id="step-3" class="step-container">
+      <div class="step-header">
+        <h5><i class="bi bi-check-circle"></i> Review your feedback</h5>
+        <p>Confirm your critique before submitting</p>
+      </div>
+      
+      <div id="feedback-preview" class="guided-selection">
+        <!-- Preview will be dynamically populated -->
+      </div>
+    </div>
+    
+    <!-- Step Navigation -->
+    <div class="step-navigation">
+      <button id="prev-step" class="btn btn-outline-secondary" style="display:none;">
+        <i class="bi bi-arrow-left"></i> Previous
+      </button>
+      
+      <div class="nav-center">
         <button id="skip-from-entry" class="btn btn-outline-secondary">
           <i class="bi bi-skip-forward"></i> Skip This Artwork
         </button>
       </div>
       
-      <div class="preference-note">
-        <small class="text-muted">
-          <i class="bi bi-info-circle"></i> Your choice will be remembered for future artworks
-        </small>
-      </div>
+      <button id="next-step" class="btn btn-primary" disabled>
+        Next <i class="bi bi-arrow-right"></i>
+      </button>
+      
+      <button id="submit-feedback" class="btn btn-success" style="display:none;">
+        <i class="bi bi-send"></i> Submit Feedback
+      </button>
     </div>
+  </section>
 
+    <!-- Legacy interface hidden -->
     <div class="critique-interface" style="display:none;">
       <!-- Quick Feedback Header with Back Button -->
       <div class="quick-feedback-header" style="display:none;">
@@ -1006,18 +1222,52 @@ function showNoArtworkMessage() {
     '<div class="text-center"><i class="bi bi-palette2"></i><br>No artworks available for critique right now.<br><small>Check back later!</small></div>';
 }
 
+// Global state for the onboarding flow
+let currentStep = 1;
+let feedbackType = null;
+let selectedFramework = null;
+let selectedTags = { strengths: [], opportunities: [] };
+let scores = {};
+
 function initializeFeedInterface() {
-  // Initialize critique tag selections
+  // Initialize the onboarding flow
+  initializeOnboardingFlow();
+  
+  // Load critique tags for use in guided steps
   loadCritiqueTags();
-  
-  // Bind event handlers
-  document.getElementById('submit-btn').addEventListener('click', submitCritique);
-  
-  // Mobile handlers
-  document.getElementById('mobile-submit-btn').addEventListener('click', submitCritique);
   
   // Entry point skip handler
   document.getElementById('skip-from-entry').addEventListener('click', skipArtwork);
+}
+
+function initializeOnboardingFlow() {
+  // Set up step navigation
+  document.getElementById('next-step').addEventListener('click', nextStep);
+  document.getElementById('prev-step').addEventListener('click', previousStep);
+  document.getElementById('submit-feedback').addEventListener('click', submitFeedback);
+  
+  // Set up feedback type selection
+  const feedbackOptions = document.querySelectorAll('.feedback-option');
+  feedbackOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      feedbackType = option.dataset.type;
+      localStorage.setItem('brushup_feedback_preference', feedbackType);
+      nextStep();
+    });
+  });
+  
+  // Check for saved preference and mark as recommended
+  const savedPreference = localStorage.getItem('brushup_feedback_preference');
+  if (savedPreference) {
+    const recommendedOption = document.querySelector(`[data-type="${savedPreference}"]`);
+    if (recommendedOption) {
+      recommendedOption.classList.add('recommended');
+      recommendedOption.style.position = 'relative';
+    }
+  }
+  
+  // Initialize step validation
+  updateStepNavigation();
 }
 
 function loadCritiqueTags() {
@@ -2378,11 +2628,6 @@ function setupDetailedCritiqueInterface() {
   setupEmotionSafeScoring();
   setupGuidedFeedback();
   setupGamifiedValidation();
-  
-  // Skip functionality is now handled at entry point
-  
-  // Add back button functionality
-  addBackToSelectionButton();
 }
 
 // Enhanced framework and scoring system functions
@@ -2845,6 +3090,347 @@ function addBackToSelectionButton() {
 function incrementUsageCount() {
   const currentCount = parseInt(localStorage.getItem('brushup_usage_count') || '0');
   localStorage.setItem('brushup_usage_count', (currentCount + 1).toString());
+}
+
+// ===== ONBOARDING FLOW FUNCTIONS =====
+
+function nextStep() {
+  if (!validateCurrentStep()) {
+    return;
+  }
+  
+  const currentStepEl = document.querySelector(`#step-${currentStep}`);
+  if (currentStepEl) {
+    currentStepEl.classList.remove('active');
+  }
+  
+  let nextStepNumber = determineNextStep();
+  
+  if (nextStepNumber) {
+    currentStep = nextStepNumber;
+    showStep(currentStep);
+    updateProgressIndicators();
+    updateStepNavigation();
+  }
+}
+
+function previousStep() {
+  const currentStepEl = document.querySelector(`#step-${currentStep}`);
+  if (currentStepEl) {
+    currentStepEl.classList.remove('active');
+  }
+  
+  let prevStepNumber = determinePreviousStep();
+  
+  if (prevStepNumber) {
+    currentStep = prevStepNumber;
+    showStep(currentStep);
+    updateProgressIndicators();
+    updateStepNavigation();
+  }
+}
+
+function determineNextStep() {
+  if (currentStep === 1) {
+    if (feedbackType === 'quick') {
+      setupQuickFeedbackFlow();
+      return 'step-2-quick-strengths';
+    } else if (feedbackType === 'detailed') {
+      setupDetailedCritiqueFlow();
+      return 'step-2-detailed-framework';
+    }
+  } else if (currentStep === 'step-2-quick-strengths') {
+    return 'step-2-quick-opportunities';
+  } else if (currentStep === 'step-2-quick-opportunities') {
+    return 'step-2-quick-note';
+  } else if (currentStep === 'step-2-quick-note') {
+    setupFeedbackPreview();
+    return 3;
+  } else if (currentStep === 'step-2-detailed-framework') {
+    setupScoringStep();
+    return 'step-2-detailed-scoring';
+  } else if (currentStep === 'step-2-detailed-scoring') {
+    return 'step-2-detailed-written';
+  } else if (currentStep === 'step-2-detailed-written') {
+    setupFeedbackPreview();
+    return 3;
+  }
+  
+  return null;
+}
+
+function determinePreviousStep() {
+  if (currentStep === 3) {
+    if (feedbackType === 'quick') {
+      return 'step-2-quick-note';
+    } else if (feedbackType === 'detailed') {
+      return 'step-2-detailed-written';
+    }
+  } else if (currentStep === 'step-2-quick-note') {
+    return 'step-2-quick-opportunities';
+  } else if (currentStep === 'step-2-quick-opportunities') {
+    return 'step-2-quick-strengths';
+  } else if (currentStep === 'step-2-quick-strengths') {
+    return 1;
+  } else if (currentStep === 'step-2-detailed-written') {
+    return 'step-2-detailed-scoring';
+  } else if (currentStep === 'step-2-detailed-scoring') {
+    return 'step-2-detailed-framework';
+  } else if (currentStep === 'step-2-detailed-framework') {
+    return 1;
+  }
+  
+  return null;
+}
+
+function showStep(stepId) {
+  document.querySelectorAll('.step-container').forEach(step => {
+    step.classList.remove('active');
+  });
+  
+  const targetStep = document.getElementById(stepId);
+  if (targetStep) {
+    targetStep.classList.add('active');
+  }
+}
+
+function updateProgressIndicators() {
+  const progressSteps = document.querySelectorAll('.progress-step');
+  const progressConnectors = document.querySelectorAll('.progress-connector');
+  
+  progressSteps.forEach((step, index) => {
+    step.classList.remove('active', 'completed');
+    if (index < progressConnectors.length) {
+      progressConnectors[index].classList.remove('completed');
+    }
+  });
+  
+  let progressIndex = 0;
+  if (currentStep === 1) {
+    progressIndex = 0;
+  } else if (typeof currentStep === 'string' && currentStep.includes('step-2')) {
+    progressIndex = 1;
+  } else if (currentStep === 3) {
+    progressIndex = 2;
+  }
+  
+  progressSteps.forEach((step, index) => {
+    if (index < progressIndex) {
+      step.classList.add('completed');
+      if (index < progressConnectors.length) {
+        progressConnectors[index].classList.add('completed');
+      }
+    } else if (index === progressIndex) {
+      step.classList.add('active');
+    }
+  });
+}
+
+function validateCurrentStep() {
+  if (currentStep === 1) {
+    return feedbackType !== null;
+  } else if (currentStep === 'step-2-quick-strengths') {
+    return selectedTags.strengths.length >= 2;
+  } else if (currentStep === 'step-2-detailed-framework') {
+    return selectedFramework !== null;
+  }
+  
+  return true;
+}
+
+function updateStepNavigation() {
+  const prevBtn = document.getElementById('prev-step');
+  const nextBtn = document.getElementById('next-step');
+  const submitBtn = document.getElementById('submit-feedback');
+  
+  prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-flex';
+  
+  if (currentStep === 3) {
+    nextBtn.style.display = 'none';
+    submitBtn.style.display = 'inline-flex';
+  } else {
+    nextBtn.style.display = 'inline-flex';
+    submitBtn.style.display = 'none';
+    nextBtn.disabled = !validateCurrentStep();
+  }
+}
+
+function setupQuickFeedbackFlow() {
+  loadTagsForStep('strengths');
+  loadTagsForStep('opportunities');
+  selectedTags = { strengths: [], opportunities: [] };
+}
+
+function loadTagsForStep(type) {
+  const container = document.getElementById(`${type}-chips`);
+  if (!container) return;
+  
+  const tagType = type === 'strengths' ? 'pro' : 'con';
+  const existingTags = document.querySelectorAll(`#${tagType}-tags .tag-chip`);
+  
+  container.innerHTML = '';
+  existingTags.forEach(existingTag => {
+    if (!existingTag.classList.contains('custom-tag')) {
+      const chip = createTagChip(existingTag.textContent, type);
+      container.appendChild(chip);
+    }
+  });
+}
+
+function createTagChip(tag, type) {
+  const chip = document.createElement('div');
+  chip.className = `tag-chip ${type === 'strengths' ? 'pro-chip' : 'con-chip'}`;
+  chip.textContent = tag;
+  chip.addEventListener('click', () => toggleTagSelection(tag, type, chip));
+  return chip;
+}
+
+function toggleTagSelection(tag, type, chipElement) {
+  const tagArray = selectedTags[type];
+  const index = tagArray.indexOf(tag);
+  
+  if (index === -1) {
+    const limit = type === 'strengths' ? 5 : 3;
+    if (tagArray.length < limit) {
+      tagArray.push(tag);
+      chipElement.classList.add('selected');
+    }
+  } else {
+    tagArray.splice(index, 1);
+    chipElement.classList.remove('selected');
+  }
+  
+  const countElement = document.getElementById(`${type}-count`);
+  if (countElement) {
+    countElement.textContent = tagArray.length;
+  }
+  
+  updateStepNavigation();
+}
+
+function setupDetailedCritiqueFlow() {
+  const frameworkOptions = document.querySelectorAll('.framework-option');
+  frameworkOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      frameworkOptions.forEach(opt => opt.classList.remove('selected'));
+      option.classList.add('selected');
+      selectedFramework = option.dataset.framework;
+      updateStepNavigation();
+    });
+  });
+}
+
+function setupScoringStep() {
+  // Simplified scoring for demo - would integrate with existing scoring system
+  const container = document.getElementById('scoring-container');
+  if (!container || !selectedFramework) return;
+  
+  const criteria = selectedFramework === 'formalist' 
+    ? ['Composition', 'Color', 'Technique', 'Visual Impact']
+    : ['Emotional Impact', 'Concept', 'Creativity', 'Personal Voice'];
+  
+  container.innerHTML = '';
+  criteria.forEach(criterion => {
+    const widget = document.createElement('div');
+    widget.className = 'mb-3';
+    widget.innerHTML = `
+      <label class="form-label">${criterion}</label>
+      <input type="range" class="form-range" min="1" max="10" value="5" 
+             data-criterion="${criterion}" onchange="updateScore('${criterion}', this.value)">
+      <div class="d-flex justify-content-between">
+        <small>1</small><small>10</small>
+      </div>
+    `;
+    container.appendChild(widget);
+  });
+}
+
+function updateScore(criterion, value) {
+  scores[criterion] = parseInt(value);
+}
+
+function setupFeedbackPreview() {
+  const preview = document.getElementById('feedback-preview');
+  if (!preview) return;
+  
+  let previewHTML = '<div class="feedback-preview">';
+  
+  if (feedbackType === 'quick') {
+    if (selectedTags.strengths.length > 0) {
+      previewHTML += '<div class="preview-section mb-3"><h6>Strengths</h6><div>';
+      selectedTags.strengths.forEach(tag => {
+        previewHTML += `<span class="badge bg-success me-1 mb-1">${tag}</span>`;
+      });
+      previewHTML += '</div></div>';
+    }
+    
+    if (selectedTags.opportunities.length > 0) {
+      previewHTML += '<div class="preview-section mb-3"><h6>Growth Opportunities</h6><div>';
+      selectedTags.opportunities.forEach(tag => {
+        previewHTML += `<span class="badge bg-warning me-1 mb-1">${tag}</span>`;
+      });
+      previewHTML += '</div></div>';
+    }
+    
+    const note = document.getElementById('quick-written-feedback');
+    if (note && note.value.trim()) {
+      previewHTML += `<div class="preview-section mb-3"><h6>Additional Note</h6><p class="text-muted">${note.value}</p></div>`;
+    }
+  } else if (feedbackType === 'detailed') {
+    previewHTML += `<div class="preview-section mb-3"><h6>Framework</h6><p class="text-muted">${selectedFramework}</p></div>`;
+    
+    if (Object.keys(scores).length > 0) {
+      previewHTML += '<div class="preview-section mb-3"><h6>Scores</h6>';
+      Object.entries(scores).forEach(([criterion, score]) => {
+        previewHTML += `<div class="d-flex justify-content-between"><span>${criterion}</span><span>${score}/10</span></div>`;
+      });
+      previewHTML += '</div>';
+    }
+    
+    const feedback = document.getElementById('detailed-written-feedback');
+    if (feedback && feedback.value.trim()) {
+      previewHTML += `<div class="preview-section mb-3"><h6>Written Feedback</h6><p class="text-muted">${feedback.value}</p></div>`;
+    }
+  }
+  
+  previewHTML += '</div>';
+  preview.innerHTML = previewHTML;
+}
+
+function submitFeedback() {
+  const submitBtn = document.getElementById('submit-feedback');
+  const originalText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Submitting...';
+  submitBtn.disabled = true;
+  
+  // Simulate submission success
+  setTimeout(() => {
+    submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Submitted!';
+    submitBtn.classList.remove('btn-success');
+    submitBtn.classList.add('btn-success');
+    
+    showCritiqueDialoguePrompt(() => {
+      resetOnboardingFlow();
+      loadNextArtwork();
+    });
+  }, 1000);
+}
+
+function resetOnboardingFlow() {
+  currentStep = 1;
+  feedbackType = null;
+  selectedFramework = null;
+  selectedTags = { strengths: [], opportunities: [] };
+  scores = {};
+  
+  showStep(1);
+  updateProgressIndicators();
+  updateStepNavigation();
+  
+  const quickNote = document.getElementById('quick-written-feedback');
+  const detailedNote = document.getElementById('detailed-written-feedback');
+  if (quickNote) quickNote.value = '';
+  if (detailedNote) detailedNote.value = '';
 }
 </script>
 
