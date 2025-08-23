@@ -1398,11 +1398,15 @@ async function submitCritique() {
   {% endif %}
   
   const feedback = document.getElementById('general-feedback').value || document.getElementById('general-feedback-mobile').value;
-  const selectedProTags = getSelectedTags('pro-chip');
-  const selectedConTags = getSelectedTags('con-chip');
+  const selectedProTags = getSelectedTags('pro');
+  const selectedConTags = getSelectedTags('con');
+  
+  console.log('Debug - feedback:', feedback.trim());
+  console.log('Debug - selectedProTags:', selectedProTags);
+  console.log('Debug - selectedConTags:', selectedConTags);
   
   if (!feedback.trim() && selectedProTags.length === 0 && selectedConTags.length === 0) {
-    alert('Please select at least one tag or add written feedback before submitting.');
+    alert('Please select at least one strength or opportunity tag before submitting.');
     return;
   }
   
@@ -1873,10 +1877,7 @@ function getCookie(name) {
   return cookieValue;
 }
 
-function getSelectedTags(chipClass) {
-  return Array.from(document.querySelectorAll(`.${chipClass}.selected`))
-    .map(chip => chip.textContent);
-}
+// Note: This function was replaced by the more robust version below
 
 function skipArtwork() {
   // Enable next button and move to next artwork
