@@ -1564,28 +1564,46 @@ function showCritiqueDialoguePrompt(onComplete) {
   // Handle ask question button
   const askQuestionBtn = modal.querySelector('#askQuestionBtn');
   askQuestionBtn.addEventListener('click', () => {
+    // Clear auto-dismiss timer when user engages with question form
+    if (backdrop.autoDismissTimer) {
+      clearTimeout(backdrop.autoDismissTimer);
+      backdrop.autoDismissTimer = null;
+    }
     showQuestionForm(backdrop, onComplete);
   });
   
   // Handle dismiss button
   const dismissBtn = modal.querySelector('#dismissBtn');
   dismissBtn.addEventListener('click', () => {
+    // Clear auto-dismiss timer
+    if (backdrop.autoDismissTimer) {
+      clearTimeout(backdrop.autoDismissTimer);
+      backdrop.autoDismissTimer = null;
+    }
     closeDialogue(backdrop, onComplete);
   });
   
   // Close on backdrop click
   backdrop.addEventListener('click', (e) => {
     if (e.target === backdrop) {
+      // Clear auto-dismiss timer
+      if (backdrop.autoDismissTimer) {
+        clearTimeout(backdrop.autoDismissTimer);
+        backdrop.autoDismissTimer = null;
+      }
       closeDialogue(backdrop, onComplete);
     }
   });
   
-  // Auto-dismiss after 8 seconds if no interaction
-  setTimeout(() => {
+  // Auto-dismiss after 8 seconds if no interaction (store timer to clear it later)
+  const autoDismissTimer = setTimeout(() => {
     if (document.body.contains(backdrop)) {
       closeDialogue(backdrop, onComplete);
     }
   }, 8000);
+  
+  // Store timer on backdrop for later access
+  backdrop.autoDismissTimer = autoDismissTimer;
 }
 
 // Show question form for artist dialogue
@@ -1643,6 +1661,27 @@ function showQuestionForm(backdrop, onComplete) {
   
   // Generate and display smart suggestion chips
   generateSuggestionChips(chipsContainer, textarea);
+  
+  // Prevent any auto-dismiss when user is actively typing
+  let isUserTyping = false;
+  
+  textarea.addEventListener('input', () => {
+    isUserTyping = true;
+    // Clear any remaining auto-dismiss timers
+    if (backdrop.autoDismissTimer) {
+      clearTimeout(backdrop.autoDismissTimer);
+      backdrop.autoDismissTimer = null;
+    }
+  });
+  
+  textarea.addEventListener('focus', () => {
+    isUserTyping = true;
+    // Clear any remaining auto-dismiss timers
+    if (backdrop.autoDismissTimer) {
+      clearTimeout(backdrop.autoDismissTimer);
+      backdrop.autoDismissTimer = null;
+    }
+  });
   
   // Focus textarea
   textarea.focus();
