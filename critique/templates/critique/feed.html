@@ -365,9 +365,9 @@
   
   /* Score text */
   .dial-score-text{ 
-    fill:#ecf0f1; font-size:20px; font-weight:700; text-anchor:middle; 
+    fill:#ffffff; font-size:22px; font-weight:900; text-anchor:middle; 
     dominant-baseline:central; font-family:'Segoe UI', system-ui, sans-serif;
-    transition:all 0.2s ease;
+    opacity:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.8));
   }
   
   /* Tooltip */
@@ -3618,17 +3618,18 @@ function createScoringDial(criterion, score) {
   const centerX = 60;
   const centerY = 60;
   const radius = 45;
-  const startAngle = -140; // Start angle for the arc
-  const endAngle = 140;   // End angle for the arc
+  // Use symmetrical angles for better visual balance
+  const startAngle = -135; // Start angle for the arc
+  const endAngle = 135;   // End angle for the arc (270 degree range)
   const totalAngle = endAngle - startAngle;
   
   // Calculate needle angle based on score (1-10 maps to startAngle to endAngle)
   const needleAngle = startAngle + (totalAngle * (score - 1) / 9);
   const needleRad = (needleAngle * Math.PI) / 180;
-  const needleX = centerX + (radius - 10) * Math.cos(needleRad);
-  const needleY = centerY + (radius - 10) * Math.sin(needleRad);
+  const needleX = centerX + (radius - 12) * Math.cos(needleRad);
+  const needleY = centerY + (radius - 12) * Math.sin(needleRad);
   
-  // Calculate segment endpoints
+  // Calculate segment endpoints for balanced distribution
   const redEndAngle = startAngle + (totalAngle * 2 / 9); // Covers scores 1-3
   const yellowEndAngle = startAngle + (totalAngle * 6 / 9); // Covers scores 4-7
   
@@ -3655,7 +3656,7 @@ function createScoringDial(criterion, score) {
       <path d="${createArcPath(yellowEndAngle, endAngle, radius)}" class="dial-segment-green"/>
       
       <!-- Center background circle -->
-      <circle cx="${centerX}" cy="${centerY}" r="18" class="dial-center-bg"/>
+      <circle cx="${centerX}" cy="${centerY}" r="20" class="dial-center-bg"/>
       
       <!-- Needle -->
       <line x1="${centerX}" y1="${centerY}" x2="${needleX}" y2="${needleY}" class="dial-needle" data-score="${score}"/>
@@ -3664,7 +3665,7 @@ function createScoringDial(criterion, score) {
       <circle cx="${centerX}" cy="${centerY}" r="3" class="dial-center-dot"/>
       
       <!-- Score text (fixed in center) -->
-      <text x="${centerX}" y="${centerY + 2}" class="dial-score-text">${score}</text>
+      <text x="${centerX}" y="${centerY + 1}" class="dial-score-text">${score}</text>
     </svg>
     <div class="dial-tooltip">Drag or use +/− to adjust</div>
   `;
@@ -3675,13 +3676,13 @@ function updateDialDisplay(dial, criterion, score) {
   const scoreText = dial.querySelector('.dial-score-text');
   
   if (needle && scoreText) {
-    // Calculate new needle position
+    // Calculate new needle position with updated angles
     const centerX = 60, centerY = 60, radius = 45;
-    const startAngle = -140, endAngle = 140, totalAngle = endAngle - startAngle;
+    const startAngle = -135, endAngle = 135, totalAngle = endAngle - startAngle;
     const needleAngle = startAngle + (totalAngle * (score - 1) / 9);
     const needleRad = (needleAngle * Math.PI) / 180;
-    const needleX = centerX + (radius - 10) * Math.cos(needleRad);
-    const needleY = centerY + (radius - 10) * Math.sin(needleRad);
+    const needleX = centerX + (radius - 12) * Math.cos(needleRad);
+    const needleY = centerY + (radius - 12) * Math.sin(needleRad);
     
     // Update needle position with animation
     needle.setAttribute('x2', needleX);
@@ -3737,12 +3738,12 @@ function setupDialDragInteraction(dial, criterion) {
     const deltaY = clientY - centerY;
     let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
     
-    // Normalize angle to our dial range (-140 to 140)
-    if (angle < -140) angle = -140;
-    if (angle > 140) angle = 140;
+    // Normalize angle to our dial range (-135 to 135)
+    if (angle < -135) angle = -135;
+    if (angle > 135) angle = 135;
     
     // Convert angle to score (1-10)
-    const normalizedAngle = (angle + 140) / 280; // 0 to 1
+    const normalizedAngle = (angle + 135) / 270; // 0 to 1
     const newScore = Math.round(normalizedAngle * 9 + 1); // 1 to 10
     
     if (newScore !== scores[criterion] && newScore >= 1 && newScore <= 10) {
