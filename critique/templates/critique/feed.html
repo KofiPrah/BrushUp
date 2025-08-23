@@ -1601,10 +1601,18 @@ function showQuestionForm(backdrop, onComplete) {
       </p>
     </div>
     
+    <!-- Smart suggestion chips -->
+    <div id="suggestionChips" style="margin-bottom: 16px;">
+      <p style="color: #95a5a6; font-size: 0.9rem; margin-bottom: 8px;">Quick suggestions:</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+        <!-- Chips will be inserted here -->
+      </div>
+    </div>
+    
     <div style="margin-bottom: 20px;">
       <textarea 
         id="artistQuestion" 
-        placeholder="e.g., What inspired this composition? How did you achieve this texture?" 
+        placeholder="Click a suggestion above or write your own question..." 
         style="
           width: 100%;
           height: 100px;
@@ -1631,6 +1639,10 @@ function showQuestionForm(backdrop, onComplete) {
   const textarea = modal.querySelector('#artistQuestion');
   const sendBtn = modal.querySelector('#sendQuestionBtn');
   const cancelBtn = modal.querySelector('#cancelBtn');
+  const chipsContainer = modal.querySelector('#suggestionChips div');
+  
+  // Generate and display smart suggestion chips
+  generateSuggestionChips(chipsContainer, textarea);
   
   // Focus textarea
   textarea.focus();
@@ -1688,6 +1700,103 @@ function showQuestionForm(backdrop, onComplete) {
       e.preventDefault();
       sendBtn.click();
     }
+  });
+}
+
+// Generate smart suggestion chips based on context
+function generateSuggestionChips(container, textarea) {
+  // Define suggestion categories with contextually relevant questions
+  const suggestionCategories = {
+    technique: [
+      "What technique did you use for this?",
+      "How did you achieve this texture?",
+      "What tools or materials did you use?",
+      "Can you explain your process?",
+      "What was the most challenging part technically?"
+    ],
+    inspiration: [
+      "What inspired this piece?",
+      "What's the story behind this?",
+      "What were you thinking when you created this?",
+      "What influenced your artistic choices?",
+      "What message were you trying to convey?"
+    ],
+    process: [
+      "How long did this take to create?",
+      "Did you sketch this first?",
+      "What was your creative process?",
+      "How did you plan the composition?",
+      "What would you do differently next time?"
+    ],
+    learning: [
+      "What did you learn while making this?",
+      "Any advice for someone trying this style?",
+      "What resources helped you develop this skill?",
+      "How did you develop this technique?",
+      "What's your next artistic goal?"
+    ]
+  };
+  
+  // Select 3-4 random suggestions from different categories
+  const selectedSuggestions = [];
+  const categories = Object.keys(suggestionCategories);
+  
+  // Pick one from each category, then fill to 4 total
+  categories.forEach((category, index) => {
+    if (selectedSuggestions.length < 4) {
+      const questions = suggestionCategories[category];
+      const randomIndex = Math.floor(Math.random() * questions.length);
+      selectedSuggestions.push(questions[randomIndex]);
+    }
+  });
+  
+  // Create chips for each suggestion
+  selectedSuggestions.forEach(suggestion => {
+    const chip = document.createElement('button');
+    chip.textContent = suggestion;
+    chip.style.cssText = `
+      background: #ecf0f1;
+      border: 1px solid #bdc3c7;
+      border-radius: 16px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      color: #2c3e50;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      outline: none;
+    `;
+    
+    // Hover and active states
+    chip.addEventListener('mouseenter', () => {
+      chip.style.background = '#3498db';
+      chip.style.color = 'white';
+      chip.style.borderColor = '#3498db';
+    });
+    
+    chip.addEventListener('mouseleave', () => {
+      chip.style.background = '#ecf0f1';
+      chip.style.color = '#2c3e50';
+      chip.style.borderColor = '#bdc3c7';
+    });
+    
+    // Click to fill textarea
+    chip.addEventListener('click', (e) => {
+      e.preventDefault();
+      textarea.value = suggestion;
+      textarea.focus();
+      
+      // Visual feedback
+      chip.style.background = '#27ae60';
+      chip.style.borderColor = '#27ae60';
+      chip.style.transform = 'scale(0.95)';
+      
+      setTimeout(() => {
+        chip.style.transform = 'scale(1)';
+      }, 150);
+    });
+    
+    container.appendChild(chip);
   });
 }
 
