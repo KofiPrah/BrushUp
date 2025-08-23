@@ -214,32 +214,129 @@
   }
   .form-header h6{ margin:0; color:#ecf0f1; display:flex; align-items:center; gap:8px; }
   
+  /* Framework Selection */
+  .framework-selection{ 
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:20px; margin-bottom:20px;
+  }
+  .framework-title{ color:#ecf0f1; margin-bottom:16px; }
+  .framework-options{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .framework-option{ 
+    background:rgba(255,255,255,.03); border:2px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:16px; cursor:pointer; transition:all 0.3s ease;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .framework-option:hover{ 
+    border-color:rgba(52, 152, 219, 0.5); background:rgba(52, 152, 219, 0.08); 
+    transform:translateY(-2px);
+  }
+  .framework-option.active{ 
+    border-color:#3498db; background:rgba(52, 152, 219, 0.15); 
+    box-shadow:0 4px 12px rgba(52, 152, 219, 0.3);
+  }
+  .framework-icon{ 
+    width:40px; height:40px; border-radius:50%; 
+    background:rgba(52, 152, 219, 0.2); border:2px solid #3498db;
+    display:flex; align-items:center; justify-content:center; margin-bottom:12px;
+  }
+  .framework-icon i{ font-size:1.1rem; color:#3498db; }
+  .framework-content h6{ color:#ecf0f1; margin-bottom:4px; }
+  .framework-content p{ color:#bdc3c7; margin-bottom:8px; font-size:0.9rem; }
+  
+  /* Enhanced Scoring */
   .critique-scoring{ 
     background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); 
     border-radius:12px; padding:20px; margin-bottom:20px;
   }
-  .score-group{ margin-bottom:20px; }
+  .scoring-title{ color:#ecf0f1; margin-bottom:16px; }
+  .scoring-framework{ display:none; }
+  .scoring-framework.active{ display:block; }
+  .score-group{ margin-bottom:24px; }
   .score-group:last-child{ margin-bottom:0; }
   .score-group label{ 
-    color:#ecf0f1; font-weight:600; margin-bottom:8px; 
-    display:flex; justify-content:space-between; align-items:center;
+    color:#ecf0f1; font-weight:600; margin-bottom:12px; 
+    display:block; font-size:1rem;
   }
-  .score-value{ color:#3498db; font-weight:700; }
-  .form-range{ margin-top:8px; }
   
-  .written-feedback{ margin-bottom:24px; }
-  .written-feedback label{ color:#ecf0f1; font-weight:600; margin-bottom:8px; display:block; }
-  .written-feedback textarea{ 
-    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.2); 
-    color:#ecf0f1; resize:vertical;
+  /* Emotion-Safe Score Dials */
+  .score-dial-container{ text-align:center; }
+  .score-dial{ 
+    width:80px; height:80px; border-radius:50%; margin:0 auto 8px; 
+    background:conic-gradient(from 0deg, #e74c3c 0deg 36deg, #f39c12 36deg 108deg, #f1c40f 108deg 180deg, #2ecc71 180deg 252deg, #27ae60 252deg 360deg);
+    display:flex; align-items:center; justify-content:center; position:relative;
+    cursor:pointer; transition:all 0.3s ease;
   }
-  .written-feedback textarea:focus{ 
+  .score-dial:before{ 
+    content:''; position:absolute; width:60px; height:60px; 
+    background:rgba(44, 62, 80, 0.95); border-radius:50%; 
+  }
+  .score-dial:after{ 
+    content:attr(data-value); position:absolute; z-index:2; 
+    color:#ecf0f1; font-weight:700; font-size:1.1rem;
+  }
+  .score-dial:hover{ transform:scale(1.05); }
+  
+  .score-description{ 
+    color:#bdc3c7; font-size:0.85rem; margin-bottom:12px; 
+    min-height:20px; transition:color 0.3s ease;
+  }
+  .score-description.positive{ color:#2ecc71; }
+  .score-description.excellent{ color:#27ae60; }
+  .score-description.needs-growth{ color:#e67e22; }
+  .score-description.challenging{ color:#e74c3c; }
+  
+  /* Guided Feedback */
+  .guided-feedback{ 
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:20px; margin-bottom:20px;
+  }
+  .feedback-title{ color:#ecf0f1; margin-bottom:16px; }
+  .prompt-group{ margin-bottom:20px; }
+  .prompt-group:last-child{ margin-bottom:0; }
+  .prompt-group label{ 
+    color:#ecf0f1; font-weight:600; margin-bottom:8px; 
+    display:flex; align-items:center; gap:8px;
+  }
+  .prompt-group textarea{ 
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.2); 
+    color:#ecf0f1; resize:vertical; transition:all 0.3s ease;
+  }
+  .prompt-group textarea:focus{ 
     background:rgba(255,255,255,.08); border-color:#3498db; 
     box-shadow:0 0 0 0.2rem rgba(52, 152, 219, 0.25);
   }
+  .prompt-group textarea.completed{ 
+    border-color:#27ae60; background:rgba(39, 174, 96, 0.1);
+  }
+  
+  .feedback-status{ 
+    margin-top:6px; display:flex; align-items:center; gap:6px; 
+    transition:all 0.3s ease;
+  }
+  .feedback-status.completed{ color:#27ae60; }
+  .feedback-status.completed i{ color:#27ae60; }
+  
+  /* Submission Progress */
+  .submission-progress{ 
+    background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1); 
+    border-radius:12px; padding:16px; margin-bottom:20px;
+  }
+  .progress-indicators{ display:flex; justify-content:space-around; gap:16px; }
+  .progress-item{ 
+    display:flex; align-items:center; gap:8px; color:#bdc3c7; 
+    font-size:0.85rem; transition:all 0.3s ease;
+  }
+  .progress-item.completed{ color:#27ae60; }
+  .progress-item.completed i{ color:#27ae60; }
   
   .form-actions{ display:flex; gap:12px; }
   .form-actions .btn{ flex:1; }
+  .form-actions .btn:disabled{ opacity:0.6; cursor:not-allowed; }
+  
+  @media (max-width: 768px) {
+    .framework-options{ grid-template-columns:1fr; }
+    .progress-indicators{ flex-direction:column; text-align:center; }
+  }
 
   .feedback-section {
     grid-column: 1 / -1;
@@ -1523,29 +1620,174 @@ function setupDetailedCritiqueInterface() {
       </button>
     </div>
     
-    <div class="critique-scoring">
-      <div class="score-group">
-        <label>Composition <span class="score-value" id="composition-value">5</span>/10</label>
-        <input type="range" id="composition-score" min="1" max="10" value="5" class="form-range">
-      </div>
-      <div class="score-group">
-        <label>Technique <span class="score-value" id="technique-value">5</span>/10</label>
-        <input type="range" id="technique-score" min="1" max="10" value="5" class="form-range">
-      </div>
-      <div class="score-group">
-        <label>Originality <span class="score-value" id="originality-value">5</span>/10</label>
-        <input type="range" id="originality-score" min="1" max="10" value="5" class="form-range">
+    <!-- Framework Selection -->
+    <div class="framework-selection">
+      <h6 class="framework-title">
+        <i class="bi bi-palette"></i> Choose Your Critique Framework
+        <small class="text-muted d-block mt-1">Select the approach that resonates with you</small>
+      </h6>
+      <div class="framework-options">
+        <div class="framework-option active" data-framework="technical">
+          <div class="framework-icon">
+            <i class="bi bi-gear-fill"></i>
+          </div>
+          <div class="framework-content">
+            <h6>Formalist</h6>
+            <p>Focus on technique & composition</p>
+            <small class="text-muted">Analyze technical execution and structural elements</small>
+          </div>
+        </div>
+        <div class="framework-option" data-framework="expressive">
+          <div class="framework-icon">
+            <i class="bi bi-heart-fill"></i>
+          </div>
+          <div class="framework-content">
+            <h6>Expressive</h6>
+            <p>Focus on emotion & storytelling</p>
+            <small class="text-muted">Explore emotional impact and narrative content</small>
+          </div>
+        </div>
       </div>
     </div>
     
-    <div class="written-feedback">
-      <label for="detailed-feedback">Written Feedback</label>
-      <textarea id="detailed-feedback" class="form-control" rows="6" 
-                placeholder="Share your detailed thoughts on this artwork..."></textarea>
+    <!-- Scoring Section -->
+    <div class="critique-scoring">
+      <h6 class="scoring-title">
+        <i class="bi bi-star"></i> Rate Each Aspect
+        <small class="text-muted d-block mt-1">Use the visual dials to express your assessment</small>
+      </h6>
+      
+      <div id="technical-scores" class="scoring-framework active">
+        <div class="score-group">
+          <label>Composition</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="composition-dial"></div>
+            <div class="score-description" id="composition-desc">Balanced and thoughtful</div>
+          </div>
+          <input type="range" id="composition-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+        <div class="score-group">
+          <label>Technique</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="technique-dial"></div>
+            <div class="score-description" id="technique-desc">Solid foundation</div>
+          </div>
+          <input type="range" id="technique-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+        <div class="score-group">
+          <label>Originality</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="originality-dial"></div>
+            <div class="score-description" id="originality-desc">Fresh perspective</div>
+          </div>
+          <input type="range" id="originality-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+        <div class="score-group">
+          <label>Impact</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="impact-dial"></div>
+            <div class="score-description" id="impact-desc">Makes an impression</div>
+          </div>
+          <input type="range" id="impact-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+      </div>
+      
+      <div id="expressive-scores" class="scoring-framework">
+        <div class="score-group">
+          <label>Emotional Resonance</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="emotion-dial"></div>
+            <div class="score-description" id="emotion-desc">Evokes feeling</div>
+          </div>
+          <input type="range" id="emotion-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+        <div class="score-group">
+          <label>Storytelling</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="storytelling-dial"></div>
+            <div class="score-description" id="storytelling-desc">Communicates clearly</div>
+          </div>
+          <input type="range" id="storytelling-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+        <div class="score-group">
+          <label>Atmosphere</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="atmosphere-dial"></div>
+            <div class="score-description" id="atmosphere-desc">Creates mood</div>
+          </div>
+          <input type="range" id="atmosphere-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+        <div class="score-group">
+          <label>Personal Connection</label>
+          <div class="score-dial-container">
+            <div class="score-dial" id="connection-dial"></div>
+            <div class="score-description" id="connection-desc">Speaks to me</div>
+          </div>
+          <input type="range" id="connection-score" min="1" max="10" value="5" class="form-range d-none">
+        </div>
+      </div>
+    </div>
+    
+    <!-- Guided Written Feedback -->
+    <div class="guided-feedback">
+      <h6 class="feedback-title">
+        <i class="bi bi-chat-quote"></i> Share Your Thoughts
+        <small class="text-muted d-block mt-1">Help the artist grow with specific insights</small>
+      </h6>
+      
+      <div class="feedback-prompts">
+        <div class="prompt-group">
+          <label for="positive-feedback">
+            <i class="bi bi-hand-thumbs-up text-success"></i> What stood out to you?
+            <small class="text-muted d-block">Highlight specific strengths and effective choices</small>
+          </label>
+          <textarea id="positive-feedback" class="form-control feedback-required" rows="3" 
+                    placeholder="I'm drawn to how you..." data-type="positive"></textarea>
+          <div class="feedback-status" id="positive-status">
+            <i class="bi bi-circle text-muted"></i> <small>Add at least one positive observation</small>
+          </div>
+        </div>
+        
+        <div class="prompt-group">
+          <label for="constructive-feedback">
+            <i class="bi bi-lightbulb text-warning"></i> What could be improved?
+            <small class="text-muted d-block">Suggest areas for growth and development</small>
+          </label>
+          <textarea id="constructive-feedback" class="form-control feedback-required" rows="3" 
+                    placeholder="Consider exploring..." data-type="constructive"></textarea>
+          <div class="feedback-status" id="constructive-status">
+            <i class="bi bi-circle text-muted"></i> <small>Add at least one constructive suggestion</small>
+          </div>
+        </div>
+        
+        <div class="prompt-group">
+          <label for="overall-feedback">
+            <i class="bi bi-heart text-info"></i> Overall impression (Optional)
+            <small class="text-muted d-block">Share your general thoughts and feelings</small>
+          </label>
+          <textarea id="overall-feedback" class="form-control" rows="2" 
+                    placeholder="This piece makes me feel..." data-type="optional"></textarea>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Submission Progress -->
+    <div class="submission-progress">
+      <div class="progress-indicators">
+        <div class="progress-item" id="positive-indicator">
+          <i class="bi bi-circle"></i> <span>Positive insight</span>
+        </div>
+        <div class="progress-item" id="constructive-indicator">
+          <i class="bi bi-circle"></i> <span>Constructive feedback</span>
+        </div>
+        <div class="progress-item" id="scores-indicator">
+          <i class="bi bi-check-circle-fill text-success"></i> <span>Ratings complete</span>
+        </div>
+      </div>
     </div>
     
     <div class="form-actions">
-      <button id="submit-detailed-btn" class="btn btn-primary">
+      <button id="submit-detailed-btn" class="btn btn-primary" disabled>
         <i class="bi bi-send"></i> Submit Detailed Critique
       </button>
       <button id="skip-detailed-btn" class="btn btn-outline-secondary">
@@ -1556,24 +1798,340 @@ function setupDetailedCritiqueInterface() {
   
   critiqueInterface.appendChild(detailedForm);
   
-  // Setup score sliders
-  setupScoreSliders();
+  // Setup enhanced components
+  setupFrameworkSelection();
+  setupEmotionSafeScoring();
+  setupGuidedFeedback();
+  setupGamifiedValidation();
   
   // Add back button functionality
   addBackToSelectionButton();
 }
 
-function setupScoreSliders() {
-  const sliders = ['composition', 'technique', 'originality'];
+// Enhanced framework and scoring system functions
+
+function setupFrameworkSelection() {
+  const frameworkOptions = document.querySelectorAll('.framework-option');
+  const technicalScores = document.getElementById('technical-scores');
+  const expressiveScores = document.getElementById('expressive-scores');
   
-  sliders.forEach(type => {
-    const slider = document.getElementById(`${type}-score`);
-    const valueDisplay = document.getElementById(`${type}-value`);
-    
-    slider.addEventListener('input', () => {
-      valueDisplay.textContent = slider.value;
+  frameworkOptions.forEach(option => {
+    option.addEventListener('click', () => {
+      // Update active framework option
+      frameworkOptions.forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+      
+      // Switch scoring framework
+      const framework = option.dataset.framework;
+      if (framework === 'technical') {
+        technicalScores.classList.add('active');
+        expressiveScores.classList.remove('active');
+      } else {
+        expressiveScores.classList.add('active');
+        technicalScores.classList.remove('active');
+      }
+      
+      // Reinitialize score dials for the new framework
+      setupEmotionSafeScoring();
     });
   });
+}
+
+function setupEmotionSafeScoring() {
+  const activeFramework = document.querySelector('.scoring-framework.active');
+  const scoreDials = activeFramework.querySelectorAll('.score-dial');
+  
+  scoreDials.forEach(dial => {
+    const dialId = dial.id;
+    const scoreType = dialId.replace('-dial', '');
+    const hiddenInput = document.getElementById(`${scoreType}-score`);
+    const description = document.getElementById(`${scoreType}-desc`);
+    
+    // Initialize with default value
+    updateScoreDial(dial, hiddenInput, description, 5);
+    
+    // Add click interaction for score adjustment
+    dial.addEventListener('click', (e) => {
+      const rect = dial.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+      
+      // Convert angle to score (1-10)
+      let normalizedAngle = (angle + Math.PI) / (2 * Math.PI);
+      if (normalizedAngle < 0) normalizedAngle += 1;
+      const score = Math.max(1, Math.min(10, Math.round(normalizedAngle * 10)));
+      
+      updateScoreDial(dial, hiddenInput, description, score);
+    });
+  });
+}
+
+function updateScoreDial(dial, hiddenInput, description, score) {
+  // Update hidden input
+  hiddenInput.value = score;
+  
+  // Update dial visual
+  dial.setAttribute('data-value', score);
+  
+  // Rotate dial to show score position
+  const rotation = (score - 1) * 36; // 360 degrees / 10 scores
+  dial.style.transform = `rotate(${rotation}deg)`;
+  
+  // Update emotion-safe description
+  const descriptions = getEmotionSafeDescriptions();
+  const descriptionKey = description.id.replace('-desc', '');
+  
+  if (descriptions[descriptionKey]) {
+    const scoreDescriptions = descriptions[descriptionKey];
+    let descText, descClass;
+    
+    if (score >= 8) {
+      descText = scoreDescriptions.excellent;
+      descClass = 'excellent';
+    } else if (score >= 6) {
+      descText = scoreDescriptions.positive;
+      descClass = 'positive';
+    } else if (score >= 4) {
+      descText = scoreDescriptions.neutral;
+      descClass = '';
+    } else if (score >= 2) {
+      descText = scoreDescriptions.needsGrowth;
+      descClass = 'needs-growth';
+    } else {
+      descText = scoreDescriptions.challenging;
+      descClass = 'challenging';
+    }
+    
+    description.textContent = descText;
+    description.className = `score-description ${descClass}`;
+  }
+}
+
+function getEmotionSafeDescriptions() {
+  return {
+    'composition': {
+      excellent: 'Masterfully arranged',
+      positive: 'Well balanced',
+      neutral: 'Functional layout',
+      needsGrowth: 'Room to explore balance',
+      challenging: 'Could benefit from restructuring'
+    },
+    'technique': {
+      excellent: 'Exceptional skill',
+      positive: 'Strong execution',
+      neutral: 'Solid foundation',
+      needsGrowth: 'Developing technique',
+      challenging: 'Focus on fundamentals'
+    },
+    'originality': {
+      excellent: 'Groundbreaking approach',
+      positive: 'Fresh perspective',
+      neutral: 'Personal touch',
+      needsGrowth: 'Explore your voice',
+      challenging: 'Push creative boundaries'
+    },
+    'impact': {
+      excellent: 'Deeply moving',
+      positive: 'Makes an impression',
+      neutral: 'Pleasant to view',
+      needsGrowth: 'Building presence',
+      challenging: 'Strengthen visual impact'
+    },
+    'emotion': {
+      excellent: 'Deeply resonant',
+      positive: 'Evokes feeling',
+      neutral: 'Emotionally present',
+      needsGrowth: 'Developing emotional depth',
+      challenging: 'Explore emotional expression'
+    },
+    'storytelling': {
+      excellent: 'Compelling narrative',
+      positive: 'Clear communication',
+      neutral: 'Tells a story',
+      needsGrowth: 'Strengthen narrative',
+      challenging: 'Focus on story clarity'
+    },
+    'atmosphere': {
+      excellent: 'Immersive world',
+      positive: 'Creates mood',
+      neutral: 'Atmospheric quality',
+      needsGrowth: 'Building atmosphere',
+      challenging: 'Enhance mood creation'
+    },
+    'connection': {
+      excellent: 'Deeply personal',
+      positive: 'Speaks to me',
+      neutral: 'Relatable content',
+      needsGrowth: 'Building connection',
+      challenging: 'Seek universal themes'
+    }
+  };
+}
+
+function setupGuidedFeedback() {
+  const feedbackTextareas = document.querySelectorAll('.feedback-required');
+  
+  feedbackTextareas.forEach(textarea => {
+    const type = textarea.dataset.type;
+    const statusElement = document.getElementById(`${type}-status`);
+    
+    textarea.addEventListener('input', () => {
+      const hasContent = textarea.value.trim().length >= 10; // Minimum 10 characters
+      
+      if (hasContent) {
+        textarea.classList.add('completed');
+        statusElement.classList.add('completed');
+        statusElement.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> <small>Great insight!</small>';
+        
+        // Update progress indicator
+        const indicator = document.getElementById(`${type}-indicator`);
+        if (indicator) {
+          indicator.classList.add('completed');
+          indicator.innerHTML = '<i class="bi bi-check-circle-fill"></i> <span>' + 
+            (type === 'positive' ? 'Positive insight' : 'Constructive feedback') + '</span>';
+        }
+      } else {
+        textarea.classList.remove('completed');
+        statusElement.classList.remove('completed');
+        const promptText = type === 'positive' ? 
+          'Add at least one positive observation' : 
+          'Add at least one constructive suggestion';
+        statusElement.innerHTML = '<i class="bi bi-circle text-muted"></i> <small>' + promptText + '</small>';
+        
+        // Update progress indicator
+        const indicator = document.getElementById(`${type}-indicator`);
+        if (indicator) {
+          indicator.classList.remove('completed');
+          indicator.innerHTML = '<i class="bi bi-circle"></i> <span>' + 
+            (type === 'positive' ? 'Positive insight' : 'Constructive feedback') + '</span>';
+        }
+      }
+      
+      // Check overall completion
+      validateSubmissionReadiness();
+    });
+  });
+}
+
+function setupGamifiedValidation() {
+  const submitButton = document.getElementById('submit-detailed-btn');
+  
+  // Add click handler for submission
+  submitButton.addEventListener('click', () => {
+    if (submitButton.disabled) return;
+    
+    submitDetailedCritique();
+  });
+}
+
+function validateSubmissionReadiness() {
+  const positiveText = document.getElementById('positive-feedback').value.trim();
+  const constructiveText = document.getElementById('constructive-feedback').value.trim();
+  const submitButton = document.getElementById('submit-detailed-btn');
+  
+  const hasPositive = positiveText.length >= 10;
+  const hasConstructive = constructiveText.length >= 10;
+  const isReady = hasPositive && hasConstructive;
+  
+  submitButton.disabled = !isReady;
+  
+  if (isReady) {
+    submitButton.innerHTML = '<i class="bi bi-send"></i> Submit Detailed Critique';
+    submitButton.classList.remove('btn-outline-primary');
+    submitButton.classList.add('btn-primary');
+  } else {
+    submitButton.innerHTML = '<i class="bi bi-lock"></i> Complete Required Fields';
+    submitButton.classList.remove('btn-primary');
+    submitButton.classList.add('btn-outline-primary');
+  }
+}
+
+async function submitDetailedCritique() {
+  const submitButton = document.getElementById('submit-detailed-btn');
+  const originalText = submitButton.innerHTML;
+  
+  // Show loading state
+  submitButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Submitting...';
+  submitButton.disabled = true;
+  
+  try {
+    // Gather all form data
+    const activeFramework = document.querySelector('.framework-option.active').dataset.framework;
+    const scoringFramework = document.querySelector('.scoring-framework.active');
+    const scores = {};
+    
+    // Collect scores from active framework
+    const scoreInputs = scoringFramework.querySelectorAll('input[type="range"]');
+    scoreInputs.forEach(input => {
+      const scoreType = input.id.replace('-score', '');
+      scores[scoreType] = parseInt(input.value);
+    });
+    
+    // Gather feedback text
+    const positiveText = document.getElementById('positive-feedback').value.trim();
+    const constructiveText = document.getElementById('constructive-feedback').value.trim();
+    const overallText = document.getElementById('overall-feedback').value.trim();
+    
+    // Combine feedback into structured text
+    let critiqueText = `**What stood out:**\n${positiveText}`;
+    critiqueText += `\n\n**Areas for improvement:**\n${constructiveText}`;
+    if (overallText) {
+      critiqueText += `\n\n**Overall impression:**\n${overallText}`;
+    }
+    critiqueText += `\n\n*Critique framework: ${activeFramework}*`;
+    
+    const artworkId = document.querySelector('.artwork-display').dataset.artworkId;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || getCookie('csrftoken');
+    
+    // Submit to API
+    const response = await fetch(`/api/artworks/${artworkId}/add_critique/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify({
+        text: critiqueText,
+        composition_score: scores.composition || null,
+        technique_score: scores.technique || null,
+        originality_score: scores.originality || null,
+        framework: activeFramework,
+        detailed_scores: scores
+      })
+    });
+    
+    if (response.ok) {
+      // Success state
+      submitButton.innerHTML = '<i class="bi bi-check-circle-fill"></i> Submitted!';
+      submitButton.classList.remove('btn-primary');
+      submitButton.classList.add('btn-success');
+      
+      // Reset after delay and move to next artwork
+      setTimeout(() => {
+        loadNextArtwork();
+      }, 2000);
+    } else {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
+  } catch (error) {
+    console.error('Error submitting detailed critique:', error);
+    
+    // Error state
+    submitButton.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error - Try Again';
+    submitButton.classList.remove('btn-primary');
+    submitButton.classList.add('btn-danger');
+    
+    // Reset after delay
+    setTimeout(() => {
+      submitButton.innerHTML = originalText;
+      submitButton.classList.remove('btn-danger');
+      submitButton.classList.add('btn-primary');
+      submitButton.disabled = false;
+    }, 3000);
+  }
 }
 
 function addBackToSelectionButton() {
