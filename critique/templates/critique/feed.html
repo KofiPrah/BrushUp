@@ -833,8 +833,7 @@
           <div class="action-buttons">
             {% if user.is_authenticated %}
               <button id="submit-btn" class="btn btn-primary">Submit Feedback</button>
-              <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
-              <button id="next-btn" class="btn btn-outline-success" disabled>Next Artwork →</button>
+              <button id="skip-btn" class="btn btn-outline-secondary">Skip This Artwork</button>
             {% else %}
               <a href="/accounts/login/" class="btn btn-primary">Login to Submit Feedback</a>
               <button id="skip-btn" class="btn btn-outline-secondary">Skip</button>
@@ -881,8 +880,7 @@
         {% else %}
           <a href="/accounts/login/" class="btn btn-primary btn-sm">Login to Submit</a>
         {% endif %}
-        <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">Skip</button>
-        <button id="mobile-next-btn" class="btn btn-outline-success btn-sm ms-auto" disabled>Next →</button>
+        <button id="mobile-skip-btn" class="btn btn-outline-secondary btn-sm">Skip This Artwork</button>
       </div>
     </div>
   </div>
@@ -1004,12 +1002,10 @@ function initializeFeedInterface() {
   // Bind event handlers
   document.getElementById('submit-btn').addEventListener('click', submitCritique);
   document.getElementById('skip-btn').addEventListener('click', skipArtwork);
-  document.getElementById('next-btn').addEventListener('click', loadNextArtwork);
   
   // Mobile handlers
   document.getElementById('mobile-submit-btn').addEventListener('click', submitCritique);
   document.getElementById('mobile-skip-btn').addEventListener('click', skipArtwork);
-  document.getElementById('mobile-next-btn').addEventListener('click', loadNextArtwork);
 }
 
 function loadCritiqueTags() {
@@ -1480,6 +1476,9 @@ async function submitCritique() {
         submitBtn.disabled = false;
         mobileSubmitBtn.textContent = originalMobileText;
         mobileSubmitBtn.disabled = false;
+        
+        // Load next artwork after dialogue
+        loadNextArtwork();
       });
       
     } else {
@@ -1880,9 +1879,7 @@ function getCookie(name) {
 // Note: This function was replaced by the more robust version below
 
 function skipArtwork() {
-  // Enable next button and move to next artwork
-  document.getElementById('next-btn').disabled = false;
-  document.getElementById('mobile-next-btn').disabled = false;
+  // Move to next artwork immediately
   loadNextArtwork();
 }
 
@@ -1896,9 +1893,7 @@ function loadNextArtwork() {
   
   document.querySelectorAll('.tag-chip.selected').forEach(chip => chip.classList.remove('selected'));
   
-  // Disable next button
-  document.getElementById('next-btn').disabled = true;
-  document.getElementById('mobile-next-btn').disabled = true;
+  // Reset buttons for next artwork
   
   // Show loading state with smooth transition
   const artworkImg = document.getElementById('artwork-img');
@@ -2374,6 +2369,12 @@ function setupDetailedCritiqueInterface() {
   setupEmotionSafeScoring();
   setupGuidedFeedback();
   setupGamifiedValidation();
+  
+  // Add skip functionality for detailed critique
+  const skipDetailedBtn = document.getElementById('skip-detailed-btn');
+  if (skipDetailedBtn) {
+    skipDetailedBtn.addEventListener('click', skipArtwork);
+  }
   
   // Add back button functionality
   addBackToSelectionButton();
