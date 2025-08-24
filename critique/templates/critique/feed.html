@@ -338,9 +338,8 @@
   
   /* Dial SVG Styling */
   .dial-svg{ 
-    overflow:visible; transition:transform 0.1s ease;
+    overflow:visible;
   }
-  .dial-svg:hover{ transform:scale(1.02); }
   
   /* Background circle */
   .dial-background{ 
@@ -3760,7 +3759,6 @@ function createScoringDial(criterion, score) {
       <!-- Needle indicator with dynamic color -->
       <line x1="${centerX}" y1="${centerY}" x2="${needleX}" y2="${needleY}" 
             stroke="${needleColor}" stroke-width="3" stroke-linecap="round"/>
-      <circle cx="${centerX}" cy="${centerY}" r="5" fill="${needleColor}" stroke="white" stroke-width="2"/>
       
       <!-- Score display in center - always visible with 100% opacity -->
       <text x="${centerX}" y="${centerY + 6}" text-anchor="middle" 
