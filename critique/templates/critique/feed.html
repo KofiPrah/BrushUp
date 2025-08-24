@@ -3707,9 +3707,6 @@ function setupEmotionSafeScoring() {
       }
     });
     
-    // Add drag interaction to the dial itself
-    setupDialDragInteraction(dial, criterion);
-    
     // Set initial button states
     updateButtonStates(decrementBtn, incrementBtn, scores[criterion]);
   });
@@ -3803,71 +3800,6 @@ function animateScoreChange(dial, criterion, newScore) {
   updateButtonStates(decrementBtn, incrementBtn, newScore);
 }
 
-function setupDialDragInteraction(dial, criterion) {
-  let isDragging = false;
-  
-  const handleInteraction = (e) => {
-    e.preventDefault();
-    const rect = dial.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    
-    let clientX, clientY;
-    if (e.type.includes('touch')) {
-      const touch = e.touches[0] || e.changedTouches[0];
-      clientX = touch.clientX;
-      clientY = touch.clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    
-    // Calculate angle from center
-    const deltaX = clientX - centerX;
-    const deltaY = clientY - centerY;
-    let angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-    
-    // Normalize angle to our dial range (-135 to 135)
-    if (angle < -135) angle = -135;
-    if (angle > 135) angle = 135;
-    
-    // Convert angle to score (1-10)
-    const normalizedAngle = (angle + 135) / 270; // 0 to 1
-    const newScore = Math.round(normalizedAngle * 9 + 1); // 1 to 10
-    
-    if (newScore !== scores[criterion] && newScore >= 1 && newScore <= 10) {
-      animateScoreChange(dial, criterion, newScore);
-    }
-  };
-  
-  // Mouse events
-  dial.addEventListener('mousedown', (e) => {
-    isDragging = true;
-    handleInteraction(e);
-  });
-  
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) handleInteraction(e);
-  });
-  
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
-  
-  // Touch events for mobile
-  dial.addEventListener('touchstart', (e) => {
-    isDragging = true;
-    handleInteraction(e);
-  });
-  
-  dial.addEventListener('touchmove', (e) => {
-    if (isDragging) handleInteraction(e);
-  });
-  
-  dial.addEventListener('touchend', () => {
-    isDragging = false;
-  });
-}
 
 function updateButtonStates(decrementBtn, incrementBtn, score) {
   decrementBtn.disabled = score <= 1;
