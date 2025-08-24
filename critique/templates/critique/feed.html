@@ -3654,6 +3654,12 @@ function setupEmotionSafeScoring() {
     const dialHTML = createScoringDial(criterion, scores[criterion]);
     dial.innerHTML = dialHTML;
     
+    // Remove existing control buttons to prevent duplicates
+    const existingControls = dial.parentElement.querySelector('.score-controls');
+    if (existingControls) {
+      existingControls.remove();
+    }
+    
     // Add control buttons
     const controls = document.createElement('div');
     controls.className = 'score-controls';
