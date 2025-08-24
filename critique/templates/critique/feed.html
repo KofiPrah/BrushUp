@@ -984,7 +984,11 @@
       </div>
       
       <div id="feedback-preview" class="guided-selection">
-        <!-- Preview will be dynamically populated -->
+        <!-- Preview content will be populated when step is shown -->
+        <div class="text-center text-muted" id="preview-loading">
+          <div class="spinner-border spinner-border-sm me-2"></div>
+          Preparing your feedback summary...
+        </div>
       </div>
     </div>
     
@@ -3314,23 +3318,30 @@ function previousStep() {
 }
 
 function goBackToEntryPoint() {
-  // Reset the flow state
+  // Reset the flow state completely
   currentStep = 1;
   feedbackType = null;
   selectedFramework = null;
   selectedTags = { strengths: [], opportunities: [] };
   scores = {};
   
-  // Show step 1 (entry point)
-  showStep(1);
-  updateProgressIndicators();
-  updateStepNavigation();
-  
   // Clear any form data
   const quickNote = document.getElementById('quick-written-feedback');
   const detailedNote = document.getElementById('detailed-written-feedback');
   if (quickNote) quickNote.value = '';
   if (detailedNote) detailedNote.value = '';
+  
+  // Clear any previous selections
+  document.querySelectorAll('.framework-option').forEach(opt => opt.classList.remove('selected'));
+  document.querySelectorAll('.tag-chip').forEach(chip => chip.classList.remove('selected'));
+  
+  // Show step 1 (entry point) and ensure it's properly visible
+  showStep(1);
+  updateProgressIndicators();
+  updateStepNavigation();
+  
+  // Make sure the entry point options are visible and working
+  setupEntryPoint();
 }
 
 function determineNextStep() {
@@ -3394,6 +3405,30 @@ function showStep(stepId) {
   const targetStep = document.getElementById(stepId);
   if (targetStep) {
     targetStep.classList.add('active');
+  }
+  
+  // Handle step-specific setup
+  if (stepId === 'step-2-detailed-scoring') {
+    setupScoringStep();
+  } else if (stepId === 'step-3') {
+    // Always populate the summary when showing step 3
+    setTimeout(() => {
+      setupFeedbackPreview();
+    }, 100);
+  } else if (stepId === 'step-1') {
+    // Make sure entry point is properly set up
+    setupEntryPoint();
+  }
+}
+
+function setupEntryPoint() {
+  // Ensure the entry point buttons are properly configured
+  const quickBtn = document.querySelector('[data-feedback-type="quick"]');
+  const detailedBtn = document.querySelector('[data-feedback-type="detailed"]');
+  
+  if (quickBtn && detailedBtn) {
+    quickBtn.onclick = () => startFeedbackFlow('quick');
+    detailedBtn.onclick = () => startFeedbackFlow('detailed');
   }
 }
 
@@ -3787,7 +3822,12 @@ function updateButtonStates(decrementBtn, incrementBtn, score) {
 
 function setupFeedbackPreview() {
   const preview = document.getElementById('feedback-preview');
+  const loadingEl = document.getElementById('preview-loading');
+  
   if (!preview) return;
+  
+  // Hide loading indicator
+  if (loadingEl) loadingEl.style.display = 'none';
   
   let previewHTML = '<div class="feedback-preview-container">';
   previewHTML += '<div class="mb-3"><h6 class="text-primary"><i class="bi bi-eye"></i> Review Your Feedback</h6></div>';
@@ -3797,17 +3837,21 @@ function setupFeedbackPreview() {
     previewHTML += '<div class="preview-card mb-3">';
     previewHTML += '<div class="preview-header"><h6><i class="bi bi-tags"></i> Quick Feedback Summary</h6></div>';
     
-    if (selectedTags.strengths.length > 0) {
+    // Show selected strengths
+    if (selectedTags.strengths && selectedTags.strengths.length > 0) {
       previewHTML += '<div class="preview-section mb-3">';
-      previewHTML += '<div class="section-label"><i class="bi bi-hand-thumbs-up text-success"></i> Strengths</div>';
+      previewHTML += '<div class="section-label"><i class="bi bi-hand-thumbs-up text-success"></i> Strengths Selected</div>';
       previewHTML += '<div class="tag-preview">';
       selectedTags.strengths.forEach(tag => {
         previewHTML += `<span class="tag-chip pro-chip selected">${tag}</span>`;
       });
       previewHTML += '</div></div>';
+    } else {
+      previewHTML += '<div class="preview-section mb-3"><em class="text-muted">No strengths selected</em></div>';
     }
     
-    if (selectedTags.opportunities.length > 0) {
+    // Show selected opportunities
+    if (selectedTags.opportunities && selectedTags.opportunities.length > 0) {
       previewHTML += '<div class="preview-section mb-3">';
       previewHTML += '<div class="section-label"><i class="bi bi-lightbulb text-warning"></i> Growth Opportunities</div>';
       previewHTML += '<div class="tag-preview">';
@@ -3815,14 +3859,19 @@ function setupFeedbackPreview() {
         previewHTML += `<span class="tag-chip con-chip selected">${tag}</span>`;
       });
       previewHTML += '</div></div>';
+    } else {
+      previewHTML += '<div class="preview-section mb-3"><em class="text-muted">No opportunities selected</em></div>';
     }
     
+    // Show additional note
     const note = document.getElementById('quick-written-feedback');
     if (note && note.value.trim()) {
       previewHTML += '<div class="preview-section mb-3">';
       previewHTML += '<div class="section-label"><i class="bi bi-chat-square-text text-info"></i> Additional Note</div>';
-      previewHTML += `<div class="written-preview">${note.value}</div>`;
+      previewHTML += `<div class="written-preview">${note.value.trim()}</div>`;
       previewHTML += '</div>';
+    } else {
+      previewHTML += '<div class="preview-section mb-3"><em class="text-muted">No additional note provided</em></div>';
     }
     previewHTML += '</div>';
     
@@ -3832,22 +3881,27 @@ function setupFeedbackPreview() {
     previewHTML += '<div class="preview-header"><h6><i class="bi bi-pencil-square"></i> Detailed Critique Summary</h6></div>';
     
     // Framework
-    previewHTML += '<div class="preview-section mb-3">';
-    previewHTML += '<div class="section-label"><i class="bi bi-diagram-3 text-primary"></i> Framework</div>';
-    const frameworkLabel = selectedFramework === 'formalist' ? 'Formalist Approach' : 'Expressive Approach';
-    previewHTML += `<div class="framework-preview">${frameworkLabel}</div>`;
-    previewHTML += '</div>';
+    if (selectedFramework) {
+      previewHTML += '<div class="preview-section mb-3">';
+      previewHTML += '<div class="section-label"><i class="bi bi-diagram-3 text-primary"></i> Framework</div>';
+      const frameworkLabel = selectedFramework === 'formalist' ? 'Formalist Approach' : 'Expressive Approach';
+      previewHTML += `<div class="framework-preview">${frameworkLabel}</div>`;
+      previewHTML += '</div>';
+    } else {
+      previewHTML += '<div class="preview-section mb-3"><em class="text-muted">No framework selected</em></div>';
+    }
     
     // Scores
-    if (Object.keys(scores).length > 0) {
+    if (scores && Object.keys(scores).length > 0) {
       previewHTML += '<div class="preview-section mb-3">';
-      previewHTML += '<div class="section-label"><i class="bi bi-sliders text-success"></i> Scores</div>';
+      previewHTML += '<div class="section-label"><i class="bi bi-sliders text-success"></i> Ratings</div>';
       previewHTML += '<div class="scores-preview">';
       Object.entries(scores).forEach(([criterion, score]) => {
         const percentage = (score / 10) * 100;
+        const criterionLabel = getCriterionDisplayName(criterion);
         previewHTML += `
           <div class="score-preview-item">
-            <div class="score-preview-label">${criterion}</div>
+            <div class="score-preview-label">${criterionLabel}</div>
             <div class="score-preview-bar">
               <div class="score-preview-fill" style="width: ${percentage}%"></div>
               <span class="score-preview-value">${score}/10</span>
@@ -3856,6 +3910,8 @@ function setupFeedbackPreview() {
         `;
       });
       previewHTML += '</div></div>';
+    } else {
+      previewHTML += '<div class="preview-section mb-3"><em class="text-muted">No ratings provided</em></div>';
     }
     
     // Written Feedback
@@ -3863,14 +3919,35 @@ function setupFeedbackPreview() {
     if (feedback && feedback.value.trim()) {
       previewHTML += '<div class="preview-section mb-3">';
       previewHTML += '<div class="section-label"><i class="bi bi-chat-square-text text-info"></i> Written Feedback</div>';
-      previewHTML += `<div class="written-preview">${feedback.value}</div>`;
+      previewHTML += `<div class="written-preview">${feedback.value.trim()}</div>`;
       previewHTML += '</div>';
+    } else {
+      previewHTML += '<div class="preview-section mb-3"><em class="text-muted">No written feedback provided</em></div>';
     }
+    previewHTML += '</div>';
+  } else {
+    // No feedback type selected - this should not happen but handle gracefully
+    previewHTML += '<div class="preview-card mb-3">';
+    previewHTML += '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> No feedback data found. Please go back and complete the form.</div>';
     previewHTML += '</div>';
   }
   
   previewHTML += '</div>';
   preview.innerHTML = previewHTML;
+}
+
+function getCriterionDisplayName(criterion) {
+  const displayNames = {
+    'composition': 'Composition',
+    'color': 'Color Theory',
+    'technique': 'Technique',
+    'impact': 'Visual Impact',
+    'emotion': 'Emotional Impact',
+    'concept': 'Concept & Meaning',
+    'creativity': 'Creativity',
+    'voice': 'Personal Voice'
+  };
+  return displayNames[criterion] || criterion;
 }
 
 function submitFeedback() {
