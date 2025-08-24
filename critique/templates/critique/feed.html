@@ -3686,7 +3686,7 @@ function setupEmotionSafeScoring() {
     // Add description below the controls
     const description = document.createElement('div');
     description.className = 'score-description';
-    description.textContent = getCriterionDescription(criterion);
+    description.textContent = getCriterionDescription(criterion, scores[criterion]);
     dial.parentElement.appendChild(description);
     
     // Add event listeners for increment/decrement
@@ -3785,6 +3785,12 @@ function updateDialDisplay(dial, criterion, score) {
     if (decrementBtn && incrementBtn) {
       updateButtonStates(decrementBtn, incrementBtn, score);
     }
+  }
+  
+  // Update description tooltip dynamically
+  const description = dial.parentElement.querySelector('.score-description');
+  if (description) {
+    description.textContent = getCriterionDescription(criterion, score);
   }
 }
 
@@ -3936,18 +3942,113 @@ function getCriterionDisplayName(criterion) {
   return displayNames[criterion] || criterion;
 }
 
-function getCriterionDescription(criterion) {
+function getCriterionDescription(criterion, score = 5) {
   const descriptions = {
-    'composition': 'Functional layout',
-    'color': 'Color harmony',
-    'technique': 'Technical skill',
-    'impact': 'Visual strength',
-    'emotion': 'Emotional resonance',
-    'concept': 'Clear meaning',
-    'creativity': 'Original approach',
-    'voice': 'Personal style'
+    'composition': {
+      1: 'Chaotic arrangement',
+      2: 'Poor organization',
+      3: 'Basic structure',
+      4: 'Adequate layout',
+      5: 'Functional layout',
+      6: 'Well-structured',
+      7: 'Strong composition',
+      8: 'Excellent balance',
+      9: 'Masterful arrangement',
+      10: 'Perfect composition'
+    },
+    'color': {
+      1: 'Clashing colors',
+      2: 'Poor color choices',
+      3: 'Limited palette',
+      4: 'Basic color use',
+      5: 'Color harmony',
+      6: 'Good color balance',
+      7: 'Rich color work',
+      8: 'Sophisticated palette',
+      9: 'Masterful color use',
+      10: 'Perfect color harmony'
+    },
+    'technique': {
+      1: 'Needs much work',
+      2: 'Basic skills shown',
+      3: 'Developing technique',
+      4: 'Adequate execution',
+      5: 'Technical skill',
+      6: 'Good craftsmanship',
+      7: 'Strong technique',
+      8: 'Excellent execution',
+      9: 'Masterful skill',
+      10: 'Technical perfection'
+    },
+    'impact': {
+      1: 'Weak presence',
+      2: 'Limited impact',
+      3: 'Modest strength',
+      4: 'Decent presence',
+      5: 'Visual strength',
+      6: 'Good impact',
+      7: 'Strong presence',
+      8: 'Powerful impact',
+      9: 'Commanding presence',
+      10: 'Overwhelming impact'
+    },
+    'emotion': {
+      1: 'No emotional connection',
+      2: 'Weak emotional pull',
+      3: 'Some feeling conveyed',
+      4: 'Decent emotional content',
+      5: 'Emotional resonance',
+      6: 'Good emotional depth',
+      7: 'Strong emotional impact',
+      8: 'Deep emotional connection',
+      9: 'Powerful emotional response',
+      10: 'Profound emotional impact'
+    },
+    'concept': {
+      1: 'Confusing message',
+      2: 'Unclear concept',
+      3: 'Basic idea present',
+      4: 'Decent concept',
+      5: 'Clear meaning',
+      6: 'Well-developed idea',
+      7: 'Strong concept',
+      8: 'Compelling message',
+      9: 'Profound concept',
+      10: 'Brilliant conceptual work'
+    },
+    'creativity': {
+      1: 'Lacks originality',
+      2: 'Conventional approach',
+      3: 'Some creative elements',
+      4: 'Decent creativity',
+      5: 'Original approach',
+      6: 'Good innovation',
+      7: 'Highly creative',
+      8: 'Exceptional originality',
+      9: 'Groundbreaking creativity',
+      10: 'Revolutionary approach'
+    },
+    'voice': {
+      1: 'No personal style',
+      2: 'Weak artistic voice',
+      3: 'Emerging style',
+      4: 'Developing voice',
+      5: 'Personal style',
+      6: 'Clear artistic voice',
+      7: 'Strong personal style',
+      8: 'Distinctive voice',
+      9: 'Unique artistic vision',
+      10: 'Iconic personal style'
+    }
   };
-  return descriptions[criterion] || 'Rate this aspect';
+  
+  const criterionDescriptions = descriptions[criterion];
+  if (criterionDescriptions && criterionDescriptions[score]) {
+    return criterionDescriptions[score];
+  }
+  
+  // Fallback to generic descriptions
+  return descriptions[criterion]?.[5] || 'Rate this aspect';
 }
 
 function submitFeedback() {
