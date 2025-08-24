@@ -3335,6 +3335,13 @@ function goBackToEntryPoint() {
   document.querySelectorAll('.framework-option').forEach(opt => opt.classList.remove('selected'));
   document.querySelectorAll('.tag-chip').forEach(chip => chip.classList.remove('selected'));
   
+  // Debug: Check if step-1 exists
+  const step1Element = document.getElementById('step-1');
+  console.log('Step 1 element found:', !!step1Element);
+  if (step1Element) {
+    console.log('Step 1 element classes before:', step1Element.className);
+  }
+  
   // Show step 1 (entry point) and ensure it's properly visible
   showStep(1);
   updateProgressIndicators();
@@ -3342,6 +3349,14 @@ function goBackToEntryPoint() {
   
   // Make sure the entry point options are visible and working
   setupEntryPoint();
+  
+  // Debug: Check if step-1 is now active
+  setTimeout(() => {
+    if (step1Element) {
+      console.log('Step 1 element classes after:', step1Element.className);
+      console.log('Step 1 element visible:', window.getComputedStyle(step1Element).display !== 'none');
+    }
+  }, 100);
 }
 
 function determineNextStep() {
@@ -3398,24 +3413,32 @@ function determinePreviousStep() {
 }
 
 function showStep(stepId) {
+  // Convert numeric step ID to string format if needed
+  let targetId = stepId;
+  if (typeof stepId === 'number') {
+    targetId = `step-${stepId}`;
+  }
+  
   document.querySelectorAll('.step-container').forEach(step => {
     step.classList.remove('active');
   });
   
-  const targetStep = document.getElementById(stepId);
+  const targetStep = document.getElementById(targetId);
   if (targetStep) {
     targetStep.classList.add('active');
+  } else {
+    console.error(`Step element not found: ${targetId}`);
   }
   
   // Handle step-specific setup
-  if (stepId === 'step-2-detailed-scoring') {
+  if (targetId === 'step-2-detailed-scoring') {
     setupScoringStep();
-  } else if (stepId === 'step-3') {
+  } else if (targetId === 'step-3') {
     // Always populate the summary when showing step 3
     setTimeout(() => {
       setupFeedbackPreview();
     }, 100);
-  } else if (stepId === 'step-1') {
+  } else if (targetId === 'step-1') {
     // Make sure entry point is properly set up
     setupEntryPoint();
   }
@@ -3423,12 +3446,29 @@ function showStep(stepId) {
 
 function setupEntryPoint() {
   // Ensure the entry point buttons are properly configured
-  const quickBtn = document.querySelector('[data-feedback-type="quick"]');
-  const detailedBtn = document.querySelector('[data-feedback-type="detailed"]');
+  const quickOption = document.querySelector('[data-type="quick"]');
+  const detailedOption = document.querySelector('[data-type="detailed"]');
   
-  if (quickBtn && detailedBtn) {
-    quickBtn.onclick = () => startFeedbackFlow('quick');
-    detailedBtn.onclick = () => startFeedbackFlow('detailed');
+  if (quickOption) {
+    quickOption.onclick = () => startFeedbackFlow('quick');
+    const quickBtn = quickOption.querySelector('button');
+    if (quickBtn) {
+      quickBtn.onclick = (e) => {
+        e.stopPropagation();
+        startFeedbackFlow('quick');
+      };
+    }
+  }
+  
+  if (detailedOption) {
+    detailedOption.onclick = () => startFeedbackFlow('detailed');
+    const detailedBtn = detailedOption.querySelector('button');
+    if (detailedBtn) {
+      detailedBtn.onclick = (e) => {
+        e.stopPropagation();
+        startFeedbackFlow('detailed');
+      };
+    }
   }
 }
 
