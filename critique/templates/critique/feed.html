@@ -4257,10 +4257,9 @@ function refreshTags(type) {
     availableTags = availableTags.filter(tag => tag.category === selectedCategory);
   }
   
-  // Shuffle and select 12-15 random tags from available pool
+  // Shuffle and select 10 random tags from available pool
   const shuffled = availableTags.sort(() => 0.5 - Math.random());
-  const randomCount = Math.floor(Math.random() * 4) + 12; // 12-15 tags
-  const selectedTags = shuffled.slice(0, Math.min(randomCount, availableTags.length));
+  const selectedTags = shuffled.slice(0, Math.min(10, availableTags.length));
   
   // Display the random selection
   displayTags(type, selectedTags);
