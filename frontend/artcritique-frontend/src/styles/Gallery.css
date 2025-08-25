@@ -2,6 +2,7 @@
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   border-radius: 12px;
   overflow: hidden;
+  height: auto;
 }
 
 .artwork-card:hover {
@@ -20,8 +21,7 @@
 
 .artwork-image {
   transition: transform 0.3s ease-in-out;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
+  border-radius: 12px;
   max-width: 100%;
   height: auto;
 }

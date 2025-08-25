@@ -602,94 +602,29 @@ const Gallery = () => {
             ) : (
               artworks.map((artwork) => (
                 <Col key={artwork.id} sm={6} md={4} lg={3} className="mb-4">
-                  <Card className="h-100 shadow-sm border-0 artwork-card">
-                    <div className="artwork-image-container">
-                      {artwork.image ? (
-                        <Card.Img
-                          variant="top"
-                          src={artwork.image}
-                          alt={artwork.title}
-                          className="artwork-image"
-                          style={{
-                            width: '100%',
-                            height: 'auto',
-                            cursor: 'pointer'
-                          }}
-                          as={Link}
-                          to={`/app/artworks/${artwork.id}`}
-                        />
-                      ) : (
-                        <Link to={`/app/artworks/${artwork.id}`} className="artwork-placeholder-link">
-                          <div className="artwork-placeholder">
-                            <i className="bi bi-image" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
-                            <p className="text-muted mt-2 mb-0">No Image</p>
-                          </div>
-                        </Link>
-                      )}
-                      {artwork.medium && (
-                        <Badge 
-                          bg="dark" 
-                          className="position-absolute top-0 end-0 m-2"
-                        >
-                          {artwork.medium}
-                        </Badge>
-                      )}
-                    </div>
-                    <Card.Body className="d-flex flex-column">
-                      <Card.Title className="h6 mb-2">
-                        <Link 
-                          to={`/app/artworks/${artwork.id}`} 
-                          className="text-decoration-none text-dark"
-                        >
-                          {artwork.title}
-                        </Link>
-                      </Card.Title>
-                      <Card.Text className="text-muted small mb-2">
-                        by <Link 
-                          to={`/app/profile/${artwork.author_username}`}
-                          className="text-decoration-none"
-                        >
-                          {artwork.author_username}
-                        </Link>
-                      </Card.Text>
-                      {artwork.description && (
-                        <Card.Text className="small text-muted mb-2">
-                          {artwork.description.length > 80 
-                            ? `${artwork.description.substring(0, 80)}...` 
-                            : artwork.description
-                          }
-                        </Card.Text>
-                      )}
-                      {artwork.tags && (
-                        <div className="mb-2">
-                          {artwork.tags.split(',').slice(0, 3).map((tag, index) => (
-                            <Badge 
-                              key={index} 
-                              bg="light" 
-                              text="dark" 
-                              className="me-1 mb-1"
-                            >
-                              {tag.trim()}
-                            </Badge>
-                          ))}
+                  <Card className="shadow-sm border-0 artwork-card">
+                    {artwork.image ? (
+                      <Card.Img
+                        variant="top"
+                        src={artwork.image}
+                        alt={artwork.title}
+                        className="artwork-image"
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          cursor: 'pointer'
+                        }}
+                        as={Link}
+                        to={`/app/artworks/${artwork.id}`}
+                      />
+                    ) : (
+                      <Link to={`/app/artworks/${artwork.id}`} className="artwork-placeholder-link">
+                        <div className="artwork-placeholder">
+                          <i className="bi bi-image" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+                          <p className="text-muted mt-2 mb-0">No Image</p>
                         </div>
-                      )}
-                      <div className="mt-auto">
-                        <div className="d-flex justify-content-between align-items-center text-muted small">
-                          <div className="d-flex gap-3">
-                            <span>
-                              <Heart className="me-1" />
-                              {artwork.likes_count || 0}
-                            </span>
-                            <span>
-                              <MessageCircle className="me-1" />
-                              {artwork.critiques_count || 0}
-                            </span>
-                          </div>
-                          <span>{formatDate(artwork.created_at)}</span>
-                        </div>
-                      </div>
-                    </Card.Body>
+                      </Link>
+                    )}
                   </Card>
                 </Col>
               ))
