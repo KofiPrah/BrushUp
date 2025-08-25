@@ -479,6 +479,58 @@
     font-style: italic;
   }
   
+  /* Tag Controls */
+  .tag-controls{
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+  .tag-search{
+    display: flex;
+    gap: 8px;
+    flex: 1;
+  }
+  .tag-search input{
+    flex: 1;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ecf0f1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  .tag-search input::placeholder{
+    color: #95a5a6;
+  }
+  .tag-search select{
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #ecf0f1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    min-width: 140px;
+  }
+  .tag-search select option{
+    background: #2c3e50;
+    color: #ecf0f1;
+  }
+  #refresh-strengths, #refresh-opportunities{
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #ecf0f1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+  #refresh-strengths:hover, #refresh-opportunities:hover{
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.3);
+    transform: rotate(180deg);
+  }
+  
   /* Add tooltips for better UX */
   .score-btn[data-action="increase"]:before{ 
     content:"Increase score"; position:absolute; bottom:100%; left:50%; 
@@ -801,6 +853,24 @@
           <p>Highlight what the artist did well</p>
         </div>
         
+        <!-- Tag Controls -->
+        <div class="tag-controls">
+          <div class="tag-search">
+            <input type="text" id="strengths-search" class="form-control" placeholder="Search tags..." />
+            <select id="strengths-category" class="form-select">
+              <option value="">All categories</option>
+              <option value="composition">Composition</option>
+              <option value="color">Color</option>
+              <option value="technique">Technique</option>
+              <option value="concept">Concept</option>
+              <option value="emotion">Emotion</option>
+            </select>
+          </div>
+          <button type="button" id="refresh-strengths" class="btn btn-outline-secondary" title="Refresh tags">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
+        
         <div id="strengths-chips" class="chips-wrap"></div>
         
         <div class="selected-count">
@@ -820,6 +890,24 @@
         <div class="selection-prompt">
           <h6>Choose 0-3 opportunities</h6>
           <p>Suggest areas where the artist could explore and grow</p>
+        </div>
+        
+        <!-- Tag Controls -->
+        <div class="tag-controls">
+          <div class="tag-search">
+            <input type="text" id="opportunities-search" class="form-control" placeholder="Search tags..." />
+            <select id="opportunities-category" class="form-select">
+              <option value="">All categories</option>
+              <option value="composition">Composition</option>
+              <option value="color">Color</option>
+              <option value="technique">Technique</option>
+              <option value="concept">Concept</option>
+              <option value="emotion">Emotion</option>
+            </select>
+          </div>
+          <button type="button" id="refresh-opportunities" class="btn btn-outline-secondary" title="Refresh tags">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
         </div>
         
         <div id="opportunities-chips" class="chips-wrap"></div>
@@ -3558,21 +3646,162 @@ function setupQuickFeedbackFlow() {
   loadTagsForStep('strengths');
   loadTagsForStep('opportunities');
   selectedTags = { strengths: [], opportunities: [] };
+  setupTagControls();
+}
+
+// Tag databases with categories
+const tagDatabase = {
+  strengths: [
+    { text: 'Dynamic composition', category: 'composition' },
+    { text: 'Balanced layout', category: 'composition' },
+    { text: 'Strong focal point', category: 'composition' },
+    { text: 'Good use of space', category: 'composition' },
+    { text: 'Harmonious colors', category: 'color' },
+    { text: 'Bold color choices', category: 'color' },
+    { text: 'Subtle palette', category: 'color' },
+    { text: 'Color contrast', category: 'color' },
+    { text: 'Skilled execution', category: 'technique' },
+    { text: 'Clean linework', category: 'technique' },
+    { text: 'Smooth shading', category: 'technique' },
+    { text: 'Detail work', category: 'technique' },
+    { text: 'Clear concept', category: 'concept' },
+    { text: 'Original idea', category: 'concept' },
+    { text: 'Strong narrative', category: 'concept' },
+    { text: 'Symbolic depth', category: 'concept' },
+    { text: 'Emotional impact', category: 'emotion' },
+    { text: 'Captures mood', category: 'emotion' },
+    { text: 'Evokes feeling', category: 'emotion' },
+    { text: 'Personal expression', category: 'emotion' }
+  ],
+  opportunities: [
+    { text: 'Experiment with composition', category: 'composition' },
+    { text: 'Try asymmetrical balance', category: 'composition' },
+    { text: 'Explore negative space', category: 'composition' },
+    { text: 'Consider rule of thirds', category: 'composition' },
+    { text: 'Expand color range', category: 'color' },
+    { text: 'Study color theory', category: 'color' },
+    { text: 'Try warmer/cooler tones', category: 'color' },
+    { text: 'Explore color mixing', category: 'color' },
+    { text: 'Practice fundamentals', category: 'technique' },
+    { text: 'Work on proportions', category: 'technique' },
+    { text: 'Refine details', category: 'technique' },
+    { text: 'Try new techniques', category: 'technique' },
+    { text: 'Develop concept further', category: 'concept' },
+    { text: 'Add more context', category: 'concept' },
+    { text: 'Strengthen message', category: 'concept' },
+    { text: 'Research references', category: 'concept' },
+    { text: 'Enhance emotional depth', category: 'emotion' },
+    { text: 'Express more feeling', category: 'emotion' },
+    { text: 'Connect with viewer', category: 'emotion' },
+    { text: 'Show personal voice', category: 'emotion' }
+  ]
+};
+
+function setupTagControls() {
+  // Setup search and category filtering for strengths
+  const strengthsSearch = document.getElementById('strengths-search');
+  const strengthsCategory = document.getElementById('strengths-category');
+  const refreshStrengths = document.getElementById('refresh-strengths');
+  
+  if (strengthsSearch) {
+    strengthsSearch.addEventListener('input', () => filterTags('strengths'));
+  }
+  if (strengthsCategory) {
+    strengthsCategory.addEventListener('change', () => filterTags('strengths'));
+  }
+  if (refreshStrengths) {
+    refreshStrengths.addEventListener('click', () => refreshTags('strengths'));
+  }
+  
+  // Setup search and category filtering for opportunities
+  const opportunitiesSearch = document.getElementById('opportunities-search');
+  const opportunitiesCategory = document.getElementById('opportunities-category');
+  const refreshOpportunities = document.getElementById('refresh-opportunities');
+  
+  if (opportunitiesSearch) {
+    opportunitiesSearch.addEventListener('input', () => filterTags('opportunities'));
+  }
+  if (opportunitiesCategory) {
+    opportunitiesCategory.addEventListener('change', () => filterTags('opportunities'));
+  }
+  if (refreshOpportunities) {
+    refreshOpportunities.addEventListener('click', () => refreshTags('opportunities'));
+  }
 }
 
 function loadTagsForStep(type) {
   const container = document.getElementById(`${type}-chips`);
   if (!container) return;
   
-  const tagType = type === 'strengths' ? 'pro' : 'con';
-  const existingTags = document.querySelectorAll(`#${tagType}-tags .tag-chip`);
+  // Load from database with random selection (12-15 tags)
+  refreshTags(type);
+}
+
+function filterTags(type) {
+  const searchInput = document.getElementById(`${type}-search`);
+  const categorySelect = document.getElementById(`${type}-category`);
+  const container = document.getElementById(`${type}-chips`);
+  
+  if (!searchInput || !categorySelect || !container) return;
+  
+  const searchTerm = searchInput.value.toLowerCase();
+  const selectedCategory = categorySelect.value;
+  
+  // Filter tags based on search and category
+  let filteredTags = tagDatabase[type];
+  
+  if (selectedCategory) {
+    filteredTags = filteredTags.filter(tag => tag.category === selectedCategory);
+  }
+  
+  if (searchTerm) {
+    filteredTags = filteredTags.filter(tag => 
+      tag.text.toLowerCase().includes(searchTerm)
+    );
+  }
+  
+  // Display filtered tags
+  displayTags(type, filteredTags);
+}
+
+function refreshTags(type) {
+  const container = document.getElementById(`${type}-chips`);
+  if (!container) return;
+  
+  // Get all tags from database
+  const allTags = [...tagDatabase[type]];
+  
+  // Shuffle and select 12-15 random tags
+  const shuffled = allTags.sort(() => 0.5 - Math.random());
+  const randomCount = Math.floor(Math.random() * 4) + 12; // 12-15 tags
+  const selectedTags = shuffled.slice(0, randomCount);
+  
+  // Display the random selection
+  displayTags(type, selectedTags);
+  
+  // Clear search and category filters
+  const searchInput = document.getElementById(`${type}-search`);
+  const categorySelect = document.getElementById(`${type}-category`);
+  if (searchInput) searchInput.value = '';
+  if (categorySelect) categorySelect.value = '';
+}
+
+function displayTags(type, tags) {
+  const container = document.getElementById(`${type}-chips`);
+  if (!container) return;
   
   container.innerHTML = '';
-  existingTags.forEach(existingTag => {
-    if (!existingTag.classList.contains('custom-tag')) {
-      const chip = createTagChip(existingTag.textContent, type);
-      container.appendChild(chip);
+  
+  tags.forEach(tagData => {
+    const chip = createTagChip(tagData.text, type);
+    chip.dataset.category = tagData.category;
+    
+    // Check if this tag was previously selected
+    if (selectedTags[type] && selectedTags[type].includes(tagData.text)) {
+      chip.classList.add('selected');
     }
+    
+    container.appendChild(chip);
   });
 }
 
