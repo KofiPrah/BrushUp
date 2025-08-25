@@ -604,19 +604,28 @@ const Gallery = () => {
                 <Col key={artwork.id} sm={6} md={4} lg={3} className="mb-4">
                   <Card className="h-100 shadow-sm border-0 artwork-card">
                     <div className="artwork-image-container">
-                      <Card.Img
-                        variant="top"
-                        src={artwork.image || '/placeholder-image.jpg'}
-                        alt={artwork.title}
-                        className="artwork-image"
-                        style={{
-                          height: '200px',
-                          objectFit: 'cover',
-                          cursor: 'pointer'
-                        }}
-                        as={Link}
-                        to={`/app/artworks/${artwork.id}`}
-                      />
+                      {artwork.image ? (
+                        <Card.Img
+                          variant="top"
+                          src={artwork.image}
+                          alt={artwork.title}
+                          className="artwork-image"
+                          style={{
+                            width: '100%',
+                            height: 'auto',
+                            cursor: 'pointer'
+                          }}
+                          as={Link}
+                          to={`/app/artworks/${artwork.id}`}
+                        />
+                      ) : (
+                        <Link to={`/app/artworks/${artwork.id}`} className="artwork-placeholder-link">
+                          <div className="artwork-placeholder">
+                            <i className="bi bi-image" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+                            <p className="text-muted mt-2 mb-0">No Image</p>
+                          </div>
+                        </Link>
+                      )}
                       {artwork.medium && (
                         <Badge 
                           bg="dark" 
