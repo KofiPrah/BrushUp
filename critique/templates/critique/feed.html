@@ -532,6 +532,32 @@
     transform: rotate(180deg);
   }
   
+  /* Framework criteria tags */
+  .framework-criteria{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .criteria-tag{
+    display: inline-block;
+    background: rgba(52, 152, 219, 0.15);
+    color: #3498db;
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    border-radius: 12px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+  }
+  .criteria-tag:hover{
+    background: rgba(52, 152, 219, 0.25);
+    border-color: rgba(52, 152, 219, 0.5);
+    transform: translateY(-1px);
+  }
+  
   /* Add tooltips for better UX */
   .score-btn[data-action="increase"]:before{ 
     content:"Increase score"; position:absolute; bottom:100%; left:50%; 
