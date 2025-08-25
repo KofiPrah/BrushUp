@@ -1069,5 +1069,17 @@ def feed_view(request):
     """
     Two-at-a-time critique feed view for focused artwork critiquing.
     Presents artworks in pairs to encourage comparative feedback.
+    Only shows artworks where seeking_critique=True.
     """
-    return render(request, 'critique/feed.html')
+    # Filter artworks to only those actively seeking critique
+    critique_artworks = ArtWork.objects.filter(
+        seeking_critique=True,
+        is_published=True,
+        visibility=ArtWork.VISIBILITY_PUBLIC
+    ).select_related('author', 'author__profile').order_by('-created_at')
+    
+    context = {
+        'critique_artworks': critique_artworks,
+    }
+    
+    return render(request, 'critique/feed.html', context)

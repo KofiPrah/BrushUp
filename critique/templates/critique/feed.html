@@ -780,11 +780,135 @@
     0%, 100% { transform: scale(1); opacity: 0.8; }
     50% { transform: scale(1.1); opacity: 1; }
   }
+  
+  /* Critique Feed Artwork Cards */
+  .artwork-card-feed {
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .artwork-card-feed:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+  .critique-focus-badge {
+    border: 1px solid rgba(0,0,0,0.15);
+    font-size: 0.7rem;
+    padding: 2px 6px;
+  }
+  .critique-areas-display {
+    background: rgba(248,249,250,0.8);
+    border-radius: 6px;
+    padding: 8px;
+    border: 1px solid rgba(0,0,0,0.05);
+  }
+  .engagement-stats small {
+    font-size: 0.75rem;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 {% csrf_token %}
+
+<!-- Artworks Seeking Critique Section -->
+<div class="container-fluid mb-4">
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">
+        <i class="bi bi-people me-2"></i>
+        Artworks Seeking Critique
+      </h5>
+      <small>Artists actively looking for feedback on their work</small>
+    </div>
+    <div class="card-body">
+      {% if critique_artworks %}
+        <div class="row">
+          {% for artwork in critique_artworks %}
+            <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
+              <div class="card h-100 artwork-card-feed">
+                <div class="artwork-image-container">
+                  {% if artwork.image_display_url %}
+                    <img src="{{ artwork.image_display_url }}" 
+                         class="card-img-top" 
+                         alt="{{ artwork.title }}"
+                         style="height: 200px; object-fit: cover;">
+                  {% else %}
+                    <div class="placeholder-image d-flex align-items-center justify-content-center"
+                         style="height: 200px; background: #f8f9fa;">
+                      <i class="bi bi-image text-muted" style="font-size: 2rem;"></i>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="card-body">
+                  <h6 class="card-title">{{ artwork.title }}</h6>
+                  <p class="card-text text-muted small">
+                    by {{ artwork.author.username }}
+                    <span class="badge bg-info ms-1">{{ artwork.author.profile.karma }} karma</span>
+                  </p>
+                  
+                  {% if artwork.critique_areas %}
+                    <div class="critique-areas-display mb-2">
+                      <small class="text-muted d-block mb-1">
+                        <i class="bi bi-target me-1"></i>Seeking feedback on:
+                      </small>
+                      <div class="critique-focus-tags">
+                        {% for area in artwork.critique_areas %}
+                          <span class="badge bg-light text-dark me-1 mb-1 critique-focus-badge">
+                            {% if area == 'technique' %}
+                              <i class="bi bi-brush me-1"></i>Technique & Skills
+                            {% elif area == 'composition' %}
+                              <i class="bi bi-grid-3x3 me-1"></i>Composition & Layout
+                            {% elif area == 'color' %}
+                              <i class="bi bi-palette me-1"></i>Color & Lighting
+                            {% elif area == 'style' %}
+                              <i class="bi bi-star me-1"></i>Artistic Style
+                            {% elif area == 'concept' %}
+                              <i class="bi bi-chat-quote me-1"></i>Concept & Storytelling
+                            {% elif area == 'improvement' %}
+                              <i class="bi bi-graph-up me-1"></i>Areas for Improvement
+                            {% else %}
+                              {{ area|title }}
+                            {% endif %}
+                          </span>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  {% endif %}
+                  
+                  <div class="d-flex justify-content-between align-items-center text-muted small">
+                    <span>{{ artwork.medium }}</span>
+                    <span>{{ artwork.created_at|date:"M d" }}</span>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div class="engagement-stats">
+                      <small class="text-muted me-2">
+                        <i class="bi bi-heart me-1"></i>{{ artwork.likes.count }}
+                      </small>
+                      <small class="text-muted">
+                        <i class="bi bi-chat-square-text me-1"></i>{{ artwork.critiques.count }}
+                      </small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-primary" 
+                            onclick="loadSpecificArtwork({{ artwork.id }})">
+                      Give Critique
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <i class="bi bi-search text-muted" style="font-size: 3rem;"></i>
+          <h6 class="text-muted mt-3">No artworks seeking critique right now</h6>
+          <p class="text-muted small">Check back later or encourage artists to share their work!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
 
 <!-- Single Artwork Layout -->
 <div id="feed-container" class="single-layout">
@@ -4821,6 +4945,27 @@ function resetOnboardingFlow() {
   const detailedNote = document.getElementById('detailed-written-feedback');
   if (quickNote) quickNote.value = '';
   if (detailedNote) detailedNote.value = '';
+}
+
+// Function to load a specific artwork for critique
+function loadSpecificArtwork(artworkId) {
+  // Show loading state
+  const feedContainer = document.getElementById('feed-container');
+  if (feedContainer) {
+    feedContainer.scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  // Load artwork data from API
+  fetch(`/api/artworks/${artworkId}/`)
+    .then(response => response.json())
+    .then(artwork => {
+      displayArtwork(artwork);
+      resetOnboardingFlow(); // Reset to step 1 for new artwork
+    })
+    .catch(error => {
+      console.error('Error loading specific artwork:', error);
+      alert('Failed to load artwork. Please try again.');
+    });
 }
 </script>
 

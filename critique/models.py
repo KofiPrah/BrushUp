@@ -248,6 +248,13 @@ class ArtWork(models.Model):
     # Critique request flag
     seeking_critique = models.BooleanField(default=False, help_text="Whether the artist is actively seeking critique for this piece")
     
+    # Critique focus areas (JSON field to store selected areas)
+    critique_areas = models.JSONField(
+        default=list, 
+        blank=True,
+        help_text="Specific areas the artist wants feedback on (e.g., ['technique', 'composition', 'color'])"
+    )
+    
     # Additional optional fields
     medium = models.CharField(max_length=100, blank=True)  # e.g., "Oil painting", "Digital art"
     dimensions = models.CharField(max_length=100, blank=True)  # e.g., "24x36 inches"
