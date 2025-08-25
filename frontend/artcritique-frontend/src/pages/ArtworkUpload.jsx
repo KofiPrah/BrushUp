@@ -176,7 +176,7 @@ const ArtworkUpload = () => {
       
       // Navigate to the new artwork's detail page after a brief delay
       setTimeout(() => {
-        navigate(`/artworks/${response.data.id}`);
+        navigate(`/app/artworks/${response.data.id}`);
       }, 2000);
       
     } catch (err) {
@@ -274,7 +274,7 @@ const ArtworkUpload = () => {
           <hr />
           <button 
             className="btn btn-primary" 
-            onClick={() => navigate('/login', { state: { from: '/upload' } })}
+            onClick={() => navigate('/login', { state: { from: '/app/upload' } })}
           >
             Go to Login
           </button>

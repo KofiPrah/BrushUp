@@ -291,7 +291,7 @@ const FolderView = ({ folders, unorganizedArtworks, showPrivate, username }) => 
               </div>
               
               <Link
-                to={`/profile/${username}/folder/${folder.slug}`}
+                to={`/app/profile/${username}/folder/${folder.slug}`}
                 className="btn btn-sm btn-outline-primary"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -364,7 +364,7 @@ const GridView = ({ artworks }) => {
 const ArtworkCard = ({ artwork, showFolder = false }) => {
   return (
     <div className="card h-100 artwork-card">
-      <Link to={`/artwork/${artwork.id}`} className="text-decoration-none">
+      <Link to={`/app/artworks/${artwork.id}`} className="text-decoration-none">
         <div className="position-relative">
           <img
             src={artwork.image_display_url || '/placeholder-image.png'}
@@ -385,7 +385,7 @@ const ArtworkCard = ({ artwork, showFolder = false }) => {
       
       <div className="card-body p-2">
         <h6 className="card-title mb-1" style={{ fontSize: '0.9rem' }}>
-          <Link to={`/artwork/${artwork.id}`} className="text-decoration-none text-dark">
+          <Link to={`/app/artworks/${artwork.id}`} className="text-decoration-none text-dark">
             {artwork.title}
           </Link>
         </h6>

@@ -200,7 +200,7 @@ const ArtworkList = () => {
                         {artwork.critiques_count}
                       </span>
                     </small>
-                    <Link to={`/artworks/${artwork.id}`} className="btn btn-sm btn-outline-primary">
+                    <Link to={`/app/artworks/${artwork.id}`} className="btn btn-sm btn-outline-primary">
                       View Details
                     </Link>
                   </div>

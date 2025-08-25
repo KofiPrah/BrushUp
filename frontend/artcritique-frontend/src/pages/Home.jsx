@@ -14,7 +14,7 @@ const Home = () => {
           Explore artwork, give meaningful critiques, and improve your craft through community feedback.
         </p>
         <div className="mt-4">
-          <Link to="/artworks" className="btn btn-primary me-3">
+          <Link to="/app/artworks" className="btn btn-primary me-3">
             Browse Artwork
           </Link>
           <Link to="/login" className="btn btn-outline-secondary">

@@ -615,7 +615,7 @@ const Gallery = () => {
                           cursor: 'pointer'
                         }}
                         as={Link}
-                        to={`/artworks/${artwork.id}`}
+                        to={`/app/artworks/${artwork.id}`}
                       />
                       {artwork.medium && (
                         <Badge 
@@ -629,7 +629,7 @@ const Gallery = () => {
                     <Card.Body className="d-flex flex-column">
                       <Card.Title className="h6 mb-2">
                         <Link 
-                          to={`/artworks/${artwork.id}`} 
+                          to={`/app/artworks/${artwork.id}`} 
                           className="text-decoration-none text-dark"
                         >
                           {artwork.title}
@@ -637,7 +637,7 @@ const Gallery = () => {
                       </Card.Title>
                       <Card.Text className="text-muted small mb-2">
                         by <Link 
-                          to={`/profile/${artwork.author_username}`}
+                          to={`/app/profile/${artwork.author_username}`}
                           className="text-decoration-none"
                         >
                           {artwork.author_username}

@@ -148,7 +148,7 @@ const ArtworkDetail = () => {
         <div className="alert alert-danger" role="alert">
           Error loading artwork: {error}
         </div>
-        <Link to="/artworks" className="btn btn-primary">
+        <Link to="/app/artworks" className="btn btn-primary">
           Back to Gallery
         </Link>
       </div>
@@ -161,7 +161,7 @@ const ArtworkDetail = () => {
         <div className="alert alert-warning" role="alert">
           Artwork not found.
         </div>
-        <Link to="/artworks" className="btn btn-primary">
+        <Link to="/app/artworks" className="btn btn-primary">
           Back to Gallery
         </Link>
       </div>
@@ -173,7 +173,7 @@ const ArtworkDetail = () => {
       <nav aria-label="breadcrumb">
         <ol className="breadcrumb">
           <li className="breadcrumb-item"><Link to="/">Home</Link></li>
-          <li className="breadcrumb-item"><Link to="/artworks">Artworks</Link></li>
+          <li className="breadcrumb-item"><Link to="/app/artworks">Artworks</Link></li>
           <li className="breadcrumb-item active" aria-current="page">{artwork.title}</li>
         </ol>
       </nav>

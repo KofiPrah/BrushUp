@@ -46,18 +46,18 @@ const Navbar = () => {
               <Link className="nav-link" to="/">Home</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/gallery">Gallery</Link>
+              <Link className="nav-link" to="/app/gallery">Gallery</Link>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/artworks">Artworks</Link>
+              <Link className="nav-link" to="/app/artworks">Artworks</Link>
             </li>
             {isAuthenticated && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/upload">Upload Artwork</Link>
+                  <Link className="nav-link" to="/app/upload">Upload Artwork</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/my-artworks">My Artworks</Link>
+                  <Link className="nav-link" to="/app/my-artworks">My Artworks</Link>
                 </li>
               </>
             )}
@@ -115,7 +115,7 @@ const Navbar = () => {
                       <li><span className="dropdown-item text-muted">No new notifications</span></li>
                     ) : (
                       <li>
-                        <Link className="dropdown-item" to="/notifications">
+                        <Link className="dropdown-item" to="/app/notifications">
                           View {user.unread_notifications} new {user.unread_notifications === 1 ? 'notification' : 'notifications'}
                         </Link>
                       </li>
@@ -141,8 +141,8 @@ const Navbar = () => {
                     )}
                   </a>
                   <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><Link className="dropdown-item" to="/profile">My Profile</Link></li>
-                    <li><Link className="dropdown-item" to="/settings">Settings</Link></li>
+                    <li><Link className="dropdown-item" to="/app/profile">My Profile</Link></li>
+                    <li><Link className="dropdown-item" to="/app/settings">Settings</Link></li>
                     <li><hr className="dropdown-divider" /></li>
                     <li><button className="dropdown-item" onClick={handleLogout}>Logout</button></li>
                   </ul>
