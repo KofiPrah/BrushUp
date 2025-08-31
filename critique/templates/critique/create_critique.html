@@ -67,7 +67,7 @@
                                     {% endfor %}
                                     <option value="10">10/10</option>
                                 </select>
-                                <div class="form-text text-muted">Rate the arrangement and balance</div>
+                                <div class="form-text text-muted" id="composition-description">Rate the arrangement and balance</div>
                             </div>
                             
                             <div class="col-md-4">
@@ -82,7 +82,7 @@
                                     {% endfor %}
                                     <option value="10">10/10</option>
                                 </select>
-                                <div class="form-text text-muted">Rate the execution and skill</div>
+                                <div class="form-text text-muted" id="technique-description">Rate the execution and skill</div>
                             </div>
                             
                             <div class="col-md-4">
@@ -97,7 +97,7 @@
                                     {% endfor %}
                                     <option value="10">10/10</option>
                                 </select>
-                                <div class="form-text text-muted">Rate the creativity and uniqueness</div>
+                                <div class="form-text text-muted" id="originality-description">Rate the creativity and uniqueness</div>
                             </div>
                         </div>
 
@@ -159,4 +159,65 @@
     color: #b6d7ff !important;
 }
 </style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to update description text color based on score
+    function updateDescriptionColor(selectElement, descriptionId) {
+        const score = parseInt(selectElement.value);
+        const descriptionElement = document.getElementById(descriptionId);
+        
+        if (!descriptionElement || !score) {
+            // Reset to default if no score selected
+            if (descriptionElement) {
+                descriptionElement.style.color = '';
+                descriptionElement.classList.add('text-muted');
+            }
+            return;
+        }
+        
+        // Remove default muted class
+        descriptionElement.classList.remove('text-muted');
+        
+        // Apply color based on score range
+        if (score >= 1 && score <= 3) {
+            descriptionElement.style.color = '#e57373'; // Soft red
+        } else if (score >= 4 && score <= 7) {
+            descriptionElement.style.color = '#fbc02d'; // Soft yellow
+        } else if (score >= 8 && score <= 10) {
+            descriptionElement.style.color = '#81c784'; // Soft green
+        }
+    }
+    
+    // Get all score select elements
+    const compositionSelect = document.getElementById('id_composition_score');
+    const techniqueSelect = document.getElementById('id_technique_score');
+    const originalitySelect = document.getElementById('id_originality_score');
+    
+    // Add event listeners for each score select
+    if (compositionSelect) {
+        compositionSelect.addEventListener('change', function() {
+            updateDescriptionColor(this, 'composition-description');
+        });
+        // Update on page load if there's already a value
+        updateDescriptionColor(compositionSelect, 'composition-description');
+    }
+    
+    if (techniqueSelect) {
+        techniqueSelect.addEventListener('change', function() {
+            updateDescriptionColor(this, 'technique-description');
+        });
+        // Update on page load if there's already a value
+        updateDescriptionColor(techniqueSelect, 'technique-description');
+    }
+    
+    if (originalitySelect) {
+        originalitySelect.addEventListener('change', function() {
+            updateDescriptionColor(this, 'originality-description');
+        });
+        // Update on page load if there's already a value
+        updateDescriptionColor(originalitySelect, 'originality-description');
+    }
+});
+</script>
 {% endblock %}
