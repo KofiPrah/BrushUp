@@ -3081,18 +3081,21 @@ function setupEmotionSafeScoring() {
     return;
   }
 
-  scoreButtons.forEach(origBtn => {
-    // Replace node to remove any prior listeners, then re-query the new node
-    const cloned = origBtn.cloneNode(true);
-    origBtn.parentNode.replaceChild(cloned, origBtn);
-    const button = cloned;
-
+  scoreButtons.forEach(button => {
     const action = button.dataset.action;   // "increase" | "decrease"
     const target = button.dataset.target;   // e.g. "composition"
     if (!action || !target) {
       console.warn('score-btn missing data-action or data-target', button);
       return;
     }
+
+    // Remove any existing scoring listeners by checking for our custom property
+    if (button._scoringHandlerAttached) {
+      return; // Skip if already has our handler
+    }
+
+    // Mark this button as having our handler
+    button._scoringHandlerAttached = true;
 
     // One handler per button
     button.addEventListener('click', (ev) => {
