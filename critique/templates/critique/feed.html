@@ -3146,14 +3146,26 @@ function setupEmotionSafeScoring() {
       ev.stopPropagation();
       console.log(`score button click: ${action} ${target}`);
 
-      // Robust element lookups
+      // Robust element lookups with comprehensive error reporting
       const hiddenInput = document.getElementById(`${target}-score`);
       const valueDisplay = document.getElementById(`${target}-value`);
       const indicator = document.getElementById(`${target}-indicator`);
       const description = document.getElementById(`${target}-desc`);
 
+      // Check for all critical elements and report missing ones
+      const missingElements = [];
+      if (!hiddenInput) missingElements.push(`${target}-score (hidden input)`);
+      if (!valueDisplay) missingElements.push(`${target}-value (display)`);
+      if (!indicator) missingElements.push(`${target}-indicator (needle)`);
+      if (!description) missingElements.push(`${target}-desc (description)`);
+
+      if (missingElements.length > 0) {
+        console.warn(`Missing DOM elements for ${target}:`, missingElements);
+      }
+
+      // Require at least the hidden input to proceed
       if (!hiddenInput) {
-        console.warn(`Missing hidden input: ${target}-score`);
+        console.error(`Critical element missing: hidden input ${target}-score. Cannot update score.`);
         return;
       }
 
