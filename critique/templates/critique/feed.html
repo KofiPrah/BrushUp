@@ -3138,10 +3138,10 @@ function waitForScoringElements(callback, maxAttempts = 10, attemptDelay = 50) {
       }
     }
     
-    // Check for at least some scoring elements (buttons or score inputs)
-    const hasButtons = activeFramework.querySelectorAll('button[data-action], .score-btn, .btn[data-action]').length > 0;
-    const hasScoreInputs = activeFramework.querySelectorAll('input[id*="-score"], [id*="-score"]').length > 0;
-    const hasDials = activeFramework.querySelectorAll('.score-dial, [id*="-dial"]').length > 0;
+    // Check for primary scoring elements using exact selectors that should exist
+    const hasButtons = activeFramework.querySelectorAll('.score-btn').length > 0;
+    const hasScoreInputs = activeFramework.querySelectorAll('input[id$="-score"]').length > 0;
+    const hasDials = activeFramework.querySelectorAll('.score-dial').length > 0;
     
     if (hasButtons || hasScoreInputs || hasDials) {
       console.log('waitForScoringElements: Found scoring elements, proceeding with setup');
@@ -3169,41 +3169,24 @@ function setupEmotionSafeScoring() {
     return;
   }
 
-  // Find all score buttons within the active framework using multiple selector strategies
-  let scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn'));
+  // Find all score buttons within the active framework
+  const scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn'));
   
-  // If no buttons found with primary selector, try alternative selectors
-  if (scoreButtons.length === 0) {
-    console.warn('No .score-btn elements found, trying alternative selectors...');
-    
-    // Try alternative button selectors that might be used
-    const alternativeSelectors = [
-      'button[data-action]', // Any button with data-action attribute
-      '.btn[data-action]', // Bootstrap-style buttons with data-action
-      '[data-action="increase"], [data-action="decrease"]', // Specific action buttons
-      'button.btn', // Generic buttons
-      '.score-control button', // Buttons within score control containers
-      '.score-controls button' // Alternative score control containers
-    ];
-    
-    for (const selector of alternativeSelectors) {
-      scoreButtons = Array.from(activeFramework.querySelectorAll(selector));
-      if (scoreButtons.length > 0) {
-        console.log(`Found ${scoreButtons.length} buttons using alternative selector: ${selector}`);
-        break;
-      }
-    }
-  } else {
-    console.log(`Found ${scoreButtons.length} score buttons using primary selector`);
-  }
+  console.log(`Found ${scoreButtons.length} score buttons in active framework`);
 
   if (scoreButtons.length === 0) {
-    console.error('No score buttons found with any selector strategy. Available elements in framework:', {
-      allButtons: activeFramework.querySelectorAll('button').length,
-      elementsWithDataAction: activeFramework.querySelectorAll('[data-action]').length,
-      framework: activeFramework.className,
-      frameworkId: activeFramework.id
-    });
+    // Provide specific diagnostic information for maintenance
+    const diagnostics = {
+      frameworkId: activeFramework.id,
+      frameworkClass: activeFramework.className,
+      totalButtons: activeFramework.querySelectorAll('button').length,
+      buttonsWithDataAction: activeFramework.querySelectorAll('button[data-action]').length,
+      scoreBtnElements: document.querySelectorAll('.score-btn').length, // Global count
+      activeFrameworkContent: activeFramework.innerHTML.substring(0, 200) + '...'
+    };
+    
+    console.error('SELECTOR MISMATCH: Expected .score-btn elements in active framework but found none.', diagnostics);
+    console.error('This indicates DOM structure and JavaScript selectors are out of sync - immediate maintenance required!');
     return;
   }
 
