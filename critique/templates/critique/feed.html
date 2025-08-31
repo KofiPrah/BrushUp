@@ -3007,10 +3007,10 @@ function setupFrameworkSelection() {
         technicalScores.classList.remove('active');
       }
       
-      // Reinitialize score dials for the new framework with small delay
-      setTimeout(() => {
+      // Reinitialize score dials for the new framework - wait for DOM readiness
+      waitForScoringElements(() => {
         setupEmotionSafeScoring();
-      }, 50);
+      });
     });
   });
 }
@@ -3062,6 +3062,52 @@ function createScoreDialSVG(svgElement) {
 }
 
 // ---- Robust scoring setup & update (drop this in to replace broken functions) ----
+
+function waitForScoringElements(callback, maxAttempts = 10, attemptDelay = 50) {
+  console.log('waitForScoringElements: Starting DOM element availability check');
+  
+  let attempts = 0;
+  
+  function checkElements() {
+    attempts++;
+    console.log(`waitForScoringElements: Attempt ${attempts}/${maxAttempts}`);
+    
+    // Check for active framework and basic scoring elements
+    const activeFramework = document.querySelector('.scoring-framework.active');
+    
+    if (!activeFramework) {
+      console.log('waitForScoringElements: No active framework found yet');
+      if (attempts < maxAttempts) {
+        setTimeout(checkElements, attemptDelay);
+        return;
+      } else {
+        console.warn('waitForScoringElements: Max attempts reached, no active framework found');
+        callback(); // Call anyway, let setupEmotionSafeScoring handle the missing elements
+        return;
+      }
+    }
+    
+    // Check for at least some scoring elements (buttons or score inputs)
+    const hasButtons = activeFramework.querySelectorAll('button[data-action], .score-btn, .btn[data-action]').length > 0;
+    const hasScoreInputs = activeFramework.querySelectorAll('input[id*="-score"], [id*="-score"]').length > 0;
+    const hasDials = activeFramework.querySelectorAll('.score-dial, [id*="-dial"]').length > 0;
+    
+    if (hasButtons || hasScoreInputs || hasDials) {
+      console.log('waitForScoringElements: Found scoring elements, proceeding with setup');
+      console.log(`  - Buttons: ${hasButtons}`, `- Score inputs: ${hasScoreInputs}`, `- Dials: ${hasDials}`);
+      callback();
+    } else if (attempts < maxAttempts) {
+      console.log('waitForScoringElements: No scoring elements found yet, retrying...');
+      setTimeout(checkElements, attemptDelay);
+    } else {
+      console.warn('waitForScoringElements: Max attempts reached, proceeding anyway');
+      callback(); // Proceed anyway, let setup function handle missing elements
+    }
+  }
+  
+  // Start checking immediately
+  checkElements();
+}
 
 function setupEmotionSafeScoring() {
   console.log('setupEmotionSafeScoring called');
@@ -4563,13 +4609,13 @@ function setupScoringStep() {
     console.log('Activated expressive-scores framework');
   }
   
-  // Initialize the scoring dials
-  setTimeout(() => {
-    if (typeof setupEmotionSafeScoring === 'function') {
-      console.log('Calling setupEmotionSafeScoring from setupScoringStep');
+  // Initialize the scoring dials - wait for DOM readiness
+  if (typeof setupEmotionSafeScoring === 'function') {
+    console.log('Calling setupEmotionSafeScoring from setupScoringStep');
+    waitForScoringElements(() => {
       setupEmotionSafeScoring();
-    }
-  }, 100);
+    });
+  }
 }
 
 function updateScore(criterion, value) {
