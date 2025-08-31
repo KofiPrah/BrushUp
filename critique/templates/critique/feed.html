@@ -3145,6 +3145,18 @@ function calculateFullCircleAngle(score, config = SCORING_CONFIG) {
   return normalizedScore * 360;
 }
 
+// Centralized persistence validation (prevents UI-state inconsistency)
+function validateScorePersistence(scoreType, actionDescription = 'update score') {
+  const hiddenInput = document.getElementById(`${scoreType}-score`);
+  
+  if (!hiddenInput) {
+    console.error(`Missing hidden input for ${scoreType}-score - cannot ${actionDescription} without persistence layer`);
+    return null; // Return null to indicate validation failure
+  }
+  
+  return hiddenInput; // Return the input for use
+}
+
 // Themeable state management (replaces inline style manipulation)
 function applyScoreIndicatorState(indicator, score) {
   if (!indicator) return;
@@ -3380,7 +3392,14 @@ function setupEmotionSafeScoring() {
     // Set initial visual state using component-safe selection
     const elements = findScoringElements(dial, scoreType);
     const { hiddenInput, valueDisplay, indicator, description: descEl } = elements;
-    const initial = parseInt(hiddenInput?.value || valueDisplay?.textContent, 10) || 5;
+
+    // Validate persistence layer exists before initializing UI
+    if (!hiddenInput) {
+      console.error(`Missing hidden input for ${scoreType}-score - skipping initialization to prevent UI-state inconsistency`);
+      return; // Don't initialize UI if we can't persist state changes
+    }
+
+    const initial = parseInt(hiddenInput.value, 10) || 5;
 
     if (valueDisplay) valueDisplay.textContent = initial;
     
@@ -3389,7 +3408,7 @@ function setupEmotionSafeScoring() {
     applyScoreDescriptionState(descEl, initial);
     
     if (!descEl) {
-      console.warn(`Could not find description or input for ${scoreType}`);
+      console.warn(`Could not find description for ${scoreType}`);
     }
   });
 
@@ -3404,7 +3423,13 @@ function updateDialDisplay(dial, criterion, score) {
   
   // Use centralized component-safe element selection
   const elements = findScoringElements(dial, criterion);
-  const { valueDisplay, indicator, description } = elements;
+  const { hiddenInput, valueDisplay, indicator, description } = elements;
+  
+  // Validate persistence layer exists before updating UI
+  if (!hiddenInput) {
+    console.error(`Missing hidden input for ${criterion}-score - cannot update display without persistence layer`);
+    return; // Don't update UI if there's no persistence backing
+  }
   
   // Update score display
   if (valueDisplay) {
@@ -4702,7 +4727,13 @@ function setupScoringStep() {
 }
 
 function updateScore(criterion, value) {
-  scores[criterion] = parseInt(value);
+  // Use centralized persistence validation
+  const hiddenInput = validateScorePersistence(criterion, 'update score');
+  if (!hiddenInput) return; // Don't update in-memory state if there's no persistence backing
+  
+  const parsedValue = parseInt(value);
+  hiddenInput.value = parsedValue;
+  scores[criterion] = parsedValue;
 }
 
 // Duplicate function removed - using the working one above
@@ -4764,11 +4795,16 @@ function createScoringDial(criterion, score) {
 }
 
 function updateDialDisplay(dial, criterion, score) {
+  // Use centralized persistence validation
+  const hiddenInput = validateScorePersistence(criterion, 'update display');
+  if (!hiddenInput) return; // Don't update UI if there's no persistence backing
+  
   // With the new 360° design, regenerate the entire dial for proper colors and positioning
   const newDialHTML = createScoringDial(criterion, score);
   dial.innerHTML = newDialHTML;
   
-  // Store the score
+  // Store the score in persistence layer
+  hiddenInput.value = score;
   scores[criterion] = score;
   
   // Update control button states
