@@ -3021,10 +3021,12 @@ function createScoreDialSVG(svgElement) {
   svgElement.innerHTML = '';
   
   // Define color segments: Red (1-3), Yellow (4-7), Green (8-10)
+  // Small gaps between segments to prevent visual overlap artifacts
+  const gapSize = 1; // 1 degree gap between segments
   const segments = [
-    { start: 0, end: 108, color: '#e74c3c' },     // Red: 0-108 degrees
-    { start: 108, end: 252, color: '#f1c40f' },   // Yellow: 108-252 degrees  
-    { start: 252, end: 360, color: '#27ae60' }    // Green: 252-360 degrees
+    { start: 0, end: 107, color: '#e74c3c' },           // Red: 0-107 degrees (gap at 107-109)
+    { start: 109, end: 251, color: '#f1c40f' },         // Yellow: 109-251 degrees (gap at 251-253)  
+    { start: 253, end: 360, color: '#27ae60' }          // Green: 253-360 degrees
   ];
   
   const center = 50;
@@ -3055,7 +3057,8 @@ function createScoreDialSVG(svgElement) {
     path.setAttribute('stroke', color);
     path.setAttribute('stroke-width', strokeWidth);
     path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-linecap', 'round');
+    path.setAttribute('stroke-linecap', 'butt'); // Use 'butt' to prevent round cap overlap
+    path.setAttribute('opacity', '0.8'); // Slight transparency for smoother appearance
     
     svgElement.appendChild(path);
   });
