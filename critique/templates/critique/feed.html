@@ -3064,164 +3064,130 @@ function createScoreDialSVG(svgElement) {
 function setupEmotionSafeScoring() {
   console.log('setupEmotionSafeScoring called');
   
-  const activeFramework = document.querySelector('.scoring-framework.active');
+  // Look for both types of scoring frameworks
+  let activeFramework = document.querySelector('.scoring-framework.active');
+  
+  // If no active framework, try to find the scoring container
   if (!activeFramework) {
-    console.log('No active framework found');
+    activeFramework = document.getElementById('scoring-container');
+  }
+  
+  if (!activeFramework) {
+    console.log('No scoring framework found');
     return;
   }
   
   console.log('Active framework found:', activeFramework);
   
-  // Setup button controls for all score types - prevent double event binding
-  const scoreButtons = activeFramework.querySelectorAll('.score-btn');
-  console.log(`Setting up ${scoreButtons.length} score buttons with event listeners`);
+  // Find all score dials with data-criterion attribute (the interface shown in the image)
+  const scoreDials = activeFramework.querySelectorAll('.score-dial[data-criterion]');
+  console.log(`Found ${scoreDials.length} score dials with data-criterion`);
   
-  scoreButtons.forEach(button => {
-    console.log('Setting up button:', button.dataset.action, button.dataset.target);
-    
-    // Remove any existing listeners to prevent double-triggering
-    const newButton = button.cloneNode(true);
-    button.parentNode.replaceChild(newButton, button);
-    
-    newButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const action = newButton.dataset.action;
-      const target = newButton.dataset.target;
-      const hiddenInput = document.getElementById(`${target}-score`);
-      
-      if (!hiddenInput) {
-        console.log(`No hidden input found for ${target}`);
-        return;
-      }
-      
-      const currentScore = parseInt(hiddenInput.value);
-      console.log(`Current score for ${target}: ${currentScore}`);
-      
-      let newScore = currentScore;
-      if (action === 'increase' && currentScore < 10) {
-        newScore = currentScore + 1;
-      } else if (action === 'decrease' && currentScore > 1) {
-        newScore = currentScore - 1;
-      }
-      
-      // Only update if the score actually changed
-      if (newScore !== currentScore && newScore >= 1 && newScore <= 10) {
-        console.log(`Button clicked: ${action} on ${target}, score ${currentScore} -> ${newScore}`);
-        
-        // Update hidden input
-        hiddenInput.value = newScore;
-        
-        // Update display elements
-        const valueDisplay = document.getElementById(`${target}-value`);
-        const indicator = document.getElementById(`${target}-indicator`);
-        const description = document.getElementById(`${target}-desc`);
-        
-        if (valueDisplay) {
-          valueDisplay.textContent = newScore;
-        }
-        
-        if (indicator) {
-          const rotation = (newScore - 1) * 36;
-          indicator.style.transform = `rotate(${rotation}deg)`;
-        }
-        
-        // Update description color immediately
-        if (description) {
-          console.log(`Updating description color for score ${newScore}`);
-          
-          // Determine the appropriate class and color
-          let descClass = '';
-          let color = '';
-          if (newScore >= 8 && newScore <= 10) {
-            descClass = 'excellent';
-            color = '#81c784'; // Green
-          } else if (newScore >= 4 && newScore <= 7) {
-            descClass = 'positive';
-            color = '#fbc02d'; // Yellow
-          } else if (newScore >= 1 && newScore <= 3) {
-            descClass = 'challenging';
-            color = '#e57373'; // Red
-          }
-          
-          // Apply both CSS class and inline style for reliability
-          description.className = `score-description ${descClass}`;
-          description.style.color = color;
-          
-          console.log(`Applied class: ${descClass}, color: ${color}`);
-        } else {
-          console.log(`No description element found for ${target}`);
-          // Try alternative selectors
-          const altDescription = document.querySelector(`#${target}-desc, .score-description[id*="${target}"]`);
-          if (altDescription) {
-            console.log(`Found description with alternative selector`);
-            let color = '';
-            if (newScore >= 8 && newScore <= 10) {
-              color = '#81c784'; // Green
-            } else if (newScore >= 4 && newScore <= 7) {
-              color = '#fbc02d'; // Yellow
-            } else if (newScore >= 1 && newScore <= 3) {
-              color = '#e57373'; // Red
-            }
-            altDescription.style.color = color;
-            console.log(`Applied color to alternative element: ${color}`);
-          }
-        }
-        
-        // Add visual feedback
-        newButton.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-          newButton.style.transform = '';
-        }, 150);
-      } else {
-        console.log(`Button click ignored: ${action} on ${target}, score would be ${newScore} (current: ${currentScore})`);
-      }
-    });
-  });
-  
-  // Initialize SVG elements and initial colors
-  const scoreDials = activeFramework.querySelectorAll('.score-dial');
   scoreDials.forEach(dial => {
-    const dialId = dial.id;
-    const scoreType = dialId.replace('-dial', '');
-    const svgElement = dial.querySelector('.score-dial-svg');
+    const criterion = dial.dataset.criterion;
+    console.log(`Setting up dial for criterion: ${criterion}`);
     
-    // Create clean SVG color bands
-    if (svgElement) {
-      createScoreDialSVG(svgElement);
+    // Initialize the score for this criterion
+    if (!scores[criterion]) {
+      scores[criterion] = 5; // Default score
     }
     
-    // Set initial description color
-    const description = document.getElementById(`${scoreType}-desc`);
-    const hiddenInput = document.getElementById(`${scoreType}-score`);
-    if (description && hiddenInput) {
-      const currentScore = parseInt(hiddenInput.value) || 5;
-      
-      let descClass = '';
-      let color = '';
-      if (currentScore >= 8 && currentScore <= 10) {
-        descClass = 'excellent';
-        color = '#81c784'; // Green
-      } else if (currentScore >= 4 && currentScore <= 7) {
-        descClass = 'positive';
-        color = '#fbc02d'; // Yellow
-      } else if (currentScore >= 1 && currentScore <= 3) {
-        descClass = 'challenging';
-        color = '#e57373'; // Red
-      }
-      
-      // Apply both CSS class and inline style
-      description.className = `score-description ${descClass}`;
-      description.style.color = color;
-      
-      console.log(`Initial color set for ${scoreType}: class=${descClass}, color=${color}`);
-    } else {
-      console.log(`Could not find description or input for ${scoreType}`);
-      console.log(`Description element:`, description);
-      console.log(`Hidden input element:`, hiddenInput);
+    // Create the visual dial content
+    const dialContent = `
+      <div class="dial-visual">
+        <svg class="score-dial-svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" stroke="#2c3e50" stroke-width="2" fill="none" opacity="0.3"/>
+          <circle cx="50" cy="50" r="30" stroke="#34495e" stroke-width="1" fill="none" opacity="0.2"/>
+          <circle cx="50" cy="50" r="20" stroke="#34495e" stroke-width="1" fill="none" opacity="0.1"/>
+        </svg>
+        <div class="dial-content">
+          <div class="score-value-display" id="${criterion}-value">${scores[criterion]}</div>
+          <div class="score-indicator" id="${criterion}-indicator"></div>
+        </div>
+      </div>
+      <div class="score-controls">
+        <button type="button" class="score-btn" data-action="decrease" data-target="${criterion}">−</button>
+        <button type="button" class="score-btn" data-action="increase" data-target="${criterion}">+</button>
+      </div>
+      <div class="score-description" id="${criterion}-desc">Rate this aspect</div>
+    `;
+    
+    dial.innerHTML = dialContent;
+    
+    // Set initial dial position and color
+    updateDialDisplay(dial, criterion, scores[criterion]);
+    
+    // Setup event listeners for the buttons
+    const decreaseBtn = dial.querySelector('[data-action="decrease"]');
+    const increaseBtn = dial.querySelector('[data-action="increase"]');
+    
+    if (decreaseBtn) {
+      decreaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (scores[criterion] > 1) {
+          scores[criterion] = scores[criterion] - 1;
+          console.log(`Decreased ${criterion} to ${scores[criterion]}`);
+          updateDialDisplay(dial, criterion, scores[criterion]);
+        }
+      });
+    }
+    
+    if (increaseBtn) {
+      increaseBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        if (scores[criterion] < 10) {
+          scores[criterion] = scores[criterion] + 1;
+          console.log(`Increased ${criterion} to ${scores[criterion]}`);
+          updateDialDisplay(dial, criterion, scores[criterion]);
+        }
+      });
     }
   });
+}
+
+function updateDialDisplay(dial, criterion, score) {
+  console.log(`Updating dial display for ${criterion}: score ${score}`);
+  
+  const valueDisplay = dial.querySelector(`#${criterion}-value`);
+  const indicator = dial.querySelector(`#${criterion}-indicator`);
+  const description = dial.querySelector(`#${criterion}-desc`);
+  
+  // Update score display
+  if (valueDisplay) {
+    valueDisplay.textContent = score;
+  }
+  
+  // Update indicator position
+  if (indicator) {
+    const rotation = (score - 1) * 36; // 0° to 324° for scores 1-10
+    indicator.style.transform = `rotate(${rotation}deg)`;
+  }
+  
+  // Update description color
+  if (description) {
+    let descClass = '';
+    let color = '';
+    
+    if (score >= 8 && score <= 10) {
+      descClass = 'excellent';
+      color = '#81c784'; // Green
+    } else if (score >= 4 && score <= 7) {
+      descClass = 'positive';
+      color = '#fbc02d'; // Yellow
+    } else if (score >= 1 && score <= 3) {
+      descClass = 'challenging';
+      color = '#e57373'; // Red
+    }
+    
+    description.className = `score-description ${descClass}`;
+    description.style.color = color;
+    
+    console.log(`Updated ${criterion} description: class=${descClass}, color=${color}`);
+  }
 }
 
 function updateImprovedScoreDial(scoreType, score) {
