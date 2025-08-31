@@ -124,9 +124,9 @@
         
         <!-- Results Grid -->
         {% if artworks %}
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="masonry-gallery">
             {% for artwork in artworks %}
-                <div class="col">
+                <div class="masonry-item">
                     <div class="card border-0 shadow-sm artwork-card">
                         <a href="{% url 'critique:artwork_detail' artwork.pk %}" class="text-decoration-none">
                             {% if artwork.image %}
@@ -300,8 +300,42 @@
         // setupLiveSearch();
     </script>
     
-    <!-- CSS for simplified artwork cards -->
+    <!-- CSS for masonry-style artwork gallery -->
     <style>
+        /* Masonry Gallery Layout */
+        .masonry-gallery {
+            column-count: 4;
+            column-gap: 16px;
+            column-fill: balance;
+        }
+        
+        .masonry-item {
+            display: inline-block;
+            margin-bottom: 16px;
+            width: 100%;
+            break-inside: avoid;
+        }
+        
+        /* Responsive breakpoints */
+        @media (max-width: 1200px) {
+            .masonry-gallery {
+                column-count: 3;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .masonry-gallery {
+                column-count: 2;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .masonry-gallery {
+                column-count: 1;
+            }
+        }
+        
+        /* Artwork card styles */
         .artwork-card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             border-radius: 12px;
