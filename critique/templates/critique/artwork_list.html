@@ -404,12 +404,9 @@
             }
             
             initializeItems() {
-                // Show items without images immediately
+                // Show all items immediately - they start visible now
                 document.querySelectorAll('.masonry-item').forEach(item => {
-                    const lazyImg = item.querySelector('.artwork-image-lazy');
-                    if (!lazyImg) {
-                        item.classList.add('loaded');
-                    }
+                    item.classList.add('loaded');
                 });
             }
         }
@@ -435,11 +432,6 @@
             margin-bottom: 20px;
             width: 100%;
             break-inside: avoid;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        .masonry-item.loaded {
             opacity: 1;
         }
         
@@ -499,8 +491,8 @@
         
         /* Loading placeholder styles */
         .artwork-image-lazy {
-            transition: opacity 0.5s ease-in-out;
-            filter: blur(5px);
+            transition: filter 0.5s ease-in-out;
+            filter: blur(2px);
         }
         
         .artwork-image-lazy.loaded {
