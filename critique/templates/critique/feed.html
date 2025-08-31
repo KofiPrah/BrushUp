@@ -3130,16 +3130,43 @@ function setupEmotionSafeScoring() {
         // Update description color immediately
         if (description) {
           console.log(`Updating description color for score ${newScore}`);
+          
+          // Determine the appropriate class and color
+          let descClass = '';
+          let color = '';
           if (newScore >= 8 && newScore <= 10) {
-            description.style.color = '#81c784'; // Green
+            descClass = 'excellent';
+            color = '#81c784'; // Green
           } else if (newScore >= 4 && newScore <= 7) {
-            description.style.color = '#fbc02d'; // Yellow
+            descClass = 'positive';
+            color = '#fbc02d'; // Yellow
           } else if (newScore >= 1 && newScore <= 3) {
-            description.style.color = '#e57373'; // Red
+            descClass = 'challenging';
+            color = '#e57373'; // Red
           }
-          console.log(`Applied color: ${description.style.color}`);
+          
+          // Apply both CSS class and inline style for reliability
+          description.className = `score-description ${descClass}`;
+          description.style.color = color;
+          
+          console.log(`Applied class: ${descClass}, color: ${color}`);
         } else {
           console.log(`No description element found for ${target}`);
+          // Try alternative selectors
+          const altDescription = document.querySelector(`#${target}-desc, .score-description[id*="${target}"]`);
+          if (altDescription) {
+            console.log(`Found description with alternative selector`);
+            let color = '';
+            if (newScore >= 8 && newScore <= 10) {
+              color = '#81c784'; // Green
+            } else if (newScore >= 4 && newScore <= 7) {
+              color = '#fbc02d'; // Yellow
+            } else if (newScore >= 1 && newScore <= 3) {
+              color = '#e57373'; // Red
+            }
+            altDescription.style.color = color;
+            console.log(`Applied color to alternative element: ${color}`);
+          }
         }
         
         // Add visual feedback
@@ -3170,14 +3197,29 @@ function setupEmotionSafeScoring() {
     const hiddenInput = document.getElementById(`${scoreType}-score`);
     if (description && hiddenInput) {
       const currentScore = parseInt(hiddenInput.value) || 5;
+      
+      let descClass = '';
+      let color = '';
       if (currentScore >= 8 && currentScore <= 10) {
-        description.style.color = '#81c784'; // Green
+        descClass = 'excellent';
+        color = '#81c784'; // Green
       } else if (currentScore >= 4 && currentScore <= 7) {
-        description.style.color = '#fbc02d'; // Yellow
+        descClass = 'positive';
+        color = '#fbc02d'; // Yellow
       } else if (currentScore >= 1 && currentScore <= 3) {
-        description.style.color = '#e57373'; // Red
+        descClass = 'challenging';
+        color = '#e57373'; // Red
       }
-      console.log(`Initial color set for ${scoreType}: ${description.style.color}`);
+      
+      // Apply both CSS class and inline style
+      description.className = `score-description ${descClass}`;
+      description.style.color = color;
+      
+      console.log(`Initial color set for ${scoreType}: class=${descClass}, color=${color}`);
+    } else {
+      console.log(`Could not find description or input for ${scoreType}`);
+      console.log(`Description element:`, description);
+      console.log(`Hidden input element:`, hiddenInput);
     }
   });
 }
