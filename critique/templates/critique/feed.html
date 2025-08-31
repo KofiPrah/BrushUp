@@ -573,6 +573,24 @@
   }
   .score-btn:hover:before{ opacity:1; }
   
+  /* Themeable score states (replaces inline style manipulation) */
+  .score-indicator {
+    transition: transform 0.3s ease;
+  }
+  
+  /* Themeable description color states (replaces inline style manipulation) */
+  .score-description.excellent {
+    color: #81c784 !important; /* Green - excellent range (8-10) */
+  }
+  
+  .score-description.positive {
+    color: #fbc02d !important; /* Yellow - positive range (4-7) */
+  }
+  
+  .score-description.challenging {
+    color: #e57373 !important; /* Red - challenging range (1-3) */
+  }
+  
   /* Score indicator glow based on score value - matching color bands */
   .score-indicator.low-score{ 
     background:linear-gradient(to bottom, #e74c3c, rgba(231, 76, 60, 0.8));
@@ -3127,6 +3145,37 @@ function calculateFullCircleAngle(score, config = SCORING_CONFIG) {
   return normalizedScore * 360;
 }
 
+// Themeable state management (replaces inline style manipulation)
+function applyScoreIndicatorState(indicator, score) {
+  if (!indicator) return;
+  
+  // Use CSS custom properties for rotation (can be themed/animated via CSS)
+  indicator.style.setProperty('--score-rotation', `${calculateScoreRotation(score)}deg`);
+  indicator.style.transform = `rotate(var(--score-rotation))`;
+  
+  // Apply score range classes instead of hardcoded colors
+  indicator.classList.remove('low-score', 'medium-score', 'high-score');
+  if (score <= 3) indicator.classList.add('low-score');
+  else if (score <= 7) indicator.classList.add('medium-score');
+  else indicator.classList.add('high-score');
+}
+
+function applyScoreDescriptionState(description, score) {
+  if (!description) return;
+  
+  // Remove all score state classes
+  description.classList.remove('excellent', 'positive', 'challenging');
+  
+  // Add appropriate class based on score (CSS handles the color)
+  if (score >= 8) {
+    description.classList.add('excellent');
+  } else if (score >= 4) {
+    description.classList.add('positive');
+  } else {
+    description.classList.add('challenging');
+  }
+}
+
 // ---- Robust scoring setup & update (drop this in to replace broken functions) ----
 
 function waitForScoringElements(callback, maxAttempts = 10, attemptDelay = 50) {
@@ -3302,28 +3351,12 @@ function setupEmotionSafeScoring() {
 
       // Update UI elements with null-safety
       if (valueDisplay) valueDisplay.textContent = next;
-      if (indicator) {
-        const rotation = calculateScoreRotation(next); // Use centralized calculation
-        indicator.style.transform = `rotate(${rotation}deg)`;
-        // reset classes then apply color class
-        indicator.classList.remove('low-score', 'medium-score', 'high-score');
-        if (next <= 3) indicator.classList.add('low-score');
-        else if (next <= 7) indicator.classList.add('medium-score');
-        else indicator.classList.add('high-score');
-      }
-
-      // Update description text (keep per-criterion text) and color overlay
-      if (description) {
-        // Keep existing text logic intact (we don't overwrite)
-        // Only apply color styling based on range:
-        if (next >= 8) {
-          description.style.color = '#81c784'; // green
-        } else if (next >= 4) {
-          description.style.color = '#fbc02d'; // yellow
-        } else {
-          description.style.color = '#e57373'; // red
-        }
-      } else {
+      
+      // Use themeable state management instead of inline styles
+      applyScoreIndicatorState(indicator, next);
+      applyScoreDescriptionState(description, next);
+      
+      if (!description) {
         console.warn(`No description element for ${target}-desc`);
       }
 
@@ -3350,19 +3383,12 @@ function setupEmotionSafeScoring() {
     const initial = parseInt(hiddenInput?.value || valueDisplay?.textContent, 10) || 5;
 
     if (valueDisplay) valueDisplay.textContent = initial;
-    if (indicator) {
-      indicator.style.transform = `rotate(${calculateScoreRotation(initial)}deg)`;
-      indicator.classList.remove('low-score', 'medium-score', 'high-score');
-      if (initial <= 3) indicator.classList.add('low-score');
-      else if (initial <= 7) indicator.classList.add('medium-score');
-      else indicator.classList.add('high-score');
-    }
-    if (descEl) {
-      // preserve text, only set color overlay
-      if (initial >= 8) descEl.style.color = '#81c784';
-      else if (initial >= 4) descEl.style.color = '#fbc02d';
-      else descEl.style.color = '#e57373';
-    } else {
+    
+    // Use themeable state management for initialization
+    applyScoreIndicatorState(indicator, initial);
+    applyScoreDescriptionState(descEl, initial);
+    
+    if (!descEl) {
       console.warn(`Could not find description or input for ${scoreType}`);
     }
   });
@@ -3385,40 +3411,16 @@ function updateDialDisplay(dial, criterion, score) {
     valueDisplay.textContent = score;
   }
   
-  // Update indicator position
-  if (indicator) {
-    const rotation = calculateScoreRotation(score); // Use centralized calculation
-    indicator.style.transform = `rotate(${rotation}deg)`;
+  // Use themeable state management instead of inline styles
+  applyScoreIndicatorState(indicator, score);
+  applyScoreDescriptionState(description, score);
+  
+  // Ensure base description class exists
+  if (description && !description.classList.contains('score-description')) {
+    description.classList.add('score-description');
   }
   
-  // Update description color
-  if (description) {
-    let descClass = '';
-    let color = '';
-    
-    if (score >= 8 && score <= 10) {
-      descClass = 'excellent';
-      color = '#81c784'; // Green
-    } else if (score >= 4 && score <= 7) {
-      descClass = 'positive';
-      color = '#fbc02d'; // Yellow
-    } else if (score >= 1 && score <= 3) {
-      descClass = 'challenging';
-      color = '#e57373'; // Red
-    }
-    
-    // Preserve existing classes and only manage the score-related classes
-    description.classList.remove('excellent', 'positive', 'challenging');
-    if (!description.classList.contains('score-description')) {
-      description.classList.add('score-description');
-    }
-    if (descClass) {
-      description.classList.add(descClass);
-    }
-    description.style.color = color;
-    
-    console.log(`Updated ${criterion} description: class=${descClass}, color=${color}`);
-  }
+  console.log(`Updated ${criterion} dial to score ${score}`);
 }
 
 // Utility to update a single dial programmatically (keep using original text mapping)
@@ -3439,14 +3441,10 @@ function updateImprovedScoreDial(scoreType, score) {
   if (!hiddenInput) return console.warn('Missing input for', scoreType);
   hiddenInput.value = score;
   if (valueDisplay) valueDisplay.textContent = score;
-  if (indicator) indicator.style.transform = `rotate(${calculateScoreRotation(score)}deg)`;
-
-  // color overlay only
-  if (description) {
-    if (score >= 8) description.style.color = '#81c784';
-    else if (score >= 4) description.style.color = '#fbc02d';
-    else description.style.color = '#e57373';
-  }
+  
+  // Use themeable state management instead of inline styles
+  applyScoreIndicatorState(indicator, score);
+  applyScoreDescriptionState(description, score);
 
   if (dial) dial.title = `Score: ${score}/10 — use +/- to adjust`;
 }
