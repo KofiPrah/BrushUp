@@ -3064,6 +3064,40 @@ function createScoreDialSVG(svgElement) {
   });
 }
 
+// ---- Scoring Configuration & Utilities ----
+
+// Centralized scoring configuration to avoid hard-coded values
+const SCORING_CONFIG = {
+  minScore: 1,
+  maxScore: 10,
+  totalRotationDegrees: 324, // 0° to 324° (leaving 36° gap at bottom)
+  startAngleDegrees: 0 // Starting position (top = -90°, but we'll handle that in the function)
+};
+
+// Centralized rotation calculation - handles any score scale
+function calculateScoreRotation(score, config = SCORING_CONFIG) {
+  const { minScore, maxScore, totalRotationDegrees } = config;
+  
+  // Clamp score to valid range
+  const clampedScore = Math.max(minScore, Math.min(maxScore, score));
+  
+  // Calculate rotation: (score - minScore) / (maxScore - minScore) * totalDegrees
+  const normalizedScore = (clampedScore - minScore) / (maxScore - minScore);
+  const rotation = normalizedScore * totalRotationDegrees;
+  
+  return Math.round(rotation * 100) / 100; // Round to 2 decimal places
+}
+
+// Calculate angle for full 360° circle (for alternate dial styles)
+function calculateFullCircleAngle(score, config = SCORING_CONFIG) {
+  const { minScore, maxScore } = config;
+  const clampedScore = Math.max(minScore, Math.min(maxScore, score));
+  
+  // Map score to full 360° circle
+  const normalizedScore = (clampedScore - minScore) / (maxScore - minScore);
+  return normalizedScore * 360;
+}
+
 // ---- Robust scoring setup & update (drop this in to replace broken functions) ----
 
 function waitForScoringElements(callback, maxAttempts = 10, attemptDelay = 50) {
@@ -3235,7 +3269,7 @@ function setupEmotionSafeScoring() {
       // Update UI elements with null-safety
       if (valueDisplay) valueDisplay.textContent = next;
       if (indicator) {
-        const rotation = (next - 1) * 36; // 0..324deg
+        const rotation = calculateScoreRotation(next); // Use centralized calculation
         indicator.style.transform = `rotate(${rotation}deg)`;
         // reset classes then apply color class
         indicator.classList.remove('low-score', 'medium-score', 'high-score');
@@ -3285,7 +3319,7 @@ function setupEmotionSafeScoring() {
 
     if (valueDisplay) valueDisplay.textContent = initial;
     if (indicator) {
-      indicator.style.transform = `rotate(${(initial - 1) * 36}deg)`;
+      indicator.style.transform = `rotate(${calculateScoreRotation(initial)}deg)`;
       indicator.classList.remove('low-score', 'medium-score', 'high-score');
       if (initial <= 3) indicator.classList.add('low-score');
       else if (initial <= 7) indicator.classList.add('medium-score');
@@ -3318,7 +3352,7 @@ function updateDialDisplay(dial, criterion, score) {
   
   // Update indicator position
   if (indicator) {
-    const rotation = (score - 1) * 36; // 0° to 324° for scores 1-10
+    const rotation = calculateScoreRotation(score); // Use centralized calculation
     indicator.style.transform = `rotate(${rotation}deg)`;
   }
   
@@ -3357,7 +3391,7 @@ function updateImprovedScoreDial(scoreType, score) {
   if (!hiddenInput) return console.warn('Missing input for', scoreType);
   hiddenInput.value = score;
   if (valueDisplay) valueDisplay.textContent = score;
-  if (indicator) indicator.style.transform = `rotate(${(score - 1) * 36}deg)`;
+  if (indicator) indicator.style.transform = `rotate(${calculateScoreRotation(score)}deg)`;
 
   // color overlay only
   if (description) {
@@ -4633,8 +4667,8 @@ function createScoringDial(criterion, score) {
   const radius = 45;
   const strokeWidth = 8;
   
-  // Map score (1-10) to full 360° circle starting from top (12 o'clock position)
-  const scoreAngle = ((score - 1) / 9) * 360; // 0° to 360°
+  // Map score to full 360° circle starting from top (12 o'clock position)
+  const scoreAngle = calculateFullCircleAngle(score); // Use centralized calculation
   const needleAngle = scoreAngle - 90; // Adjust to start from top (12 o'clock)
   const needleRad = (needleAngle * Math.PI) / 180;
   const needleLength = radius - 8;
