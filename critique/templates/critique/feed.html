@@ -3066,6 +3066,20 @@ function createScoreDialSVG(svgElement) {
 
 // ---- Scoring Configuration & Utilities ----
 
+// Centralized element selection within scoring dials (component-safe)
+function findScoringElements(dial, scoreType) {
+  if (!dial) return {};
+  
+  return {
+    // Prefer relative class selectors, fallback to ID-based for compatibility
+    valueDisplay: dial.querySelector(`.score-value, [id$="-value"], #${scoreType}-value`),
+    indicator: dial.querySelector(`.score-indicator, [id$="-indicator"], #${scoreType}-indicator`),
+    description: dial.querySelector(`.score-description, [id$="-desc"], #${scoreType}-desc`),
+    hiddenInput: dial.querySelector(`input[type="hidden"], #${scoreType}-score`),
+    svgElement: dial.querySelector(`.score-dial-svg, .dial-svg`)
+  };
+}
+
 // Centralized scoring configuration to avoid hard-coded values
 const SCORING_CONFIG = {
   minScore: 1,
@@ -3229,11 +3243,24 @@ function setupEmotionSafeScoring() {
       ev.stopPropagation();
       console.log(`score button click: ${action} ${target}`);
 
-      // Robust element lookups with comprehensive error reporting
-      const hiddenInput = document.getElementById(`${target}-score`);
-      const valueDisplay = document.getElementById(`${target}-value`);
-      const indicator = document.getElementById(`${target}-indicator`);
-      const description = document.getElementById(`${target}-desc`);
+      // Find parent dial for component-safe element lookups
+      const parentDial = button.closest('.score-dial') || button.closest(`[id*="${target}"]`);
+      
+      // Use component-safe element selection
+      let hiddenInput, valueDisplay, indicator, description;
+      
+      if (parentDial) {
+        // Use scoped selection within the dial component
+        const elements = findScoringElements(parentDial, target);
+        ({hiddenInput, valueDisplay, indicator, description} = elements);
+      } else {
+        // Fallback to global IDs if no parent dial found
+        console.warn(`No parent dial found for button, using global ID selectors`);
+        hiddenInput = document.getElementById(`${target}-score`);
+        valueDisplay = document.getElementById(`${target}-value`);
+        indicator = document.getElementById(`${target}-indicator`);
+        description = document.getElementById(`${target}-desc`);
+      }
 
       // Check for all critical elements and report missing ones
       const missingElements = [];
@@ -3310,11 +3337,9 @@ function setupEmotionSafeScoring() {
       try { createScoreDialSVG(svgEl); } catch (err) { console.warn('createScoreDialSVG failed', err); }
     }
 
-    // Set initial visual state based on the hidden input value
-    const hiddenInput = document.getElementById(`${scoreType}-score`);
-    const descEl = document.getElementById(`${scoreType}-desc`);
-    const indicator = document.getElementById(`${scoreType}-indicator`);
-    const valueDisplay = document.getElementById(`${scoreType}-value`);
+    // Set initial visual state using component-safe selection
+    const elements = findScoringElements(dial, scoreType);
+    const { hiddenInput, valueDisplay, indicator, description: descEl } = elements;
     const initial = parseInt(hiddenInput?.value || valueDisplay?.textContent, 10) || 5;
 
     if (valueDisplay) valueDisplay.textContent = initial;
@@ -3341,9 +3366,9 @@ function setupEmotionSafeScoring() {
 function updateDialDisplay(dial, criterion, score) {
   console.log(`Updating dial display for ${criterion}: score ${score}`);
   
-  const valueDisplay = dial.querySelector(`#${criterion}-value`);
-  const indicator = dial.querySelector(`#${criterion}-indicator`);
-  const description = dial.querySelector(`#${criterion}-desc`);
+  // Use centralized component-safe element selection
+  const elements = findScoringElements(dial, criterion);
+  const { valueDisplay, indicator, description } = elements;
   
   // Update score display
   if (valueDisplay) {
@@ -3389,11 +3414,17 @@ function updateDialDisplay(dial, criterion, score) {
 // Utility to update a single dial programmatically (keep using original text mapping)
 function updateImprovedScoreDial(scoreType, score) {
   console.log(`updateImprovedScoreDial called: ${scoreType} = ${score}`);
-  const hiddenInput = document.getElementById(`${scoreType}-score`);
-  const valueDisplay = document.getElementById(`${scoreType}-value`);
-  const indicator = document.getElementById(`${scoreType}-indicator`);
-  const description = document.getElementById(`${scoreType}-desc`);
-  const dial = document.getElementById(`${scoreType}-dial`);
+  
+  // Find the dial component first, then get elements within it
+  const dial = document.getElementById(`${scoreType}-dial`) || document.querySelector(`[data-score-type="${scoreType}"]`);
+  
+  if (!dial) {
+    console.warn(`No dial found for scoreType: ${scoreType}`);
+    return;
+  }
+  
+  const elements = findScoringElements(dial, scoreType);
+  const { hiddenInput, valueDisplay, indicator, description } = elements;
 
   if (!hiddenInput) return console.warn('Missing input for', scoreType);
   hiddenInput.value = score;
