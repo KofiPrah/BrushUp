@@ -4,6 +4,44 @@ import { getValidImageUrl, handleImageError } from '../utils/imageUtils';
 import PlaceholderImage from '../components/PlaceholderImage';
 import { artworkAPI } from '../services/api';
 
+// Add inline styles for the simplified artwork cards
+const artworkCardStyles = `
+  .artwork-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  
+  .artwork-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+  }
+  
+  .artwork-image {
+    transition: transform 0.3s ease-in-out;
+    border-radius: 12px;
+    max-width: 100%;
+    height: auto;
+  }
+  
+  .artwork-card:hover .artwork-image {
+    transform: scale(1.02);
+  }
+  
+  .artwork-placeholder:hover {
+    background-color: #e9ecef !important;
+    border-color: #6c757d !important;
+  }
+`;
+
+// Add styles to document head
+if (typeof document !== 'undefined' && !document.getElementById('artwork-list-styles')) {
+  const style = document.createElement('style');
+  style.id = 'artwork-list-styles';
+  style.textContent = artworkCardStyles;
+  document.head.appendChild(style);
+}
+
 const ArtworkList = () => {
   const [artworks, setArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -159,54 +197,36 @@ const ArtworkList = () => {
           <>
             {artworks.map(artwork => (
               <div className="col-md-4 mb-4" key={artwork.id}>
-                <div className="card h-100">
-                  {artwork.image_display_url ? (
-                    <div className="card-img-container" style={{ height: '200px', position: 'relative' }}>
+                <div className="card border-0 shadow-sm artwork-card">
+                  <Link to={`/app/artworks/${artwork.id}`} className="text-decoration-none">
+                    {artwork.image_display_url ? (
                       <img 
                         src={getValidImageUrl(artwork.image_display_url)} 
-                        className="card-img-top" 
+                        className="card-img artwork-image" 
                         alt={artwork.title} 
-                        style={{ height: '200px', objectFit: 'cover', width: '100%' }}
+                        style={{ width: '100%', height: 'auto', cursor: 'pointer' }}
                         onError={handleImageError}
                       />
-                    </div>
-                  ) : (
-                    <PlaceholderImage 
-                      alt={`${artwork.title} (image unavailable)`}
-                      className="card-img-top"
-                      style={{ height: '200px' }}
-                      aspectRatio="16:9"
-                    />
-                  )}
-                  <div className="card-body">
-                    <h5 className="card-title">{artwork.title}</h5>
-                    <h6 className="card-subtitle mb-2 text-muted">
-                      by {artwork.author.username}
-                    </h6>
-                    <p className="card-text">
-                      {artwork.description?.length > 100
-                        ? `${artwork.description.substring(0, 100)}...`
-                        : artwork.description}
-                    </p>
-                  </div>
-                  <div className="card-footer d-flex justify-content-between align-items-center">
-                    <small className="text-muted">
-                      <span className="me-2">
-                        <i className="bi bi-heart-fill text-danger me-1"></i> 
-                        {artwork.likes_count}
-                      </span>
-                      <span>
-                        <i className="bi bi-chat-text-fill me-1"></i> 
-                        {artwork.critiques_count}
-                      </span>
-                    </small>
-                    <Link to={`/app/artworks/${artwork.id}`} className="btn btn-sm btn-outline-primary">
-                      View Details
-                    </Link>
-                  </div>
+                    ) : (
+                      <div className="artwork-placeholder" style={{ 
+                        height: '200px', 
+                        backgroundColor: '#f8f9fa', 
+                        border: '2px dashed #dee2e6', 
+                        borderRadius: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer'
+                      }}>
+                        <i className="bi bi-image" style={{ fontSize: '3rem', color: '#6c757d' }}></i>
+                        <p className="text-muted mt-2 mb-0">No Image</p>
+                      </div>
+                    )}
+                  </Link>
                 </div>
               </div>
-            ))}
+            ))
             
             {/* Loading indicator and Load More button */}
             <div className="col-12 text-center my-4">
