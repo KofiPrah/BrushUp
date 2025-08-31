@@ -3072,20 +3072,63 @@ function setupEmotionSafeScoring() {
     return;
   }
 
-  // Find all score buttons within the active framework
-  const scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn'));
-  console.log(`Found ${scoreButtons.length} score buttons`);
+  // Find all score buttons within the active framework using multiple selector strategies
+  let scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn'));
+  
+  // If no buttons found with primary selector, try alternative selectors
+  if (scoreButtons.length === 0) {
+    console.warn('No .score-btn elements found, trying alternative selectors...');
+    
+    // Try alternative button selectors that might be used
+    const alternativeSelectors = [
+      'button[data-action]', // Any button with data-action attribute
+      '.btn[data-action]', // Bootstrap-style buttons with data-action
+      '[data-action="increase"], [data-action="decrease"]', // Specific action buttons
+      'button.btn', // Generic buttons
+      '.score-control button', // Buttons within score control containers
+      '.score-controls button' // Alternative score control containers
+    ];
+    
+    for (const selector of alternativeSelectors) {
+      scoreButtons = Array.from(activeFramework.querySelectorAll(selector));
+      if (scoreButtons.length > 0) {
+        console.log(`Found ${scoreButtons.length} buttons using alternative selector: ${selector}`);
+        break;
+      }
+    }
+  } else {
+    console.log(`Found ${scoreButtons.length} score buttons using primary selector`);
+  }
 
   if (scoreButtons.length === 0) {
-    console.warn('No score buttons found in active framework - ensure markup is present and visible');
+    console.error('No score buttons found with any selector strategy. Available elements in framework:', {
+      allButtons: activeFramework.querySelectorAll('button').length,
+      elementsWithDataAction: activeFramework.querySelectorAll('[data-action]').length,
+      framework: activeFramework.className,
+      frameworkId: activeFramework.id
+    });
     return;
   }
 
   scoreButtons.forEach(button => {
     const action = button.dataset.action;   // "increase" | "decrease"
     const target = button.dataset.target;   // e.g. "composition"
+    
     if (!action || !target) {
-      console.warn('score-btn missing data-action or data-target', button);
+      console.warn('Button missing required data attributes:', {
+        element: button,
+        action: action,
+        target: target,
+        allDataAttributes: Object.keys(button.dataset),
+        className: button.className,
+        id: button.id
+      });
+      return;
+    }
+
+    // Validate action values
+    if (!['increase', 'decrease'].includes(action)) {
+      console.warn(`Invalid action value "${action}" for button. Expected "increase" or "decrease"`, button);
       return;
     }
 
