@@ -3372,7 +3372,14 @@ function updateDialDisplay(dial, criterion, score) {
       color = '#e57373'; // Red
     }
     
-    description.className = `score-description ${descClass}`;
+    // Preserve existing classes and only manage the score-related classes
+    description.classList.remove('excellent', 'positive', 'challenging');
+    if (!description.classList.contains('score-description')) {
+      description.classList.add('score-description');
+    }
+    if (descClass) {
+      description.classList.add(descClass);
+    }
     description.style.color = color;
     
     console.log(`Updated ${criterion} description: class=${descClass}, color=${color}`);
