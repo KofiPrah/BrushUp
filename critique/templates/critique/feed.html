@@ -4583,9 +4583,7 @@ function setupDetailedCritiqueFlow() {
 }
 
 function setupScoringStep() {
-  if (!selectedFramework) return;
-  
-  // Show the appropriate scoring framework
+  // Show the appropriate scoring framework based on the selected framework option
   const technicalScores = document.getElementById('technical-scores');
   const expressiveScores = document.getElementById('expressive-scores');
   
@@ -4593,16 +4591,25 @@ function setupScoringStep() {
   if (technicalScores) technicalScores.classList.remove('active');
   if (expressiveScores) expressiveScores.classList.remove('active');
   
+  // Check which framework option is currently active
+  const activeFrameworkOption = document.querySelector('.framework-option.active');
+  const activeFramework = activeFrameworkOption ? activeFrameworkOption.dataset.framework : 'technical';
+  
+  console.log(`setupScoringStep: Active framework is ${activeFramework}`);
+  
   // Show the selected framework
-  if (selectedFramework === 'formalist' && technicalScores) {
+  if (activeFramework === 'technical' && technicalScores) {
     technicalScores.classList.add('active');
-  } else if (expressiveScores) {
+    console.log('Activated technical-scores framework');
+  } else if (activeFramework === 'expressive' && expressiveScores) {
     expressiveScores.classList.add('active');
+    console.log('Activated expressive-scores framework');
   }
   
   // Initialize the scoring dials
   setTimeout(() => {
     if (typeof setupEmotionSafeScoring === 'function') {
+      console.log('Calling setupEmotionSafeScoring from setupScoringStep');
       setupEmotionSafeScoring();
     }
   }, 100);
