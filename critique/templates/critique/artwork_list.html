@@ -130,9 +130,31 @@
                     <div class="card border-0 shadow-sm artwork-card">
                         <a href="{% url 'critique:artwork_detail' artwork.pk %}" class="text-decoration-none">
                             {% if artwork.image %}
-                                <img src="{{ artwork.image.url }}" class="card-img artwork-image" alt="{{ artwork.title }}" style="width: 100%; height: auto; border-radius: 12px;">
+                                <div class="image-container">
+                                    <div class="artwork-image-placeholder">
+                                        <i class="bi bi-image" style="font-size: 2rem; color: #999;"></i>
+                                    </div>
+                                    <img 
+                                        data-src="{{ artwork.image.url }}" 
+                                        class="card-img artwork-image artwork-image-lazy" 
+                                        alt="{{ artwork.title }}" 
+                                        style="width: 100%; height: auto; border-radius: 12px; position: absolute; top: 0; left: 0;"
+                                        loading="lazy"
+                                    >
+                                </div>
                             {% elif artwork.image_url %}
-                                <img src="{{ artwork.image_url }}" class="card-img artwork-image" alt="{{ artwork.title }}" style="width: 100%; height: auto; border-radius: 12px;">
+                                <div class="image-container">
+                                    <div class="artwork-image-placeholder">
+                                        <i class="bi bi-image" style="font-size: 2rem; color: #999;"></i>
+                                    </div>
+                                    <img 
+                                        data-src="{{ artwork.image_url }}" 
+                                        class="card-img artwork-image artwork-image-lazy" 
+                                        alt="{{ artwork.title }}" 
+                                        style="width: 100%; height: auto; border-radius: 12px; position: absolute; top: 0; left: 0;"
+                                        loading="lazy"
+                                    >
+                                </div>
                             {% else %}
                                 <div class="artwork-placeholder d-flex justify-content-center align-items-center" style="height: 200px; background-color: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 12px;">
                                     <div class="text-center">
@@ -298,41 +320,236 @@
         
         // Uncomment the line below to enable live search
         // setupLiveSearch();
+        
+        // Adaptive Masonry Gallery JavaScript
+        class AdaptiveMasonryGallery {
+            constructor() {
+                this.images = [];
+                this.loadedCount = 0;
+                this.observer = null;
+                this.resizeTimeout = null;
+                this.init();
+            }
+            
+            init() {
+                this.setupLazyLoading();
+                this.setupResizeHandler();
+                this.initializeItems();
+            }
+            
+            setupLazyLoading() {
+                // Intersection Observer for lazy loading
+                this.observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            this.loadImage(entry.target);
+                        }
+                    });
+                }, {
+                    rootMargin: '50px 0px',
+                    threshold: 0.1
+                });
+                
+                // Observe all lazy images
+                document.querySelectorAll('.artwork-image-lazy').forEach(img => {
+                    this.observer.observe(img);
+                });
+            }
+            
+            loadImage(img) {
+                const dataSrc = img.getAttribute('data-src');
+                if (dataSrc && !img.src) {
+                    img.onload = () => {
+                        img.classList.add('loaded');
+                        this.loadedCount++;
+                        this.triggerReflow();
+                        
+                        // Hide placeholder after image loads
+                        const container = img.closest('.image-container');
+                        if (container) {
+                            const placeholder = container.querySelector('.artwork-image-placeholder');
+                            if (placeholder) {
+                                placeholder.style.display = 'none';
+                            }
+                        }
+                        
+                        // Show the masonry item
+                        const masonryItem = img.closest('.masonry-item');
+                        if (masonryItem) {
+                            masonryItem.classList.add('loaded');
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        // If image fails to load, show placeholder
+                        const container = img.closest('.image-container');
+                        if (container) {
+                            const placeholder = container.querySelector('.artwork-image-placeholder');
+                            if (placeholder) {
+                                placeholder.innerHTML = '<i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: #dc3545;"></i>';
+                            }
+                        }
+                        
+                        const masonryItem = img.closest('.masonry-item');
+                        if (masonryItem) {
+                            masonryItem.classList.add('loaded');
+                        }
+                    };
+                    
+                    img.src = dataSrc;
+                    this.observer.unobserve(img);
+                }
+            }
+            
+            triggerReflow() {
+                // Force reflow by slightly changing column count
+                const gallery = document.querySelector('.masonry-gallery');
+                if (gallery) {
+                    const currentColumnCount = window.getComputedStyle(gallery).columnCount;
+                    gallery.style.columnCount = parseInt(currentColumnCount) + 0.001;
+                    
+                    // Reset after a brief moment
+                    setTimeout(() => {
+                        gallery.style.columnCount = '';
+                    }, 10);
+                }
+            }
+            
+            setupResizeHandler() {
+                window.addEventListener('resize', () => {
+                    clearTimeout(this.resizeTimeout);
+                    this.resizeTimeout = setTimeout(() => {
+                        this.triggerReflow();
+                    }, 100);
+                });
+            }
+            
+            initializeItems() {
+                // Show items without images immediately
+                document.querySelectorAll('.masonry-item').forEach(item => {
+                    const lazyImg = item.querySelector('.artwork-image-lazy');
+                    if (!lazyImg) {
+                        item.classList.add('loaded');
+                    }
+                });
+            }
+        }
+        
+        // Initialize gallery when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new AdaptiveMasonryGallery();
+        });
     </script>
     
-    <!-- CSS for masonry-style artwork gallery -->
+    <!-- CSS for adaptive masonry artwork gallery -->
     <style>
-        /* Masonry Gallery Layout */
+        /* Adaptive Masonry Gallery Layout */
         .masonry-gallery {
-            column-count: 4;
-            column-gap: 16px;
+            column-count: 5;
+            column-gap: 20px;
             column-fill: balance;
+            padding: 0 10px;
         }
         
         .masonry-item {
             display: inline-block;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             width: 100%;
             break-inside: avoid;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
         }
         
-        /* Responsive breakpoints */
-        @media (max-width: 1200px) {
+        .masonry-item.loaded {
+            opacity: 1;
+        }
+        
+        /* Enhanced Responsive breakpoints */
+        /* Extra large screens */
+        @media (min-width: 1400px) {
+            .masonry-gallery {
+                column-count: 5;
+                column-gap: 24px;
+            }
+        }
+        
+        /* Large screens */
+        @media (max-width: 1399px) and (min-width: 1200px) {
+            .masonry-gallery {
+                column-count: 4;
+                column-gap: 20px;
+            }
+        }
+        
+        /* Medium screens */
+        @media (max-width: 1199px) and (min-width: 992px) {
             .masonry-gallery {
                 column-count: 3;
+                column-gap: 18px;
             }
         }
         
-        @media (max-width: 768px) {
+        /* Small screens (tablets) */
+        @media (max-width: 991px) and (min-width: 768px) {
+            .masonry-gallery {
+                column-count: 3;
+                column-gap: 16px;
+            }
+        }
+        
+        /* Extra small screens (large phones) */
+        @media (max-width: 767px) and (min-width: 576px) {
             .masonry-gallery {
                 column-count: 2;
+                column-gap: 14px;
             }
         }
         
-        @media (max-width: 480px) {
+        /* Small phones */
+        @media (max-width: 575px) {
             .masonry-gallery {
                 column-count: 1;
+                column-gap: 0;
+                padding: 0 5px;
             }
+            
+            .masonry-item {
+                margin-bottom: 16px;
+            }
+        }
+        
+        /* Loading placeholder styles */
+        .artwork-image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0 25%, #e0e0e0 25%, #e0e0e0 50%, #f0f0f0 50%, #f0f0f0 75%, #e0e0e0 75%);
+            background-size: 20px 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+        
+        .artwork-image-lazy {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .artwork-image-lazy.loaded {
+            opacity: 1;
+        }
+        
+        .image-container {
+            position: relative;
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
         }
         
         /* Artwork card styles */
