@@ -2987,6 +2987,12 @@ function setupDetailedCritiqueInterface() {
 // Enhanced framework and scoring system functions
 
 function setupFrameworkSelection() {
+  // Idempotence check: prevent duplicate framework listeners
+  if (setupFrameworkSelection._initialized) {
+    console.log('Framework selection already initialized, skipping');
+    return;
+  }
+  
   const frameworkOptions = document.querySelectorAll('.framework-option');
   const technicalScores = document.getElementById('technical-scores');
   const expressiveScores = document.getElementById('expressive-scores');
@@ -2999,6 +3005,11 @@ function setupFrameworkSelection() {
       
       // Switch scoring framework
       const framework = option.dataset.framework;
+      
+      // Clear initialization flags from all frameworks before switching
+      if (technicalScores) technicalScores._scoringInitialized = false;
+      if (expressiveScores) expressiveScores._scoringInitialized = false;
+      
       if (framework === 'technical') {
         technicalScores.classList.add('active');
         expressiveScores.classList.remove('active');
@@ -3013,6 +3024,10 @@ function setupFrameworkSelection() {
       });
     });
   });
+  
+  // Mark framework selection as initialized
+  setupFrameworkSelection._initialized = true;
+  console.log('Framework selection setup complete');
 }
 
 // Create clean SVG arcs for color segments
@@ -3161,11 +3176,20 @@ function waitForScoringElements(callback, maxAttempts = 10, attemptDelay = 50) {
 }
 
 function setupEmotionSafeScoring() {
-  console.log('setupEmotionSafeScoring called');
+  // Track initialization attempts for debugging
+  setupEmotionSafeScoring._callCount = (setupEmotionSafeScoring._callCount || 0) + 1;
+  console.log(`setupEmotionSafeScoring called (attempt #${setupEmotionSafeScoring._callCount})`);
 
+  // Idempotence check: prevent multiple initializations of the same framework
   const activeFramework = document.querySelector('.scoring-framework.active');
   if (!activeFramework) {
     console.log('No active scoring framework found');
+    return;
+  }
+
+  // Check if this specific framework has already been initialized
+  if (activeFramework._scoringInitialized) {
+    console.log(`Scoring already initialized for framework ${activeFramework.id}, skipping setup (idempotent)`);
     return;
   }
 
@@ -3343,7 +3367,10 @@ function setupEmotionSafeScoring() {
     }
   });
 
-  console.log('setupEmotionSafeScoring complete');
+  // Mark this framework as initialized to prevent repeated setup
+  activeFramework._scoringInitialized = true;
+  
+  console.log(`setupEmotionSafeScoring complete - framework ${activeFramework.id} marked as initialized (${scoreButtons.length} buttons processed)`);
 }
 
 function updateDialDisplay(dial, criterion, score) {
