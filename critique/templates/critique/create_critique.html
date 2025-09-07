@@ -67,7 +67,7 @@
                                     {% endfor %}
                                     <option value="10">10/10</option>
                                 </select>
-                                <div class="form-text text-muted" id="composition-description">Rate the arrangement and balance</div>
+                                <div class="form-text text-muted">Rate the arrangement and balance</div>
                             </div>
                             
                             <div class="col-md-4">
@@ -82,7 +82,7 @@
                                     {% endfor %}
                                     <option value="10">10/10</option>
                                 </select>
-                                <div class="form-text text-muted" id="technique-description">Rate the execution and skill</div>
+                                <div class="form-text text-muted">Rate the execution and skill</div>
                             </div>
                             
                             <div class="col-md-4">
@@ -97,7 +97,7 @@
                                     {% endfor %}
                                     <option value="10">10/10</option>
                                 </select>
-                                <div class="form-text text-muted" id="originality-description">Rate the creativity and uniqueness</div>
+                                <div class="form-text text-muted">Rate the creativity and uniqueness</div>
                             </div>
                         </div>
 
@@ -159,80 +159,4 @@
     color: #b6d7ff !important;
 }
 </style>
-
-<script>
-// Wait for DOM to be fully loaded
-window.addEventListener('load', function() {
-    console.log('Score description color script initialized');
-    
-    // Function to update description text color based on score
-    function updateDescriptionColor(selectElement, descriptionId) {
-        if (!selectElement || !descriptionId) return;
-        
-        const score = parseInt(selectElement.value);
-        const descriptionElement = document.getElementById(descriptionId);
-        
-        console.log(`Updating ${descriptionId} with score: ${score}`);
-        
-        if (!descriptionElement) {
-            console.error(`Description element not found: ${descriptionId}`);
-            return;
-        }
-        
-        // Reset styles first
-        descriptionElement.classList.remove('text-muted');
-        descriptionElement.removeAttribute('style');
-        
-        if (!score || score === 0) {
-            // Reset to default if no score selected
-            descriptionElement.classList.add('text-muted');
-            console.log(`Reset ${descriptionId} to default`);
-            return;
-        }
-        
-        // Apply color based on score range
-        let color = '';
-        if (score >= 1 && score <= 3) {
-            color = '#e57373'; // Soft red
-            console.log(`Set ${descriptionId} to red (score: ${score})`);
-        } else if (score >= 4 && score <= 7) {
-            color = '#fbc02d'; // Soft yellow  
-            console.log(`Set ${descriptionId} to yellow (score: ${score})`);
-        } else if (score >= 8 && score <= 10) {
-            color = '#81c784'; // Soft green
-            console.log(`Set ${descriptionId} to green (score: ${score})`);
-        }
-        
-        if (color) {
-            descriptionElement.style.color = color;
-            descriptionElement.style.setProperty('color', color, 'important');
-        }
-    }
-    
-    // Get all score select elements
-    const selects = [
-        { element: document.getElementById('id_composition_score'), desc: 'composition-description' },
-        { element: document.getElementById('id_technique_score'), desc: 'technique-description' },
-        { element: document.getElementById('id_originality_score'), desc: 'originality-description' }
-    ];
-    
-    console.log('Found score elements:', selects.map(s => s.element ? s.desc : null).filter(Boolean));
-    
-    // Setup event listeners for each select
-    selects.forEach(function(selectObj) {
-        if (selectObj.element) {
-            // Add change event listener
-            selectObj.element.addEventListener('change', function() {
-                console.log('Select changed:', this.id, this.value);
-                updateDescriptionColor(this, selectObj.desc);
-            });
-            
-            // Initial update in case there's already a value
-            updateDescriptionColor(selectObj.element, selectObj.desc);
-        }
-    });
-    
-    console.log('Score color change handlers attached successfully');
-});
-</script>
 {% endblock %}

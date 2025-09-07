@@ -8,7 +8,7 @@
   /* --- Desktop look & feel --- */
   @media (min-width: 992px){
     body{ background: linear-gradient(135deg,#2c3e50 0%,#34495e 100%); color:#fff; }
-    /* Mobile quickbar removed */
+    #quickbar{ display:none !important; } /* hide bottom bar on desktop */
   }
   #feed-container{ max-width:1200px; margin:0 auto; padding:20px; }
   .single-layout{ display:grid; grid-template-columns:1fr 500px; gap:30px; align-items:start; }
@@ -613,10 +613,10 @@
     color:#bdc3c7; font-size:0.85rem; margin-bottom:12px; 
     min-height:20px; transition:color 0.3s ease;
   }
-  .score-description.positive{ color:#fbc02d !important; }
-  .score-description.excellent{ color:#81c784 !important; }
-  .score-description.needs-growth{ color:#fbc02d !important; }
-  .score-description.challenging{ color:#e57373 !important; }
+  .score-description.positive{ color:#2ecc71; }
+  .score-description.excellent{ color:#27ae60; }
+  .score-description.needs-growth{ color:#e67e22; }
+  .score-description.challenging{ color:#e74c3c; }
   
   /* Guided Feedback */
   .guided-feedback{ 
@@ -753,7 +753,14 @@
     .critique-interface{ background:#fff; border:1px solid #e0e0e0; }
   }
 
-  /* Mobile quickbar styles removed */
+  /* Quickbar (mobile) */
+  #quickbar{
+    position:fixed; left:0; right:0; bottom:0; z-index:1000;
+    backdrop-filter:blur(10px); background:rgba(33,37,41,.95);
+    border-top:1px solid rgba(255,255,255,.1); max-height:40vh; overflow-y:auto;
+    padding:15px;
+  }
+  .chip-row{ max-height:120px; overflow-x:auto; overflow-y:hidden; }
   
   /* Loading placeholder animations */
   .loading-placeholder {
@@ -1492,7 +1499,48 @@
   </section>
 </div>
 
-<!-- Mobile Quickbar removed as requested -->
+<!-- Mobile Quickbar -->
+<div id="quickbar" class="d-lg-none">
+  <div class="row chip-row mb-3">
+    <div class="col-6">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="small text-muted mb-0">Strengths</h6>
+        <button id="refresh-pro-mobile" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div id="pro-tags-mobile" class="d-flex flex-wrap gap-2 mb-2" style="max-height:120px; overflow-y:auto;"></div>
+      <small class="text-muted"><span id="pro-count-mobile">0</span>/5</small>
+    </div>
+    <div class="col-6">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="small text-muted mb-0">Opportunities</h6>
+        <button id="refresh-con-mobile" class="btn btn-sm btn-outline-secondary">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+      </div>
+      <div id="con-tags-mobile" class="d-flex flex-wrap gap-2 mb-2" style="max-height:120px; overflow-y:auto;"></div>
+      <small class="text-muted"><span id="con-count-mobile">0</span>/5</small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <small class="text-muted d-block mb-1"><i class="bi bi-info-circle"></i> Written feedback is optional - tags alone work fine</small>
+      <textarea id="general-feedback-mobile" class="form-control mb-2" rows="3" placeholder="Additional thoughts (optional)..."></textarea>
+      <div class="d-flex gap-2">
+        {% if user.is_authenticated %}
+          <button id="mobile-submit-btn" class="btn btn-primary btn-sm">
+            <i class="bi bi-send"></i> Submit
+          </button>
+        {% else %}
+          <a href="/accounts/login/" class="btn btn-primary btn-sm">
+            <i class="bi bi-box-arrow-in-right"></i> Login to Submit
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1660,7 +1708,13 @@ function loadCritiqueTags() {
   document.getElementById('refresh-pro-tags').addEventListener('click', () => loadTagSet('pro'));
   document.getElementById('refresh-con-tags').addEventListener('click', () => loadTagSet('con'));
   
-  // Mobile refresh handlers removed
+  // Bind refresh handlers - mobile
+  if (document.getElementById('refresh-pro-mobile')) {
+    document.getElementById('refresh-pro-mobile').addEventListener('click', () => loadTagSet('pro'));
+  }
+  if (document.getElementById('refresh-con-mobile')) {
+    document.getElementById('refresh-con-mobile').addEventListener('click', () => loadTagSet('con'));
+  }
   
   // Bind search handlers
   setupTagSearch('pro');
@@ -1692,7 +1746,11 @@ function loadTagSet(type) {
   
   populateTags(containerId, selectedTags, chipClass, type);
   
-  // Mobile tag population removed
+  // Also populate mobile if exists
+  const mobileContainerId = `${type}-tags-mobile`;
+  if (document.getElementById(mobileContainerId)) {
+    populateTags(mobileContainerId, selectedTags, chipClass, type);
+  }
   
   // Load categorized tags as well
   loadCategorizedTags(type);
@@ -1806,6 +1864,7 @@ function toggleTagSelection(chip, type) {
   
   // Update counts and states
   updateTagCount(baseType);
+  updateTagCount(`${baseType}-mobile`);
   updateTagStates(baseType);
 }
 
@@ -1822,11 +1881,15 @@ function updateTagCount(type) {
   const baseType = type.replace('-mobile', '');
   const count = getSelectedTagCount(baseType);
   
-  // Update desktop counter
+  // Update both desktop and mobile counters
   const countElement = document.getElementById(`${baseType}-count`);
+  const mobileCountElement = document.getElementById(`${baseType}-count-mobile`);
   
   if (countElement) {
     countElement.textContent = count;
+  }
+  if (mobileCountElement) {
+    mobileCountElement.textContent = count;
   }
   
   // Update tab badges
@@ -2021,7 +2084,7 @@ async function submitCritique() {
     return;
   {% endif %}
   
-  const feedback = document.getElementById('general-feedback').value;
+  const feedback = document.getElementById('general-feedback').value || document.getElementById('general-feedback-mobile').value;
   const selectedProTags = getSelectedTags('pro');
   const selectedConTags = getSelectedTags('con');
   
@@ -2054,10 +2117,15 @@ async function submitCritique() {
   
   // Show loading state
   const submitBtn = document.getElementById('submit-btn');
+  const mobileSubmitBtn = document.getElementById('mobile-submit-btn');
+  
   const originalText = submitBtn.textContent;
+  const originalMobileText = mobileSubmitBtn.textContent;
   
   submitBtn.textContent = 'Submitting...';
   submitBtn.disabled = true;
+  mobileSubmitBtn.textContent = 'Submitting...';
+  mobileSubmitBtn.disabled = true;
   
   try {
     // Get CSRF token
@@ -2086,15 +2154,19 @@ async function submitCritique() {
       
       // Show success state
       submitBtn.textContent = 'Submitted!';
+      mobileSubmitBtn.textContent = 'Submitted!';
       
       // Enable next button
       document.getElementById('next-btn').disabled = false;
+      document.getElementById('mobile-next-btn').disabled = false;
       
       // Show dialogue prompt for conversational critique
       showCritiqueDialoguePrompt(() => {
         // Reset button after dialogue is dismissed
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
+        mobileSubmitBtn.textContent = originalMobileText;
+        mobileSubmitBtn.disabled = false;
         
         // Load next artwork after dialogue
         loadNextArtwork();
@@ -2109,11 +2181,14 @@ async function submitCritique() {
     
     // Show error state
     submitBtn.textContent = 'Error - Try Again';
+    mobileSubmitBtn.textContent = 'Error - Try Again';
     
     // Reset button after delay
     setTimeout(() => {
       submitBtn.textContent = originalText;
       submitBtn.disabled = false;
+      mobileSubmitBtn.textContent = originalMobileText;
+      mobileSubmitBtn.disabled = false;
     }, 3000);
     
     alert('Failed to submit critique. Please try again.');
@@ -3087,8 +3162,6 @@ function setupEmotionSafeScoring() {
   
   // Setup button controls for all score types - prevent double event binding
   const scoreButtons = activeFramework.querySelectorAll('.score-btn');
-  console.log(`Setting up ${scoreButtons.length} score buttons with event listeners`);
-  
   scoreButtons.forEach(button => {
     // Remove any existing listeners to prevent double-triggering
     const newButton = button.cloneNode(true);
@@ -3111,7 +3184,6 @@ function setupEmotionSafeScoring() {
       
       // Only update if the score actually changed
       if (newScore !== currentScore && newScore >= 1 && newScore <= 10) {
-        console.log(`Button clicked: ${action} on ${target}, score ${currentScore} -> ${newScore}`);
         updateImprovedScoreDial(target, newScore);
         
         // Add visual feedback
@@ -3119,31 +3191,19 @@ function setupEmotionSafeScoring() {
         setTimeout(() => {
           newButton.style.transform = '';
         }, 150);
-      } else {
-        console.log(`Button click ignored: ${action} on ${target}, score would be ${newScore} (current: ${currentScore})`);
       }
     });
   });
 }
 
 function updateImprovedScoreDial(scoreType, score) {
-  console.log(`updateImprovedScoreDial called: scoreType=${scoreType}, score=${score}`);
-  
   // Update all related elements
   const hiddenInput = document.getElementById(`${scoreType}-score`);
   const valueDisplay = document.getElementById(`${scoreType}-value`);
   const indicator = document.getElementById(`${scoreType}-indicator`);
   const description = document.getElementById(`${scoreType}-desc`);
   
-  if (!hiddenInput || !valueDisplay || !indicator || !description) {
-    console.log(`Missing elements for ${scoreType}:`, {
-      hiddenInput: !!hiddenInput,
-      valueDisplay: !!valueDisplay,
-      indicator: !!indicator,
-      description: !!description
-    });
-    return;
-  }
+  if (!hiddenInput || !valueDisplay || !indicator || !description) return;
   
   // Update hidden input
   hiddenInput.value = score;
@@ -3174,23 +3234,23 @@ function updateImprovedScoreDial(scoreType, score) {
     const scoreDescriptions = descriptions[descriptionKey];
     let descText, descClass;
     
-    // Fix color mapping: 1-3 red, 4-7 yellow, 8-10 green
-    if (score >= 8 && score <= 10) {
+    if (score >= 8) {
       descText = scoreDescriptions.excellent;
       descClass = 'excellent';
-    } else if (score >= 4 && score <= 7) {
+    } else if (score >= 6) {
       descText = scoreDescriptions.positive;
       descClass = 'positive';
-    } else if (score >= 1 && score <= 3) {
-      descText = scoreDescriptions.challenging;
-      descClass = 'challenging';
-    } else {
-      // Fallback for edge cases
+    } else if (score >= 4) {
       descText = scoreDescriptions.neutral;
       descClass = '';
+    } else if (score >= 2) {
+      descText = scoreDescriptions.needsGrowth;
+      descClass = 'needs-growth';
+    } else {
+      descText = scoreDescriptions.challenging;
+      descClass = 'challenging';
     }
     
-    console.log(`Score ${score} mapped to class: ${descClass}, text: ${descText}`);
     description.textContent = descText;
     description.className = `score-description ${descClass}`;
   }
@@ -4452,11 +4512,8 @@ function updateScore(criterion, value) {
 }
 
 function setupEmotionSafeScoring() {
-  console.log('setupEmotionSafeScoring called');
-  
   // Initialize scoring dials for the active framework
   const activeDials = document.querySelectorAll('.scoring-framework.active .score-dial');
-  console.log(`Found ${activeDials.length} active dials`);
   
   activeDials.forEach(dial => {
     const criterion = dial.dataset.criterion;
