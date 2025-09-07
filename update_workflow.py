@@ -1,19 +1,16 @@
 """
-Update the workflow to use HTTP-only mode
+Update the workflow to use the unified CLI
 """
 import json
-import os
 
 def main():
     workflow_data = {
         "name": "Start application",
-        "command": "python flask_proxy.py"
+        "command": "python scripts/cli.py serve --protocol http"
     }
-    
     with open('http_workflow.json', 'w') as f:
         json.dump(workflow_data, f, indent=2)
-    
-    print("Workflow updated to use HTTP proxy")
+    print("Workflow updated to use unified CLI")
 
 if __name__ == "__main__":
     main()

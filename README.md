@@ -50,36 +50,27 @@ The project is organized into the following directories:
 
 ## Running the Application
 
-The simplest way to run the application is:
+The project now ships with a single CLI that replaces the numerous
+`start_*` and `run_*` scripts previously used in the repository.
 
 ```bash
-./run_app
+python scripts/cli.py serve
 ```
 
-You can also specify options:
+Common options:
 
 ```bash
-./run_app --http     # Start with HTTP mode (default, recommended for Replit)
-./run_app --https    # Start with HTTPS mode
-./run_app --with-s3  # Enable S3 storage (requires AWS credentials)
+python scripts/cli.py serve --protocol https --ssl    # enable HTTPS
+python scripts/cli.py serve --server gunicorn         # use gunicorn
+python scripts/cli.py serve --workflow                # run setup fixes
 ```
 
 ## Running Tests
 
-You can run all tests with:
+Run the test suite with:
 
 ```bash
-./run_app --test
-```
-
-Or run specific test categories:
-
-```bash
-./run_app --test=http    # Run HTTP tests
-./run_app --test=api     # Run API tests
-./run_app --test=auth    # Run authentication tests
-./run_app --test=s3      # Run S3 tests
-./run_app --test=media   # Run media tests
+pytest
 ```
 
 ## Documentation

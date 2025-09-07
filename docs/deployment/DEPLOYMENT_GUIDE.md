@@ -74,9 +74,9 @@ If you're just testing and don't need HTTPS:
    - Remove the `--certfile` and `--keyfile` options 
    - Set `SSL_ENABLED = "false"` in the environment section
 
-2. Use the provided `start_http.sh` script to run in HTTP mode:
+2. Use the unified CLI to run in HTTP mode:
    ```
-   ./start_http.sh
+   python scripts/cli.py serve --protocol http
    ```
 
 ## Troubleshooting

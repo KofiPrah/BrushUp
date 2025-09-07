@@ -21,7 +21,7 @@ You need to reconfigure the Replit workflow to use HTTP mode:
    ```
    [[workflows.workflow.tasks]]
    task = "shell.exec"
-   args = "./start_http.sh"
+   args = "python scripts/cli.py serve --protocol http"
    waitForPort = 5000
    ```
 
@@ -33,11 +33,11 @@ If you can't edit the `.replit` file, you can run the HTTP server manually:
 1. Stop the current workflow
 2. In the Shell, run:
    ```
-   ./start_http.sh
+   python scripts/cli.py serve --protocol http
    ```
 
 ## Files Created by This Script
-- `start_http.sh`: Script to start the HTTP server
+- `python scripts/cli.py serve --protocol http`: Command to start the HTTP server
 - `replit_http.sh`: Symbolic link for workflow use
 - `main.py`: Updated to force HTTP mode
 - `main.py.original`: Backup of the original main.py (if created)

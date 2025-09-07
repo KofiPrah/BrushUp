@@ -41,12 +41,12 @@ This script stops any existing server processes and starts the application in HT
 ./restart_http_server.sh
 ```
 
-### Option 3: Use the run_http_only.py Script
+### Option 3: Use the unified CLI
 
-Similar to the first option, but with more detailed logging:
+This approach replaces the previous `run_http_only.py` helper:
 
 ```bash
-python run_http_only.py
+python scripts/cli.py serve --protocol http
 ```
 
 ## S3 Storage in HTTP Mode

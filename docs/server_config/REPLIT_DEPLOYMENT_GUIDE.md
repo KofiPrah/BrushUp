@@ -54,7 +54,7 @@ If you encounter an `ERR_SSL_PROTOCOL_ERROR` when deploying:
 1. **Verify local functionality**
    ```bash
    export PORT=8080  # Choose any free port
-   ./start_http.sh   # Use the plain HTTP script
+   python scripts/cli.py serve --protocol http   # Use the unified CLI
    ```
 
 2. **Test the HTTP endpoint locally**
