@@ -573,24 +573,6 @@
   }
   .score-btn:hover:before{ opacity:1; }
   
-  /* Themeable score states (replaces inline style manipulation) */
-  .score-indicator {
-    transition: transform 0.3s ease;
-  }
-  
-  /* Themeable description color states (replaces inline style manipulation) */
-  .score-description.excellent {
-    color: #81c784 !important; /* Green - excellent range (8-10) */
-  }
-  
-  .score-description.positive {
-    color: #fbc02d !important; /* Yellow - positive range (4-7) */
-  }
-  
-  .score-description.challenging {
-    color: #e57373 !important; /* Red - challenging range (1-3) */
-  }
-  
   /* Score indicator glow based on score value - matching color bands */
   .score-indicator.low-score{ 
     background:linear-gradient(to bottom, #e74c3c, rgba(231, 76, 60, 0.8));
@@ -3005,12 +2987,6 @@ function setupDetailedCritiqueInterface() {
 // Enhanced framework and scoring system functions
 
 function setupFrameworkSelection() {
-  // Idempotence check: prevent duplicate framework listeners
-  if (setupFrameworkSelection._initialized) {
-    console.log('Framework selection already initialized, skipping');
-    return;
-  }
-  
   const frameworkOptions = document.querySelectorAll('.framework-option');
   const technicalScores = document.getElementById('technical-scores');
   const expressiveScores = document.getElementById('expressive-scores');
@@ -3023,11 +2999,6 @@ function setupFrameworkSelection() {
       
       // Switch scoring framework
       const framework = option.dataset.framework;
-      
-      // Clear initialization flags from all frameworks before switching
-      if (technicalScores) technicalScores._scoringInitialized = false;
-      if (expressiveScores) expressiveScores._scoringInitialized = false;
-      
       if (framework === 'technical') {
         technicalScores.classList.add('active');
         expressiveScores.classList.remove('active');
@@ -3036,16 +3007,12 @@ function setupFrameworkSelection() {
         technicalScores.classList.remove('active');
       }
       
-      // Reinitialize score dials for the new framework - wait for DOM readiness
-      waitForScoringElements(() => {
+      // Reinitialize score dials for the new framework with small delay
+      setTimeout(() => {
         setupEmotionSafeScoring();
-      });
+      }, 50);
     });
   });
-  
-  // Mark framework selection as initialized
-  setupFrameworkSelection._initialized = true;
-  console.log('Framework selection setup complete');
 }
 
 // Create clean SVG arcs for color segments
@@ -3054,12 +3021,10 @@ function createScoreDialSVG(svgElement) {
   svgElement.innerHTML = '';
   
   // Define color segments: Red (1-3), Yellow (4-7), Green (8-10)
-  // Small gaps between segments to prevent visual overlap artifacts
-  const gapSize = 1; // 1 degree gap between segments
   const segments = [
-    { start: 0, end: 107, color: '#e74c3c' },           // Red: 0-107 degrees (gap at 107-109)
-    { start: 109, end: 251, color: '#f1c40f' },         // Yellow: 109-251 degrees (gap at 251-253)  
-    { start: 253, end: 360, color: '#27ae60' }          // Green: 253-360 degrees
+    { start: 0, end: 108, color: '#e74c3c' },     // Red: 0-108 degrees
+    { start: 108, end: 252, color: '#f1c40f' },   // Yellow: 108-252 degrees  
+    { start: 252, end: 360, color: '#27ae60' }    // Green: 252-360 degrees
   ];
   
   const center = 50;
@@ -3090,388 +3055,151 @@ function createScoreDialSVG(svgElement) {
     path.setAttribute('stroke', color);
     path.setAttribute('stroke-width', strokeWidth);
     path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-linecap', 'butt'); // Use 'butt' to prevent round cap overlap
-    path.setAttribute('opacity', '0.8'); // Slight transparency for smoother appearance
+    path.setAttribute('stroke-linecap', 'round');
     
     svgElement.appendChild(path);
   });
 }
 
-// ---- Scoring Configuration & Utilities ----
-
-// Centralized element selection within scoring dials (component-safe)
-function findScoringElements(dial, scoreType) {
-  if (!dial) return {};
-  
-  return {
-    // Prefer relative class selectors, fallback to ID-based for compatibility
-    valueDisplay: dial.querySelector(`.score-value, [id$="-value"], #${scoreType}-value`),
-    indicator: dial.querySelector(`.score-indicator, [id$="-indicator"], #${scoreType}-indicator`),
-    description: dial.querySelector(`.score-description, [id$="-desc"], #${scoreType}-desc`),
-    hiddenInput: dial.querySelector(`input[type="hidden"], #${scoreType}-score`),
-    svgElement: dial.querySelector(`.score-dial-svg, .dial-svg`)
-  };
-}
-
-// Centralized scoring configuration to avoid hard-coded values
-const SCORING_CONFIG = {
-  minScore: 1,
-  maxScore: 10,
-  totalRotationDegrees: 324, // 0° to 324° (leaving 36° gap at bottom)
-  startAngleDegrees: 0 // Starting position (top = -90°, but we'll handle that in the function)
-};
-
-// Centralized rotation calculation - handles any score scale
-function calculateScoreRotation(score, config = SCORING_CONFIG) {
-  const { minScore, maxScore, totalRotationDegrees } = config;
-  
-  // Clamp score to valid range
-  const clampedScore = Math.max(minScore, Math.min(maxScore, score));
-  
-  // Calculate rotation: (score - minScore) / (maxScore - minScore) * totalDegrees
-  const normalizedScore = (clampedScore - minScore) / (maxScore - minScore);
-  const rotation = normalizedScore * totalRotationDegrees;
-  
-  return Math.round(rotation * 100) / 100; // Round to 2 decimal places
-}
-
-// Calculate angle for full 360° circle (for alternate dial styles)
-function calculateFullCircleAngle(score, config = SCORING_CONFIG) {
-  const { minScore, maxScore } = config;
-  const clampedScore = Math.max(minScore, Math.min(maxScore, score));
-  
-  // Map score to full 360° circle
-  const normalizedScore = (clampedScore - minScore) / (maxScore - minScore);
-  return normalizedScore * 360;
-}
-
-// Centralized persistence validation (prevents UI-state inconsistency)
-function validateScorePersistence(scoreType, actionDescription = 'update score') {
-  const hiddenInput = document.getElementById(`${scoreType}-score`);
-  
-  if (!hiddenInput) {
-    console.error(`Missing hidden input for ${scoreType}-score - cannot ${actionDescription} without persistence layer`);
-    return null; // Return null to indicate validation failure
-  }
-  
-  return hiddenInput; // Return the input for use
-}
-
-// Themeable state management (replaces inline style manipulation)
-function applyScoreIndicatorState(indicator, score) {
-  if (!indicator) return;
-  
-  // Use CSS custom properties for rotation (can be themed/animated via CSS)
-  indicator.style.setProperty('--score-rotation', `${calculateScoreRotation(score)}deg`);
-  indicator.style.transform = `rotate(var(--score-rotation))`;
-  
-  // Apply score range classes instead of hardcoded colors
-  indicator.classList.remove('low-score', 'medium-score', 'high-score');
-  if (score <= 3) indicator.classList.add('low-score');
-  else if (score <= 7) indicator.classList.add('medium-score');
-  else indicator.classList.add('high-score');
-}
-
-function applyScoreDescriptionState(description, score) {
-  if (!description) return;
-  
-  // Remove all score state classes
-  description.classList.remove('excellent', 'positive', 'challenging');
-  
-  // Add appropriate class based on score (CSS handles the color)
-  if (score >= 8) {
-    description.classList.add('excellent');
-  } else if (score >= 4) {
-    description.classList.add('positive');
-  } else {
-    description.classList.add('challenging');
-  }
-}
-
-// ---- Robust scoring setup & update (drop this in to replace broken functions) ----
-
-function waitForScoringElements(callback, maxAttempts = 10, attemptDelay = 50) {
-  console.log('waitForScoringElements: Starting DOM element availability check');
-  
-  let attempts = 0;
-  
-  function checkElements() {
-    attempts++;
-    console.log(`waitForScoringElements: Attempt ${attempts}/${maxAttempts}`);
-    
-    // Check for active framework and basic scoring elements
-    const activeFramework = document.querySelector('.scoring-framework.active');
-    
-    if (!activeFramework) {
-      console.log('waitForScoringElements: No active framework found yet');
-      if (attempts < maxAttempts) {
-        setTimeout(checkElements, attemptDelay);
-        return;
-      } else {
-        console.warn('waitForScoringElements: Max attempts reached, no active framework found');
-        callback(); // Call anyway, let setupEmotionSafeScoring handle the missing elements
-        return;
-      }
-    }
-    
-    // Check for primary scoring elements using exact selectors that should exist
-    const hasButtons = activeFramework.querySelectorAll('.score-btn').length > 0;
-    const hasScoreInputs = activeFramework.querySelectorAll('input[id$="-score"]').length > 0;
-    const hasDials = activeFramework.querySelectorAll('.score-dial').length > 0;
-    
-    if (hasButtons || hasScoreInputs || hasDials) {
-      console.log('waitForScoringElements: Found scoring elements, proceeding with setup');
-      console.log(`  - Buttons: ${hasButtons}`, `- Score inputs: ${hasScoreInputs}`, `- Dials: ${hasDials}`);
-      callback();
-    } else if (attempts < maxAttempts) {
-      console.log('waitForScoringElements: No scoring elements found yet, retrying...');
-      setTimeout(checkElements, attemptDelay);
-    } else {
-      console.warn('waitForScoringElements: Max attempts reached, proceeding anyway');
-      callback(); // Proceed anyway, let setup function handle missing elements
-    }
-  }
-  
-  // Start checking immediately
-  checkElements();
-}
-
 function setupEmotionSafeScoring() {
-  // Track initialization attempts for debugging
-  setupEmotionSafeScoring._callCount = (setupEmotionSafeScoring._callCount || 0) + 1;
-  console.log(`setupEmotionSafeScoring called (attempt #${setupEmotionSafeScoring._callCount})`);
-
-  // Idempotence check: prevent multiple initializations of the same framework
   const activeFramework = document.querySelector('.scoring-framework.active');
-  if (!activeFramework) {
-    console.log('No active scoring framework found');
-    return;
-  }
-
-  // Check if this specific framework has already been initialized
-  if (activeFramework._scoringInitialized) {
-    console.log(`Scoring already initialized for framework ${activeFramework.id}, skipping setup (idempotent)`);
-    return;
-  }
-
-  // Find all score buttons within the active framework
-  const scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn'));
+  if (!activeFramework) return;
   
-  console.log(`Found ${scoreButtons.length} score buttons in active framework`);
-
-  if (scoreButtons.length === 0) {
-    // Provide specific diagnostic information for maintenance
-    const diagnostics = {
-      frameworkId: activeFramework.id,
-      frameworkClass: activeFramework.className,
-      totalButtons: activeFramework.querySelectorAll('button').length,
-      buttonsWithDataAction: activeFramework.querySelectorAll('button[data-action]').length,
-      scoreBtnElements: document.querySelectorAll('.score-btn').length, // Global count
-      activeFrameworkContent: activeFramework.innerHTML.substring(0, 200) + '...'
-    };
+  const scoreDials = activeFramework.querySelectorAll('.score-dial');
+  
+  scoreDials.forEach(dial => {
+    const dialId = dial.id;
+    const scoreType = dialId.replace('-dial', '');
+    const hiddenInput = document.getElementById(`${scoreType}-score`);
+    const description = document.getElementById(`${scoreType}-desc`);
+    const valueDisplay = document.getElementById(`${scoreType}-value`);
+    const indicator = document.getElementById(`${scoreType}-indicator`);
+    const svgElement = dial.querySelector('.score-dial-svg');
     
-    console.error('SELECTOR MISMATCH: Expected .score-btn elements in active framework but found none.', diagnostics);
-    console.error('This indicates DOM structure and JavaScript selectors are out of sync - immediate maintenance required!');
-    return;
-  }
-
+    // Create clean SVG color bands
+    if (svgElement) {
+      createScoreDialSVG(svgElement);
+    }
+    
+    // Initialize with default value
+    updateImprovedScoreDial(scoreType, 5);
+  });
+  
+  // Setup button controls for all score types - prevent double event binding
+  const scoreButtons = activeFramework.querySelectorAll('.score-btn');
+  console.log(`Setting up ${scoreButtons.length} score buttons with event listeners`);
+  
   scoreButtons.forEach(button => {
-    const action = button.dataset.action;   // "increase" | "decrease"
-    const target = button.dataset.target;   // e.g. "composition"
+    // Remove any existing listeners to prevent double-triggering
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
     
-    if (!action || !target) {
-      console.warn('Button missing required data attributes:', {
-        element: button,
-        action: action,
-        target: target,
-        allDataAttributes: Object.keys(button.dataset),
-        className: button.className,
-        id: button.id
-      });
-      return;
-    }
-
-    // Validate action values
-    if (!['increase', 'decrease'].includes(action)) {
-      console.warn(`Invalid action value "${action}" for button. Expected "increase" or "decrease"`, button);
-      return;
-    }
-
-    // Remove any existing scoring listeners by checking for our custom property
-    if (button._scoringHandlerAttached) {
-      return; // Skip if already has our handler
-    }
-
-    // Mark this button as having our handler
-    button._scoringHandlerAttached = true;
-
-    // One handler per button
-    button.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      ev.stopPropagation();
-      console.log(`score button click: ${action} ${target}`);
-
-      // Find parent dial for component-safe element lookups
-      const parentDial = button.closest('.score-dial') || button.closest(`[id*="${target}"]`);
+    newButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       
-      // Use component-safe element selection
-      let hiddenInput, valueDisplay, indicator, description;
+      const action = newButton.dataset.action;
+      const target = newButton.dataset.target;
+      const currentScore = parseInt(document.getElementById(`${target}-score`).value);
       
-      if (parentDial) {
-        // Use scoped selection within the dial component
-        const elements = findScoringElements(parentDial, target);
-        ({hiddenInput, valueDisplay, indicator, description} = elements);
+      let newScore = currentScore;
+      if (action === 'increase' && currentScore < 10) {
+        newScore = currentScore + 1;
+      } else if (action === 'decrease' && currentScore > 1) {
+        newScore = currentScore - 1;
+      }
+      
+      // Only update if the score actually changed
+      if (newScore !== currentScore && newScore >= 1 && newScore <= 10) {
+        console.log(`Button clicked: ${action} on ${target}, score ${currentScore} -> ${newScore}`);
+        updateImprovedScoreDial(target, newScore);
+        
+        // Add visual feedback
+        newButton.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          newButton.style.transform = '';
+        }, 150);
       } else {
-        // Fallback to global IDs if no parent dial found
-        console.warn(`No parent dial found for button, using global ID selectors`);
-        hiddenInput = document.getElementById(`${target}-score`);
-        valueDisplay = document.getElementById(`${target}-value`);
-        indicator = document.getElementById(`${target}-indicator`);
-        description = document.getElementById(`${target}-desc`);
+        console.log(`Button click ignored: ${action} on ${target}, score would be ${newScore} (current: ${currentScore})`);
       }
-
-      // Check for all critical elements and report missing ones
-      const missingElements = [];
-      if (!hiddenInput) missingElements.push(`${target}-score (hidden input)`);
-      if (!valueDisplay) missingElements.push(`${target}-value (display)`);
-      if (!indicator) missingElements.push(`${target}-indicator (needle)`);
-      if (!description) missingElements.push(`${target}-desc (description)`);
-
-      if (missingElements.length > 0) {
-        console.warn(`Missing DOM elements for ${target}:`, missingElements);
-      }
-
-      // Require at least the hidden input to proceed
-      if (!hiddenInput) {
-        console.error(`Critical element missing: hidden input ${target}-score. Cannot update score.`);
-        return;
-      }
-
-      // parse and clamp
-      const current = parseInt(hiddenInput.value, 10) || 5;
-      let next = current;
-      if (action === 'increase' && current < 10) next = current + 1;
-      if (action === 'decrease' && current > 1) next = current - 1;
-
-      if (next === current) {
-        console.log(`No change for ${target}: ${current}`);
-        return;
-      }
-
-      // persist new value to input
-      hiddenInput.value = next;
-
-      // Update UI elements with null-safety
-      if (valueDisplay) valueDisplay.textContent = next;
-      
-      // Use themeable state management instead of inline styles
-      applyScoreIndicatorState(indicator, next);
-      applyScoreDescriptionState(description, next);
-      
-      if (!description) {
-        console.warn(`No description element for ${target}-desc`);
-      }
-
-      console.log(`Updated ${target} → ${next}`);
     });
   });
-
-  // Initialize SVGs and set initial colors for visible dials
-  const scoreDials = activeFramework.querySelectorAll('.score-dial');
-  scoreDials.forEach(dial => {
-    const dialId = dial.id || '';
-    const scoreType = dialId.replace('-dial', '');
-    if (!scoreType) return;
-
-    // create SVG bands if present (non-destructive)
-    const svgEl = dial.querySelector('.score-dial-svg');
-    if (svgEl && typeof createScoreDialSVG === 'function') {
-      try { createScoreDialSVG(svgEl); } catch (err) { console.warn('createScoreDialSVG failed', err); }
-    }
-
-    // Set initial visual state using component-safe selection
-    const elements = findScoringElements(dial, scoreType);
-    const { hiddenInput, valueDisplay, indicator, description: descEl } = elements;
-
-    // Validate persistence layer exists before initializing UI
-    if (!hiddenInput) {
-      console.error(`Missing hidden input for ${scoreType}-score - skipping initialization to prevent UI-state inconsistency`);
-      return; // Don't initialize UI if we can't persist state changes
-    }
-
-    const initial = parseInt(hiddenInput.value, 10) || 5;
-
-    if (valueDisplay) valueDisplay.textContent = initial;
-    
-    // Use themeable state management for initialization
-    applyScoreIndicatorState(indicator, initial);
-    applyScoreDescriptionState(descEl, initial);
-    
-    if (!descEl) {
-      console.warn(`Could not find description for ${scoreType}`);
-    }
-  });
-
-  // Mark this framework as initialized to prevent repeated setup
-  activeFramework._scoringInitialized = true;
-  
-  console.log(`setupEmotionSafeScoring complete - framework ${activeFramework.id} marked as initialized (${scoreButtons.length} buttons processed)`);
 }
 
-function updateDialDisplay(dial, criterion, score) {
-  console.log(`Updating dial display for ${criterion}: score ${score}`);
-  
-  // Use centralized component-safe element selection
-  const elements = findScoringElements(dial, criterion);
-  const { hiddenInput, valueDisplay, indicator, description } = elements;
-  
-  // Validate persistence layer exists before updating UI
-  if (!hiddenInput) {
-    console.error(`Missing hidden input for ${criterion}-score - cannot update display without persistence layer`);
-    return; // Don't update UI if there's no persistence backing
-  }
-  
-  // Update score display
-  if (valueDisplay) {
-    valueDisplay.textContent = score;
-  }
-  
-  // Use themeable state management instead of inline styles
-  applyScoreIndicatorState(indicator, score);
-  applyScoreDescriptionState(description, score);
-  
-  // Ensure base description class exists
-  if (description && !description.classList.contains('score-description')) {
-    description.classList.add('score-description');
-  }
-  
-  console.log(`Updated ${criterion} dial to score ${score}`);
-}
-
-// Utility to update a single dial programmatically (keep using original text mapping)
 function updateImprovedScoreDial(scoreType, score) {
-  console.log(`updateImprovedScoreDial called: ${scoreType} = ${score}`);
+  console.log(`updateImprovedScoreDial called: scoreType=${scoreType}, score=${score}`);
   
-  // Find the dial component first, then get elements within it
-  const dial = document.getElementById(`${scoreType}-dial`) || document.querySelector(`[data-score-type="${scoreType}"]`);
+  // Update all related elements
+  const hiddenInput = document.getElementById(`${scoreType}-score`);
+  const valueDisplay = document.getElementById(`${scoreType}-value`);
+  const indicator = document.getElementById(`${scoreType}-indicator`);
+  const description = document.getElementById(`${scoreType}-desc`);
   
-  if (!dial) {
-    console.warn(`No dial found for scoreType: ${scoreType}`);
+  if (!hiddenInput || !valueDisplay || !indicator || !description) {
+    console.log(`Missing elements for ${scoreType}:`, {
+      hiddenInput: !!hiddenInput,
+      valueDisplay: !!valueDisplay,
+      indicator: !!indicator,
+      description: !!description
+    });
     return;
   }
   
-  const elements = findScoringElements(dial, scoreType);
-  const { hiddenInput, valueDisplay, indicator, description } = elements;
-
-  if (!hiddenInput) return console.warn('Missing input for', scoreType);
+  // Update hidden input
   hiddenInput.value = score;
-  if (valueDisplay) valueDisplay.textContent = score;
   
-  // Use themeable state management instead of inline styles
-  applyScoreIndicatorState(indicator, score);
-  applyScoreDescriptionState(description, score);
-
-  if (dial) dial.title = `Score: ${score}/10 — use +/- to adjust`;
+  // Update fixed center display (number stays in place)
+  valueDisplay.textContent = score;
+  
+  // Rotate needle to match score position - properly aligned with color bands
+  // Score 1 at 0deg (top), Score 10 at 324deg, each score 36deg apart
+  const rotation = (score - 1) * 36; // Score 1=0°, Score 2=36°, Score 3=72°, etc.
+  indicator.style.transform = `rotate(${rotation}deg)`;
+  
+  // Update indicator styling to match color bands
+  indicator.className = 'score-indicator';
+  if (score >= 1 && score <= 3) {
+    indicator.classList.add('low-score');    // Red zone: scores 1-3
+  } else if (score >= 4 && score <= 7) {
+    indicator.classList.add('medium-score'); // Yellow zone: scores 4-7  
+  } else if (score >= 8 && score <= 10) {
+    indicator.classList.add('high-score');   // Green zone: scores 8-10
+  }
+  
+  // Update emotion-safe description
+  const descriptions = getEmotionSafeDescriptions();
+  const descriptionKey = scoreType;
+  
+  if (descriptions[descriptionKey]) {
+    const scoreDescriptions = descriptions[descriptionKey];
+    let descText, descClass;
+    
+    // Fix color mapping: 1-3 red, 4-7 yellow, 8-10 green
+    if (score >= 8 && score <= 10) {
+      descText = scoreDescriptions.excellent;
+      descClass = 'excellent';
+    } else if (score >= 4 && score <= 7) {
+      descText = scoreDescriptions.positive;
+      descClass = 'positive';
+    } else if (score >= 1 && score <= 3) {
+      descText = scoreDescriptions.challenging;
+      descClass = 'challenging';
+    } else {
+      // Fallback for edge cases
+      descText = scoreDescriptions.neutral;
+      descClass = '';
+    }
+    
+    console.log(`Score ${score} mapped to class: ${descClass}, text: ${descText}`);
+    description.textContent = descText;
+    description.className = `score-description ${descClass}`;
+  }
+  
+  // Add tooltip for clarity
+  const dial = document.getElementById(`${scoreType}-dial`);
+  if (dial) {
+    dial.title = `Score: ${score}/10 - Use +/- buttons to adjust`;
+  }
 }
 
 function getEmotionSafeDescriptions() {
@@ -4694,7 +4422,9 @@ function setupDetailedCritiqueFlow() {
 }
 
 function setupScoringStep() {
-  // Show the appropriate scoring framework based on the selected framework option
+  if (!selectedFramework) return;
+  
+  // Show the appropriate scoring framework
   const technicalScores = document.getElementById('technical-scores');
   const expressiveScores = document.getElementById('expressive-scores');
   
@@ -4702,41 +4432,89 @@ function setupScoringStep() {
   if (technicalScores) technicalScores.classList.remove('active');
   if (expressiveScores) expressiveScores.classList.remove('active');
   
-  // Check which framework option is currently active
-  const activeFrameworkOption = document.querySelector('.framework-option.active');
-  const activeFramework = activeFrameworkOption ? activeFrameworkOption.dataset.framework : 'technical';
-  
-  console.log(`setupScoringStep: Active framework is ${activeFramework}`);
-  
   // Show the selected framework
-  if (activeFramework === 'technical' && technicalScores) {
+  if (selectedFramework === 'formalist' && technicalScores) {
     technicalScores.classList.add('active');
-    console.log('Activated technical-scores framework');
-  } else if (activeFramework === 'expressive' && expressiveScores) {
+  } else if (expressiveScores) {
     expressiveScores.classList.add('active');
-    console.log('Activated expressive-scores framework');
   }
   
-  // Initialize the scoring dials - wait for DOM readiness
-  if (typeof setupEmotionSafeScoring === 'function') {
-    console.log('Calling setupEmotionSafeScoring from setupScoringStep');
-    waitForScoringElements(() => {
+  // Initialize the scoring dials
+  setTimeout(() => {
+    if (typeof setupEmotionSafeScoring === 'function') {
       setupEmotionSafeScoring();
-    });
-  }
+    }
+  }, 100);
 }
 
 function updateScore(criterion, value) {
-  // Use centralized persistence validation
-  const hiddenInput = validateScorePersistence(criterion, 'update score');
-  if (!hiddenInput) return; // Don't update in-memory state if there's no persistence backing
-  
-  const parsedValue = parseInt(value);
-  hiddenInput.value = parsedValue;
-  scores[criterion] = parsedValue;
+  scores[criterion] = parseInt(value);
 }
 
-// Duplicate function removed - using the working one above
+function setupEmotionSafeScoring() {
+  console.log('setupEmotionSafeScoring called');
+  
+  // Initialize scoring dials for the active framework
+  const activeDials = document.querySelectorAll('.scoring-framework.active .score-dial');
+  console.log(`Found ${activeDials.length} active dials`);
+  
+  activeDials.forEach(dial => {
+    const criterion = dial.dataset.criterion;
+    if (!scores[criterion]) {
+      scores[criterion] = 5; // Default score
+    }
+    
+    // Create sophisticated SVG dial with color bands and needle
+    const dialHTML = createScoringDial(criterion, scores[criterion]);
+    dial.innerHTML = dialHTML;
+    
+    // Remove existing control buttons and descriptions to prevent duplicates
+    const existingControls = dial.parentElement.querySelector('.score-controls');
+    const existingDescription = dial.parentElement.querySelector('.score-description');
+    if (existingControls) {
+      existingControls.remove();
+    }
+    if (existingDescription) {
+      existingDescription.remove();
+    }
+    
+    // Add control buttons with description
+    const controls = document.createElement('div');
+    controls.className = 'score-controls';
+    controls.innerHTML = `
+      <button class="score-btn" data-action="decrement" data-criterion="${criterion}" title="Decrease score">−</button>
+      <button class="score-btn" data-action="increment" data-criterion="${criterion}" title="Increase score">+</button>
+    `;
+    dial.parentElement.appendChild(controls);
+    
+    // Add description below the controls
+    const description = document.createElement('div');
+    description.className = 'score-description';
+    description.textContent = getCriterionDescription(criterion, scores[criterion]);
+    dial.parentElement.appendChild(description);
+    
+    // Add event listeners for increment/decrement
+    const decrementBtn = controls.querySelector('[data-action="decrement"]');
+    const incrementBtn = controls.querySelector('[data-action="increment"]');
+    
+    decrementBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (scores[criterion] > 1) {
+        animateScoreChange(dial, criterion, scores[criterion] - 1);
+      }
+    });
+    
+    incrementBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (scores[criterion] < 10) {
+        animateScoreChange(dial, criterion, scores[criterion] + 1);
+      }
+    });
+    
+    // Set initial button states
+    updateButtonStates(decrementBtn, incrementBtn, scores[criterion]);
+  });
+}
 
 function createScoringDial(criterion, score) {
   const centerX = 60;
@@ -4744,8 +4522,8 @@ function createScoringDial(criterion, score) {
   const radius = 45;
   const strokeWidth = 8;
   
-  // Map score to full 360° circle starting from top (12 o'clock position)
-  const scoreAngle = calculateFullCircleAngle(score); // Use centralized calculation
+  // Map score (1-10) to full 360° circle starting from top (12 o'clock position)
+  const scoreAngle = ((score - 1) / 9) * 360; // 0° to 360°
   const needleAngle = scoreAngle - 90; // Adjust to start from top (12 o'clock)
   const needleRad = (needleAngle * Math.PI) / 180;
   const needleLength = radius - 8;
@@ -4795,16 +4573,11 @@ function createScoringDial(criterion, score) {
 }
 
 function updateDialDisplay(dial, criterion, score) {
-  // Use centralized persistence validation
-  const hiddenInput = validateScorePersistence(criterion, 'update display');
-  if (!hiddenInput) return; // Don't update UI if there's no persistence backing
-  
   // With the new 360° design, regenerate the entire dial for proper colors and positioning
   const newDialHTML = createScoringDial(criterion, score);
   dial.innerHTML = newDialHTML;
   
-  // Store the score in persistence layer
-  hiddenInput.value = score;
+  // Store the score
   scores[criterion] = score;
   
   // Update control button states
