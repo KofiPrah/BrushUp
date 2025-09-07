@@ -7,8 +7,10 @@ import os
 import sys
 import django
 
-# Add the project directory to the Python path
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Add the project root to the Python path
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+)
 
 # Setup Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
