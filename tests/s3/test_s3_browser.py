@@ -254,12 +254,13 @@ def create_html_page(objects):
 </html>
     """
     
-    # Save the HTML file
-    with open('s3_browser.html', 'w') as f:
+    # Save the HTML file inside the templates directory
+    output_path = os.path.join('templates', 's3_browser.html')
+    with open(output_path, 'w') as f:
         f.write(html)
-    
-    print(f"Created S3 browser page: s3_browser.html")
-    print(f"Open this file in your browser to view your S3 bucket contents")
+
+    print(f"Created S3 browser page: {output_path}")
+    print("Open this file in your browser to view your S3 bucket contents")
     
 def main():
     print("Creating S3 Browser for Art Critique")
