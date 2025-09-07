@@ -77,4 +77,6 @@ python scripts/fixes/s3/fix_s3_permissions.py
 ### Fixing HTTP Issues
 ```bash
 python scripts/fixes/http/fix_ssl_issue.py
+python scripts/fixes/http/fix_http_server.py
+python scripts/fixes/http/fix_server_ssl.py
 ```
