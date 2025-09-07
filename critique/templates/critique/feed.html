@@ -3241,18 +3241,12 @@ function setupEmotionSafeScoring() {
   setupEmotionSafeScoring._callCount = (setupEmotionSafeScoring._callCount || 0) + 1;
   console.log(`setupEmotionSafeScoring called (attempt #${setupEmotionSafeScoring._callCount})`);
 
-  // FIXED: Find active framework using the correct selector that matches the DOM
-  let activeFramework = document.querySelector('#technical-scores.active') ||
-                       document.querySelector('#expressive-scores.active') ||
-                       document.querySelector('#technical-scores') ||
-                       document.querySelector('#expressive-scores');
-  
+  // Idempotence check: prevent multiple initializations of the same framework
+  const activeFramework = document.querySelector('.scoring-framework.active');
   if (!activeFramework) {
-    console.log('No scoring framework found');
+    console.log('No active scoring framework found');
     return;
   }
-  
-  console.log(`DEBUG: Found framework ${activeFramework.id} with classes: ${activeFramework.className}`);
 
   // Check if this specific framework has already been initialized
   if (activeFramework._scoringInitialized) {
@@ -3260,10 +3254,10 @@ function setupEmotionSafeScoring() {
     return;
   }
 
-  // FIXED: Find score buttons with proper selector matching actual DOM structure
-  const scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn[data-action][data-target]'));
+  // Find all score buttons within the active framework
+  const scoreButtons = Array.from(activeFramework.querySelectorAll('.score-btn'));
   
-  console.log(`Found ${scoreButtons.length} score buttons in active framework ${activeFramework.id}`);
+  console.log(`Found ${scoreButtons.length} score buttons in active framework`);
 
   if (scoreButtons.length === 0) {
     // Provide specific diagnostic information for maintenance

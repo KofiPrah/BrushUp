@@ -3061,299 +3061,227 @@ function createScoreDialSVG(svgElement) {
   });
 }
 
-// FIXED: Consolidated setupEmotionSafeScoring function - addresses all identified issues
 function setupEmotionSafeScoring() {
-  console.log('setupEmotionSafeScoring called - robust version');
+  console.log('setupEmotionSafeScoring called');
   
-  // Robust element finder with multiple fallback strategies
-  function findScoringElements(parentEl, targetId) {
-    const elements = {};
-    
-    // Strategy 1: Direct ID lookup
-    elements.hiddenInput = document.getElementById(`${targetId}-score`) || 
-                          parentEl?.querySelector(`input[name="${targetId}_score"]`) ||
-                          parentEl?.querySelector(`input[data-target="${targetId}"]`);
-                          
-    elements.valueDisplay = document.getElementById(`${targetId}-value`) || 
-                           parentEl?.querySelector(`[data-display="${targetId}"]`) ||
-                           parentEl?.querySelector(`.score-value-display`);
-                           
-    elements.indicator = document.getElementById(`${targetId}-indicator`) || 
-                        parentEl?.querySelector(`[data-indicator="${targetId}"]`) ||
-                        parentEl?.querySelector(`.score-indicator`);
-                        
-    elements.description = document.getElementById(`${targetId}-desc`) || 
-                          parentEl?.querySelector(`[data-desc="${targetId}"]`) ||
-                          parentEl?.querySelector(`.score-description`);
-    
-    return elements;
-  }
+  // Look for the detailed feedback scoring framework (with specific IDs)
+  let activeFramework = document.querySelector('.scoring-framework.active');
   
-  // Enhanced updateImprovedScoreDial with null safety
-  function updateImprovedScoreDial(scoreType, score) {
-    console.log(`updateImprovedScoreDial: ${scoreType} = ${score}`);
-    
-    if (score < 1 || score > 10) {
-      console.warn(`Invalid score: ${score}. Must be between 1-10`);
-      return false;
-    }
-    
-    const parentDial = document.querySelector(`#${scoreType}-dial`) || 
-                      document.querySelector(`[data-criterion="${scoreType}"]`);
-    
-    const elements = findScoringElements(parentDial, scoreType);
-    
-    let updateSuccess = false;
-    
-    // Update hidden input
-    if (elements.hiddenInput) {
-      elements.hiddenInput.value = score;
-      updateSuccess = true;
-      console.log(`✓ Updated input for ${scoreType}`);
-    } else {
-      console.warn(`✗ No input found for ${scoreType}`);
-    }
-    
-    // Update display value
-    if (elements.valueDisplay) {
-      elements.valueDisplay.textContent = score;
-      console.log(`✓ Updated display for ${scoreType}`);
-    }
-    
-    // Update indicator rotation
-    if (elements.indicator) {
-      const rotation = (score - 1) * 36; // 0° to 324° for scores 1-10
-      elements.indicator.style.transform = `rotate(${rotation}deg)`;
-      
-      // Add score-based styling classes
-      elements.indicator.className = elements.indicator.className.replace(/\b(low|medium|high)-score\b/g, '');
-      if (score <= 3) {
-        elements.indicator.classList.add('low-score');
-      } else if (score <= 7) {
-        elements.indicator.classList.add('medium-score');
-      } else {
-        elements.indicator.classList.add('high-score');
-      }
-      
-      console.log(`✓ Updated indicator for ${scoreType} to ${rotation}°`);
-    }
-    
-    // Update description with color and class
-    if (elements.description) {
-      let descClass = '';
-      let color = '';
-      
-      if (score >= 8 && score <= 10) {
-        descClass = 'excellent';
-        color = '#81c784';
-      } else if (score >= 4 && score <= 7) {
-        descClass = 'positive';
-        color = '#fbc02d';
-      } else if (score >= 1 && score <= 3) {
-        descClass = 'challenging';
-        color = '#e57373';
-      }
-      
-      // Reset classes to avoid conflicts
-      elements.description.className = `score-description ${descClass}`;
-      elements.description.style.color = color;
-      
-      console.log(`✓ Updated description for ${scoreType}: ${descClass}`);
-    }
-    
-    return updateSuccess;
-  }
-  
-  // Main setup with proper error handling and race condition fixes
-  setTimeout(() => {
-    // Find active scoring framework with fallbacks
-    let activeFramework = document.querySelector('.scoring-framework.active') ||
-                         document.querySelector('.critique-scoring.active') ||
-                         document.querySelector('.scoring-framework:not([style*="display: none"])') ||
-                         document.querySelector('.critique-scoring');
-    
-    if (!activeFramework) {
-      console.log('No active scoring framework found');
-      return;
-    }
-    
-    // Prevent double initialization
-    if (activeFramework._scoringInitialized) {
-      console.log('Scoring already initialized for this framework');
-      return;
-    }
-    
-    console.log('Active framework found:', activeFramework.className);
-    
-    // Find score buttons with multiple selector strategies
-    let scoreButtons = activeFramework.querySelectorAll('.score-btn');
-    
-    if (scoreButtons.length === 0) {
-      // Fallback selectors
-      scoreButtons = activeFramework.querySelectorAll('[data-action]');
-      console.log(`Fallback selector found ${scoreButtons.length} buttons`);
-    }
-    
-    if (scoreButtons.length === 0) {
-      scoreButtons = activeFramework.querySelectorAll('button[data-target]');
-      console.log(`Second fallback found ${scoreButtons.length} buttons`);
-    }
-    
-    console.log(`Setting up ${scoreButtons.length} score buttons`);
-    
-    if (scoreButtons.length === 0) {
-      console.warn('No score buttons found');
-      return;
-    }
-    
-    // Initialize existing scores
-    const scoreDials = activeFramework.querySelectorAll('.score-dial, [data-criterion]');
-    console.log(`Initializing ${scoreDials.length} score dials`);
-    
-    scoreDials.forEach(dial => {
-      const scoreType = dial.id?.replace('-dial', '') || dial.dataset.criterion;
-      if (!scoreType) return;
-      
-      const elements = findScoringElements(dial, scoreType);
-      if (elements.hiddenInput) {
-        const currentScore = parseInt(elements.hiddenInput.value) || 5;
-        updateImprovedScoreDial(scoreType, currentScore);
-      }
-    });
-    
-    // Setup button click handlers
-    let handlerCount = 0;
-    
-    scoreButtons.forEach(button => {
-      const action = button.dataset.action;
-      const target = button.dataset.target || button.dataset.criterion;
-      
-      if (!action || !target) {
-        console.warn('Button missing action or target:', button);
-        return;
-      }
-      
-      console.log(`Setting up button: ${action} for ${target}`);
-      
-      // Remove existing listeners properly
-      const newButton = button.cloneNode(true);
-      button.parentNode.replaceChild(newButton, button);
-      
-      // Restore dataset properties that might be lost
-      newButton.dataset.action = action;
-      newButton.dataset.target = target;
-      
-      newButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        console.log(`Button clicked: ${action} on ${target}`);
-        
-        const elements = findScoringElements(null, target);
-        
-        if (!elements.hiddenInput) {
-          console.error(`No hidden input found for ${target}`);
-          return;
-        }
-        
-        const currentScore = parseInt(elements.hiddenInput.value) || 5;
-        let newScore = currentScore;
-        
-        if (action === 'increase' && currentScore < 10) {
-          newScore = currentScore + 1;
-        } else if (action === 'decrease' && currentScore > 1) {
-          newScore = currentScore - 1;
-        }
-        
-        if (newScore !== currentScore) {
-          console.log(`Updating ${target}: ${currentScore} → ${newScore}`);
-          
-          const success = updateImprovedScoreDial(target, newScore);
-          
-          if (success) {
-            // Visual feedback
-            newButton.style.transform = 'scale(0.9)';
-            setTimeout(() => {
-              newButton.style.transform = '';
-            }, 150);
-          }
-        }
-      });
-      
-      handlerCount++;
-    });
-    
-    console.log(`✓ setupEmotionSafeScoring complete: ${handlerCount} handlers attached`);
-    
-    // Mark framework as initialized
-    activeFramework._scoringInitialized = true;
-    
-  }, 50); // Small delay to ensure DOM is ready
-}
-
-// FIXED: Enhanced updateDialDisplay function - consolidated and robust
-function updateDialDisplay(dial, criterion, score) {
-  console.log(`updateDialDisplay: ${criterion} = ${score}`);
-  
-  if (!dial) {
-    console.error('No dial element provided');
+  if (!activeFramework) {
+    console.log('No active scoring framework found');
     return;
   }
   
-  // Use robust element finding
-  const elements = {
-    valueDisplay: document.getElementById(`${criterion}-value`) || dial.querySelector('.score-value-display'),
-    indicator: document.getElementById(`${criterion}-indicator`) || dial.querySelector('.score-indicator'), 
-    description: document.getElementById(`${criterion}-desc`) || dial.querySelector('.score-description')
-  };
+  console.log('Active framework found:', activeFramework);
+  
+  // Find all score buttons in the active framework (detailed feedback interface)
+  const scoreButtons = activeFramework.querySelectorAll('.score-btn');
+  console.log(`Setting up ${scoreButtons.length} score buttons with event listeners`);
+  
+  if (scoreButtons.length === 0) {
+    console.log('No score buttons found in active framework');
+    return;
+  }
+  
+  scoreButtons.forEach(button => {
+    const action = button.dataset.action;
+    const target = button.dataset.target;
+    console.log(`Setting up button: ${action} for ${target}`);
+    
+    // Remove any existing listeners to prevent double-triggering
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    
+    newButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      console.log(`Button clicked: ${action} on ${target}`);
+      
+      // Find the corresponding elements using the target ID
+      const hiddenInput = document.getElementById(`${target}-score`);
+      const valueDisplay = document.getElementById(`${target}-value`);
+      const indicator = document.getElementById(`${target}-indicator`);
+      const description = document.getElementById(`${target}-desc`);
+      
+      if (!hiddenInput) {
+        console.log(`No hidden input found for ${target}-score`);
+        return;
+      }
+      
+      const currentScore = parseInt(hiddenInput.value) || 5;
+      console.log(`Current score for ${target}: ${currentScore}`);
+      
+      let newScore = currentScore;
+      if (action === 'increase' && currentScore < 10) {
+        newScore = currentScore + 1;
+      } else if (action === 'decrease' && currentScore > 1) {
+        newScore = currentScore - 1;
+      }
+      
+      // Only update if the score actually changed
+      if (newScore !== currentScore && newScore >= 1 && newScore <= 10) {
+        console.log(`Updating ${target} from ${currentScore} to ${newScore}`);
+        
+        // Update hidden input
+        hiddenInput.value = newScore;
+        
+        // Update display elements with null checks
+        if (valueDisplay) {
+          valueDisplay.textContent = newScore;
+          console.log(`Updated value display for ${target}`);
+        } else {
+          console.log(`No value display found for ${target}-value`);
+        }
+        
+        if (indicator) {
+          const rotation = (newScore - 1) * 36;
+          indicator.style.transform = `rotate(${rotation}deg)`;
+          console.log(`Updated indicator rotation for ${target}`);
+        } else {
+          console.log(`No indicator found for ${target}-indicator`);
+        }
+        
+        // Update description color with null check
+        if (description) {
+          let descClass = '';
+          let color = '';
+          
+          if (newScore >= 8 && newScore <= 10) {
+            descClass = 'excellent';
+            color = '#81c784'; // Green
+          } else if (newScore >= 4 && newScore <= 7) {
+            descClass = 'positive';
+            color = '#fbc02d'; // Yellow
+          } else if (newScore >= 1 && newScore <= 3) {
+            descClass = 'challenging';
+            color = '#e57373'; // Red
+          }
+          
+          description.className = `score-description ${descClass}`;
+          description.style.color = color;
+          
+          console.log(`Updated ${target} description: class=${descClass}, color=${color}`);
+        } else {
+          console.log(`No description found for ${target}-desc`);
+        }
+        
+        // Add visual feedback to button
+        newButton.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          newButton.style.transform = '';
+        }, 150);
+      } else {
+        console.log(`Button click ignored: ${action} on ${target}, score would be ${newScore} (current: ${currentScore})`);
+      }
+    });
+  });
+  
+  // Initialize SVG elements and set initial colors
+  const scoreDials = activeFramework.querySelectorAll('.score-dial');
+  console.log(`Initializing ${scoreDials.length} score dials`);
+  
+  scoreDials.forEach(dial => {
+    const dialId = dial.id;
+    if (!dialId) return;
+    
+    const scoreType = dialId.replace('-dial', '');
+    const svgElement = dial.querySelector('.score-dial-svg');
+    
+    // Create clean SVG color bands
+    if (svgElement) {
+      createScoreDialSVG(svgElement);
+    }
+    
+    // Set initial description color
+    const description = document.getElementById(`${scoreType}-desc`);
+    const hiddenInput = document.getElementById(`${scoreType}-score`);
+    
+    if (description && hiddenInput) {
+      const currentScore = parseInt(hiddenInput.value) || 5;
+      
+      let descClass = '';
+      let color = '';
+      if (currentScore >= 8 && currentScore <= 10) {
+        descClass = 'excellent';
+        color = '#81c784'; // Green
+      } else if (currentScore >= 4 && currentScore <= 7) {
+        descClass = 'positive';
+        color = '#fbc02d'; // Yellow
+      } else if (currentScore >= 1 && currentScore <= 3) {
+        descClass = 'challenging';
+        color = '#e57373'; // Red
+      }
+      
+      description.className = `score-description ${descClass}`;
+      description.style.color = color;
+      
+      console.log(`Initial color set for ${scoreType}: class=${descClass}, color=${color}`);
+    } else {
+      console.log(`Could not find description (${description ? 'found' : 'missing'}) or input (${hiddenInput ? 'found' : 'missing'}) for ${scoreType}`);
+    }
+  });
+}
+
+function updateDialDisplay(dial, criterion, score) {
+  console.log(`Updating dial display for ${criterion}: score ${score}`);
+  
+  const valueDisplay = dial.querySelector(`#${criterion}-value`);
+  const indicator = dial.querySelector(`#${criterion}-indicator`);
+  const description = dial.querySelector(`#${criterion}-desc`);
   
   // Update score display
-  if (elements.valueDisplay) {
-    elements.valueDisplay.textContent = score;
+  if (valueDisplay) {
+    valueDisplay.textContent = score;
   }
   
-  // Update indicator position with smooth transition
-  if (elements.indicator) {
-    const rotation = (score - 1) * 36;
-    elements.indicator.style.transition = 'transform 0.3s ease';
-    elements.indicator.style.transform = `rotate(${rotation}deg)`;
-    
-    // Add score-based styling
-    elements.indicator.className = 'score-indicator';
-    if (score <= 3) {
-      elements.indicator.classList.add('low-score');
-    } else if (score <= 7) {
-      elements.indicator.classList.add('medium-score');
-    } else {
-      elements.indicator.classList.add('high-score');
-    }
+  // Update indicator position
+  if (indicator) {
+    const rotation = (score - 1) * 36; // 0° to 324° for scores 1-10
+    indicator.style.transform = `rotate(${rotation}deg)`;
   }
   
-  // Update description color and class
-  if (elements.description) {
+  // Update description color
+  if (description) {
     let descClass = '';
     let color = '';
     
     if (score >= 8 && score <= 10) {
       descClass = 'excellent';
-      color = '#81c784';
+      color = '#81c784'; // Green
     } else if (score >= 4 && score <= 7) {
-      descClass = 'positive'; 
-      color = '#fbc02d';
+      descClass = 'positive';
+      color = '#fbc02d'; // Yellow
     } else if (score >= 1 && score <= 3) {
       descClass = 'challenging';
-      color = '#e57373';
+      color = '#e57373'; // Red
     }
     
-    elements.description.className = `score-description ${descClass}`;
-    elements.description.style.color = color;
+    description.className = `score-description ${descClass}`;
+    description.style.color = color;
+    
+    console.log(`Updated ${criterion} description: class=${descClass}, color=${color}`);
   }
-  
-  console.log(`✓ Updated dial display for ${criterion}`);
 }
 
-// REMOVED: Duplicate updateImprovedScoreDial function - now handled by setupEmotionSafeScoring
-// This function is integrated into the main setupEmotionSafeScoring implementation above
+function updateImprovedScoreDial(scoreType, score) {
+  console.log(`updateImprovedScoreDial called: scoreType=${scoreType}, score=${score}`);
+  
+  // Update all related elements
+  const hiddenInput = document.getElementById(`${scoreType}-score`);
+  const valueDisplay = document.getElementById(`${scoreType}-value`);
+  const indicator = document.getElementById(`${scoreType}-indicator`);
+  const description = document.getElementById(`${scoreType}-desc`);
+  
+  if (!hiddenInput || !valueDisplay || !indicator || !description) {
+    console.log(`Missing elements for ${scoreType}:`, {
+      hiddenInput: !!hiddenInput,
+      valueDisplay: !!valueDisplay,
+      indicator: !!indicator,
+      description: !!description
+    });
+    
+    // Try alternative selectors for missing elements
     if (!description) {
       console.log(`Attempting to find description element with alternative selector`);
       const alternativeDesc = document.querySelector(`#${scoreType}-desc, .score-description[id*="${scoreType}"]`);
@@ -4749,7 +4677,30 @@ function createScoringDial(criterion, score) {
   `;
 }
 
-// REMOVED: Duplicate updateDialDisplay function - using the fixed version above
+function updateDialDisplay(dial, criterion, score) {
+  // With the new 360° design, regenerate the entire dial for proper colors and positioning
+  const newDialHTML = createScoringDial(criterion, score);
+  dial.innerHTML = newDialHTML;
+  
+  // Store the score
+  scores[criterion] = score;
+  
+  // Update control button states
+  const controls = dial.parentElement.querySelector('.score-controls');
+  if (controls) {
+    const decrementBtn = controls.querySelector('[data-action="decrement"]');
+    const incrementBtn = controls.querySelector('[data-action="increment"]');
+    if (decrementBtn && incrementBtn) {
+      updateButtonStates(decrementBtn, incrementBtn, score);
+    }
+  }
+  
+  // Update description tooltip dynamically
+  const description = dial.parentElement.querySelector('.score-description');
+  if (description) {
+    description.textContent = getCriterionDescription(criterion, score);
+  }
+}
 
 function animateScoreChange(dial, criterion, newScore) {
   if (newScore < 1 || newScore > 10) return;
