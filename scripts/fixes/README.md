@@ -15,6 +15,8 @@ Scripts for fixing S3 storage issues:
 Scripts for fixing HTTP/HTTPS configuration issues:
 
 - `fix_ssl_issue.py`: Fix SSL issues with Replit's load balancer
+- `fix_http_server.py`: Run Gunicorn in HTTP mode without SSL
+- `fix_server_ssl.py`: Configure the server for HTTP-only mode and patch serializer methods
 
 ## Usage
 
@@ -36,4 +38,10 @@ bash scripts/fixes/s3/apply_s3_fixes.sh
 ```bash
 # Fix SSL issues with Replit's load balancer
 python scripts/fixes/http/fix_ssl_issue.py
+
+# Start an HTTP-only server for local testing
+python scripts/fixes/http/fix_http_server.py
+
+# Configure server for HTTP-only mode and patch serializers
+python scripts/fixes/http/fix_server_ssl.py
 ```

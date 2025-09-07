@@ -14,7 +14,7 @@ from django.core.asgi import get_asgi_application
 
 # Initialize Django ASGI application early to ensure AppRegistry is populated
 # before importing channel routes
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings.prod')
 django_asgi_app = get_asgi_application()
 
 # Now import channels components after Django initialization
@@ -33,3 +33,4 @@ application = ProtocolTypeRouter({
         )
     ),
 })
+
