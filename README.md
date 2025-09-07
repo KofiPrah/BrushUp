@@ -4,6 +4,7 @@ The repository is organized into key directories:
 - `scripts/server/` – server start scripts (e.g., `http_server.py`, `flask_proxy.py`)
 - `scripts/maintenance/` – maintenance utilities (`restart_server.py`, `update_workflow.py`, etc.)
 - `scripts/utility/` – one-off helper scripts (`add_focus_js.py`, `test_permissions.py`, etc.)
+- `templates/` – HTML templates including `login_page.html`, `signup_page.html`, and `s3_browser.html`
 
 ## Documentation
 
