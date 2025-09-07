@@ -48,6 +48,18 @@ The project is organized into the following directories:
     - `test-images/`: Test image files
   - `s3/`: S3 storage tests
 
+## Dependency Management
+
+Dependencies are defined in `pyproject.toml` and locked with `uv.lock`.
+Use `uv` to sync and lock dependencies:
+
+```bash
+uv sync      # install dependencies from the lock file
+uv lock      # regenerate uv.lock after modifying dependencies
+```
+
+The legacy `project_requirements.txt` file has been removed.
+
 ## Running the Application
 
 The simplest way to run the application is:
