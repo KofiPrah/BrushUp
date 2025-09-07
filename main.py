@@ -15,7 +15,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Set deployment environment variables
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
+# Use production settings by default for this entrypoint
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings.prod')
 os.environ.setdefault('SSL_ENABLED', 'false')
 os.environ.setdefault('HTTP_ONLY', 'true')
 
