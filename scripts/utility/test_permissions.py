@@ -7,12 +7,17 @@ This script tests the role-based permissions by:
 3. Printing the results to verify permissions are working
 
 Usage:
-    python test_permissions.py
+    python scripts/utility/test_permissions.py
 """
 
 import os
 import sys
 import django
+
+# Ensure project root is on the Python path
+sys.path.append(
+    os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+)
 
 # Set up Django environment
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
