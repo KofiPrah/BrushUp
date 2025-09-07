@@ -14,26 +14,28 @@ import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1234567890abcdefghijklmnopqrstuvwxyz'
+# Loaded from environment with a fallback for development
+SECRET_KEY = os.environ.get('SECRET_KEY', 'insecure-development-key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Debug mode defaults to False and can be overridden in env or specific settings
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Allow all hosts
-ALLOWED_HOSTS = ['*', '.replit.app']
+# Allowed hosts can be overridden via environment variable
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
 
 # Get Replit domain from environment
 REPLIT_DOMAIN = os.environ.get('REPLIT_DOMAIN', '*')
 
 # Configure SSL based on environment variable
-# Forced to False for Replit to work with the load balancer
-SSL_ENABLED = False  # Force SSL off for Replit
+# Forced to False for Replit to work with the load balancer by default
+SSL_ENABLED = os.environ.get('SSL_ENABLED', 'False') == 'True'
 
 # Flexible SSL settings that work in both development and production
 if SSL_ENABLED:
@@ -399,3 +401,4 @@ SOCIALACCOUNT_PROVIDERS = {
 # Social Auth settings - using consistent variable names
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
+
