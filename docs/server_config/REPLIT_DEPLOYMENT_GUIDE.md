@@ -7,7 +7,7 @@ This guide provides instructions for deploying the Art Critique Django applicati
 There are two modes of operation for this application:
 
 1. **Local Development** (with HTTPS):
-   - Uses self-signed certificates (cert.pem and key.pem)
+   - Uses self-signed certificates stored in `certs/cert.pem` and `certs/key.pem`
    - Handles TLS termination in the application
    - Binds to port 5000
 

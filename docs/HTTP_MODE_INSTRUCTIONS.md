@@ -32,7 +32,7 @@ To permanently update the Replit workflow to use HTTP mode:
 1. Open the `.replit` file in the Replit editor
 2. Change the command in the workflow from:
    ```
-   gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --reuse-port --reload main:app
+   gunicorn --bind 0.0.0.0:5000 --certfile=certs/cert.pem --keyfile=certs/key.pem --reuse-port --reload main:app
    ```
    to:
    ```

@@ -5,7 +5,7 @@ To properly run the Art Critique application in Replit, update the workflow conf
 1. Open `.replit` file in the Replit editor
 2. Change the following line:
    ```
-   args = "gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --reuse-port --reload main:app"
+   args = "gunicorn --bind 0.0.0.0:5000 --certfile=certs/cert.pem --keyfile=certs/key.pem --reuse-port --reload main:app"
    ```
    
    To:

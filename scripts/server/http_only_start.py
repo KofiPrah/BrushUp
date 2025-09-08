@@ -6,6 +6,10 @@ import os
 import sys
 import subprocess
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem')
+
 def main():
     # Force HTTP mode
     os.environ['DJANGO_INSECURE'] = 'true'
@@ -16,15 +20,16 @@ def main():
     os.environ['PYTHONUNBUFFERED'] = '1'
     
     # Disable SSL by creating empty certificate files
-    if os.path.exists('cert.pem'):
-        os.rename('cert.pem', 'cert.pem.disabled')
-    if os.path.exists('key.pem'):
-        os.rename('key.pem', 'key.pem.disabled')
-    
+    os.makedirs(CERT_DIR, exist_ok=True)
+    if os.path.exists(CERT_FILE):
+        os.rename(CERT_FILE, f"{CERT_FILE}.disabled")
+    if os.path.exists(KEY_FILE):
+        os.rename(KEY_FILE, f"{KEY_FILE}.disabled")
+
     # Create empty certificate files
-    with open('cert.pem', 'w') as f:
+    with open(CERT_FILE, 'w') as f:
         f.write('')
-    with open('key.pem', 'w') as f:
+    with open(KEY_FILE, 'w') as f:
         f.write('')
     
     # Print startup message

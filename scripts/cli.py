@@ -12,11 +12,14 @@ import subprocess
 import sys
 from pathlib import Path
 
+CERT_DIR = Path('certs')
+
 
 def _ensure_disabled_ssl():
     """Rename existing cert files and create empty placeholders."""
+    CERT_DIR.mkdir(exist_ok=True)
     for name in ("cert.pem", "key.pem"):
-        path = Path(name)
+        path = CERT_DIR / name
         disabled = path.with_suffix(path.suffix + ".disabled")
         if path.exists() and not disabled.exists():
             path.rename(disabled)
@@ -53,7 +56,12 @@ def serve(args: argparse.Namespace) -> None:
             app,
         ]
         if args.protocol == "https" and args.ssl:
-            cmd.extend(["--certfile", "cert.pem", "--keyfile", "key.pem"])
+            cmd.extend([
+                "--certfile",
+                str(CERT_DIR / "cert.pem"),
+                "--keyfile",
+                str(CERT_DIR / "key.pem"),
+            ])
     else:  # daphne for ASGI/websockets
         app = args.app or "artcritique.asgi:application"
         cmd = [

@@ -9,6 +9,7 @@ import sys
 import subprocess
 import signal
 import time
+from pathlib import Path
 
 # Configure environment variables
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'artcritique.settings')
@@ -62,9 +63,11 @@ except:
     pass
 
 # Create dummy certificate files to prevent errors
-with open('cert.pem', 'w') as f:
+cert_dir = Path('certs')
+cert_dir.mkdir(exist_ok=True)
+with open(cert_dir / 'cert.pem', 'w') as f:
     f.write('# Dummy certificate\n')
-with open('key.pem', 'w') as f:
+with open(cert_dir / 'key.pem', 'w') as f:
     f.write('# Dummy key\n')
 
 # Launch Django's built-in development server

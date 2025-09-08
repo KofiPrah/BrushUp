@@ -9,6 +9,10 @@ import sys
 import signal
 import subprocess
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem.disabled')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem.disabled')
+
 def print_header(message):
     """Print a formatted header"""
     print("\n" + "=" * 80)
@@ -27,9 +31,10 @@ def main():
     signal.signal(signal.SIGTERM, signal_handler)
     
     # Clear the SSL certificate files to ensure they don't interfere
-    with open('cert.pem.disabled', 'w') as f:
+    os.makedirs(CERT_DIR, exist_ok=True)
+    with open(CERT_FILE, 'w') as f:
         f.write('DISABLED')
-    with open('key.pem.disabled', 'w') as f:
+    with open(KEY_FILE, 'w') as f:
         f.write('DISABLED')
     
     # Set up HTTP environment

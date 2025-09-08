@@ -8,6 +8,10 @@ import os
 import sys
 import signal
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem')
+
 def signal_handler(sig, frame):
     """Handle termination signals gracefully"""
     print("\nShutting down server...")
@@ -28,10 +32,11 @@ def main():
     os.environ['HTTP_ONLY'] = 'true'
     
     # Disable SSL certificates
-    if os.path.exists('cert.pem'):
-        os.rename('cert.pem', 'cert.pem.bak')
-    if os.path.exists('key.pem'):
-        os.rename('key.pem', 'key.pem.bak')
+    os.makedirs(CERT_DIR, exist_ok=True)
+    if os.path.exists(CERT_FILE):
+        os.rename(CERT_FILE, f"{CERT_FILE}.bak")
+    if os.path.exists(KEY_FILE):
+        os.rename(KEY_FILE, f"{KEY_FILE}.bak")
     
     # Print banner
     print("\n" + "=" * 70)

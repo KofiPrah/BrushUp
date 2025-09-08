@@ -6,6 +6,10 @@ import os
 import sys
 import signal
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem')
+
 # Signal handler for graceful shutdown
 def signal_handler(sig, frame):
     print("\nShutting down server...")
@@ -29,10 +33,11 @@ def run_server():
     print("Starting Django development server on port 5000")
     
     # Make empty certificate files to avoid errors
-    if os.path.exists('cert.pem'):
-        os.rename('cert.pem', 'cert.pem.bak')
-    if os.path.exists('key.pem'):
-        os.rename('key.pem', 'key.pem.bak')
+    os.makedirs(CERT_DIR, exist_ok=True)
+    if os.path.exists(CERT_FILE):
+        os.rename(CERT_FILE, f"{CERT_FILE}.bak")
+    if os.path.exists(KEY_FILE):
+        os.rename(KEY_FILE, f"{KEY_FILE}.bak")
     
     # Directly use Django's runserver
     from django.core.management import execute_from_command_line

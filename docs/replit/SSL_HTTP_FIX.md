@@ -13,7 +13,7 @@ You need to reconfigure the Replit workflow to use HTTP mode:
    ```
    [[workflows.workflow.tasks]]
    task = "shell.exec"
-   args = "gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --reuse-port --reload main:app"
+   args = "gunicorn --bind 0.0.0.0:5000 --certfile=certs/cert.pem --keyfile=certs/key.pem --reuse-port --reload main:app"
    waitForPort = 5000
    ```
 

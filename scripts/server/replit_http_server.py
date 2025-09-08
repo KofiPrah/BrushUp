@@ -9,18 +9,21 @@ import sys
 import subprocess
 from pathlib import Path
 
+CERT_DIR = Path('certs')
+
 def main():
     """Run the Django server in HTTP mode"""
     print("Starting Brush Up application in HTTP mode...")
     
     # Create empty certificate files if they don't exist
-    cert_file = Path("cert.pem")
-    key_file = Path("key.pem")
-    
+    CERT_DIR.mkdir(exist_ok=True)
+    cert_file = CERT_DIR / "cert.pem"
+    key_file = CERT_DIR / "key.pem"
+
     if not cert_file.exists():
         print("Creating empty cert.pem")
         cert_file.touch()
-    
+
     if not key_file.exists():
         print("Creating empty key.pem")
         key_file.touch()
