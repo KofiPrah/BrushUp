@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
-"""
-HTTP-only main file for workflow use
-
-This script runs the HTTP-only version of the Brush Up application
-without requiring SSL certificates.
-"""
-import os
+"""HTTP-only main file for workflow use."""
+from pathlib import Path
 import subprocess
-import sys
 
-# Run our HTTP-only startup script
-subprocess.run(["./run.sh"])
+# Run our HTTP-only startup script relative to repository root
+run_script = Path(__file__).resolve().parent.parent / "run.sh"
+subprocess.run([str(run_script)])

@@ -57,7 +57,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "./run_http.sh"
+args = "./scripts/run_http.sh"
 waitForPort = 5000
 
 [[ports]]

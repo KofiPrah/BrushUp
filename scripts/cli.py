@@ -40,9 +40,10 @@ def serve(args: argparse.Namespace) -> None:
         _ensure_disabled_ssl()
 
     # optional workflow pre-steps
+    script_dir = Path(__file__).resolve().parent
     if args.workflow:
-        subprocess.run([sys.executable, "fix_karma_db.py"], check=False)
-        subprocess.run([sys.executable, "fix_critique_serializer.py"], check=False)
+        subprocess.run([sys.executable, str(script_dir / "fix_karma_db.py")], check=False)
+        subprocess.run([sys.executable, str(script_dir / "fix_critique_serializer.py")], check=False)
 
     if args.server == "django":
         env.setdefault("DJANGO_SETTINGS_MODULE", "artcritique.settings")

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Simple wrapper to run the art critique application
+# This file exists for ease of use
+
+# Run the main script relative to this file
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$SCRIPT_DIR/run_art_critique.sh" "$@"

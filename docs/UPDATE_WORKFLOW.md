@@ -18,7 +18,7 @@ To fix SSL/HTTP compatibility issues with Replit's load balancer, follow these s
 You can also run the application manually with:
 
 ```
-./run_http_only.sh
+./scripts/run_http_only.sh
 ```
 
 This script will:
@@ -41,7 +41,7 @@ If your application is configured to use SSL/HTTPS internally, it will reject th
 [SSL: HTTP_REQUEST] http request (_ssl.c:2580)
 ```
 
-The `run_in_http_mode.py` and `run_http_only.sh` scripts fix this by:
+The `run_in_http_mode.py` and `scripts/run_http_only.sh` scripts fix this by:
 - Setting the SSL_ENABLED environment variable to false
 - Configuring Gunicorn to listen on HTTP instead of HTTPS
 - Removing SSL certificate configuration (--certfile, --keyfile)

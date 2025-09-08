@@ -1,6 +1,0 @@
-#!/bin/bash
-# Simple wrapper to run the art critique application
-# This file exists for ease of use
-
-# Run the main script
-exec ./run_art_critique.sh "$@"
