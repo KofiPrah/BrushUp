@@ -9,6 +9,8 @@ import sys
 import subprocess
 import signal
 
+CERT_DIR = 'certs'
+
 def signal_handler(sig, frame):
     """Handle termination signals"""
     print("\nShutting down server...")
@@ -26,8 +28,9 @@ def main():
     subprocess.run("pkill -f 'gunicorn|runserver' || true", shell=True)
     
     # Create empty certificate files
+    os.makedirs(CERT_DIR, exist_ok=True)
     for filename in ['cert.pem', 'key.pem']:
-        with open(filename, 'w') as f:
+        with open(os.path.join(CERT_DIR, filename), 'w') as f:
             f.write("")
     
     # Configure environment for HTTP-only mode

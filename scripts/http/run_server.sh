@@ -75,5 +75,5 @@ if [ "$USE_HTTP" = true ]; then
 else
   # Run Gunicorn with SSL certificates
   echo "Starting Gunicorn with SSL certificates..."
-  exec gunicorn --bind 0.0.0.0:5000 --certfile=cert.pem --keyfile=key.pem --workers=1 --threads=2 --reload main:app
+  exec gunicorn --bind 0.0.0.0:5000 --certfile=certs/cert.pem --keyfile=certs/key.pem --workers=1 --threads=2 --reload main:app
 fi

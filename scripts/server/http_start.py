@@ -7,6 +7,10 @@ import sys
 import signal
 import subprocess
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem')
+
 # Signal handler for graceful shutdown
 def signal_handler(sig, frame):
     print("\nShutting down server...")
@@ -23,9 +27,10 @@ def main():
     print("=" * 70)
     
     # Disable SSL by making empty certificate files
-    with open('cert.pem', 'w') as f:
+    os.makedirs(CERT_DIR, exist_ok=True)
+    with open(CERT_FILE, 'w') as f:
         f.write('')
-    with open('key.pem', 'w') as f:
+    with open(KEY_FILE, 'w') as f:
         f.write('')
     
     # Set environment variables

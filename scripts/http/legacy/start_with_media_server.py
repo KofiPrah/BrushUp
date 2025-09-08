@@ -53,8 +53,8 @@ def main():
         # Start the main Django application with gunicorn
         print("Starting main application...")
         main_process = subprocess.Popen(
-            ["gunicorn", "--bind", "0.0.0.0:5000", "--certfile=cert.pem", 
-             "--keyfile=key.pem", "--reuse-port", "--reload", "main:app"],
+            ["gunicorn", "--bind", "0.0.0.0:5000", "--certfile=certs/cert.pem",
+             "--keyfile=certs/key.pem", "--reuse-port", "--reload", "main:app"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True

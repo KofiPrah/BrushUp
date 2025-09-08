@@ -28,6 +28,13 @@ run = [
 3. SSL/HTTPS is handled by Replit's infrastructure
 4. The application runs in HTTP mode internally
 
+## Certificate Handling
+
+SSL certificates should be placed in the `certs/` directory at the project
+root. This folder is ignored by Git (except for a placeholder) so sensitive
+keys aren't committed. Server scripts now look for `certs/cert.pem` and
+`certs/key.pem`; create or upload your certificates there if HTTPS is required.
+
 ## Manual Setup Instructions
 
 If needed, you can manually run the server with:

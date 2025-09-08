@@ -10,6 +10,10 @@ import subprocess
 import signal
 import time
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem')
+
 def main():
     """Run Django in HTTP mode without SSL"""
     # Set Django environment variables
@@ -24,12 +28,13 @@ def main():
     print("=" * 70)
     
     # Make sure we don't use SSL
-    if os.path.exists('cert.pem'):
-        os.rename('cert.pem', 'cert.pem.bak')
+    os.makedirs(CERT_DIR, exist_ok=True)
+    if os.path.exists(CERT_FILE):
+        os.rename(CERT_FILE, f"{CERT_FILE}.bak")
         print("Renamed cert.pem to cert.pem.bak")
-    
-    if os.path.exists('key.pem'):
-        os.rename('key.pem', 'key.pem.bak')
+
+    if os.path.exists(KEY_FILE):
+        os.rename(KEY_FILE, f"{KEY_FILE}.bak")
         print("Renamed key.pem to key.pem.bak")
     
     # Start Django server directly

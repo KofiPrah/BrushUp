@@ -19,3 +19,6 @@ db.sqlite3
 
 # Node/JS (if hybrid)
 node_modules/
+# SSL Certificates
+certs/*
+!certs/.gitkeep

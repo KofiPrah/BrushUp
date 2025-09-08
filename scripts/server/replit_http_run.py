@@ -7,6 +7,10 @@ import sys
 import signal
 import subprocess
 
+CERT_DIR = 'certs'
+CERT_FILE = os.path.join(CERT_DIR, 'cert.pem')
+KEY_FILE = os.path.join(CERT_DIR, 'key.pem')
+
 def signal_handler(sig, frame):
     """Handle termination signals gracefully"""
     print("\nShutting down server...")
@@ -26,10 +30,9 @@ def main():
     
     # Remove SSL certificates
     try:
-        if os.path.exists('cert.pem'):
-            os.remove('cert.pem')
-        if os.path.exists('key.pem'):
-            os.remove('key.pem')
+        for path in [CERT_FILE, KEY_FILE]:
+            if os.path.exists(path):
+                os.remove(path)
     except Exception as e:
         print(f"Error removing SSL certificates: {e}")
     
