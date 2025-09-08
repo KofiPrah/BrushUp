@@ -7,7 +7,7 @@ This script tests the role-based permissions by:
 3. Printing the results to verify permissions are working
 
 Usage:
-    python scripts/utility/test_permissions.py
+    python tests/auth/test_permissions.py
 """
 
 import os
@@ -168,3 +168,4 @@ def test_permissions():
 
 if __name__ == "__main__":
     test_permissions()
+

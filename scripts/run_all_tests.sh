@@ -30,6 +30,7 @@ run_auth_tests() {
   print_header "Running Authentication Tests"
   python tests/auth/test_auth_api.py
   python tests/auth/test_auth_image_upload.py
+  python tests/auth/test_permissions.py
 }
 
 # S3 Tests
