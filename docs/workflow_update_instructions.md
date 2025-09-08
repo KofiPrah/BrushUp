@@ -20,7 +20,7 @@ Invalid request from ip=127.0.0.1: [SSL: HTTP_REQUEST] http request (_ssl.c:2580
 3. Edit the **Start application** workflow
 4. Change the command to:
    ```
-   ./run_http_only.sh
+   ./scripts/run_http_only.sh
    ```
 5. Click Save
 
@@ -28,7 +28,7 @@ Invalid request from ip=127.0.0.1: [SSL: HTTP_REQUEST] http request (_ssl.c:2580
 
 You can also run the application manually with:
 ```
-./run_http_only.sh
+./scripts/run_http_only.sh
 ```
 
 ## Technical Details

@@ -11,7 +11,7 @@ Replit's load balancer handles SSL termination before requests reach our applica
 1. Run the application with the HTTP-only script:
 
 ```bash
-./start_http_server.sh
+./scripts/http/start_http_server.sh
 ```
 
 This script:
@@ -23,7 +23,7 @@ This script:
 
 - `http_main.py` - Entry point that loads HTTP settings
 - `http_server_settings.py` - HTTP configuration module
-- `start_http_server.sh` - Script to start the server in HTTP mode
+- `scripts/http/start_http_server.sh` - Script to start the server in HTTP mode
 
 ## Updating the Workflow
 
@@ -36,7 +36,7 @@ To permanently update the Replit workflow to use HTTP mode:
    ```
    to:
    ```
-   ./start_http_server.sh
+   ./scripts/http/start_http_server.sh
    ```
 
 3. Set the `SSL_ENABLED` environment variable to `false`

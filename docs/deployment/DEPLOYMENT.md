@@ -40,7 +40,7 @@ keys aren't committed. Server scripts now look for `certs/cert.pem` and
 If needed, you can manually run the server with:
 
 ```bash
-./run.sh
+./scripts/run.sh
 ```
 
 The script automatically uses the PORT environment variable or defaults to port 5000 if not defined.

@@ -10,7 +10,7 @@ To properly run the Art Critique application in Replit, update the workflow conf
    
    To:
    ```
-   args = "./run_app --http"
+   args = "./scripts/run_app --http"
    ```
 
 3. Set the environment variables:

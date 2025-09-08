@@ -45,5 +45,5 @@ bash scripts/s3/utils/setup_s3_env.sh
 Or use the main test runner:
 
 ```bash
-./run_app --test=s3
+./scripts/run_app --test=s3
 ```

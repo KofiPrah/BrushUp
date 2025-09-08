@@ -7,6 +7,8 @@ This directory contains scripts for running, managing, and fixing the Art Critiq
 ### HTTP Scripts (`scripts/http/`)
 Scripts for HTTP server configuration and management:
 - `run_server.sh`: Main script to run the HTTP server
+- `start_http.sh`: Simple HTTP start script
+- `start_http_server.sh`: Start server in HTTP mode
 - `config/`: HTTP server configuration files
 - `modules/`: HTTP Python modules
 - `runners/`: HTTP server runner implementations
@@ -37,36 +39,38 @@ Scripts for managing Replit workflow configuration:
 
 ## Main Scripts
 
-The following scripts are available in the root directory for easy access:
+The following scripts live in the `scripts/` directory:
 
 - `run_app`: Main entry point for the application
 - `run_art_critique.sh`: Full-featured runner with options
-- `run_server.sh`: Simplified server runner
+- `run.sh`: Legacy wrapper that starts the HTTP-mode server
+- `run_http.sh`: Start the server in HTTP mode after applying fixes
+- `run_http_only.sh`: Minimal HTTP server launcher
 
 ## Running the Application
 
 ```bash
 # Start the application with default options (HTTP mode)
-./run_app
+./scripts/run_app
 
 # Specify options (HTTP mode with S3 storage)
-./run_app --http --with-s3
+./scripts/run_app --http --with-s3
 
 # Run tests
-./run_app --test
-./run_app --test=http  # Run only HTTP tests
+./scripts/run_app --test
+./scripts/run_app --test=http  # Run only HTTP tests
 ```
 
 ## Common Tasks
 
 ### Starting the Server
 ```bash
-./run_app
+./scripts/run_app
 ```
 
 ### Running Tests
 ```bash
-./run_app --test
+./scripts/run_app --test
 ```
 
 ### Fixing S3 Issues
